@@ -1,5 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
-import { OrderDetail } from '@/views/OrderDetail'
+import { Account } from '@/views/Account'
 
 type Props = { params: Promise<{ orderId: string }> }
 
@@ -14,5 +14,5 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default function OrderDetailPage() {
-  return <OrderDetail />
+  return <Account />
 }

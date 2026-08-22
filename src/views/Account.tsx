@@ -13,18 +13,14 @@ import { ProductGridSkeleton, ListRowSkeleton, ContentSkeleton } from '../compon
 import { useToast } from '../context/ToastContext'
 import { triggerPdfDownload } from '../lib/downloads'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { StatusBadge, type OrderRow } from '../components/StatusBadge'
 import { Wishlist } from './Wishlist'
+import { OrderDetail } from './OrderDetail'
+import { subscribeToNewsletter } from '../lib/newsletter'
 import type { Purchase, Product } from '../lib/types'
 
-export type OrderRow = {
-  id: string
-  lemon_order_id: string
-  amount: number
-  currency: string
-  status: string
-  product_ids: string[]
-  created_at: string
-}
+export type { OrderRow } from '../components/StatusBadge'
+export { StatusBadge } from '../components/StatusBadge'
 
 const BRAND = '#0f3fc9'
 const BRAND_SOFT = '#e8eefc'
@@ -34,11 +30,24 @@ const NAV_ITEMS: { to: string; label: string; icon: string; end?: boolean }[] = 
   { to: '/account/orders', label: 'Orders', icon: 'receipt_long' },
   { to: '/account/downloads', label: 'Downloads', icon: 'download' },
   { to: '/account/wishlist', label: 'Wishlist', icon: 'favorite' },
+  { to: '/account/addresses', label: 'Addresses', icon: 'home' },
   { to: '/account/profile', label: 'Account Settings', icon: 'settings' },
+  { to: '/account/newsletter', label: 'Newsletter', icon: 'mail' },
 ]
 
+const PAGE_TITLES: Record<string, string> = {
+  '/account': 'Dashboard',
+  '/account/orders': 'Orders',
+  '/account/downloads': 'Downloads',
+  '/account/wishlist': 'Wishlist',
+  '/account/addresses': 'Addresses',
+  '/account/profile': 'Account Settings',
+  '/account/newsletter': 'Newsletter',
+  '/account/logout': 'Log Out',
+}
+
 export function Account() {
-  const { user, profile, signOut, loading } = useAuth()
+  const { user, profile, loading } = useAuth()
   const pathname = usePathname()
 
   if (loading) return <ContentSkeleton />
@@ -52,13 +61,31 @@ export function Account() {
   }
 
   const firstName = profile?.first_name
+  const isOrderDetail = /^\/account\/orders\/[^/]+$/.test(pathname ?? '')
+  const crumbLabel = isOrderDetail
+    ? 'Order Details'
+    : (PAGE_TITLES[pathname ?? ''] ?? 'My Account')
 
   return (
     <div className="max-w-[1400px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
         <span>›</span>
-        <span className="text-ink">My Account</span>
+        <Link href="/account" className="hover:text-ink">My Account</Link>
+        {pathname !== '/account' && pathname !== '/account/' && (
+          <>
+            <span>›</span>
+            {isOrderDetail ? (
+              <>
+                <Link href="/account/orders" className="hover:text-ink">Orders</Link>
+                <span>›</span>
+                <span className="text-ink">Details</span>
+              </>
+            ) : (
+              <span className="text-ink">{crumbLabel}</span>
+            )}
+          </>
+        )}
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
@@ -68,8 +95,8 @@ export function Account() {
             {NAV_ITEMS.map((t) => {
               const active = t.end
                 ? pathname === '/account'
-                : t.to === '/account/wishlist'
-                  ? pathname === '/account/wishlist'
+                : t.to === '/account/orders'
+                  ? pathname === '/account/orders' || isOrderDetail
                   : pathname === t.to || pathname.startsWith(t.to + '/')
               return (
                 <Link
@@ -85,13 +112,16 @@ export function Account() {
                 </Link>
               )
             })}
-            <button
-              onClick={signOut}
-              className="shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] text-ink-soft hover:text-madder hover:bg-surface text-left w-full"
+            <Link
+              href="/account/logout"
+              className={`shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] transition-colors ${
+                pathname === '/account/logout' ? 'font-medium' : 'text-ink-soft hover:text-madder hover:bg-surface'
+              }`}
+              style={pathname === '/account/logout' ? { background: '#F5E6E6', color: 'var(--color-madder)' } : undefined}
             >
-              <MaterialIcon name="logout" size={18} />
+              <MaterialIcon name="logout" size={18} color={pathname === '/account/logout' ? 'var(--color-madder)' : 'var(--color-ink-soft)'} />
               Log Out
-            </button>
+            </Link>
           </nav>
 
           <div className="hidden lg:block rounded-2xl p-5" style={{ background: BRAND_SOFT }}>
@@ -124,6 +154,9 @@ export function Account() {
               </div>
             </div>
           )}
+          {pathname !== '/account' && pathname !== '/account/' && !isOrderDetail && pathname !== '/account/wishlist' && (
+            <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
+          )}
           <AccountContent />
         </div>
       </div>
@@ -133,7 +166,8 @@ export function Account() {
 
 /** Renders account tab content based on the current URL pathname. */
 function AccountContent() {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''
+  if (/^\/account\/orders\/[^/]+$/.test(pathname)) return <OrderDetail embedded />
   switch (pathname) {
     case '/account/orders':
       return <MyOrders />
@@ -141,6 +175,12 @@ function AccountContent() {
       return <Downloads />
     case '/account/wishlist':
       return <Wishlist embedded />
+    case '/account/addresses':
+      return <AddressesPage />
+    case '/account/newsletter':
+      return <NewsletterPrefs />
+    case '/account/logout':
+      return <LogoutConfirm />
     case '/account/profile':
       return <ProfileTab />
     default:
@@ -194,7 +234,7 @@ function Dashboard() {
     { href: '/shop?price=free', icon: 'redeem', title: 'Free Patterns', desc: 'Start stitching for free' },
     { href: '/account/downloads', icon: 'folder_open', title: 'My Downloads', desc: 'Re-download your PDFs' },
     { href: '/account/profile', icon: 'person', title: 'Edit Profile', desc: 'Update your details' },
-    { href: '/account/profile#billing', icon: 'location_on', title: 'Addresses', desc: 'Billing information' },
+    { href: '/account/addresses', icon: 'location_on', title: 'Addresses', desc: 'Billing information' },
     { href: '/contact', icon: 'mail', title: 'Support', desc: 'Get help from us' },
   ]
 
@@ -331,15 +371,6 @@ function Dashboard() {
   )
 }
 
-export function StatusBadge({ status }: { status: string }) {
-  const style =
-    status === 'paid' ? { background: BRAND_SOFT, color: BRAND } :
-    status === 'refunded' ? { background: '#F5E6E6', color: 'var(--color-madder)' } :
-    { background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }
-  const label = status === 'paid' ? 'Completed' : status === 'refunded' ? 'Refunded' : 'Pending'
-  return <span className="text-[10px] tracking-wide px-2.5 py-1 rounded-full font-medium" style={style}>{label}</span>
-}
-
 function MyOrders() {
   const { user } = useAuth()
   const [orders, setOrders] = useState<OrderRow[]>([])
@@ -353,19 +384,28 @@ function MyOrders() {
   }, [user])
 
   const filtered = filter === 'all' ? orders : orders.filter((o) => o.status === filter)
+  const filters: { key: typeof filter; label: string }[] = [
+    { key: 'all', label: 'All Orders' },
+    { key: 'paid', label: 'Completed' },
+    { key: 'pending', label: 'Processing' },
+    { key: 'refunded', label: 'Refunded' },
+  ]
 
   if (loading) return <ListRowSkeleton />
 
   return (
     <div>
-      <div className="flex gap-6 border-b border-line mb-6 text-[12px] tracking-[0.08em]">
-        {(['all', 'paid', 'pending', 'refunded'] as const).map((f) => (
+      <div className="flex gap-1 sm:gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {filters.map((f) => (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`pb-3 border-b-2 -mb-px ${filter === f ? 'border-ink text-ink' : 'border-transparent text-ink-soft hover:text-ink'}`}
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className="shrink-0 px-4 py-2 rounded-full text-[12px] font-medium transition-colors"
+            style={filter === f.key
+              ? { background: BRAND, color: '#fff' }
+              : { background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
           >
-            {f === 'all' ? 'ALL ORDERS' : f.toUpperCase()}
+            {f.label}
           </button>
         ))}
       </div>
@@ -383,25 +423,40 @@ function MyOrders() {
           <p className="text-[13px] text-ink-soft">No orders in this view.</p>
         )
       ) : (
-        <div className="bg-white border border-line rounded-2xl divide-y divide-line overflow-hidden">
-          {filtered.map((o) => (
-            <div key={o.id} className="px-5 py-4">
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <p className="text-[13px] font-medium">Order #{o.lemon_order_id}</p>
-                  <p className="text-[11px] text-ink-soft mt-0.5">{new Date(o.created_at).toLocaleDateString()} · {o.product_ids?.length ?? 0} item{(o.product_ids?.length ?? 0) === 1 ? '' : 's'}</p>
-                </div>
-                <span className="text-[13px] font-medium shrink-0">${o.amount.toFixed(2)}</span>
-                <StatusBadge status={o.status} />
-                <Link
-                  href={`/account/orders/${o.id}`}
-                  className="text-[11px] text-ink-soft hover:text-ink underline underline-offset-2 shrink-0"
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px] min-w-[560px]">
+              <thead>
+                <tr className="text-left text-[11px] tracking-[0.06em] text-ink-soft border-b border-line bg-surface/50">
+                  <th className="px-5 py-3 font-medium">Order</th>
+                  <th className="px-3 py-3 font-medium">Date</th>
+                  <th className="px-3 py-3 font-medium">Items</th>
+                  <th className="px-3 py-3 font-medium">Total</th>
+                  <th className="px-3 py-3 font-medium">Status</th>
+                  <th className="px-5 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {filtered.map((o) => (
+                  <tr key={o.id} className="hover:bg-surface/40">
+                    <td className="px-5 py-4 font-medium">#{o.lemon_order_id || o.id.slice(0, 8)}</td>
+                    <td className="px-3 py-4 text-ink-soft">{new Date(o.created_at).toLocaleDateString()}</td>
+                    <td className="px-3 py-4 text-ink-soft">{o.product_ids?.length ?? 0}</td>
+                    <td className="px-3 py-4 font-medium">${o.amount.toFixed(2)}</td>
+                    <td className="px-3 py-4"><StatusBadge status={o.status} /></td>
+                    <td className="px-5 py-4 text-right">
+                      <Link
+                        href={`/account/orders/${o.id}`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] rounded-lg border border-line hover:bg-surface"
+                      >
+                        VIEW
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
@@ -446,30 +501,50 @@ function Downloads() {
   )
 
   return (
-    <div className="border border-line rounded-2xl overflow-hidden bg-white divide-y divide-line">
-      {purchases.map((p) => (
-        <div key={p.id} className="flex items-center gap-4 p-3">
-          <Link href={p.product ? `/pattern/${p.product.slug}` : '#'} className="w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-surface">
-            {p.product?.images?.[0] ? (
-              <img src={deriveVariantUrl(p.product.images[0], 'micro')} alt={p.product.title} loading="lazy" className="w-full h-full object-cover" />
-            ) : null}
-          </Link>
-          <div className="flex-1 min-w-0">
-            <Link href={p.product ? `/pattern/${p.product.slug}` : '#'} className="block text-[13px] font-medium truncate hover:underline underline-offset-2">
-              {p.product?.title}
-            </Link>
-            <p className="text-[11px] text-ink-soft">Purchased {new Date(p.purchase_date).toLocaleDateString()}</p>
-          </div>
-          <button
-            onClick={() => download(p.product_id, p.product?.title)}
-            disabled={downloading === p.product_id}
-            className="shrink-0 px-4 py-2 text-canvas text-[11px] font-semibold tracking-[0.06em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-            style={{ background: 'var(--color-accent)' }}
-          >
-            {downloading === p.product_id ? '…' : 'DOWNLOAD'}
-          </button>
-        </div>
-      ))}
+    <div className="bg-white border border-line rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="overflow-x-auto">
+        <table className="w-full text-[13px] min-w-[520px]">
+          <thead>
+            <tr className="text-left text-[11px] tracking-[0.06em] text-ink-soft border-b border-line bg-surface/50">
+              <th className="px-5 py-3 font-medium">Product</th>
+              <th className="px-3 py-3 font-medium">Purchased</th>
+              <th className="px-3 py-3 font-medium">File</th>
+              <th className="px-5 py-3 font-medium text-right">Download</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {purchases.map((p) => (
+              <tr key={p.id} className="hover:bg-surface/40">
+                <td className="px-5 py-3.5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Link href={p.product ? `/pattern/${p.product.slug}` : '#'} className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-surface">
+                      {p.product?.images?.[0] ? (
+                        <img src={deriveVariantUrl(p.product.images[0], 'micro')} alt={p.product.title} loading="lazy" className="w-full h-full object-cover" />
+                      ) : null}
+                    </Link>
+                    <Link href={p.product ? `/pattern/${p.product.slug}` : '#'} className="font-medium truncate hover:underline underline-offset-2 max-w-[220px]">
+                      {p.product?.title ?? 'Pattern'}
+                    </Link>
+                  </div>
+                </td>
+                <td className="px-3 py-3.5 text-ink-soft whitespace-nowrap">{new Date(p.purchase_date).toLocaleDateString()}</td>
+                <td className="px-3 py-3.5 text-ink-soft">PDF Pattern</td>
+                <td className="px-5 py-3.5 text-right">
+                  <button
+                    onClick={() => download(p.product_id, p.product?.title)}
+                    disabled={downloading === p.product_id}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-canvas text-[11px] font-semibold tracking-[0.06em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                    style={{ background: BRAND }}
+                  >
+                    <MaterialIcon name="download" size={14} />
+                    {downloading === p.product_id ? '…' : 'DOWNLOAD'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
@@ -487,18 +562,11 @@ const COUNTRIES: [string, string][] = [
 function ProfileTab() {
   const { user, profile, refreshProfile } = useAuth()
   const { showToast } = useToast()
+  const [settingsTab, setSettingsTab] = useState<'profile' | 'password'>('profile')
   const [firstName, setFirstName] = useState(profile?.first_name ?? '')
   const [lastName, setLastName] = useState(profile?.last_name ?? '')
   const [editingName, setEditingName] = useState(false)
   const [nameSaving, setNameSaving] = useState(false)
-  const [billingCountry, setBillingCountry] = useState(profile?.billing_country ?? '')
-  const [billingAddressLine1, setBillingAddressLine1] = useState(profile?.billing_address_line1 ?? '')
-  const [billingCity, setBillingCity] = useState(profile?.billing_city ?? '')
-  const [billingState, setBillingState] = useState(profile?.billing_state ?? '')
-  const [billingZip, setBillingZip] = useState(profile?.billing_zip ?? '')
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [touched, setTouched] = useState(false)
 
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -509,13 +577,7 @@ function ProfileTab() {
   useEffect(() => {
     setFirstName(profile?.first_name ?? '')
     setLastName(profile?.last_name ?? '')
-    setBillingCountry(profile?.billing_country ?? '')
-    setBillingAddressLine1(profile?.billing_address_line1 ?? '')
-    setBillingCity(profile?.billing_city ?? '')
-    setBillingState(profile?.billing_state ?? '')
-    setBillingZip(profile?.billing_zip ?? '')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.first_name, profile?.last_name, profile?.billing_country, profile?.billing_address_line1, profile?.billing_city, profile?.billing_state, profile?.billing_zip])
+  }, [profile?.first_name, profile?.last_name])
 
   const NAME_COOLDOWN_DAYS = 7
   const daysSinceNameChange = profile?.name_changed_at ? (Date.now() - new Date(profile.name_changed_at).getTime()) / 86400000 : Infinity
@@ -552,6 +614,176 @@ function ProfileTab() {
     showToast('Name updated.', 'success')
   }
 
+  const changePassword = async () => {
+    setPwMessage(null)
+    if (!oldPassword) { setPwMessage('Enter your current password.'); return }
+    if (newPassword.length < 8) { setPwMessage('New password must be at least 8 characters.'); return }
+    if (newPassword !== confirmPassword) { setPwMessage("New passwords don't match."); return }
+    setPwSaving(true)
+
+    const { error: verifyError } = await supabase.auth.signInWithPassword({ email: user!.email!, password: oldPassword })
+    if (verifyError) {
+      setPwSaving(false)
+      showToast('Current password is incorrect.', 'error')
+      setPwMessage('Current password is incorrect.')
+      return
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    setPwSaving(false)
+    if (error) { showToast(error.message, 'error'); setPwMessage(error.message); return }
+    setOldPassword('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setPwMessage(null)
+    showToast('Password updated.', 'success')
+  }
+
+  return (
+    <div>
+      <div className="flex gap-6 border-b border-line mb-8 text-[12px] tracking-[0.08em]">
+        {([
+          { key: 'profile' as const, label: 'Profile Information' },
+          { key: 'password' as const, label: 'Password' },
+        ]).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setSettingsTab(t.key)}
+            className={`pb-3 border-b-2 -mb-px ${settingsTab === t.key ? 'border-[var(--color-accent)] text-[var(--color-accent)] font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
+          >
+            {t.label.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {settingsTab === 'profile' ? (
+        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-xl space-y-5 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center text-[20px] font-semibold shrink-0" style={{ background: BRAND_SOFT, color: BRAND }}>
+              {(profile?.first_name?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()}
+            </div>
+            <div>
+              <p className="font-medium text-[15px]">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Your Account'}</p>
+              <p className="text-[12px] text-ink-soft">{user?.email}</p>
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="block text-ink-soft text-[11px] tracking-[0.1em]">FIRST NAME</span>
+              {!editingName && (
+                <button onClick={startEditingName} className="text-[11px] tracking-[0.08em] underline underline-offset-2 hover:opacity-70" style={{ color: BRAND }}>
+                  EDIT YOUR NAME
+                </button>
+              )}
+            </div>
+            <input
+              value={firstName}
+              disabled={!editingName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg disabled:bg-surface disabled:text-ink-soft"
+            />
+          </div>
+          <label className="block">
+            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">LAST NAME</span>
+            <input
+              value={lastName}
+              disabled={!editingName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg disabled:bg-surface disabled:text-ink-soft"
+            />
+          </label>
+          {editingName && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={saveName}
+                disabled={nameSaving}
+                className="px-5 py-2 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                style={{ background: BRAND }}
+              >
+                {nameSaving ? 'SAVING…' : 'SAVE NAME'}
+              </button>
+              <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
+            </div>
+          )}
+          {!editingName && nameEditLocked && (
+            <p className="text-[11px] text-ink-soft">You can change your name again in {nameCooldownDaysLeft} day{nameCooldownDaysLeft === 1 ? '' : 's'}.</p>
+          )}
+          <div>
+            <p className="text-ink-soft text-[11px] tracking-[0.1em] mb-1">EMAIL</p>
+            <p>{user?.email}</p>
+            <p className="text-ink-soft text-[11px] mt-1">Contact support to change your email address.</p>
+          </div>
+          <p className="text-[12px] text-ink-soft pt-2 border-t border-line">
+            Manage your billing address under{' '}
+            <Link href="/account/addresses" className="underline underline-offset-2 font-medium" style={{ color: BRAND }}>Addresses</Link>.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-sm space-y-5 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <label className="block">
+            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CURRENT PASSWORD</span>
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
+            />
+          </label>
+          <label className="block">
+            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">NEW PASSWORD</span>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
+            />
+          </label>
+          <label className="block">
+            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CONFIRM NEW PASSWORD</span>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
+            />
+          </label>
+          <button
+            onClick={changePassword}
+            disabled={pwSaving}
+            className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            style={{ background: BRAND }}
+          >
+            {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
+          </button>
+          {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
+          <p className="text-[11px] text-ink-soft">If you signed up with Google, password changes aren&apos;t available here.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AddressesPage() {
+  const { user, profile, refreshProfile } = useAuth()
+  const [billingCountry, setBillingCountry] = useState(profile?.billing_country ?? '')
+  const [billingAddressLine1, setBillingAddressLine1] = useState(profile?.billing_address_line1 ?? '')
+  const [billingCity, setBillingCity] = useState(profile?.billing_city ?? '')
+  const [billingState, setBillingState] = useState(profile?.billing_state ?? '')
+  const [billingZip, setBillingZip] = useState(profile?.billing_zip ?? '')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [touched, setTouched] = useState(false)
+  const [editing, setEditing] = useState(!profile?.billing_country)
+
+  useEffect(() => {
+    setBillingCountry(profile?.billing_country ?? '')
+    setBillingAddressLine1(profile?.billing_address_line1 ?? '')
+    setBillingCity(profile?.billing_city ?? '')
+    setBillingState(profile?.billing_state ?? '')
+    setBillingZip(profile?.billing_zip ?? '')
+    setEditing(!profile?.billing_country)
+  }, [profile?.billing_country, profile?.billing_address_line1, profile?.billing_city, profile?.billing_state, profile?.billing_zip])
+
   const isUS = billingCountry === 'US'
   const zipValid = billingZip.trim() === '' || isValidPostalCode(billingCountry, billingZip)
   const addressValid = isUS
@@ -574,209 +806,162 @@ function ProfileTab() {
     await refreshProfile()
     setSaving(false)
     setSaved(true)
+    setEditing(false)
   }
 
-  const changePassword = async () => {
-    setPwMessage(null)
-    if (!oldPassword) { setPwMessage('Enter your current password.'); return }
-    if (newPassword.length < 8) { setPwMessage('New password must be at least 8 characters.'); return }
-    if (newPassword !== confirmPassword) { setPwMessage("New passwords don't match."); return }
-    setPwSaving(true)
+  const hasAddress = !!profile?.billing_country
 
-    // Verify the current password by re-authenticating before allowing a change.
-    const { error: verifyError } = await supabase.auth.signInWithPassword({ email: user!.email!, password: oldPassword })
-    if (verifyError) {
-      setPwSaving(false)
-      showToast('Current password is incorrect.', 'error')
-      setPwMessage('Current password is incorrect.')
+  return (
+    <div className="space-y-6 max-w-xl">
+      <div className="flex gap-2 mb-2">
+        <span className="px-4 py-2 rounded-full text-[12px] font-medium text-canvas" style={{ background: BRAND }}>Billing Address</span>
+      </div>
+
+      {hasAddress && !editing ? (
+        <div className="bg-white border border-line rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <p className="text-[14px] font-semibold">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Billing'}</p>
+            <span className="text-[10px] tracking-wide px-2.5 py-1 rounded-full font-medium" style={{ background: BRAND_SOFT, color: BRAND }}>Default</span>
+          </div>
+          <div className="text-[13px] text-ink-soft leading-relaxed space-y-0.5">
+            {profile?.billing_country === 'US' ? (
+              <>
+                {profile.billing_address_line1 && <p>{profile.billing_address_line1}</p>}
+                <p>{[profile.billing_city, profile.billing_state, profile.billing_zip].filter(Boolean).join(', ')}</p>
+              </>
+            ) : (
+              profile?.billing_zip && <p>{profile.billing_zip}</p>
+            )}
+            <p>{COUNTRIES.find(([code]) => code === profile?.billing_country)?.[1] ?? profile?.billing_country}</p>
+          </div>
+          <div className="flex gap-3 mt-4 pt-4 border-t border-line">
+            <button onClick={() => setEditing(true)} className="text-[12px] font-medium underline underline-offset-2" style={{ color: BRAND }}>Edit</button>
+          </div>
+        </div>
+      ) : null}
+
+      {(editing || !hasAddress) && (
+        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 space-y-4 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-[13px] text-ink-soft">Saved here fills in automatically at checkout.</p>
+          <label className="block">
+            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">COUNTRY</span>
+            <select
+              value={billingCountry}
+              onChange={(e) => { setBillingCountry(e.target.value); setSaved(false); setTouched(false) }}
+              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
+            >
+              <option value="">Select a country</option>
+              {COUNTRIES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
+            </select>
+          </label>
+          {isUS ? (
+            <>
+              <label className="block">
+                <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">ADDRESS LINE 1</span>
+                <input value={billingAddressLine1} onChange={(e) => { setBillingAddressLine1(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
+              </label>
+              <label className="block">
+                <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">STATE</span>
+                <select value={billingState} onChange={(e) => { setBillingState(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg">
+                  <option value="">Select a state…</option>
+                  {US_STATES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CITY</span>
+                  <input value={billingCity} onChange={(e) => { setBillingCity(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
+                </label>
+                <label className="block">
+                  <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">ZIP</span>
+                  <input value={billingZip} onChange={(e) => { setBillingZip(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
+                </label>
+              </div>
+            </>
+          ) : billingCountry ? (
+            <label className="block">
+              <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">POSTAL CODE</span>
+              <input value={billingZip} onChange={(e) => { setBillingZip(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
+              {touched && !zipValid && <span className="text-[11px] text-madder mt-1 block">Enter a valid postal code.</span>}
+            </label>
+          ) : null}
+          <div className="flex items-center gap-3 pt-2">
+            <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
+              {saving ? 'SAVING…' : 'SAVE ADDRESS'}
+            </button>
+            {hasAddress && <button onClick={() => setEditing(false)} className="text-[11px] text-ink-soft hover:text-ink">CANCEL</button>}
+            {saved && <span className="text-[12px] text-ink-soft">Saved.</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function NewsletterPrefs() {
+  const { user } = useAuth()
+  const { showToast } = useToast()
+  const [subscribed, setSubscribed] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  const save = async () => {
+    if (!user?.email) return
+    if (!subscribed) {
+      showToast('Uncheck and we won’t email you — leave the box checked to stay subscribed.', 'info')
       return
     }
-
-    const { error } = await supabase.auth.updateUser({ password: newPassword })
-    setPwSaving(false)
-    if (error) { showToast(error.message, 'error'); setPwMessage(error.message); return }
-    setOldPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setPwMessage(null)
-    showToast('Password updated.', 'success')
+    setSaving(true)
+    const { ok, error } = await subscribeToNewsletter(user.email)
+    setSaving(false)
+    if (!ok) showToast(error ?? "Couldn't subscribe.", 'error')
+    else showToast('You’re subscribed to the maker newsletter.', 'success')
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-12">
-      <div className="max-w-sm space-y-5 text-[13px]">
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft">PERSONAL INFORMATION</p>
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="block text-ink-soft text-[11px] tracking-[0.1em]">FIRST NAME</span>
-            {!editingName && (
-              <button onClick={startEditingName} className="text-[11px] tracking-[0.08em] text-ink underline underline-offset-2 hover:opacity-70">
-                EDIT YOUR NAME
-              </button>
-            )}
-          </div>
-          <input
-            value={firstName}
-            disabled={!editingName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg disabled:bg-surface disabled:text-ink-soft"
-          />
-        </div>
-        <label className="block">
-          <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">LAST NAME</span>
-          <input
-            value={lastName}
-            disabled={!editingName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg disabled:bg-surface disabled:text-ink-soft"
-          />
-        </label>
-        {editingName && (
-          <div className="flex items-center gap-3">
-            <button
-              onClick={saveName}
-              disabled={nameSaving}
-              className="px-5 py-2 bg-ink text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-85 transition-opacity disabled:opacity-50"
-            >
-              {nameSaving ? 'SAVING…' : 'SAVE NAME'}
-            </button>
-            <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
-          </div>
-        )}
-        {!editingName && nameEditLocked && (
-          <p className="text-[11px] text-ink-soft">You can change your name again in {nameCooldownDaysLeft} day{nameCooldownDaysLeft === 1 ? '' : 's'}.</p>
-        )}
-        <div>
-          <p className="text-ink-soft text-[11px] tracking-[0.1em] mb-1">EMAIL</p>
-          <p>{user?.email}</p>
-          <p className="text-ink-soft text-[11px] mt-1">Contact support to change your email address.</p>
-        </div>
-        <div className="pt-2 border-t border-line" id="billing">
-          <p className="text-ink-soft text-[11px] tracking-[0.1em] mb-3 pt-4">BILLING ADDRESS <span className="normal-case text-ink-soft/80">— saved here fills in automatically at checkout</span></p>
-          <div className="space-y-4">
-            <label className="block">
-              <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">COUNTRY</span>
-              <select
-                value={billingCountry}
-                onChange={(e) => { setBillingCountry(e.target.value); setSaved(false); setTouched(false) }}
-                className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-              >
-                <option value="">Select a country</option>
-                {COUNTRIES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-              </select>
-            </label>
+    <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-lg space-y-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <p className="text-[14px] text-ink-soft leading-relaxed">
+        Get new pattern drops, freebies, and maker tips at <span className="text-ink font-medium">{user?.email}</span>.
+      </p>
+      <label className="flex items-center gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={subscribed}
+          onChange={(e) => setSubscribed(e.target.checked)}
+          className="w-4 h-4 accent-[var(--color-accent)]"
+        />
+        <span className="text-[14px] font-medium">Subscribe to newsletter</span>
+      </label>
+      <button
+        onClick={save}
+        disabled={saving || !subscribed}
+        className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50"
+        style={{ background: BRAND }}
+      >
+        {saving ? 'SAVING…' : 'SAVE PREFERENCES'}
+      </button>
+    </div>
+  )
+}
 
-            {isUS ? (
-              <>
-                <label className="block">
-                  <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">ADDRESS LINE 1</span>
-                  <input
-                    value={billingAddressLine1}
-                    onChange={(e) => { setBillingAddressLine1(e.target.value); setSaved(false) }}
-                    placeholder="Street address"
-                    className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-                  />
-                  {touched && !billingAddressLine1.trim() && <span className="text-[11px] text-madder mt-1 block">Required.</span>}
-                </label>
-                <label className="block">
-                  <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">STATE</span>
-                  <select
-                    value={billingState}
-                    onChange={(e) => { setBillingState(e.target.value); setSaved(false) }}
-                    className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-                  >
-                    <option value="">Select a state…</option>
-                    {US_STATES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-                  </select>
-                  {touched && !billingState.trim() && <span className="text-[11px] text-madder mt-1 block">Required.</span>}
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="block">
-                    <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CITY</span>
-                    <input
-                      value={billingCity}
-                      onChange={(e) => { setBillingCity(e.target.value); setSaved(false) }}
-                      className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-                    />
-                    {touched && !billingCity.trim() && <span className="text-[11px] text-madder mt-1 block">Required.</span>}
-                  </label>
-                  <label className="block">
-                    <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">ZIP</span>
-                    <input
-                      value={billingZip}
-                      onChange={(e) => { setBillingZip(e.target.value); setSaved(false) }}
-                      className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-                    />
-                    {touched && !isValidPostalCode('US', billingZip) && <span className="text-[11px] text-madder mt-1 block">Enter a valid ZIP.</span>}
-                  </label>
-                </div>
-              </>
-            ) : billingCountry ? (
-              <label className="block">
-                <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">POSTAL CODE</span>
-                <input
-                  value={billingZip}
-                  onChange={(e) => { setBillingZip(e.target.value); setSaved(false) }}
-                  className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-                />
-                {touched && !zipValid && <span className="text-[11px] text-madder mt-1 block">Enter a valid postal code.</span>}
-              </label>
-            ) : null}
-          </div>
-        </div>
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            onClick={save}
-            disabled={saving}
-            className="px-6 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-85 transition-opacity disabled:opacity-50"
-          >
-            {saving ? 'SAVING…' : 'SAVE CHANGES'}
-          </button>
-          {saved && <span className="text-[12px] text-ink-soft">Saved.</span>}
-          {touched && billingCountry && !addressValid && !saving && <span className="text-[12px] text-madder">Please fix the highlighted fields.</span>}
-        </div>
+function LogoutConfirm() {
+  const { signOut } = useAuth()
+  return (
+    <div className="bg-white border border-line rounded-2xl p-8 sm:p-12 max-w-md mx-auto text-center shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: BRAND_SOFT }}>
+        <MaterialIcon name="logout" size={28} color={BRAND} />
       </div>
-
-      <div className="max-w-sm space-y-5 text-[13px]">
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft">CHANGE PASSWORD</p>
-        <label className="block">
-          <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CURRENT PASSWORD</span>
-          <input
-            type="password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-          />
-        </label>
-        <label className="block">
-          <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">NEW PASSWORD</span>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-          />
-        </label>
-        <label className="block">
-          <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CONFIRM NEW PASSWORD</span>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg"
-          />
-        </label>
-        <button
-          onClick={changePassword}
-          disabled={pwSaving}
-          className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-          style={{ background: 'var(--color-sale-green)' }}
-        >
-          {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
-        </button>
-        {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
-        <p className="text-[11px] text-ink-soft">Note: if you signed up with Google, you don't have a password to change here — sign-in stays via Google.</p>
-      </div>
+      <h2 className="font-heading font-semibold text-2xl mb-2">Log Out</h2>
+      <p className="text-[14px] text-ink-soft mb-8">Are you sure you want to sign out of your Notion Creative Art account?</p>
+      <button
+        onClick={signOut}
+        className="w-full py-3.5 text-canvas text-[12px] tracking-[0.12em] font-semibold rounded-lg hover:opacity-90 mb-3"
+        style={{ background: BRAND }}
+      >
+        LOG OUT
+      </button>
+      <Link href="/account" className="text-[12px] text-ink-soft hover:text-ink underline underline-offset-2">
+        Cancel — stay signed in
+      </Link>
     </div>
   )
 }
