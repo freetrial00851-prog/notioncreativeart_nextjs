@@ -5,6 +5,12 @@ import { ProductDetail } from '@/views/ProductDetail'
 
 type Props = { params: Promise<{ slug: string }> }
 
+/** Allow product pages added after the last deploy (not only build-time slugs). */
+export const dynamicParams = true
+
+/** Revalidate product pages so newly listed patterns appear without a full redeploy. */
+export const revalidate = 60
+
 /** Server-rendered product metadata — indexable without JavaScript execution. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params

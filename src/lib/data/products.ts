@@ -1,10 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
 import { createStaticClient } from '@/lib/supabase/static'
 import type { Product } from '@/lib/types'
 
-/** Fetches a single active product by slug — used for SSR metadata and preloading. */
+/**
+ * Fetches a single active product by slug.
+ * Uses the anon static client (no cookies) so pattern pages can be statically
+ * rendered / on-demand generated without DYNAMIC_SERVER_USAGE errors.
+ */
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const supabase = await createClient()
+  const supabase = createStaticClient()
   const { data } = await supabase
     .from('products')
     .select('*')
