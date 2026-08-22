@@ -1,13 +1,6 @@
-import { buildMetadata } from '@/lib/seo'
-import { Wishlist } from '@/views/Wishlist'
+import { redirect } from 'next/navigation'
 
-export const metadata = buildMetadata({
-  title: 'Wishlist',
-  description: 'Your saved crochet patterns.',
-  path: '/wishlist',
-  noIndex: true,
-})
-
-export default function WishlistPage() {
-  return <Wishlist />
+/** Keep /wishlist working — account shell lives at /account/wishlist. */
+export default function WishlistRedirectPage() {
+  redirect('/account/wishlist')
 }

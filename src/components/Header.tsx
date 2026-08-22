@@ -450,7 +450,7 @@ export function Header() {
         <div className="flex items-center gap-5 shrink-0">
           <button
             aria-label="Wishlist"
-            onClick={() => requireAuth() && (window.location.href = '/wishlist')}
+            onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
             className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
           >
             <HeartIcon size={20} />
@@ -477,7 +477,7 @@ export function Header() {
                     <Link href="/account" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Dashboard</Link>
                     <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Orders</Link>
                     <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px] lg:hidden">My Downloads</Link>
-                    <Link href="/wishlist" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Wishlist</Link>
+                    <Link href="/account/wishlist" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Wishlist</Link>
                     <Link href="/account/profile" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Profile</Link>
                     <button onClick={() => { signOut(); setDesktopAccountOpen(false) }} className="w-full text-left px-5 py-3 hover:bg-surface text-[13px] text-ink border-t border-line">Logout</button>
                   </div>
@@ -519,7 +519,7 @@ export function Header() {
           </button>
           <button
             aria-label="Wishlist"
-            onClick={() => requireAuth() && (window.location.href = '/wishlist')}
+            onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
             className="w-10 h-10 flex items-center justify-center text-ink"
           >
             <HeartIcon size={19} />
@@ -710,7 +710,7 @@ export function Header() {
                   <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
                     <MaterialIcon name="download" size={18} /> My Downloads
                   </Link>
-                  <Link href="/wishlist" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
+                  <Link href="/account/wishlist" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
                     <HeartIcon size={18} /> Wishlist
                   </Link>
                   <div className="border-t border-line mt-2 pt-2">

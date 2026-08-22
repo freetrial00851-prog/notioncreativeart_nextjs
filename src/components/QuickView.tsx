@@ -76,7 +76,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
     } else {
       await supabase.from('wishlist').upsert({ user_id: user!.id, product_id: product.id })
       setInWishlist(true)
-      showToast('♡ Saved to wishlist', 'success', { label: 'View Wishlist', onClick: () => { onClose(); router.push('/wishlist') } })
+      showToast('♡ Saved to wishlist', 'success', { label: 'View Wishlist', onClick: () => { onClose(); router.push('/account/wishlist') } })
     }
   }
 

@@ -11,7 +11,8 @@ import type { Product } from '../lib/types'
 
 const PAGE_SIZE = 15
 
-export function Wishlist() {
+/** Wishlist grid — use `embedded` inside the account shell so sidebar nav stays visible. */
+export function Wishlist({ embedded = false }: { embedded?: boolean }) {
   const { user, loading: authLoading } = useAuth()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,11 +30,11 @@ export function Wishlist() {
       })
   }, [user])
 
-  if (authLoading) return null
+  if (authLoading) return <ProductGridSkeleton count={4} />
 
   if (!user) {
     return (
-      <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
+      <div className={embedded ? 'py-16 text-center' : 'max-w-[1400px] mx-auto px-8 py-32 text-center'}>
         <p className="font-subheading text-2xl mb-4">Sign in to see your wishlist.</p>
         <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
       </div>
@@ -47,12 +48,8 @@ export function Wishlist() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  return (
-    <div className="max-w-[1400px] mx-auto px-8 md:px-16 py-14">
-      <div className="border-b border-line pb-8 mb-10">
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">MY ACCOUNT</p>
-        <h1 className="font-display font-semibold text-4xl">Wishlist</h1>
-      </div>
+  const body = (
+    <>
       {loading ? (
         <ProductGridSkeleton count={4} />
       ) : products.length === 0 ? (
@@ -65,7 +62,7 @@ export function Wishlist() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
             {pagedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
           {pageCount > 1 && (
@@ -87,6 +84,25 @@ export function Wishlist() {
           )}
         </>
       )}
+    </>
+  )
+
+  if (embedded) {
+    return (
+      <div>
+        <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-6">Wishlist</h2>
+        {body}
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-[1400px] mx-auto px-8 md:px-16 py-14">
+      <div className="border-b border-line pb-8 mb-10">
+        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">MY ACCOUNT</p>
+        <h1 className="font-display font-semibold text-4xl">Wishlist</h1>
+      </div>
+      {body}
     </div>
   )
 }

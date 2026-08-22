@@ -13,6 +13,7 @@ import { ProductGridSkeleton, ListRowSkeleton, ContentSkeleton } from '../compon
 import { useToast } from '../context/ToastContext'
 import { triggerPdfDownload } from '../lib/downloads'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { Wishlist } from './Wishlist'
 import type { Purchase, Product } from '../lib/types'
 
 export type OrderRow = {
@@ -32,7 +33,7 @@ const NAV_ITEMS: { to: string; label: string; icon: string; end?: boolean }[] = 
   { to: '/account', label: 'Dashboard', icon: 'dashboard', end: true },
   { to: '/account/orders', label: 'Orders', icon: 'receipt_long' },
   { to: '/account/downloads', label: 'Downloads', icon: 'download' },
-  { to: '/wishlist', label: 'Wishlist', icon: 'favorite' },
+  { to: '/account/wishlist', label: 'Wishlist', icon: 'favorite' },
   { to: '/account/profile', label: 'Account Settings', icon: 'settings' },
 ]
 
@@ -67,8 +68,8 @@ export function Account() {
             {NAV_ITEMS.map((t) => {
               const active = t.end
                 ? pathname === '/account'
-                : t.to === '/wishlist'
-                  ? pathname === '/wishlist'
+                : t.to === '/account/wishlist'
+                  ? pathname === '/account/wishlist'
                   : pathname === t.to || pathname.startsWith(t.to + '/')
               return (
                 <Link
@@ -138,6 +139,8 @@ function AccountContent() {
       return <MyOrders />
     case '/account/downloads':
       return <Downloads />
+    case '/account/wishlist':
+      return <Wishlist embedded />
     case '/account/profile':
       return <ProfileTab />
     default:
@@ -182,7 +185,7 @@ function Dashboard() {
   const stats = [
     { label: 'Total Orders', value: totalOrders, icon: 'shopping_bag', href: '/account/orders', cta: 'View your order history' },
     { label: 'Total Downloads', value: downloads, icon: 'download', href: '/account/downloads', cta: 'View your downloads' },
-    { label: 'Wishlist Items', value: wishlistCount, icon: 'favorite', href: '/wishlist', cta: 'View your wishlist' },
+    { label: 'Wishlist Items', value: wishlistCount, icon: 'favorite', href: '/account/wishlist', cta: 'View your wishlist' },
     { label: 'Completed Orders', value: completedOrders, icon: 'check_circle', href: '/account/orders', cta: 'See completed orders' },
   ]
 

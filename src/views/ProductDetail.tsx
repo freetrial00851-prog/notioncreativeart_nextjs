@@ -272,7 +272,7 @@ export function ProductDetail() {
     } else {
       await supabase.from('wishlist').upsert({ user_id: user!.id, product_id: product.id })
       setInWishlist(true)
-      showToast('♡ Saved to wishlist', 'success', { label: 'View Wishlist', onClick: () => router.push('/wishlist') })
+      showToast('♡ Saved to wishlist', 'success', { label: 'View Wishlist', onClick: () => router.push('/account/wishlist') })
     }
   }
 

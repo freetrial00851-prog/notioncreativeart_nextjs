@@ -217,7 +217,7 @@ export function Footer() {
     <>
       <li><Link href="/account" className="hover:underline">My Account</Link></li>
       <li><Link href="/account/orders" className="hover:underline">My Purchases</Link></li>
-      <li><Link href="/wishlist" className="hover:underline">Wishlist</Link></li>
+      <li><Link href="/account/wishlist" className="hover:underline">Wishlist</Link></li>
       <li><Link href="/cart" className="hover:underline">Cart</Link></li>
       {user ? (
         <li><button onClick={() => signOut()} className="hover:underline text-left">Logout</button></li>
