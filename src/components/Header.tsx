@@ -33,7 +33,7 @@ const SKILL_LEVELS: { key: 'beginner' | 'intermediate' | 'advanced'; label: stri
   { key: 'advanced', label: 'Advanced', icon: 'military_tech' },
 ]
 
-const LOGO_BLUE = '#0A3CC9'
+const LOGO_BLUE = '#0f3fc9'
 
 /** Desktop: large blue NCA + stacked NOTION / CREATIVE / ART. Mobile: blue NCA only. */
 function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {

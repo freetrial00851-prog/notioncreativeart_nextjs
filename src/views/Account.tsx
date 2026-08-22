@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { NavLink } from '@/components/NavLink'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -10,10 +9,11 @@ import { useAuth } from '../context/AuthContext'
 import { US_STATES } from '../lib/usStates'
 import { isValidPostalCode } from '../lib/billingAddress'
 import { EmptyState } from '../components/EmptyState'
-import { ProductGridSkeleton, ListRowSkeleton } from '../components/Skeleton'
+import { ProductGridSkeleton, ListRowSkeleton, ContentSkeleton } from '../components/Skeleton'
 import { useToast } from '../context/ToastContext'
 import { triggerPdfDownload } from '../lib/downloads'
-import type { Purchase } from '../lib/types'
+import { MaterialIcon } from '../components/MaterialIcon'
+import type { Purchase, Product } from '../lib/types'
 
 export type OrderRow = {
   id: string
@@ -25,18 +25,22 @@ export type OrderRow = {
   created_at: string
 }
 
-const TABS = [
-  { to: '/account', label: 'Dashboard', end: true },
-  { to: '/account/orders', label: 'My Orders' },
-  { to: '/account/downloads', label: 'Downloads' },
-  { to: '/wishlist', label: 'Wishlist' },
-  { to: '/account/profile', label: 'Account Settings' },
+const BRAND = '#0f3fc9'
+const BRAND_SOFT = '#e8eefc'
+
+const NAV_ITEMS: { to: string; label: string; icon: string; end?: boolean }[] = [
+  { to: '/account', label: 'Dashboard', icon: 'dashboard', end: true },
+  { to: '/account/orders', label: 'Orders', icon: 'receipt_long' },
+  { to: '/account/downloads', label: 'Downloads', icon: 'download' },
+  { to: '/wishlist', label: 'Wishlist', icon: 'favorite' },
+  { to: '/account/profile', label: 'Account Settings', icon: 'settings' },
 ]
 
 export function Account() {
   const { user, profile, signOut, loading } = useAuth()
+  const pathname = usePathname()
 
-  if (loading) return null
+  if (loading) return <ContentSkeleton />
   if (!user) {
     return (
       <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
@@ -46,29 +50,79 @@ export function Account() {
     )
   }
 
+  const firstName = profile?.first_name
+
   return (
-    <div className="max-w-[1400px] mx-auto px-8 md:px-16 py-14">
-      <div className="border-b border-line pb-8 mb-10">
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">MY ACCOUNT</p>
-        <h1 className="font-display font-semibold text-[28px] sm:text-3xl md:text-4xl leading-tight break-words">{profile?.first_name ? `Welcome back, ${profile.first_name} 👋` : 'My Account'}</h1>
-      </div>
+    <div className="max-w-[1400px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
+      <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
+        <Link href="/" className="hover:text-ink">Home</Link>
+        <span>›</span>
+        <span className="text-ink">My Account</span>
+      </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-[190px_minmax(0,1fr)] gap-14">
-        <nav className="flex md:flex-col gap-6 md:gap-1 text-[12px] tracking-[0.08em] overflow-x-auto md:overflow-visible -mx-8 px-8 md:mx-0 md:px-0 pb-1 md:pb-0" style={{ scrollbarWidth: 'none' }}>
-          {TABS.map((t) => (
-            <NavLink
-              key={t.to}
-              href={t.to}
-              end={t.end}
-              className={({ isActive }) => `shrink-0 whitespace-nowrap md:py-3 border-b md:border-b-0 md:border-l pl-0 md:pl-4 ${isActive ? 'text-ink md:border-ink' : 'text-ink-soft md:border-transparent hover:text-ink'}`}
+      <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
+        {/* Sidebar */}
+        <aside className="lg:sticky lg:top-24 space-y-4">
+          <nav className="bg-white border border-line rounded-2xl p-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible" style={{ scrollbarWidth: 'none' }}>
+            {NAV_ITEMS.map((t) => {
+              const active = t.end
+                ? pathname === '/account'
+                : t.to === '/wishlist'
+                  ? pathname === '/wishlist'
+                  : pathname === t.to || pathname.startsWith(t.to + '/')
+              return (
+                <Link
+                  key={t.to + t.label}
+                  href={t.to}
+                  className={`shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] transition-colors ${
+                    active ? 'font-medium' : 'text-ink-soft hover:text-ink hover:bg-surface'
+                  }`}
+                  style={active ? { background: BRAND_SOFT, color: BRAND } : undefined}
+                >
+                  <MaterialIcon name={t.icon} size={18} color={active ? BRAND : 'var(--color-ink-soft)'} />
+                  {t.label}
+                </Link>
+              )
+            })}
+            <button
+              onClick={signOut}
+              className="shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] text-ink-soft hover:text-madder hover:bg-surface text-left w-full"
             >
-              {t.label.toUpperCase()}
-            </NavLink>
-          ))}
-          <button onClick={signOut} className="shrink-0 whitespace-nowrap md:py-3 md:pl-4 text-left text-ink-soft hover:text-madder">LOGOUT</button>
-        </nav>
+              <MaterialIcon name="logout" size={18} />
+              Log Out
+            </button>
+          </nav>
 
-        <div>
+          <div className="hidden lg:block rounded-2xl p-5" style={{ background: BRAND_SOFT }}>
+            <div className="flex items-center gap-2 mb-2">
+              <MaterialIcon name="support_agent" size={20} color={BRAND} />
+              <p className="text-[14px] font-semibold text-ink">Need Help?</p>
+            </div>
+            <p className="text-[12px] text-ink-soft mb-4 leading-relaxed">Questions about downloads or orders? We&apos;re happy to help.</p>
+            <Link
+              href="/contact"
+              className="block text-center w-full py-2.5 text-canvas text-[11px] tracking-[0.1em] font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              style={{ background: BRAND }}
+            >
+              CONTACT SUPPORT
+            </Link>
+          </div>
+        </aside>
+
+        {/* Main */}
+        <div className="min-w-0">
+          {(pathname === '/account' || pathname === '/account/') && (
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+              <div>
+                <h1 className="font-heading font-semibold text-3xl md:text-4xl text-ink mb-1.5">My Account</h1>
+                <p className="text-[14px] text-ink-soft">
+                  {firstName
+                    ? `Welcome back, ${firstName}! Here's what's happening with your account.`
+                    : "Here's what's happening with your account."}
+                </p>
+              </div>
+            </div>
+          )}
           <AccountContent />
         </div>
       </div>
@@ -91,22 +145,15 @@ function AccountContent() {
   }
 }
 
-function StatCard({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="bg-white border border-line rounded-2xl px-5 py-4">
-      <p className="text-[24px] font-semibold font-subheading">{value}</p>
-      <p className="text-[12px] text-ink-soft mt-0.5">{label}</p>
-    </div>
-  )
-}
-
 function Dashboard() {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
   const [totalOrders, setTotalOrders] = useState<number | null>(null)
-  const [completedOrders, setCompletedOrders] = useState<number | null>(null)
   const [downloads, setDownloads] = useState<number | null>(null)
   const [wishlistCount, setWishlistCount] = useState<number | null>(null)
+  const [completedOrders, setCompletedOrders] = useState<number | null>(null)
   const [recent, setRecent] = useState<OrderRow[]>([])
+  const [recentDownloads, setRecentDownloads] = useState<Purchase[]>([])
+  const [downloading, setDownloading] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -114,98 +161,168 @@ function Dashboard() {
     supabase.from('orders').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'paid').then(({ count }) => setCompletedOrders(count ?? 0))
     supabase.from('purchases').select('id', { count: 'exact', head: true }).eq('user_id', user.id).then(({ count }) => setDownloads(count ?? 0))
     supabase.from('wishlist').select('product_id', { count: 'exact', head: true }).eq('user_id', user.id).then(({ count }) => setWishlistCount(count ?? 0))
-    supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3)
+    supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5)
       .then(({ data }) => setRecent((data as OrderRow[]) ?? []))
+    supabase
+      .from('purchases')
+      .select('*, product:products(*)')
+      .eq('user_id', user.id)
+      .order('purchase_date', { ascending: false })
+      .limit(4)
+      .then(({ data }) => setRecentDownloads((data as unknown as Purchase[]) ?? []))
   }, [user])
 
+  const download = async (productId: string, title?: string) => {
+    setDownloading(productId)
+    const ok = await triggerPdfDownload(productId, title)
+    setDownloading(null)
+    if (!ok) alert("This pattern's file isn't uploaded yet — please check back soon.")
+  }
+
+  const stats = [
+    { label: 'Total Orders', value: totalOrders, icon: 'shopping_bag', href: '/account/orders', cta: 'View your order history' },
+    { label: 'Total Downloads', value: downloads, icon: 'download', href: '/account/downloads', cta: 'View your downloads' },
+    { label: 'Wishlist Items', value: wishlistCount, icon: 'favorite', href: '/wishlist', cta: 'View your wishlist' },
+    { label: 'Completed Orders', value: completedOrders, icon: 'check_circle', href: '/account/orders', cta: 'See completed orders' },
+  ]
+
+  const quickLinks = [
+    { href: '/shop', icon: 'storefront', title: 'Browse Patterns', desc: 'Explore the full shop' },
+    { href: '/shop?price=free', icon: 'redeem', title: 'Free Patterns', desc: 'Start stitching for free' },
+    { href: '/account/downloads', icon: 'folder_open', title: 'My Downloads', desc: 'Re-download your PDFs' },
+    { href: '/account/profile', icon: 'person', title: 'Edit Profile', desc: 'Update your details' },
+    { href: '/account/profile#billing', icon: 'location_on', title: 'Addresses', desc: 'Billing information' },
+    { href: '/contact', icon: 'mail', title: 'Support', desc: 'Get help from us' },
+  ]
+
   return (
-    <div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        <StatCard label="Total Orders" value={totalOrders ?? '—'} />
-        <StatCard label="Completed Orders" value={completedOrders ?? '—'} />
-        <StatCard label="Available Downloads" value={downloads ?? '—'} />
-        <StatCard label="Wishlist Items" value={wishlistCount ?? '—'} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-10">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[11px] tracking-[0.15em] text-ink-soft">RECENT ORDERS</p>
-            <Link href="/account/orders" className="text-[11px] text-ink-soft hover:text-ink underline underline-offset-2">View all orders</Link>
-          </div>
-          {recent.length === 0 ? (
-            <p className="text-[13px] text-ink-soft">No orders yet.</p>
-          ) : (
-            <div className="bg-white border border-line rounded-2xl divide-y divide-line overflow-hidden">
-              {recent.map((o) => (
-                <div key={o.id} className="flex items-center justify-between px-5 py-3.5 text-[13px]">
-                  <div>
-                    <p className="font-medium">Order #{o.lemon_order_id}</p>
-                    <p className="text-[11px] text-ink-soft mt-0.5">{new Date(o.created_at).toLocaleDateString()}</p>
-                  </div>
-                  <span className="text-[12px] font-medium">${o.amount.toFixed(2)}</span>
-                  <StatusBadge status={o.status} />
-                </div>
-              ))}
+    <div className="space-y-8">
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white border border-line rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center mb-3" style={{ background: BRAND_SOFT }}>
+              <MaterialIcon name={s.icon} size={18} color={BRAND} />
             </div>
-          )}
-        </div>
-
-        <div className="space-y-8">
-          <div className="bg-white border border-line rounded-2xl p-5">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center text-[15px] font-semibold shrink-0" style={{ background: 'var(--color-surface)', color: 'var(--color-sale-green)' }}>
-                {(profile?.first_name?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[14px] font-medium truncate">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Your Account'}</p>
-                <p className="text-[12px] text-ink-soft truncate">{user?.email}</p>
-              </div>
-            </div>
-            {user?.created_at && (
-              <p className="text-[11px] text-ink-soft mt-3">Member since {new Date(user.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</p>
-            )}
-            <Link href="/account/profile" className="inline-block mt-3 text-[11px] tracking-[0.08em] border border-line rounded-lg px-4 py-2 hover:bg-surface transition-colors">
-              EDIT PROFILE
+            <p className="text-[12px] text-ink-soft mb-1">{s.label}</p>
+            <p className="text-[28px] font-semibold font-subheading leading-none mb-3">{s.value ?? '—'}</p>
+            <Link href={s.href} className="text-[12px] font-medium hover:opacity-80 inline-flex items-center gap-0.5" style={{ color: BRAND }}>
+              {s.cta} <span aria-hidden>→</span>
             </Link>
           </div>
+        ))}
+      </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] tracking-[0.15em] text-ink-soft">BILLING ADDRESS</p>
-              <Link href="/account/profile#billing" className="text-[11px] text-ink-soft hover:text-ink underline underline-offset-2">
-                {profile?.billing_country ? 'Edit' : 'Add'}
-              </Link>
-            </div>
-            {profile?.billing_country ? (
-              <div className="bg-white border border-line rounded-2xl p-4 text-[13px] leading-relaxed">
-                {profile.billing_country === 'US' ? (
-                  <>
-                    {profile.billing_address_line1 && <p>{profile.billing_address_line1}</p>}
-                    <p>
-                      {[profile.billing_city, profile.billing_state, profile.billing_zip].filter(Boolean).join(', ')}
-                    </p>
-                  </>
-                ) : (
-                  profile.billing_zip && <p>{profile.billing_zip}</p>
-                )}
-                <p className="text-ink-soft mt-0.5">{COUNTRIES.find(([code]) => code === profile.billing_country)?.[1] ?? profile.billing_country}</p>
-              </div>
-            ) : (
-              <p className="text-[13px] text-ink-soft">No billing address on file yet.</p>
-            )}
+      {/* Recent orders + quick links */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] gap-6">
+        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-subheading font-semibold text-lg">Recent Orders</h2>
           </div>
-
-          <div>
-            <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-4">QUICK LINKS</p>
-            <div className="space-y-1 text-[13px]">
-              <Link href="/shop/new" className="block py-2.5 border-b border-line hover:text-ink text-ink-soft">Browse New Arrivals</Link>
-              <Link href="/shop/bestsellers" className="block py-2.5 border-b border-line hover:text-ink text-ink-soft">Shop Featured Items</Link>
-              <Link href="/account/downloads" className="block py-2.5 border-b border-line hover:text-ink text-ink-soft">My Downloads</Link>
-              <Link href="/account/profile" className="block py-2.5 hover:text-ink text-ink-soft">Account Settings</Link>
+          {recent.length === 0 ? (
+            <p className="text-[13px] text-ink-soft py-6 text-center">No orders yet.</p>
+          ) : (
+            <div className="overflow-x-auto -mx-1">
+              <table className="w-full text-[13px] min-w-[480px]">
+                <thead>
+                  <tr className="text-left text-[11px] tracking-[0.06em] text-ink-soft border-b border-line">
+                    <th className="pb-2.5 font-medium">Order</th>
+                    <th className="pb-2.5 font-medium">Date</th>
+                    <th className="pb-2.5 font-medium">Items</th>
+                    <th className="pb-2.5 font-medium">Total</th>
+                    <th className="pb-2.5 font-medium">Status</th>
+                    <th className="pb-2.5 font-medium w-8" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {recent.map((o) => (
+                    <tr key={o.id} className="hover:bg-surface/60">
+                      <td className="py-3.5 font-medium">#{o.lemon_order_id || o.id.slice(0, 8)}</td>
+                      <td className="py-3.5 text-ink-soft">{new Date(o.created_at).toLocaleDateString()}</td>
+                      <td className="py-3.5 text-ink-soft">{o.product_ids?.length ?? 0}</td>
+                      <td className="py-3.5 font-medium">${o.amount.toFixed(2)}</td>
+                      <td className="py-3.5"><StatusBadge status={o.status} /></td>
+                      <td className="py-3.5 text-right">
+                        <Link href={`/account/orders/${o.id}`} aria-label="View order" className="inline-flex text-ink-soft hover:text-ink">
+                          <MaterialIcon name="chevron_right" size={18} />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          )}
+          <div className="mt-5 pt-4 border-t border-line flex justify-center">
+            <Link
+              href="/account/orders"
+              className="px-6 py-2.5 text-[11px] tracking-[0.1em] font-semibold border border-line rounded-lg hover:bg-surface transition-colors"
+            >
+              VIEW ALL ORDERS
+            </Link>
           </div>
         </div>
+
+        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <h2 className="font-subheading font-semibold text-lg mb-4">Quick Links</h2>
+          <div className="grid grid-cols-2 gap-2.5">
+            {quickLinks.map((q) => (
+              <Link
+                key={q.href + q.title}
+                href={q.href}
+                className="rounded-xl border border-line p-3.5 hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)] transition-colors group"
+              >
+                <MaterialIcon name={q.icon} size={20} color={BRAND} />
+                <p className="text-[13px] font-medium mt-2 text-ink group-hover:text-[var(--color-accent)]">{q.title}</p>
+                <p className="text-[11px] text-ink-soft mt-0.5 leading-snug">{q.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Recently downloaded */}
+      <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-subheading font-semibold text-lg">Recently Downloaded</h2>
+          <Link href="/account/downloads" className="text-[12px] font-medium hover:opacity-80" style={{ color: BRAND }}>
+            View all →
+          </Link>
+        </div>
+        {recentDownloads.length === 0 ? (
+          <p className="text-[13px] text-ink-soft text-center py-8">Your pattern downloads will show up here.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            {recentDownloads.map((p) => {
+              const product = p.product as Product | undefined
+              return (
+                <div key={p.id} className="flex gap-3 items-center rounded-xl border border-line p-2.5">
+                  <Link href={product ? `/pattern/${product.slug}` : '#'} className="w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-surface">
+                    {product?.images?.[0] && (
+                      <img src={deriveVariantUrl(product.images[0], 'micro')} alt={product.title} loading="lazy" className="w-full h-full object-cover" />
+                    )}
+                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <Link href={product ? `/pattern/${product.slug}` : '#'} className="block text-[12px] font-medium truncate hover:underline">
+                      {product?.title ?? 'Pattern'}
+                    </Link>
+                    <p className="text-[10px] text-ink-soft mt-0.5">Crochet Pattern PDF</p>
+                    <p className="text-[10px] text-ink-soft">{new Date(p.purchase_date).toLocaleDateString()}</p>
+                  </div>
+                  <button
+                    onClick={() => download(p.product_id, product?.title)}
+                    disabled={downloading === p.product_id}
+                    aria-label="Download PDF"
+                    className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center hover:opacity-90 disabled:opacity-50"
+                    style={{ background: BRAND_SOFT }}
+                  >
+                    <MaterialIcon name="download" size={16} color={BRAND} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -213,7 +330,7 @@ function Dashboard() {
 
 export function StatusBadge({ status }: { status: string }) {
   const style =
-    status === 'paid' ? { background: '#E8F0E5', color: 'var(--color-sale-green)' } :
+    status === 'paid' ? { background: BRAND_SOFT, color: BRAND } :
     status === 'refunded' ? { background: '#F5E6E6', color: 'var(--color-madder)' } :
     { background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }
   const label = status === 'paid' ? 'Completed' : status === 'refunded' ? 'Refunded' : 'Pending'

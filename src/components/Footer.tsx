@@ -10,7 +10,7 @@ import type { SocialContent, CategoryContent } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
 
 const FOOTER_BG = '#FCFBF8'
-const FOOTER_GREEN = '#0A3CC9'
+const FOOTER_GREEN = '#0f3fc9'
 const FOOTER_TEXT = '#202720'
 const FOOTER_MUTED = '#667066'
 const FOOTER_BORDER = '#E3E6E0'
