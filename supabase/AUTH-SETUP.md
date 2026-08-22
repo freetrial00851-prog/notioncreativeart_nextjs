@@ -1,0 +1,72 @@
+# Auth setup — Google sign-in (project `anlsellghialszuuvipw`)
+
+The error **"Unsupported provider: provider is not enabled"** means Google OAuth is
+**not turned on** in this Supabase project yet. The app code is fine — enable it in the
+dashboard (5 minutes).
+
+## 1. Enable Google in Supabase
+
+1. Open [Authentication → Providers → Google](https://supabase.com/dashboard/project/anlsellghialszuuvipw/auth/providers?provider=Google)
+2. Turn **Enable Sign in with Google** ON
+3. Paste your **Client ID** and **Client Secret** from Google Cloud Console (see step 2)
+4. Save
+
+### Copy credentials from your old project (easiest)
+
+If Google already works on **notioncreativeart.com** / project `npkqvhdsyyxphcinhcej`:
+
+1. Open the **old** project → Authentication → Providers → Google
+2. Copy **Client ID** and **Client Secret**
+3. Paste them into the **new** project (`anlsellghialszuuvipw`) → Save
+
+You can reuse the same Google OAuth app — just add the new callback URL (step 2).
+
+---
+
+## 2. Google Cloud Console
+
+1. [Google Cloud Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials)
+2. Open your OAuth 2.0 Client ID (Web application)
+3. Under **Authorized redirect URIs**, add:
+
+```
+https://anlsellghialszuuvipw.supabase.co/auth/v1/callback
+```
+
+Keep any existing URIs (e.g. old Supabase project callback). Save.
+
+---
+
+## 3. Supabase URL configuration
+
+[Authentication → URL Configuration](https://supabase.com/dashboard/project/anlsellghialszuuvipw/auth/url-configuration)
+
+| Field | Value |
+|-------|--------|
+| **Site URL** | `https://notioncreativeartnextjs.vercel.app` |
+
+**Redirect URLs** (add all, then Save):
+
+```
+http://localhost:3000/**
+http://localhost:3001/**
+https://notioncreativeartnextjs.vercel.app/**
+https://notioncreativeart.com/**
+```
+
+The app uses `/auth/callback` after Google sign-in; wildcards above cover it.
+
+---
+
+## 4. Test
+
+1. Incognito → https://notioncreativeartnextjs.vercel.app/signup
+2. **Continue with Google** → pick account → should land on `/account`
+3. Local: `npm run dev` → http://localhost:3000/signup (same flow)
+
+---
+
+## Email sign-up / password reset
+
+Same **Site URL** and **Redirect URLs** apply to verification and reset emails.
+No extra code changes needed.

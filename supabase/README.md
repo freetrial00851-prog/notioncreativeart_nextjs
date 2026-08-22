@@ -32,6 +32,8 @@ If you see **`relation "public.purchases" does not exist`**, your database is st
 
 ## Auth redirect URLs
 
+See **[AUTH-SETUP.md](./AUTH-SETUP.md)** for Google OAuth (required on new projects).
+
 In **Authentication → URL Configuration**, add:
 
 - `http://localhost:3000/**`

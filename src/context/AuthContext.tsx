@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { authCallbackUrl } from '../lib/authCallbackUrl'
 import type { Profile } from '../lib/types'
 
 type PendingAction = { type: 'buy' | 'wishlist' | 'cart'; productId: string } | null
@@ -79,7 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.setItem('nca_signin_intent', '1')
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}${redirectPath || ''}` },
+      options: {
+        redirectTo: authCallbackUrl(redirectPath || '/account'),
+        queryParams: { prompt: 'select_account' },
+      },
     })
   }
 
