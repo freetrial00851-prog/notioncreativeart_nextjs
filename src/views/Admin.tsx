@@ -437,6 +437,10 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
   const save = async (publish: boolean): Promise<string | null> => {
     setSaveError(null)
     const slug = form.slug.trim() || slugify(form.title)
+    if (!form.title.trim()) {
+      setSaveError('Add a title before saving.')
+      return null
+    }
     let conflictQuery = supabase.from('products').select('id').eq('slug', slug)
     if (form.id) conflictQuery = conflictQuery.neq('id', form.id)
     const { data: conflict } = await conflictQuery.maybeSingle()
@@ -456,7 +460,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
       images: form.images,
       pdf_pages: form.pdf_pages ? parseInt(form.pdf_pages) : null,
       materials: form.materials || null,
-      lemon_variant_id: form.lemon_variant_id,
+      lemon_variant_id: form.lemon_variant_id || '',
       lemon_numeric_variant_id: form.lemon_numeric_variant_id || null,
       active: publish,
       featured: form.featured,
@@ -470,9 +474,19 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
     setForm((f) => ({ ...f, active: publish }))
     let savedId = form.id
     if (form.id) {
-      await supabase.from('products').update(payload).eq('id', form.id)
+      const { error } = await supabase.from('products').update(payload).eq('id', form.id)
+      if (error) {
+        setSaveError(error.message)
+        setSaving(false)
+        return null
+      }
     } else {
-      const { data } = await supabase.from('products').insert(payload).select().single()
+      const { data, error } = await supabase.from('products').insert(payload).select().single()
+      if (error) {
+        setSaveError(error.message)
+        setSaving(false)
+        return null
+      }
       if (data) {
         savedId = data.id
         setForm((f) => ({ ...f, id: data.id })) // keep form open so images/PDF can now be attached
@@ -480,7 +494,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
     }
     setSaving(false)
     load()
-    return savedId
+    return savedId || null
   }
 
   const setActive = async (p: Product, active: boolean) => {

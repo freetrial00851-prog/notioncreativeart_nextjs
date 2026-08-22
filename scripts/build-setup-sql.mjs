@@ -43,6 +43,7 @@ const ORDER = [
   'rate-limit-table.sql',
   'newsletter-close-direct-insert.sql',
   'catchup-migration.sql',
+  'products-bundle-fields.sql',
   'grants-api-access.sql',
   'seed-initial-data.sql',
 ]
