@@ -1,8 +1,8 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useAuth } from '../context/AuthContext'
@@ -26,7 +26,6 @@ const BRAND = '#0f3fc9'
 const BRAND_SOFT = '#e8eefc'
 
 const NAV_ITEMS: { to: string; label: string; icon: string; end?: boolean }[] = [
-  { to: '/account', label: 'Dashboard', icon: 'dashboard', end: true },
   { to: '/account/orders', label: 'Orders', icon: 'receipt_long' },
   { to: '/account/downloads', label: 'Downloads', icon: 'download' },
   { to: '/account/wishlist', label: 'Wishlist', icon: 'favorite' },
@@ -36,7 +35,6 @@ const NAV_ITEMS: { to: string; label: string; icon: string; end?: boolean }[] = 
 ]
 
 const PAGE_TITLES: Record<string, string> = {
-  '/account': 'Dashboard',
   '/account/orders': 'Orders',
   '/account/downloads': 'Downloads',
   '/account/wishlist': 'Wishlist',
@@ -47,7 +45,7 @@ const PAGE_TITLES: Record<string, string> = {
 }
 
 export function Account() {
-  const { user, profile, loading } = useAuth()
+  const { user, loading } = useAuth()
   const pathname = usePathname()
 
   if (loading) return <ContentSkeleton />
@@ -55,30 +53,30 @@ export function Account() {
     return (
       <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Sign in to view your account.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
+        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME â†’</Link>
       </div>
     )
   }
 
-  const firstName = profile?.first_name
   const isOrderDetail = /^\/account\/orders\/[^/]+$/.test(pathname ?? '')
   const crumbLabel = isOrderDetail
     ? 'Order Details'
     : (PAGE_TITLES[pathname ?? ''] ?? 'My Account')
+  const isAccountHome = pathname === '/account' || pathname === '/account/'
 
   return (
     <div className="max-w-[1400px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
-        <span>›</span>
-        <Link href="/account" className="hover:text-ink">My Account</Link>
-        {pathname !== '/account' && pathname !== '/account/' && (
+        <span>â€º</span>
+        <Link href="/account/orders" className="hover:text-ink">My Account</Link>
+        {!isAccountHome && (
           <>
-            <span>›</span>
+            <span>â€º</span>
             {isOrderDetail ? (
               <>
                 <Link href="/account/orders" className="hover:text-ink">Orders</Link>
-                <span>›</span>
+                <span>â€º</span>
                 <span className="text-ink">Details</span>
               </>
             ) : (
@@ -93,11 +91,9 @@ export function Account() {
         <aside className="lg:sticky lg:top-24 space-y-4">
           <nav className="bg-white border border-line rounded-2xl p-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible" style={{ scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map((t) => {
-              const active = t.end
-                ? pathname === '/account'
-                : t.to === '/account/orders'
-                  ? pathname === '/account/orders' || isOrderDetail
-                  : pathname === t.to || pathname.startsWith(t.to + '/')
+              const active = t.to === '/account/orders'
+                ? pathname === '/account/orders' || isOrderDetail
+                : pathname === t.to || pathname.startsWith(t.to + '/')
               return (
                 <Link
                   key={t.to + t.label}
@@ -142,19 +138,7 @@ export function Account() {
 
         {/* Main */}
         <div className="min-w-0">
-          {(pathname === '/account' || pathname === '/account/') && (
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-              <div>
-                <h1 className="font-heading font-semibold text-3xl md:text-4xl text-ink mb-1.5">My Account</h1>
-                <p className="text-[14px] text-ink-soft">
-                  {firstName
-                    ? `Welcome back, ${firstName}! Here's what's happening with your account.`
-                    : "Here's what's happening with your account."}
-                </p>
-              </div>
-            </div>
-          )}
-          {pathname !== '/account' && pathname !== '/account/' && !isOrderDetail && pathname !== '/account/wishlist' && (
+          {!isOrderDetail && pathname !== '/account/wishlist' && !isAccountHome && (
             <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
           )}
           <AccountContent />
@@ -167,6 +151,17 @@ export function Account() {
 /** Renders account tab content based on the current URL pathname. */
 function AccountContent() {
   const pathname = usePathname() ?? ''
+  const router = useRouter()
+
+  useEffect(() => {
+    if (pathname === '/account' || pathname === '/account/') {
+      router.replace('/account/orders')
+    }
+  }, [pathname, router])
+
+  if (pathname === '/account' || pathname === '/account/') {
+    return <ContentSkeleton />
+  }
   if (/^\/account\/orders\/[^/]+$/.test(pathname)) return <OrderDetail embedded />
   switch (pathname) {
     case '/account/orders':
@@ -184,191 +179,8 @@ function AccountContent() {
     case '/account/profile':
       return <ProfileTab />
     default:
-      return <Dashboard />
+      return <MyOrders />
   }
-}
-
-function Dashboard() {
-  const { user } = useAuth()
-  const [totalOrders, setTotalOrders] = useState<number | null>(null)
-  const [downloads, setDownloads] = useState<number | null>(null)
-  const [wishlistCount, setWishlistCount] = useState<number | null>(null)
-  const [completedOrders, setCompletedOrders] = useState<number | null>(null)
-  const [recent, setRecent] = useState<OrderRow[]>([])
-  const [recentDownloads, setRecentDownloads] = useState<Purchase[]>([])
-  const [downloading, setDownloading] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!user) return
-    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('user_id', user.id).then(({ count }) => setTotalOrders(count ?? 0))
-    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'paid').then(({ count }) => setCompletedOrders(count ?? 0))
-    supabase.from('purchases').select('id', { count: 'exact', head: true }).eq('user_id', user.id).then(({ count }) => setDownloads(count ?? 0))
-    supabase.from('wishlist').select('product_id', { count: 'exact', head: true }).eq('user_id', user.id).then(({ count }) => setWishlistCount(count ?? 0))
-    supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5)
-      .then(({ data }) => setRecent((data as OrderRow[]) ?? []))
-    supabase
-      .from('purchases')
-      .select('*, product:products(*)')
-      .eq('user_id', user.id)
-      .order('purchase_date', { ascending: false })
-      .limit(4)
-      .then(({ data }) => setRecentDownloads((data as unknown as Purchase[]) ?? []))
-  }, [user])
-
-  const download = async (productId: string, title?: string) => {
-    setDownloading(productId)
-    const ok = await triggerPdfDownload(productId, title)
-    setDownloading(null)
-    if (!ok) alert("This pattern's file isn't uploaded yet — please check back soon.")
-  }
-
-  const stats = [
-    { label: 'Total Orders', value: totalOrders, icon: 'shopping_bag', href: '/account/orders', cta: 'View your order history' },
-    { label: 'Total Downloads', value: downloads, icon: 'download', href: '/account/downloads', cta: 'View your downloads' },
-    { label: 'Wishlist Items', value: wishlistCount, icon: 'favorite', href: '/account/wishlist', cta: 'View your wishlist' },
-    { label: 'Completed Orders', value: completedOrders, icon: 'check_circle', href: '/account/orders', cta: 'See completed orders' },
-  ]
-
-  const quickLinks = [
-    { href: '/shop', icon: 'storefront', title: 'Browse Patterns', desc: 'Explore the full shop' },
-    { href: '/shop?price=free', icon: 'redeem', title: 'Free Patterns', desc: 'Start stitching for free' },
-    { href: '/account/downloads', icon: 'folder_open', title: 'My Downloads', desc: 'Re-download your PDFs' },
-    { href: '/account/profile', icon: 'person', title: 'Edit Profile', desc: 'Update your details' },
-    { href: '/account/addresses', icon: 'location_on', title: 'Addresses', desc: 'Billing information' },
-    { href: '/contact', icon: 'mail', title: 'Support', desc: 'Get help from us' },
-  ]
-
-  return (
-    <div className="space-y-8">
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-        {stats.map((s) => (
-          <div key={s.label} className="bg-white border border-line rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center mb-3" style={{ background: BRAND_SOFT }}>
-              <MaterialIcon name={s.icon} size={18} color={BRAND} />
-            </div>
-            <p className="text-[12px] text-ink-soft mb-1">{s.label}</p>
-            <p className="text-[28px] font-semibold font-subheading leading-none mb-3">{s.value ?? '—'}</p>
-            <Link href={s.href} className="text-[12px] font-medium hover:opacity-80 inline-flex items-center gap-0.5" style={{ color: BRAND }}>
-              {s.cta} <span aria-hidden>→</span>
-            </Link>
-          </div>
-        ))}
-      </div>
-
-      {/* Recent orders + quick links */}
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] gap-6">
-        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-subheading font-semibold text-lg">Recent Orders</h2>
-          </div>
-          {recent.length === 0 ? (
-            <p className="text-[13px] text-ink-soft py-6 text-center">No orders yet.</p>
-          ) : (
-            <div className="overflow-x-auto -mx-1">
-              <table className="w-full text-[13px] min-w-[480px]">
-                <thead>
-                  <tr className="text-left text-[11px] tracking-[0.06em] text-ink-soft border-b border-line">
-                    <th className="pb-2.5 font-medium">Order</th>
-                    <th className="pb-2.5 font-medium">Date</th>
-                    <th className="pb-2.5 font-medium">Items</th>
-                    <th className="pb-2.5 font-medium">Total</th>
-                    <th className="pb-2.5 font-medium">Status</th>
-                    <th className="pb-2.5 font-medium w-8" />
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {recent.map((o) => (
-                    <tr key={o.id} className="hover:bg-surface/60">
-                      <td className="py-3.5 font-medium">#{o.lemon_order_id || o.id.slice(0, 8)}</td>
-                      <td className="py-3.5 text-ink-soft">{new Date(o.created_at).toLocaleDateString()}</td>
-                      <td className="py-3.5 text-ink-soft">{o.product_ids?.length ?? 0}</td>
-                      <td className="py-3.5 font-medium">${o.amount.toFixed(2)}</td>
-                      <td className="py-3.5"><StatusBadge status={o.status} /></td>
-                      <td className="py-3.5 text-right">
-                        <Link href={`/account/orders/${o.id}`} aria-label="View order" className="inline-flex text-ink-soft hover:text-ink">
-                          <MaterialIcon name="chevron_right" size={18} />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <div className="mt-5 pt-4 border-t border-line flex justify-center">
-            <Link
-              href="/account/orders"
-              className="px-6 py-2.5 text-[11px] tracking-[0.1em] font-semibold border border-line rounded-lg hover:bg-surface transition-colors"
-            >
-              VIEW ALL ORDERS
-            </Link>
-          </div>
-        </div>
-
-        <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <h2 className="font-subheading font-semibold text-lg mb-4">Quick Links</h2>
-          <div className="grid grid-cols-2 gap-2.5">
-            {quickLinks.map((q) => (
-              <Link
-                key={q.href + q.title}
-                href={q.href}
-                className="rounded-xl border border-line p-3.5 hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)] transition-colors group"
-              >
-                <MaterialIcon name={q.icon} size={20} color={BRAND} />
-                <p className="text-[13px] font-medium mt-2 text-ink group-hover:text-[var(--color-accent)]">{q.title}</p>
-                <p className="text-[11px] text-ink-soft mt-0.5 leading-snug">{q.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Recently downloaded */}
-      <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="font-subheading font-semibold text-lg">Recently Downloaded</h2>
-          <Link href="/account/downloads" className="text-[12px] font-medium hover:opacity-80" style={{ color: BRAND }}>
-            View all →
-          </Link>
-        </div>
-        {recentDownloads.length === 0 ? (
-          <p className="text-[13px] text-ink-soft text-center py-8">Your pattern downloads will show up here.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            {recentDownloads.map((p) => {
-              const product = p.product as Product | undefined
-              return (
-                <div key={p.id} className="flex gap-3 items-center rounded-xl border border-line p-2.5">
-                  <Link href={product ? `/pattern/${product.slug}` : '#'} className="w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-surface">
-                    {product?.images?.[0] && (
-                      <img src={deriveVariantUrl(product.images[0], 'micro')} alt={product.title} loading="lazy" className="w-full h-full object-cover" />
-                    )}
-                  </Link>
-                  <div className="min-w-0 flex-1">
-                    <Link href={product ? `/pattern/${product.slug}` : '#'} className="block text-[12px] font-medium truncate hover:underline">
-                      {product?.title ?? 'Pattern'}
-                    </Link>
-                    <p className="text-[10px] text-ink-soft mt-0.5">Crochet Pattern PDF</p>
-                    <p className="text-[10px] text-ink-soft">{new Date(p.purchase_date).toLocaleDateString()}</p>
-                  </div>
-                  <button
-                    onClick={() => download(p.product_id, product?.title)}
-                    disabled={downloading === p.product_id}
-                    aria-label="Download PDF"
-                    className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center hover:opacity-90 disabled:opacity-50"
-                    style={{ background: BRAND_SOFT }}
-                  >
-                    <MaterialIcon name="download" size={16} color={BRAND} />
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  )
 }
 
 function MyOrders() {
@@ -486,7 +298,7 @@ function Downloads() {
     setDownloading(productId)
     const ok = await triggerPdfDownload(productId, title)
     setDownloading(null)
-    if (!ok) alert("This pattern's file isn't uploaded yet — please check back soon.")
+    if (!ok) alert("This pattern's file isn't uploaded yet â€” please check back soon.")
   }
 
   if (loading) return <ProductGridSkeleton count={6} />
@@ -537,7 +349,7 @@ function Downloads() {
                     style={{ background: BRAND }}
                   >
                     <MaterialIcon name="download" size={14} />
-                    {downloading === p.product_id ? '…' : 'DOWNLOAD'}
+                    {downloading === p.product_id ? 'â€¦' : 'DOWNLOAD'}
                   </button>
                 </td>
               </tr>
@@ -590,7 +402,7 @@ function ProfileTab() {
       return
     }
     setEditingName(true)
-    showToast('You can change your name once every 7 days — make sure it\'s right.', 'info')
+    showToast('You can change your name once every 7 days â€” make sure it\'s right.', 'info')
   }
 
   const cancelEditingName = () => {
@@ -609,7 +421,7 @@ function ProfileTab() {
     }).eq('id', user.id)
     await refreshProfile()
     setNameSaving(false)
-    if (error) { showToast("Couldn't update your name — please try again.", 'error'); return }
+    if (error) { showToast("Couldn't update your name â€” please try again.", 'error'); return }
     setEditingName(false)
     showToast('Name updated.', 'success')
   }
@@ -700,7 +512,7 @@ function ProfileTab() {
                 className="px-5 py-2 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 style={{ background: BRAND }}
               >
-                {nameSaving ? 'SAVING…' : 'SAVE NAME'}
+                {nameSaving ? 'SAVINGâ€¦' : 'SAVE NAME'}
               </button>
               <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
             </div>
@@ -753,7 +565,7 @@ function ProfileTab() {
             className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: BRAND }}
           >
-            {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
+            {pwSaving ? 'UPDATINGâ€¦' : 'UPDATE PASSWORD'}
           </button>
           {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
           <p className="text-[11px] text-ink-soft">If you signed up with Google, password changes aren&apos;t available here.</p>
@@ -863,7 +675,7 @@ function AddressesPage() {
               <label className="block">
                 <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">STATE</span>
                 <select value={billingState} onChange={(e) => { setBillingState(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg">
-                  <option value="">Select a state…</option>
+                  <option value="">Select a stateâ€¦</option>
                   {US_STATES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
                 </select>
               </label>
@@ -887,7 +699,7 @@ function AddressesPage() {
           ) : null}
           <div className="flex items-center gap-3 pt-2">
             <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
-              {saving ? 'SAVING…' : 'SAVE ADDRESS'}
+              {saving ? 'SAVINGâ€¦' : 'SAVE ADDRESS'}
             </button>
             {hasAddress && <button onClick={() => setEditing(false)} className="text-[11px] text-ink-soft hover:text-ink">CANCEL</button>}
             {saved && <span className="text-[12px] text-ink-soft">Saved.</span>}
@@ -907,14 +719,14 @@ function NewsletterPrefs() {
   const save = async () => {
     if (!user?.email) return
     if (!subscribed) {
-      showToast('Uncheck and we won’t email you — leave the box checked to stay subscribed.', 'info')
+      showToast('Uncheck and we wonâ€™t email you â€” leave the box checked to stay subscribed.', 'info')
       return
     }
     setSaving(true)
     const { ok, error } = await subscribeToNewsletter(user.email)
     setSaving(false)
     if (!ok) showToast(error ?? "Couldn't subscribe.", 'error')
-    else showToast('You’re subscribed to the maker newsletter.', 'success')
+    else showToast('Youâ€™re subscribed to the maker newsletter.', 'success')
   }
 
   return (
@@ -937,7 +749,7 @@ function NewsletterPrefs() {
         className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50"
         style={{ background: BRAND }}
       >
-        {saving ? 'SAVING…' : 'SAVE PREFERENCES'}
+        {saving ? 'SAVINGâ€¦' : 'SAVE PREFERENCES'}
       </button>
     </div>
   )
@@ -960,7 +772,7 @@ function LogoutConfirm() {
         LOG OUT
       </button>
       <Link href="/account" className="text-[12px] text-ink-soft hover:text-ink underline underline-offset-2">
-        Cancel — stay signed in
+        Cancel â€” stay signed in
       </Link>
     </div>
   )

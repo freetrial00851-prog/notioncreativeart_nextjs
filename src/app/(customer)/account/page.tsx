@@ -1,14 +1,6 @@
-import { buildMetadata } from '@/lib/seo'
-import { Account } from '@/views/Account'
+import { redirect } from 'next/navigation'
 
-export const metadata = buildMetadata({
-  title: 'My Account',
-  description: 'Manage your Notion Creative Art account, orders, and downloads.',
-  path: '/account',
-  noIndex: true,
-})
-
-/** Account dashboard and sub-pages — tab routing handled inside Account component. */
+/** Account home redirects to Orders — there is no dashboard. */
 export default function AccountPage() {
-  return <Account />
+  redirect('/account/orders')
 }

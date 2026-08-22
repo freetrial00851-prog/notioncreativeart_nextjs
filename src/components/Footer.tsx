@@ -215,7 +215,7 @@ export function Footer() {
 
   const AccountLinks = (
     <>
-      <li><Link href="/account" className="hover:underline">My Account</Link></li>
+      <li><Link href="/account/orders" className="hover:underline">My Account</Link></li>
       <li><Link href="/account/orders" className="hover:underline">My Purchases</Link></li>
       <li><Link href="/account/wishlist" className="hover:underline">Wishlist</Link></li>
       <li><Link href="/cart" className="hover:underline">Cart</Link></li>

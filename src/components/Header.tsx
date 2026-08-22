@@ -456,43 +456,62 @@ export function Header() {
             <HeartIcon size={20} />
             <span className="text-[13px]">Wishlist</span>
           </button>
-          {user ? (
-            <div ref={desktopAccountWrapRef} className="relative">
-              <button
-                onClick={() => setDesktopAccountOpen((v) => !v)}
-                className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
-                aria-label="Account"
-                aria-expanded={desktopAccountOpen}
-              >
-                <UserIcon size={20} />
-                <span className="text-[13px]">Account</span>
-                <ChevronIcon open={desktopAccountOpen} />
-              </button>
-              {desktopAccountOpen && (
-                <div className="absolute right-0 top-full pt-3 z-50">
-                  <div className="w-48 bg-canvas border border-line shadow-lg text-sm rounded-lg overflow-hidden">
-                    <div className="px-5 py-3 border-b border-line text-ink-soft text-[11px] tracking-wide">
-                      {profile?.first_name || 'MY ACCOUNT'}
-                    </div>
-                    <Link href="/account" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Dashboard</Link>
-                    <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Orders</Link>
-                    <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px] lg:hidden">My Downloads</Link>
-                    <Link href="/account/wishlist" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Wishlist</Link>
-                    <Link href="/account/profile" onClick={() => setDesktopAccountOpen(false)} className="block px-5 py-3 hover:bg-surface text-[13px]">Profile</Link>
-                    <button onClick={() => { signOut(); setDesktopAccountOpen(false) }} className="w-full text-left px-5 py-3 hover:bg-surface text-[13px] text-ink border-t border-line">Logout</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
+          <div ref={desktopAccountWrapRef} className="relative">
             <button
-              onClick={() => requireAuth()}
+              onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
               className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
+              aria-label="Account"
+              aria-expanded={desktopAccountOpen}
             >
               <UserIcon size={20} />
               <span className="text-[13px]">Account</span>
+              {user && <ChevronIcon open={desktopAccountOpen} />}
             </button>
-          )}
+            {user && desktopAccountOpen && (
+              <div className="absolute right-0 top-full pt-2 z-50">
+                <div className="w-[260px] bg-white border border-line shadow-[0_8px_30px_rgba(0,0,0,0.12)] text-sm rounded-xl overflow-hidden">
+                  <div className="h-1" style={{ background: 'var(--color-accent)' }} />
+                  <Link
+                    href="/account/profile"
+                    onClick={() => setDesktopAccountOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3.5 hover:bg-surface border-b border-line"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-[14px] font-semibold"
+                      style={{ background: 'var(--color-accent)' }}
+                    >
+                      {(profile?.first_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-ink truncate">
+                        {[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}
+                      </p>
+                      <p className="text-[11px] text-ink-soft">View your profile</p>
+                    </div>
+                  </Link>
+                  <div className="py-1.5">
+                    <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+                      <MaterialIcon name="receipt_long" size={18} /> Orders
+                    </Link>
+                    <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+                      <MaterialIcon name="download" size={18} /> Downloads
+                    </Link>
+                  </div>
+                  <div className="border-t border-line py-1.5">
+                    <Link href="/account/profile" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+                      <MaterialIcon name="settings" size={18} /> Account settings
+                    </Link>
+                    <button
+                      onClick={() => { signOut(); setDesktopAccountOpen(false) }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink text-left"
+                    >
+                      <MaterialIcon name="logout" size={18} /> Sign out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           <button
             onClick={openDrawer}
             aria-label="Cart"
@@ -691,34 +710,26 @@ export function Header() {
 
             {user ? (
               <>
-                <div className="px-6 py-5 border-b border-line flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-semibold" style={{ background: 'var(--color-primary)' }}>
+                <div className="h-1" style={{ background: 'var(--color-accent)' }} />
+                <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="px-6 py-5 border-b border-line flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-semibold" style={{ background: 'var(--color-accent)' }}>
                     {(profile?.first_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
                   </div>
                   <div className="min-w-0">
                     <p className="text-[14px] font-medium truncate">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}</p>
-                    <p className="text-[12px] text-ink-soft truncate">{user.email}</p>
+                    <p className="text-[12px] text-ink-soft">View your profile</p>
                   </div>
-                </div>
+                </Link>
                 <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
-                  <Link href="/account" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <UserIcon size={18} /> My Account
-                  </Link>
                   <Link href="/account/orders" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <MaterialIcon name="receipt_long" size={18} /> My Purchases
+                    <MaterialIcon name="receipt_long" size={18} /> Orders
                   </Link>
                   <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <MaterialIcon name="download" size={18} /> My Downloads
-                  </Link>
-                  <Link href="/account/wishlist" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <HeartIcon size={18} /> Wishlist
+                    <MaterialIcon name="download" size={18} /> Downloads
                   </Link>
                   <div className="border-t border-line mt-2 pt-2">
                     <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                      <MaterialIcon name="settings" size={18} /> Account Settings
-                    </Link>
-                    <Link href="/faq" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                      <MaterialIcon name="help" size={18} /> Help &amp; Support
+                      <MaterialIcon name="settings" size={18} /> Account settings
                     </Link>
                   </div>
                   <div className="border-t border-line mt-2 pt-2">
@@ -726,7 +737,7 @@ export function Header() {
                       onClick={() => { signOut(); setMobileAccountOpen(false) }}
                       className="w-full flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink"
                     >
-                      <MaterialIcon name="logout" size={18} /> Sign Out
+                      <MaterialIcon name="logout" size={18} /> Sign out
                     </button>
                   </div>
                 </nav>
@@ -734,7 +745,7 @@ export function Header() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
                 <UserIcon size={36} />
-                <p className="text-[14px] text-ink-soft">Sign in to see your account, orders and downloads.</p>
+                <p className="text-[14px] text-ink-soft">Sign in to see your orders and downloads.</p>
                 <button
                   onClick={() => { setMobileAccountOpen(false); requireAuth() }}
                   className="px-6 py-3 rounded-lg text-white text-[13px] font-semibold"
