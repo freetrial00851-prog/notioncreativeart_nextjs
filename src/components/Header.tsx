@@ -33,11 +33,36 @@ const SKILL_LEVELS: { key: 'beginner' | 'intermediate' | 'advanced'; label: stri
   { key: 'advanced', label: 'Advanced', icon: 'military_tech' },
 ]
 
-function Logo() {
+const LOGO_BLUE = '#0A3CC9'
+
+/** Desktop: large blue NCA + stacked NOTION / CREATIVE / ART. Mobile: blue NCA only. */
+function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
+  if (variant === 'mobile') {
+    return (
+      <Link href="/" className="shrink-0 leading-none" aria-label="Notion Creative Art — home">
+        <span
+          className="font-display font-extrabold tracking-tight text-[26px]"
+          style={{ color: LOGO_BLUE }}
+        >
+          NCA
+        </span>
+      </Link>
+    )
+  }
+
   return (
-    <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="Notion Creative Art — home">
-      <img src="/logo-nca.png?v=2" alt="NCA" width={72} height={28} className="h-7 w-auto object-contain shrink-0" />
-      <span className="font-display text-[15px] font-semibold tracking-wide leading-none hidden sm:inline">Notion Creative Art</span>
+    <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Notion Creative Art — home">
+      <span
+        className="font-display font-extrabold tracking-tight text-[34px] xl:text-[38px] leading-none"
+        style={{ color: LOGO_BLUE }}
+      >
+        NCA
+      </span>
+      <span className="flex flex-col justify-center leading-[1.05] text-[10px] xl:text-[11px] font-semibold tracking-[0.06em] uppercase text-ink">
+        <span>Notion</span>
+        <span>Creative</span>
+        <span>Art</span>
+      </span>
     </Link>
   )
 }
@@ -486,9 +511,7 @@ export function Header() {
 
       {/* Mobile row — V2: logo left, icon row right, prominent search bar below */}
       <div className="flex md:hidden items-center justify-between px-4 h-[58px]">
-        <Link href="/" className="flex items-center gap-1.5 shrink-0" aria-label="Notion Creative Art — home">
-          <img src="/logo-nca.png?v=2" alt="NCA" width={64} height={24} className="h-6 w-auto object-contain shrink-0" />
-        </Link>
+        <Logo variant="mobile" />
 
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={() => setMobileOpen(true)} aria-label="Categories" className="w-10 h-10 flex items-center justify-center text-ink">

@@ -73,7 +73,7 @@ export function Admin() {
       {/* Mobile top bar */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 text-white sticky top-0 z-40" style={{ background: '#16233d' }}>
         <div className="flex items-center gap-2.5">
-          <img src="/logo-nca.png?v=2" alt="NCA" width={56} height={22} className="h-5 w-auto object-contain shrink-0 rounded-md bg-white px-1.5 py-1" />
+          <span className="font-display font-extrabold tracking-tight text-[20px] leading-none text-white">NCA</span>
           <p className="text-[12px] font-semibold tracking-wide">ADMIN</p>
         </div>
         <button onClick={() => setMobileNavOpen(true)} aria-label="Open menu" className="p-1">
@@ -98,7 +98,7 @@ export function Admin() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-[240px] shrink-0 flex-col text-white" style={{ background: '#16233d' }}>
         <div className="px-6 py-6 flex items-center gap-2.5 border-b border-white/10">
-          <img src="/logo-nca.png?v=2" alt="NCA" width={64} height={24} className="h-6 w-auto object-contain shrink-0 rounded-md bg-white px-1.5 py-1" />
+          <span className="font-display font-extrabold tracking-tight text-[22px] leading-none text-white">NCA</span>
           <div className="leading-tight">
             <p className="text-[12px] font-semibold tracking-wide">NOTION CREATIVE ART</p>
             <p className="text-[10px] tracking-[0.15em] text-white/50">ADMIN</p>
