@@ -36,8 +36,8 @@ const SKILL_LEVELS: { key: 'beginner' | 'intermediate' | 'advanced'; label: stri
 function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="Notion Creative Art — home">
-      <img src="/logo-nca.png" alt="" width={36} height={36} className="w-9 h-9 object-contain shrink-0" />
-      <span className="font-display text-[15px] font-semibold tracking-wide leading-none">Notion Creative Art</span>
+      <img src="/logo-nca.png?v=2" alt="NCA" width={72} height={28} className="h-7 w-auto object-contain shrink-0" />
+      <span className="font-display text-[15px] font-semibold tracking-wide leading-none hidden sm:inline">Notion Creative Art</span>
     </Link>
   )
 }
@@ -487,7 +487,7 @@ export function Header() {
       {/* Mobile row — V2: logo left, icon row right, prominent search bar below */}
       <div className="flex md:hidden items-center justify-between px-4 h-[58px]">
         <Link href="/" className="flex items-center gap-1.5 shrink-0" aria-label="Notion Creative Art — home">
-          <img src="/logo-nca.png" alt="" width={32} height={32} className="w-8 h-8 object-contain shrink-0" />
+          <img src="/logo-nca.png?v=2" alt="NCA" width={64} height={24} className="h-6 w-auto object-contain shrink-0" />
         </Link>
 
         <div className="flex items-center gap-1 shrink-0">
