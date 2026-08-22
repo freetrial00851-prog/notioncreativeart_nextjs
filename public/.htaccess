@@ -1,0 +1,26 @@
+# Required for React Router (client-side routing) on Apache/cPanel shared hosting.
+# Without this, refreshing any page other than / (e.g. /shop or /pattern/xyz) returns a 404
+# because Apache looks for a real file/folder at that path — this rewrites everything to index.html
+# so React Router can take over and render the right page.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# index.html must NEVER be cached by the browser — it's the entry point that references
+# the current build's JS/CSS files. If it's cached, visitors (and you, testing) keep loading
+# an old version of the site even after a fresh upload, until they manually clear cache.
+<IfModule mod_headers.c>
+  <FilesMatch "index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+  # JS/CSS files ARE safe to cache aggressively — Vite gives each build a unique
+  # hashed filename (e.g. index-Bl_CVgYh.js), so a new build never collides with a cached old one.
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

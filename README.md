@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Notion Creative Art — Next.js
 
-## Getting Started
+Professional Next.js 16 migration of the NCA crochet pattern e-commerce site. Server-rendered SEO, Supabase SSR auth, and the same stable feature set as the original Vite/React app.
 
-First, run the development server:
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd nca-nextjs
+cp .env.example .env.local   # fill in your Supabase + Lemon Squeezy keys
+npm install
+npm run dev                  # http://localhost:3000
+npm run build                # production build (verified passing)
+npm start                    # serve production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What changed from Vite → Next.js
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Area | Before (Vite SPA) | After (Next.js App Router) |
+|------|-------------------|----------------------------|
+| **SEO** | Client-side `useMeta` hook — crawlers had to run JS | Server `generateMetadata()` on every page — indexable immediately |
+| **Product pages** | Client fetch only | Static pre-generation + JSON-LD Product schema |
+| **Sitemap** | Build script → static XML | Dynamic `/sitemap.xml` from live Supabase data |
+| **Auth** | Browser-only Supabase client | `@supabase/ssr` with middleware session refresh |
+| **Routing** | react-router-dom | Next.js App Router file-based routes |
+| **Preloading** | Client prefetch cache | `generateStaticParams` pre-builds all product pages |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project structure
 
-## Learn More
+```
+src/
+├── app/                  # Next.js routes (thin wrappers — metadata + imports)
+│   ├── (customer)/       # Header/footer shell pages
+│   ├── admin/            # Admin panel (no customer shell)
+│   ├── login|signup/     # Auth pages (standalone layout)
+│   ├── sitemap.ts        # Dynamic SEO sitemap
+│   └── robots.ts         # Crawler rules
+├── views/                # Page components (migrated from Vite src/pages)
+├── components/           # Shared UI components
+├── context/              # Auth, cart, toast, UI providers
+└── lib/
+    ├── seo.ts            # Metadata helpers + JSON-LD builders
+    ├── data/products.ts  # Server-side Supabase queries
+    └── supabase/         # client | server | static | middleware clients
+supabase/                 # SQL migrations + Edge Functions (unchanged)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## SEO features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Server-rendered metadata** — title, description, canonical, Open Graph, Twitter cards on every page
+- **Keyword targeting** — 18+ primary keywords in `src/lib/seo.ts` (crochet patterns, amigurumi, PDF downloads, etc.)
+- **JSON-LD structured data** — Organization, WebSite (with SearchAction), Product schema on pattern pages
+- **Dynamic sitemap** — all active products + categories auto-included at `/sitemap.xml`
+- **robots.txt** — blocks `/account`, `/admin`, `/cart`, `/wishlist` from indexing
+- **Static product pre-rendering** — every active pattern pre-built at deploy time
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment variables
 
-## Deploy on Vercel
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_LEMON_STORE_SLUG` | Lemon Squeezy store slug |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics ID (optional) |
+| `NEXT_PUBLIC_SITE_URL` | Production URL (default: https://notioncreativeart.com) |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Optimized for [Vercel](https://vercel.com). Set environment variables in the Vercel dashboard, connect the repo, and deploy. The build generates static pages for all products automatically.
+
+For other hosts: `npm run build && npm start` (Node.js server required).
+
+## Original source
+
+The Vite source is preserved in `../nca-source/source/` for reference.
