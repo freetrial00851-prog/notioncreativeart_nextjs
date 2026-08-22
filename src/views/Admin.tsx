@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, Fragment } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { NavLink } from '@/components/NavLink'
 import { supabase } from '../lib/supabase'
 import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl } from '../lib/imageVariants'
@@ -10,24 +10,43 @@ import { compressImage } from '../lib/imageCompress'
 import { useAuth } from '../context/AuthContext'
 import type { Product, Category } from '../lib/types'
 import { HomepageAdmin } from './AdminHomepage'
+import { AdminDashboard } from './AdminDashboard'
 import { DropzoneUpload } from '../components/DropzoneUpload'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { triggerPdfDownload } from '../lib/downloads'
 
-const ADMIN_NAV = [
-  { to: '/admin', label: 'Products', icon: 'inventory_2', end: true },
-  { to: '/admin/categories', label: 'Categories', icon: 'category' },
-  { to: '/admin/free-patterns', label: 'Free Patterns', icon: 'card_giftcard' },
-  { to: '/admin/bundles', label: 'Bundles', icon: 'redeem' },
-  { to: '/admin/orders', label: 'Orders', icon: 'receipt_long' },
-  { to: '/admin/homepage', label: 'Homepage', icon: 'home' },
-  { to: '/admin/subscribers', label: 'Newsletter', icon: 'mail' },
-  { to: '/admin/trash', label: 'Trash', icon: 'delete' },
+const SHELL_BG = '#f9f8f6'
+const SIDEBAR_BG = '#f3f1ec'
+const ACCENT = '#0f3fc9'
+
+type NavItem =
+  | { kind: 'link'; to: string; label: string; icon: string; end?: boolean }
+  | { kind: 'group'; id: string; label: string; icon: string; children: { to: string; label: string }[] }
+
+const ADMIN_NAV: NavItem[] = [
+  { kind: 'link', to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true },
+  { kind: 'link', to: '/admin/listings', label: 'Listings', icon: 'sell' },
+  { kind: 'link', to: '/admin/orders', label: 'Orders', icon: 'receipt_long' },
+  { kind: 'link', to: '/admin/categories', label: 'Categories', icon: 'category' },
+  {
+    kind: 'group',
+    id: 'settings',
+    label: 'Settings',
+    icon: 'settings',
+    children: [
+      { to: '/admin/homepage', label: 'Homepage' },
+      { to: '/admin/subscribers', label: 'Newsletter' },
+    ],
+  },
+  { kind: 'link', to: '/admin/trash', label: 'Trash', icon: 'delete' },
 ]
 
 export function Admin() {
   const { user, profile, loading, signOut } = useAuth()
+  const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ settings: true })
+  const shopLabel = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Notion Creative Art'
 
   if (loading) return null
   if (!user || !profile?.is_admin) {
@@ -41,53 +60,110 @@ export function Admin() {
 
   const navContent = (
     <>
-      <nav className="flex-1 py-4 px-3 space-y-1">
-        {ADMIN_NAV.map((item) => (
-          <NavLink
-            key={item.to}
-            href={item.to}
-            end={item.end}
-            onClick={() => setMobileNavOpen(false)}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors ${isActive ? 'bg-white/10 text-white font-medium' : 'text-white/60 hover:text-white hover:bg-white/5'}`
-            }
-          >
-            <MaterialIcon name={item.icon} size={18} />
-            {item.label}
-          </NavLink>
-        ))}
+      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+        {ADMIN_NAV.map((item) => {
+          if (item.kind === 'link') {
+            return (
+              <NavLink
+                key={item.to}
+                href={item.to}
+                end={item.end}
+                onClick={() => setMobileNavOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                    isActive ? 'bg-white text-ink font-medium shadow-sm' : 'text-[#444] hover:bg-white/70 hover:text-ink'
+                  }`
+                }
+              >
+                <MaterialIcon name={item.icon} size={18} />
+                {item.label}
+              </NavLink>
+            )
+          }
+          const groupOpen = openGroups[item.id]
+          const childActive = item.children.some((c) => pathname === c.to || pathname?.startsWith(c.to + '/'))
+          return (
+            <div key={item.id}>
+              <button
+                type="button"
+                onClick={() => setOpenGroups((g) => ({ ...g, [item.id]: !g[item.id] }))}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                  childActive ? 'text-ink font-medium' : 'text-[#444] hover:bg-white/70'
+                }`}
+              >
+                <MaterialIcon name={item.icon} size={18} />
+                <span className="flex-1 text-left">{item.label}</span>
+                <MaterialIcon name="expand_more" size={16} style={{ transform: groupOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+              </button>
+              {groupOpen && (
+                <div className="ml-4 pl-3 border-l border-[#e4e1db] space-y-0.5 mb-1">
+                  {item.children.map((c) => (
+                    <NavLink
+                      key={c.to}
+                      href={c.to}
+                      onClick={() => setMobileNavOpen(false)}
+                      className={({ isActive }) =>
+                        `block px-3 py-1.5 rounded-md text-[12px] ${isActive ? 'text-ink font-medium bg-white' : 'text-[#666] hover:text-ink'}`
+                      }
+                    >
+                      {c.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </nav>
-      <div className="border-t border-white/10 px-5 py-4">
-        <p className="text-[12px] font-medium truncate">Admin</p>
-        <p className="text-[11px] text-white/50 truncate mb-3">{user.email}</p>
-        <div className="flex items-center gap-4 text-[11px] tracking-[0.08em]">
-          <Link href="/" target="_blank" rel="noreferrer" className="text-white/50 hover:text-white transition-colors">VIEW SITE ↗</Link>
-          <button onClick={signOut} className="text-white/50 hover:text-white transition-colors">SIGN OUT</button>
+
+      <div className="px-3 pb-2">
+        <p className="px-3 text-[11px] font-semibold tracking-wide text-[#888] uppercase mb-1.5">Sales channels</p>
+        <a
+          href="/"
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-ink hover:bg-white/70"
+        >
+          <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0" style={{ background: ACCENT }}>N</span>
+          <span className="truncate">NCA Shop</span>
+        </a>
+      </div>
+
+      <div className="border-t border-[#e4e1db] px-3 py-3">
+        <div className="flex items-center gap-2.5 px-2 py-1.5">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[12px] font-semibold shrink-0" style={{ background: ACCENT }}>
+            {(shopLabel[0] || 'A').toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-medium truncate">{shopLabel}</p>
+            <p className="text-[11px] text-[#888] truncate">{user.email}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 px-2 mt-2 text-[11px]">
+          <Link href="/" target="_blank" rel="noreferrer" className="text-[#666] hover:text-ink">View site</Link>
+          <button onClick={signOut} className="text-[#666] hover:text-ink">Sign out</button>
         </div>
       </div>
     </>
   )
 
   return (
-    <div className="min-h-screen md:flex" style={{ background: '#f6f4ef' }}>
-      {/* Mobile top bar */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 text-white sticky top-0 z-40" style={{ background: '#16233d' }}>
-        <div className="flex items-center gap-2.5">
-          <span className="font-display font-extrabold tracking-tight text-[20px] leading-none text-white">NCA</span>
-          <p className="text-[12px] font-semibold tracking-wide">ADMIN</p>
+    <div className="min-h-screen md:flex" style={{ background: SHELL_BG }}>
+      <div className="md:hidden flex items-center justify-between px-4 py-3 sticky top-0 z-40 border-b border-[#e4e1db]" style={{ background: SIDEBAR_BG }}>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setMobileNavOpen(true)} aria-label="Open menu" className="p-1">
+            <MaterialIcon name="menu" size={22} />
+          </button>
+          <p className="font-heading text-[18px] font-semibold">Shop Manager</p>
         </div>
-        <button onClick={() => setMobileNavOpen(true)} aria-label="Open menu" className="p-1">
-          <MaterialIcon name="menu" size={22} />
-        </button>
       </div>
 
-      {/* Mobile drawer */}
       {mobileNavOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-ink/40" onClick={() => setMobileNavOpen(false)} />
-          <aside className="relative w-[240px] shrink-0 flex flex-col text-white" style={{ background: '#16233d' }}>
-            <div className="px-6 py-6 flex items-center justify-between border-b border-white/10">
-              <p className="text-[12px] font-semibold tracking-wide">NOTION CREATIVE ART</p>
+          <div className="absolute inset-0 bg-ink/30" onClick={() => setMobileNavOpen(false)} />
+          <aside className="relative w-[260px] shrink-0 flex flex-col border-r border-[#e4e1db]" style={{ background: SIDEBAR_BG }}>
+            <div className="px-4 py-4 flex items-center justify-between border-b border-[#e4e1db]">
+              <p className="font-heading text-[18px] font-semibold">Shop Manager</p>
               <button onClick={() => setMobileNavOpen(false)} aria-label="Close menu"><MaterialIcon name="close" size={20} /></button>
             </div>
             {navContent}
@@ -95,19 +171,15 @@ export function Admin() {
         </div>
       )}
 
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-[240px] shrink-0 flex-col text-white" style={{ background: '#16233d' }}>
-        <div className="px-6 py-6 flex items-center gap-2.5 border-b border-white/10">
-          <span className="font-display font-extrabold tracking-tight text-[22px] leading-none text-white">NCA</span>
-          <div className="leading-tight">
-            <p className="text-[12px] font-semibold tracking-wide">NOTION CREATIVE ART</p>
-            <p className="text-[10px] tracking-[0.15em] text-white/50">ADMIN</p>
-          </div>
+      <aside className="hidden md:flex w-[240px] shrink-0 flex-col border-r border-[#e4e1db] sticky top-0 h-screen" style={{ background: SIDEBAR_BG }}>
+        <div className="px-4 py-5 flex items-center gap-2 border-b border-[#e4e1db]">
+          <MaterialIcon name="menu" size={20} />
+          <p className="font-heading text-[18px] font-semibold">Shop Manager</p>
         </div>
         {navContent}
       </aside>
 
-      <main className="flex-1 min-w-0 px-4 py-6 md:px-12 md:py-10 overflow-x-auto">
+      <main className="flex-1 min-w-0 px-4 py-6 md:px-8 md:py-8 overflow-x-auto">
         <AdminContent />
       </main>
     </div>
@@ -118,8 +190,13 @@ export function Admin() {
 function AdminContent() {
   const pathname = usePathname()
   switch (pathname) {
+    case '/admin':
+    case '/admin/':
+      return <AdminDashboard />
     case '/admin/categories':
       return <CategoriesAdmin />
+    case '/admin/listings':
+      return <ProductsAdmin mode="listings" />
     case '/admin/free-patterns':
       return <ProductsAdmin mode="free" />
     case '/admin/bundles':
@@ -133,7 +210,7 @@ function AdminContent() {
     case '/admin/trash':
       return <TrashAdmin />
     default:
-      return <ProductsAdmin mode="all" />
+      return <AdminDashboard />
   }
 }
 
@@ -191,8 +268,9 @@ const emptyForm = {
   meta_description: '',
 }
 
-function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
+function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings' }) {
   const PAGE_SIZE = 25
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -209,9 +287,24 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkWorking, setBulkWorking] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<'active' | 'draft' | 'sold_out' | 'inactive' | 'all'>(
+    (searchParams.get('status') as 'active' | 'draft' | 'sold_out' | 'inactive' | 'all') || 'active'
+  )
+  const [typeFilter, setTypeFilter] = useState<'all' | 'paid' | 'free' | 'bundles'>(
+    mode === 'free' ? 'free' : mode === 'bundles' ? 'bundles' : 'all'
+  )
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
+  const [statusCounts, setStatusCounts] = useState({ active: 0, draft: 0, sold_out: 0, inactive: 0 })
+  const [showStats, setShowStats] = useState(true)
 
-  const pageTitle = mode === 'free' ? 'Free Patterns' : mode === 'bundles' ? 'Bundles' : 'Products'
-  const emptyMessage = mode === 'free' ? 'No free patterns yet — set a product\'s price to $0 to list it here.' : mode === 'bundles' ? 'No bundles yet — check "This is a bundle" on a product to list it here.' : 'No products yet.'
+  const pageTitle = mode === 'free' ? 'Free Patterns' : mode === 'bundles' ? 'Bundles' : 'Listings'
+  const emptyMessage = mode === 'free' ? 'No free patterns yet — set a product\'s price to $0 to list it here.' : mode === 'bundles' ? 'No bundles yet — check "This is a bundle" on a product to list it here.' : 'No listings yet.'
+
+  useEffect(() => {
+    const s = searchParams.get('status') as typeof statusFilter | null
+    if (s && ['active', 'draft', 'sold_out', 'inactive', 'all'].includes(s)) setStatusFilter(s)
+  }, [searchParams])
 
   const uploadImages = async (files: File[]) => {
     setUploadingImages(true)
@@ -274,16 +367,45 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
 
   const [counts, setCounts] = useState<Record<string, { wishlist: number; sales: number }>>({})
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applyProductFilters = (query: any) => {
+    let q = query.is('deleted_at', null)
+    if (mode === 'free' || typeFilter === 'free') q = q.eq('price', 0)
+    else if (mode === 'bundles' || typeFilter === 'bundles') q = q.eq('is_bundle', true)
+    else if (mode === 'listings' && typeFilter === 'paid') q = q.gt('price', 0)
+    else if (mode === 'all') q = q.gt('price', 0)
+
+    if (statusFilter === 'active') q = q.eq('active', true).eq('sold_out', false)
+    else if (statusFilter === 'draft' || statusFilter === 'inactive') q = q.eq('active', false)
+    else if (statusFilter === 'sold_out') q = q.eq('sold_out', true)
+
+    if (search.trim()) q = q.ilike('title', `%${search.trim()}%`)
+    return q
+  }
+
+  const loadStatusCounts = async () => {
+    const base = () => supabase.from('products').select('id', { count: 'exact', head: true }).is('deleted_at', null)
+    const [{ count: active }, { count: draft }, { count: sold_out }] = await Promise.all([
+      base().eq('active', true).eq('sold_out', false),
+      base().eq('active', false),
+      base().eq('sold_out', true),
+    ])
+    setStatusCounts({
+      active: active ?? 0,
+      draft: draft ?? 0,
+      sold_out: sold_out ?? 0,
+      inactive: draft ?? 0,
+    })
+  }
+
   const load = () => {
-    let query = supabase.from('products').select('*').is('deleted_at', null).order('created_at', { ascending: false })
-    if (mode === 'all') query = query.gt('price', 0)
-    if (mode === 'free') query = query.eq('price', 0)
-    if (mode === 'bundles') query = query.eq('is_bundle', true)
-    if (search.trim()) query = query.ilike('title', `%${search.trim()}%`)
+    let query = supabase.from('products').select('*').order('created_at', { ascending: false })
+    query = applyProductFilters(query)
     query.range(0, PAGE_SIZE - 1).then(({ data }) => {
       setProducts((data as Product[]) ?? [])
       setHasMore((data?.length ?? 0) === PAGE_SIZE)
     })
+    loadStatusCounts()
     supabase.from('wishlist').select('product_id').then(({ data }) => {
       const tally: Record<string, number> = {}
       for (const row of data ?? []) tally[row.product_id] = (tally[row.product_id] ?? 0) + 1
@@ -298,11 +420,8 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
 
   const loadMore = async () => {
     setLoadingMore(true)
-    let query = supabase.from('products').select('*').is('deleted_at', null).order('created_at', { ascending: false })
-    if (mode === 'all') query = query.gt('price', 0)
-    if (mode === 'free') query = query.eq('price', 0)
-    if (mode === 'bundles') query = query.eq('is_bundle', true)
-    if (search.trim()) query = query.ilike('title', `%${search.trim()}%`)
+    let query = supabase.from('products').select('*').order('created_at', { ascending: false })
+    query = applyProductFilters(query)
     const { data } = await query.range(products.length, products.length + PAGE_SIZE - 1)
     setProducts((prev) => [...prev, ...((data as Product[]) ?? [])])
     setHasMore((data?.length ?? 0) === PAGE_SIZE)
@@ -314,7 +433,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
     load()
     supabase.from('categories').select('*').order('sort_order').then(({ data }) => setCategories((data as Category[]) ?? []))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
+  }, [mode, statusFilter, typeFilter])
 
   useEffect(() => {
     setSelected(new Set())
@@ -514,6 +633,11 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
     load()
   }
 
+  const setFeatured = async (p: Product) => {
+    await supabase.from('products').update({ featured: !p.featured }).eq('id', p.id)
+    load()
+  }
+
   const trash = async (id: string) => {
     if (!confirm('Move this product to Trash? It will disappear from the site, and you can restore it later.')) return
     await supabase.from('products').update({ deleted_at: new Date().toISOString(), active: false }).eq('id', id)
@@ -524,7 +648,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
     const isFreeItem = form.itemType === 'free'
     const priceNum = form.price.trim() === '' ? null : parseFloat(form.price)
     const tabs: ('general' | 'media' | 'pricing' | 'seo')[] = isFreeItem ? ['general', 'media', 'seo'] : ['general', 'media', 'pricing', 'seo']
-    const tabLabels: Record<'general' | 'media' | 'pricing' | 'seo', string> = { general: 'GENERAL', media: 'MEDIA', pricing: 'PRICING & CHECKOUT', seo: 'SEO' }
+    const tabLabels: Record<'general' | 'media' | 'pricing' | 'seo', string> = { general: 'Details', media: 'Photos & files', pricing: 'Pricing', seo: 'SEO' }
     const isLastTab = activeTab === tabs[tabs.length - 1]
     const missingFields: string[] = []
     if (!form.title.trim()) missingFields.push('Title')
@@ -540,42 +664,69 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
     const canPublish = missingFields.length === 0
 
     return (
-      <div className="max-w-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="font-display font-semibold text-2xl">{form.id ? 'Edit Product' : `New ${mode === 'free' ? 'Free Pattern' : mode === 'bundles' ? 'Bundle' : 'Product'}`}</h1>
-          <button onClick={() => setEditing(false)} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">← BACK TO {pageTitle.toUpperCase()}</button>
-        </div>
-        <div className="bg-white border border-line rounded-2xl overflow-hidden">
-          <div className="flex border-b border-line">
-            {tabs.map((key) => (
-              <button
-                key={key}
-                onClick={() => setActiveTab(key)}
-                className={`px-5 py-3.5 text-[11px] tracking-[0.1em] border-b-2 transition-colors ${activeTab === key ? 'border-ink text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
-              >
-                {tabLabels[key]}
-              </button>
-            ))}
+      <div className="max-w-3xl mx-auto pb-24">
+        <div className="sticky top-0 z-20 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-6 border-b border-[#e4e1db] flex flex-wrap items-center gap-2" style={{ background: SHELL_BG }}>
+          <div className="min-w-0 flex-1">
+            <p className="text-[15px] font-semibold text-ink truncate">{form.title || (form.id ? 'Edit listing' : 'New listing')}</p>
+            {form.id && (
+              <p className="text-[12px] text-ink-soft">{form.active ? 'Published' : 'Draft'}</p>
+            )}
           </div>
+          {form.slug && (
+            <a href={`/pattern/${form.slug}`} target="_blank" rel="noreferrer" className="px-3 py-2 text-[13px] border border-[#d9d5ce] rounded-full bg-white hover:bg-[#f3f1ec]">
+              Preview
+            </a>
+          )}
+          <button
+            onClick={async () => { const id = await save(false); if (id) setEditing(false) }}
+            disabled={saving}
+            className="px-3 py-2 text-[13px] border border-[#d9d5ce] rounded-full bg-white hover:bg-[#f3f1ec] disabled:opacity-50"
+          >
+            Save as draft
+          </button>
+          <button onClick={() => setEditing(false)} className="px-3 py-2 text-[13px] text-ink-soft hover:text-ink">Cancel</button>
+          <button
+            onClick={async () => { const id = await save(true); if (id) setEditing(false) }}
+            disabled={saving || !canPublish}
+            className="px-4 py-2 text-[13px] font-medium rounded-full text-white disabled:opacity-40"
+            style={{ background: '#222' }}
+          >
+            {saving ? 'Saving…' : 'Publish'}
+          </button>
+        </div>
 
+        <div className="flex gap-1 border-b border-[#e4e1db] mb-6 overflow-x-auto">
+          {tabs.map((key) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`px-4 py-2.5 text-[13px] whitespace-nowrap -mb-px border-b-2 transition-colors ${activeTab === key ? 'border-[#0f3fc9] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
+            >
+              {tabLabels[key]}
+            </button>
+          ))}
+        </div>
+
+        <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden">
           <div className="p-6">
             {activeTab === 'general' && (
-              <div className="grid gap-4">
-                <Field label="TITLE"><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onBlur={() => !form.slug && setForm((f) => ({ ...f, slug: slugify(f.title) }))} className="input" /></Field>
+              <div className="grid gap-5">
+                <h2 className="text-[16px] font-semibold">Listing details</h2>
+                <Field label="Title"><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onBlur={() => !form.slug && setForm((f) => ({ ...f, slug: slugify(f.title) }))} className="input" /></Field>
                 {!form.id && form.images.length > 0 && (
-                  <p className="text-[11px] text-ink-soft -mt-2">Duplicated from another product — images and details copied, but you'll need to set a new Lemon Squeezy checkout ID and re-upload the PDF file in the Media step before publishing.</p>
+                  <p className="text-[12px] text-ink-soft -mt-2">Duplicated from another product — images and details copied, but you&apos;ll need a new Lemon Squeezy checkout ID and PDF before publishing.</p>
                 )}
-                <Field label="SLUG (URL — leave blank to auto-generate from title)"><input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="input" placeholder="granny-stripe-top" /></Field>
-                <Field label="DESCRIPTION"><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input" rows={4} /></Field>
+                <Field label="Slug (URL)"><input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="input" placeholder="granny-stripe-top" /></Field>
+                <Field label="Description"><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input" rows={5} /></Field>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="SKILL LEVEL">
+                  <Field label="Skill level">
                     <select value={form.skill_level} onChange={(e) => setForm({ ...form, skill_level: e.target.value as typeof form.skill_level })} className="input">
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
                       <option value="advanced">Advanced</option>
                     </select>
                   </Field>
-                  <Field label="CATEGORY">
+                  <Field label="Category">
                     <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="input">
                       <option value="">—</option>
                       {sortedForDropdown(categories).map((c) => (
@@ -584,51 +735,27 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
                     </select>
                   </Field>
                 </div>
-                <Field label="TYPE">
-                  <select
-                    value={form.itemType}
-                    onChange={(e) => {
-                      const itemType = e.target.value as 'free' | 'paid'
-                      setForm({
-                        ...form,
-                        itemType,
-                        price: itemType === 'free' ? '0' : (form.price === '0' ? '' : form.price),
-                        is_bundle: itemType === 'free' ? false : form.is_bundle,
-                      })
-                    }}
-                    className="input"
-                  >
-                    <option value="paid">Paid — sold via Lemon Squeezy checkout</option>
-                    <option value="free">Free — instant download, no checkout</option>
-                  </select>
-                  <p className="text-[11px] text-ink-soft mt-1.5">
-                    {form.itemType === 'free' ? "Skips the Pricing & Checkout step entirely — nothing to set up." : 'Unlocks the Pricing & Checkout step next.'}
-                  </p>
-                </Field>
-                {form.id && (
-                  <div>
-                    <span className="block text-[10px] tracking-[0.1em] text-ink-soft mb-1.5">CURRENT STATUS</span>
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] tracking-[0.06em] px-2.5 py-1 rounded-full ${form.active ? 'bg-ink text-canvas' : 'border border-line text-ink-soft'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${form.active ? 'bg-canvas' : 'bg-ink-soft'}`} />
-                      {form.active ? 'PUBLISHED' : 'DRAFT'}
-                    </span>
-                    <p className="text-[11px] text-ink-soft mt-1.5">Use Save as Draft / Publish at the bottom of each step to change this.</p>
+                <Field label="Type">
+                  <div className="flex gap-4 text-[13px]">
+                    <label className="flex items-center gap-2"><input type="radio" checked={form.itemType === 'paid'} onChange={() => setForm({ ...form, itemType: 'paid', price: form.price === '0' ? '' : form.price })} /> Digital — paid</label>
+                    <label className="flex items-center gap-2"><input type="radio" checked={form.itemType === 'free'} onChange={() => setForm({ ...form, itemType: 'free', price: '0', is_bundle: false })} /> Free download</label>
                   </div>
-                )}
-                <label className="flex items-center gap-2 text-[12px]">
-                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured (shows in homepage Featured Items row — product stays in its own category too)
+                </Field>
+                <label className="flex items-center gap-2 text-[13px]">
+                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured on homepage
                 </label>
-                <label className="flex items-center gap-2 text-[12px]">
-                  <input type="checkbox" checked={form.sold_out} onChange={(e) => setForm({ ...form, sold_out: e.target.checked })} /> Sold out (shows badge, disables Buy Now)
+                <label className="flex items-center gap-2 text-[13px]">
+                  <input type="checkbox" checked={form.sold_out} onChange={(e) => setForm({ ...form, sold_out: e.target.checked })} /> Mark as sold out
                 </label>
               </div>
             )}
 
             {activeTab === 'media' && (
-              <div className="grid gap-4">
+              <div className="grid gap-5">
+                <h2 className="text-[16px] font-semibold">Photos &amp; files</h2>
                 <DropzoneUpload
-                  label="PRODUCT PHOTOS (first image is primary — drag to reorder)"
-                  sizeHint="Auto-compressed to ≤26KB WebP on upload (portrait 3:4 works best for shop cards)"
+                  label="Photos (first image is primary — drag to reorder)"
+                  sizeHint="Auto-compressed to ≤26KB WebP on upload"
                   urls={form.images}
                   accept="image/jpeg,image/png"
                   acceptLabel="JPEG or PNG"
@@ -637,81 +764,54 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
                   onRemove={removeImage}
                   onReorder={reorderImages}
                 />
-                <Field label="PDF PAGES"><input value={form.pdf_pages} onChange={(e) => setForm({ ...form, pdf_pages: e.target.value })} className="input" /></Field>
-                <Field label="MATERIALS NEEDED (one per line — e.g. hook size, yarn weight, yardage)">
-                  <textarea value={form.materials} onChange={(e) => setForm({ ...form, materials: e.target.value })} rows={4} className="input" placeholder={"5mm (US H/8) crochet hook\nDK weight yarn, approx 400 yds\nTapestry needle"} />
+                <Field label="PDF pages"><input value={form.pdf_pages} onChange={(e) => setForm({ ...form, pdf_pages: e.target.value })} className="input" /></Field>
+                <Field label="Materials needed (one per line)">
+                  <textarea value={form.materials} onChange={(e) => setForm({ ...form, materials: e.target.value })} rows={4} className="input" placeholder={"5mm (US H/8) crochet hook\nDK weight yarn, approx 400 yds"} />
                 </Field>
-                {form.id ? (
-                  <div className="pt-2 border-t border-line">
-                    <p className="text-[10px] tracking-[0.1em] text-ink-soft mb-2 mt-4">PATTERN PDF FILE</p>
+                <div className="pt-2 border-t border-[#e4e1db]">
+                  <p className="text-[14px] font-semibold mb-2">Digital files</p>
+                  {form.id ? (
                     <PdfDropzone uploading={uploadingPdf} uploaded={pdfUploaded} info={pdfInfo} productId={form.id} productTitle={form.title} onSelect={(file) => uploadPdf(file, form.id)} />
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-ink-soft pt-2 border-t border-line mt-2">Save the product once first — then the PDF upload will appear here.</p>
-                )}
+                  ) : (
+                    <p className="text-[12px] text-ink-soft">Save the listing once first — then you can upload the PDF.</p>
+                  )}
+                </div>
               </div>
             )}
 
             {activeTab === 'pricing' && (
-              <div className="grid gap-4">
+              <div className="grid gap-5">
+                <h2 className="text-[16px] font-semibold">Inventory and pricing</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="PRICE (USD)"><input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="input" placeholder="6.50" /></Field>
-                  <Field label="COMPARE-AT (OPTIONAL)"><input value={form.compare_at_price} onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })} className="input" /></Field>
+                  <Field label="Price (USD)"><input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="input" placeholder="6.50" /></Field>
+                  <Field label="Compare-at (optional)"><input value={form.compare_at_price} onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })} className="input" /></Field>
                 </div>
                 {form.compare_at_price && parseFloat(form.compare_at_price) <= (parseFloat(form.price) || 0) && (
-                  <p className="text-[11px] text-madder -mt-2">Compare-at should be higher than the price, or the Sale badge won't show — it'll just display as the regular price.</p>
+                  <p className="text-[12px] text-madder -mt-2">Compare-at should be higher than the price for the Sale badge to show.</p>
                 )}
-                <Field label="LEMON SQUEEZY CHECKOUT ID (from product's Share button — the ID in the checkout URL, not the numeric variant ID)"><input value={form.lemon_variant_id} onChange={(e) => setForm({ ...form, lemon_variant_id: e.target.value })} className="input" placeholder="a208e95b-8f17-407f-b7a7-115583bed5a5" /></Field>
-                <Field label="LEMON SQUEEZY NUMERIC VARIANT ID (only needed for the cart feature — the number in the product's dashboard URL, e.g. app.lemonsqueezy.com/products/1255414)"><input value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value })} className="input" placeholder="1255414" /></Field>
+                <Field label="Lemon Squeezy checkout ID"><input value={form.lemon_variant_id} onChange={(e) => setForm({ ...form, lemon_variant_id: e.target.value })} className="input" placeholder="a208e95b-8f17-407f-b7a7-115583bed5a5" /></Field>
+                <Field label="Lemon Squeezy numeric variant ID"><input value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value })} className="input" placeholder="1255414" /></Field>
                 <div>
-                  <span className="block text-[10px] tracking-[0.1em] text-ink-soft mb-1.5">CHECKOUT STYLE</span>
-                  <div className="flex border border-line w-fit text-[11px] tracking-[0.1em] rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setForm({ ...form, checkout_mode: 'overlay' })}
-                      className={`px-4 py-2 ${form.checkout_mode === 'overlay' ? 'bg-ink text-canvas' : 'text-ink-soft hover:text-ink'}`}
-                    >
-                      OVERLAY
-                    </button>
-                    <button
-                      onClick={() => setForm({ ...form, checkout_mode: 'hosted' })}
-                      className={`px-4 py-2 border-l border-line ${form.checkout_mode === 'hosted' ? 'bg-ink text-canvas' : 'text-ink-soft hover:text-ink'}`}
-                    >
-                      HOSTED (NEW TAB)
-                    </button>
+                  <span className="block text-[12px] text-ink-soft mb-1.5">Checkout style</span>
+                  <div className="flex border border-[#d9d5ce] w-fit text-[12px] rounded-lg overflow-hidden bg-white">
+                    <button onClick={() => setForm({ ...form, checkout_mode: 'overlay' })} className={`px-4 py-2 ${form.checkout_mode === 'overlay' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Overlay</button>
+                    <button onClick={() => setForm({ ...form, checkout_mode: 'hosted' })} className={`px-4 py-2 border-l border-[#d9d5ce] ${form.checkout_mode === 'hosted' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Hosted</button>
                   </div>
-                  <p className="text-[11px] text-ink-soft mt-1.5">
-                    {form.checkout_mode === 'overlay'
-                      ? 'Stays on your site — narrower checkout layout.'
-                      : "Opens Lemon Squeezy's full checkout page in a new tab — wider layout, but leaves your site."}
-                  </p>
                 </div>
-
-                <div className="border-t border-line pt-4">
-                  <label className="flex items-center gap-2 text-[12px] mb-3">
-                    <input type="checkbox" checked={form.is_bundle} onChange={(e) => setForm({ ...form, is_bundle: e.target.checked })} /> This is a bundle (shows in the homepage Bundles section)
+                <div className="border-t border-[#e4e1db] pt-4">
+                  <label className="flex items-center gap-2 text-[13px] mb-3">
+                    <input type="checkbox" checked={form.is_bundle} onChange={(e) => setForm({ ...form, is_bundle: e.target.checked })} /> This is a bundle
                   </label>
                   {form.is_bundle && (
                     <div className="space-y-3">
-                      <p className="text-[11px] text-ink-soft">
-                        What's included — one line per pattern (e.g. "Amigurumi Bear Pattern PDF"). This is display text only; set the total bundle price above like any other product, and give it its own Lemon Squeezy product/variant as usual.
-                      </p>
+                      <p className="text-[12px] text-ink-soft">What&apos;s included — one line per pattern.</p>
                       {form.bundle_includes.map((line, i) => (
                         <div key={i} className="flex gap-2">
-                          <input
-                            value={line}
-                            onChange={(e) => { const next = [...form.bundle_includes]; next[i] = e.target.value; setForm({ ...form, bundle_includes: next }) }}
-                            className="input flex-1"
-                            placeholder="Pattern name"
-                          />
-                          <button onClick={() => setForm({ ...form, bundle_includes: form.bundle_includes.filter((_, idx) => idx !== i) })} className="px-3 text-[11px] text-ink-soft hover:text-madder">✕</button>
+                          <input value={line} onChange={(e) => { const next = [...form.bundle_includes]; next[i] = e.target.value; setForm({ ...form, bundle_includes: next }) }} className="input flex-1" placeholder="Pattern name" />
+                          <button onClick={() => setForm({ ...form, bundle_includes: form.bundle_includes.filter((_, idx) => idx !== i) })} className="px-3 text-[12px] text-ink-soft hover:text-madder">✕</button>
                         </div>
                       ))}
-                      <button
-                        onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })}
-                        className="text-[11px] tracking-[0.1em] border-b border-ink pb-0.5"
-                      >
-                        + ADD INCLUDED PATTERN
-                      </button>
+                      <button onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })} className="text-[13px] text-[#0f3fc9] hover:underline">+ Add included pattern</button>
                     </div>
                   )}
                 </div>
@@ -719,29 +819,17 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
             )}
 
             {activeTab === 'seo' && (
-              <div className="grid gap-4">
-                <p className="text-[12px] text-ink-soft -mt-1">Optional — leave blank to use the product title and description automatically.</p>
-                <Field label={`META TITLE (${form.meta_title.length}/60 recommended)`}>
-                  <input
-                    value={form.meta_title}
-                    onChange={(e) => setForm({ ...form, meta_title: e.target.value })}
-                    className="input"
-                    placeholder={form.title || 'Product title'}
-                    maxLength={70}
-                  />
+              <div className="grid gap-5">
+                <h2 className="text-[16px] font-semibold">SEO &amp; visibility</h2>
+                <p className="text-[12px] text-ink-soft -mt-2">Optional — leave blank to use the product title and description.</p>
+                <Field label={`Meta title (${form.meta_title.length}/60)`}>
+                  <input value={form.meta_title} onChange={(e) => setForm({ ...form, meta_title: e.target.value })} className="input" placeholder={form.title || 'Product title'} maxLength={70} />
                 </Field>
-                <Field label={`META DESCRIPTION (${form.meta_description.length}/155 recommended)`}>
-                  <textarea
-                    value={form.meta_description}
-                    onChange={(e) => setForm({ ...form, meta_description: e.target.value })}
-                    className="input"
-                    rows={3}
-                    maxLength={200}
-                    placeholder={form.description ? form.description.slice(0, 155) : 'Product description'}
-                  />
+                <Field label={`Meta description (${form.meta_description.length}/155)`}>
+                  <textarea value={form.meta_description} onChange={(e) => setForm({ ...form, meta_description: e.target.value })} className="input" rows={3} maxLength={200} placeholder={form.description ? form.description.slice(0, 155) : 'Product description'} />
                 </Field>
-                <div className="border border-line rounded-lg p-4 bg-surface/50">
-                  <p className="text-[10px] tracking-[0.1em] text-ink-soft mb-2">SEARCH PREVIEW</p>
+                <div className="border border-[#e4e1db] rounded-lg p-4 bg-[#f9f8f6]">
+                  <p className="text-[11px] text-ink-soft mb-2">Search preview</p>
                   <p className="text-[17px] leading-tight" style={{ color: '#1a0dab' }}>{form.meta_title || form.title || 'Product title'}</p>
                   <p className="text-[12px] text-ink-soft mt-0.5">notioncreativeart.com/pattern/{form.slug || slugify(form.title) || 'product-slug'}</p>
                   <p className="text-[13px] mt-1 leading-snug">{(form.meta_description || form.description || 'Product description').slice(0, 155)}</p>
@@ -750,41 +838,25 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
             )}
           </div>
 
-          <div className="px-6 py-5 border-t border-line bg-surface/50">
-            {saveError && <p className="text-[11px] text-madder mb-3">{saveError}</p>}
-            {isLastTab && !canPublish && (
-              <p className="text-[11px] text-madder mb-3">Still needed to publish: {missingFields.join(', ')}.</p>
+          <div className="px-6 py-4 border-t border-[#e4e1db] bg-[#f9f8f6]">
+            {saveError && <p className="text-[12px] text-madder mb-2">{saveError}</p>}
+            {!canPublish && (
+              <p className="text-[12px] text-madder mb-2">Still needed to publish: {missingFields.join(', ')}.</p>
             )}
-            <div className="flex gap-3">
-              <button
-                onClick={async () => { const id = await save(false); if (id) setEditing(false) }}
-                disabled={saving}
-                className="px-6 py-3 border border-ink text-[11px] tracking-[0.12em] hover:bg-surface disabled:opacity-50 rounded-lg bg-white"
-              >
-                {saving ? 'SAVING…' : 'SAVE AS DRAFT'}
-              </button>
-              {isLastTab ? (
-                <button
-                  onClick={async () => { const id = await save(true); if (id) setEditing(false) }}
-                  disabled={saving || !canPublish}
-                  className="px-6 py-3 bg-ink text-canvas text-[11px] tracking-[0.12em] hover:opacity-85 disabled:opacity-40 rounded-lg"
-                >
-                  {saving ? 'SAVING…' : 'PUBLISH'}
-                </button>
-              ) : (
-                <button
-                  onClick={async () => { const id = await save(false); if (id) setActiveTab(tabs[tabs.indexOf(activeTab) + 1]) }}
-                  disabled={saving}
-                  className="px-6 py-3 bg-ink text-canvas text-[11px] tracking-[0.12em] hover:opacity-85 disabled:opacity-50 rounded-lg"
-                >
-                  {saving ? 'SAVING…' : 'SAVE & CONTINUE →'}
+            <div className="flex flex-wrap gap-2">
+              <button onClick={async () => { const id = await save(false); if (id) setEditing(false) }} disabled={saving} className="px-4 py-2 border border-[#d9d5ce] text-[13px] rounded-full bg-white disabled:opacity-50">Save as draft</button>
+              {!isLastTab && (
+                <button onClick={async () => { const id = await save(false); if (id) setActiveTab(tabs[tabs.indexOf(activeTab) + 1]) }} disabled={saving} className="px-4 py-2 text-[13px] rounded-full text-white disabled:opacity-50" style={{ background: '#222' }}>
+                  Save &amp; continue
                 </button>
               )}
-              <button onClick={() => setEditing(false)} className="px-6 py-3 text-[11px] tracking-[0.12em] text-ink-soft hover:text-ink rounded-lg">CANCEL</button>
+              {isLastTab && (
+                <button onClick={async () => { const id = await save(true); if (id) setEditing(false) }} disabled={saving || !canPublish} className="px-4 py-2 text-[13px] rounded-full text-white disabled:opacity-40" style={{ background: '#222' }}>Publish</button>
+              )}
             </div>
           </div>
         </div>
-        <style>{`.input { width: 100%; border: 1px solid var(--color-line); padding: 10px 12px; font-size: 13px; background: white; border-radius: 8px; } .input:focus { outline: none; border-color: var(--color-ink); }`}</style>
+        <style>{`.input { width: 100%; border: 1px solid #d9d5ce; padding: 10px 12px; font-size: 13px; background: white; border-radius: 8px; } .input:focus { outline: none; border-color: #222; }`}</style>
       </div>
     )
   }
@@ -797,109 +869,223 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
   const categoryById = new Map(categories.map((c) => [c.id, c.name]))
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6 gap-4">
-        <h1 className="font-display font-semibold text-2xl shrink-0">{pageTitle}</h1>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search products…"
-              className="border border-line rounded-lg px-3 py-2.5 text-[13px] bg-white focus:outline-none focus:border-ink pr-8"
-              style={{ width: 220 }}
-            />
-            {search && (
-              <button onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink text-[13px]">✕</button>
-            )}
+    <div className="flex gap-6 items-start">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-5">
+          <h1 className="text-[28px] font-semibold text-ink shrink-0">{pageTitle}</h1>
+          <div className="flex-1 flex justify-center">
+            <div className="relative w-full max-w-md">
+              <MaterialIcon name="search" size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by title…"
+                className="w-full border border-[#d9d5ce] rounded-full pl-10 pr-9 py-2.5 text-[13px] bg-white focus:outline-none focus:border-ink"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink text-[13px]">✕</button>
+              )}
+            </div>
           </div>
-          <button onClick={() => startEdit()} className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] hover:opacity-85 rounded-lg whitespace-nowrap">
-            + ADD {mode === 'free' ? 'FREE PATTERN' : mode === 'bundles' ? 'BUNDLE' : 'NEW PRODUCT'}
+          <button onClick={() => startEdit()} className="shrink-0 px-4 py-2.5 text-[13px] font-medium rounded-full text-white whitespace-nowrap" style={{ background: '#222' }}>
+            + Add a listing
           </button>
         </div>
-      </div>
 
-      {selected.size > 0 && (
-        <div className="flex items-center gap-4 mb-4 px-5 py-3 rounded-xl bg-ink text-canvas text-[12px]">
-          <span className="tracking-[0.05em]">{selected.size} selected</span>
-          <div className="flex gap-4 ml-auto tracking-[0.08em]">
-            <button disabled={bulkWorking} onClick={() => bulkSetActive(true)} className="hover:opacity-70 disabled:opacity-50">ACTIVATE</button>
-            <button disabled={bulkWorking} onClick={() => bulkSetActive(false)} className="hover:opacity-70 disabled:opacity-50">DEACTIVATE</button>
-            <button disabled={bulkWorking} onClick={bulkTrash} className="hover:opacity-70 disabled:opacity-50 text-[#ffb4b4]">DELETE</button>
-            <button onClick={() => setSelected(new Set())} className="hover:opacity-70">CLEAR</button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <label className="flex items-center gap-2 px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px]">
+            <input type="checkbox" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} />
+          </label>
+          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(true)} className="px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] disabled:opacity-40">Activate</button>
+          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(false)} className="px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] disabled:opacity-40">Deactivate</button>
+          <button disabled={selected.size === 0 || bulkWorking} onClick={bulkTrash} className="px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] disabled:opacity-40">Delete</button>
+          {selected.size > 0 && (
+            <button onClick={() => setSelected(new Set())} className="text-[13px] text-ink-soft hover:text-ink ml-1">Clear ({selected.size})</button>
+          )}
         </div>
-      )}
 
-      <div className="bg-white border border-line rounded-2xl overflow-hidden">
         {products.length === 0 ? (
-          <p className="py-12 text-center text-ink-soft text-sm">{search ? `No products match "${search}".` : emptyMessage}</p>
-        ) : (
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-line text-left text-[10px] tracking-[0.1em] text-ink-soft">
-                <th className="px-5 py-3 font-medium w-10">
-                  <input type="checkbox" checked={selected.size === products.length} onChange={toggleSelectAll} className="accent-ink" />
-                </th>
-                <th className="px-5 py-3 font-medium">PRODUCT</th>
-                <th className="px-5 py-3 font-medium">CATEGORY</th>
-                <th className="px-5 py-3 font-medium">PRICE</th>
-                <th className="px-5 py-3 font-medium">STATUS</th>
-                <th className="px-5 py-3 font-medium">SOLD / SAVED</th>
-                <th className="px-5 py-3 font-medium text-right">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {products.map((p) => {
-                const isDuplicateVariant = !!p.lemon_variant_id && variantCounts[p.lemon_variant_id] > 1
-                const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
-                return (
-                  <tr key={p.id} className={`hover:bg-surface/50 ${selected.has(p.id) ? 'bg-surface/70' : ''}`}>
-                    <td className="px-5 py-3">
+          <div className="bg-white border border-[#e4e1db] rounded-xl py-16 text-center text-[14px] text-ink-soft">
+            {search ? `No listings match "${search}".` : emptyMessage}
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {products.map((p) => {
+              const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
+              const isDuplicateVariant = !!p.lemon_variant_id && variantCounts[p.lemon_variant_id] > 1
+              return (
+                <div key={p.id} className={`bg-white border rounded-xl overflow-hidden ${selected.has(p.id) ? 'border-[#0f3fc9]' : 'border-[#e4e1db]'}`}>
+                  <div className="relative aspect-[4/3] bg-[#f3f1ec]">
+                    {p.images?.[0] ? (
+                      <img src={deriveVariantUrl(p.images[0], 'thumb')} alt="" className="w-full h-full object-cover" />
+                    ) : null}
+                    <span className="absolute bottom-2 left-2 text-[10px] font-medium px-2 py-0.5 rounded bg-white/90 border border-[#e4e1db]">Digital</span>
+                    {p.featured && <MaterialIcon name="star" size={18} color="#c9a227" className="absolute top-2 right-2" />}
+                  </div>
+                  <div className="p-3">
+                    <p className="text-[13px] font-medium text-ink truncate mb-1">{p.title}</p>
+                    <p className="text-[12px] text-ink-soft mb-2">
+                      {p.price === 0 ? 'Free' : `USD ${p.price.toFixed(2)}`}
+                      {p.category_id ? ` · ${categoryById.get(p.category_id) ?? ''}` : ''}
+                    </p>
+                    {isDuplicateVariant && <p className="text-[11px] text-madder mb-1">Duplicate checkout ID</p>}
+                    {showStats && (
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-ink-soft border-t border-[#e4e1db] pt-2 mb-2">
+                        <div>
+                          <p className="font-semibold text-[10px] tracking-wide text-[#888] mb-0.5">ALL TIME</p>
+                          <p>{c.sales} sales</p>
+                          <p>{c.wishlist} favourites</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-[10px] tracking-wide text-[#888] mb-0.5">STATUS</p>
+                          <p>{p.active ? 'Active' : 'Draft'}{p.sold_out ? ' · Sold out' : ''}</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 relative">
                       <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} className="accent-ink" />
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 shrink-0 bg-surface overflow-hidden rounded-lg">
-                          {p.images?.[0] ? <img src={deriveVariantUrl(p.images[0], 'micro')} alt="" className="w-full h-full object-cover" /> : null}
-                        </div>
-                        <div className="min-w-0">
+                      <button onClick={() => setFeatured(p)} className="p-1 text-ink-soft hover:text-ink" aria-label="Toggle featured">
+                        <MaterialIcon name={p.featured ? 'star' : 'star_border'} size={18} color={p.featured ? '#c9a227' : undefined} />
+                      </button>
+                      <div className="ml-auto relative">
+                        <button onClick={() => setMenuOpenId(menuOpenId === p.id ? null : p.id)} className="p-1.5 rounded-full hover:bg-[#f3f1ec]" aria-label="Listing options">
+                          <MaterialIcon name="settings" size={18} />
+                        </button>
+                        {menuOpenId === p.id && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
+                            <div className="absolute right-0 bottom-full mb-1 z-20 w-44 bg-white border border-[#e4e1db] rounded-lg shadow-lg py-1 text-[13px]">
+                              <a href={`/pattern/${p.slug}`} target="_blank" rel="noreferrer" className="block px-3 py-2 hover:bg-[#f3f1ec]">View on shop</a>
+                              <button onClick={() => { setMenuOpenId(null); startEdit(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec]">Edit</button>
+                              <button onClick={() => { setMenuOpenId(null); duplicateProduct(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec]">Copy</button>
+                              <button onClick={() => { setMenuOpenId(null); setActive(p, !p.active) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec]">{p.active ? 'Deactivate' : 'Activate'}</button>
+                              <button onClick={() => { setMenuOpenId(null); trash(p.id) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec] text-madder">Delete</button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden">
+            <table className="w-full text-[13px]">
+              <thead>
+                <tr className="border-b border-[#e4e1db] text-left text-[11px] text-ink-soft">
+                  <th className="px-4 py-3 w-10"><input type="checkbox" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} /></th>
+                  <th className="px-4 py-3 font-medium">Listing</th>
+                  <th className="px-4 py-3 font-medium">Price</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Sales</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e4e1db]">
+                {products.map((p) => {
+                  const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
+                  return (
+                    <tr key={p.id} className={selected.has(p.id) ? 'bg-[#f3f1ec]/70' : 'hover:bg-[#f9f8f6]'}>
+                      <td className="px-4 py-3"><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} /></td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#f3f1ec] shrink-0">
+                            {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt="" className="w-full h-full object-cover" />}
+                          </div>
                           <p className="font-medium truncate">{p.title}</p>
-                          {isDuplicateVariant && <p className="text-[10px] text-madder">⚠ Duplicate checkout ID</p>}
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3 text-ink-soft">{p.category_id ? categoryById.get(p.category_id) ?? '—' : '—'}</td>
-                    <td className="px-5 py-3">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</td>
-                    <td className="px-5 py-3">
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] tracking-[0.06em] px-2 py-0.5 rounded-full ${p.active ? 'bg-ink text-canvas' : 'border border-line text-ink-soft'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${p.active ? 'bg-canvas' : 'bg-ink-soft'}`} />
-                        {p.active ? 'PUBLISHED' : 'DRAFT'}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-ink-soft">{c.sales} sold · {c.wishlist} saved</td>
-                    <td className="px-5 py-3">
-                      <div className="flex gap-4 text-[11px] tracking-[0.08em] justify-end">
-                        <button onClick={() => startEdit(p)} className="text-ink hover:opacity-70">EDIT</button>
-                        <button onClick={() => duplicateProduct(p)} className="text-ink-soft hover:text-ink">DUPLICATE</button>
-                        <button onClick={() => setActive(p, !p.active)} className="text-ink-soft hover:text-ink">{p.active ? 'DEACTIVATE' : 'ACTIVATE'}</button>
-                        <button onClick={() => trash(p.id)} className="text-ink-soft hover:text-madder">DELETE</button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="px-4 py-3">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</td>
+                      <td className="px-4 py-3">{p.active ? 'Active' : 'Draft'}</td>
+                      <td className="px-4 py-3 text-ink-soft">{c.sales} · {c.wishlist} fav</td>
+                      <td className="px-4 py-3 text-right">
+                        <button onClick={() => startEdit(p)} className="text-[#0f3fc9] hover:underline">Edit</button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="text-center mt-6">
+            <button onClick={loadMore} disabled={loadingMore} className="px-5 py-2 border border-[#d9d5ce] text-[13px] rounded-full hover:bg-white bg-white disabled:opacity-50">
+              {loadingMore ? 'Loading…' : 'Load more'}
+            </button>
+          </div>
         )}
       </div>
-      {hasMore && (
-        <div className="text-center mt-6">
-          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-lg hover:bg-surface bg-white disabled:opacity-50">
-            {loadingMore ? 'LOADING…' : 'LOAD MORE'}
+
+      {/* Right filter panel */}
+      <aside className="hidden lg:block w-[220px] shrink-0 sticky top-6 space-y-5">
+        <div className="flex items-center justify-between">
+          <span className="text-[13px] text-ink">Stats</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showStats}
+            onClick={() => setShowStats((v) => !v)}
+            className={`w-9 h-5 rounded-full transition-colors relative ${showStats ? 'bg-[#222]' : 'bg-[#d9d5ce]'}`}
+          >
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${showStats ? 'left-4' : 'left-0.5'}`} />
           </button>
         </div>
-      )}
+        <div className="flex gap-1">
+          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md border ${viewMode === 'grid' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="Grid view">
+            <MaterialIcon name="grid_view" size={18} />
+          </button>
+          <button onClick={() => setViewMode('list')} className={`p-2 rounded-md border ${viewMode === 'list' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="List view">
+            <MaterialIcon name="view_list" size={18} />
+          </button>
+        </div>
+
+        <div>
+          <p className="text-[13px] font-semibold text-ink mb-2">Listing status</p>
+          <div className="space-y-1.5 text-[13px]">
+            {([
+              { id: 'active' as const, label: 'Active', count: statusCounts.active },
+              { id: 'draft' as const, label: 'Draft', count: statusCounts.draft },
+              { id: 'sold_out' as const, label: 'Sold out', count: statusCounts.sold_out },
+              { id: 'all' as const, label: 'All', count: statusCounts.active + statusCounts.draft },
+            ]).map((s) => (
+              <label key={s.id} className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="status" checked={statusFilter === s.id} onChange={() => setStatusFilter(s.id)} />
+                <span className="flex-1">{s.label}</span>
+                <span className="text-ink-soft">({s.count})</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[13px] font-semibold text-ink mb-2">Type</p>
+          <div className="space-y-1.5 text-[13px]">
+            {([
+              { id: 'all' as const, label: 'All listings' },
+              { id: 'paid' as const, label: 'Paid' },
+              { id: 'free' as const, label: 'Free patterns' },
+              { id: 'bundles' as const, label: 'Bundles' },
+            ]).map((t) => (
+              <label key={t.id} className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="type" checked={typeFilter === t.id} onChange={() => setTypeFilter(t.id)} />
+                {t.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[13px] font-semibold text-ink">Sections</p>
+            <Link href="/admin/categories" className="text-[12px] text-[#0f3fc9] hover:underline">Manage</Link>
+          </div>
+          <p className="text-[12px] text-ink-soft">Filter by category from the listing editor, or manage shop sections in Categories.</p>
+        </div>
+      </aside>
     </div>
   )
 }

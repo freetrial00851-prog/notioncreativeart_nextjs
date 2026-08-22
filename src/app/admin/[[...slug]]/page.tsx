@@ -1,14 +1,19 @@
+import { Suspense } from 'react'
 import { buildMetadata } from '@/lib/seo'
 import { Admin } from '@/views/Admin'
 
 export const metadata = buildMetadata({
-  title: 'Admin',
-  description: 'Notion Creative Art admin panel.',
+  title: 'Shop Manager',
+  description: 'Notion Creative Art shop manager.',
   path: '/admin',
   noIndex: true,
 })
 
-/** Admin catch-all — handles /admin, /admin/categories, /admin/orders, etc. */
+/** Admin catch-all — handles /admin, /admin/listings, /admin/orders, etc. */
 export default function AdminCatchAllPage() {
-  return <Admin />
+  return (
+    <Suspense fallback={null}>
+      <Admin />
+    </Suspense>
+  )
 }
