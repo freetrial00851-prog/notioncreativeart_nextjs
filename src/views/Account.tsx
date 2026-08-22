@@ -771,8 +771,8 @@ function LogoutConfirm() {
       >
         LOG OUT
       </button>
-      <Link href="/account" className="text-[12px] text-ink-soft hover:text-ink underline underline-offset-2">
-        Cancel â€” stay signed in
+      <Link href="/account/orders" className="text-[12px] text-ink-soft hover:text-ink underline underline-offset-2">
+        Cancel - stay signed in
       </Link>
     </div>
   )
