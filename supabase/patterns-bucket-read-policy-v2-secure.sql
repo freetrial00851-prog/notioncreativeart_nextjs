@@ -11,6 +11,7 @@
 -- button, which checks arbitrary products regardless of purchase history).
 
 drop policy if exists "authenticated users can read patterns" on storage.objects;
+drop policy if exists "read own purchased patterns or admin" on storage.objects;
 
 create policy "read own purchased patterns or admin"
 on storage.objects for select

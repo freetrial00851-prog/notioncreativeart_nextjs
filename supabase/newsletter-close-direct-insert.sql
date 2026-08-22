@@ -8,4 +8,4 @@
 -- uses the service-role key, which bypasses RLS entirely. Admin read access
 -- is untouched.
 
-drop policy "public can subscribe" on public.newsletter_subscribers;
+drop policy if exists "public can subscribe" on public.newsletter_subscribers;

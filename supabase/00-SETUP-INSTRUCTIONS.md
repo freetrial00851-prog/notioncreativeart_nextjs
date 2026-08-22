@@ -1,9 +1,9 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- notioncreativeart_nextjs — FULL DATABASE SETUP
--- Project: pxfzolhemduyfqpziauo (independent from old Vite/React DB)
+-- Project: anlsellghialszuuvipw
 --
 -- Run ONCE in Supabase Dashboard → SQL Editor on the NEW empty project:
---   https://supabase.com/dashboard/project/pxfzolhemduyfqpziauo/sql/new
+--   https://supabase.com/dashboard/project/anlsellghialszuuvipw/sql/new
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- Paste and run each section below IN ORDER, or run this entire file if your

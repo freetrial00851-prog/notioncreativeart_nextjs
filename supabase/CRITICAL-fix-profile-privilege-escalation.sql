@@ -11,7 +11,7 @@
 -- be changed by you directly via Supabase Dashboard → Table Editor (which
 -- uses a privileged connection that bypasses RLS entirely).
 
-drop policy "update own profile" on public.profiles;
+drop policy if exists "update own profile" on public.profiles;
 
 create policy "update own profile" on public.profiles for update
   using (auth.uid() = id)

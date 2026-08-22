@@ -8,11 +8,28 @@
 -- failed free-download attempts (before this was fixed) — clean those up
 -- first, keeping the earliest row per pair, or the constraint can't be
 -- created.
+-- Skipped entirely when public.purchases does not exist yet (run full-setup.sql first).
 
-delete from public.purchases a
-using public.purchases b
-where a.user_id = b.user_id
-  and a.product_id = b.product_id
-  and a.purchase_date > b.purchase_date;
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'purchases'
+  ) then
+    raise notice 'Skipping purchases-unique-constraint-fix: public.purchases does not exist yet.';
+    return;
+  end if;
 
-alter table public.purchases add constraint purchases_user_id_product_id_key unique (user_id, product_id);
+  delete from public.purchases a
+  using public.purchases b
+  where a.user_id = b.user_id
+    and a.product_id = b.product_id
+    and a.purchase_date > b.purchase_date;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'purchases_user_id_product_id_key'
+  ) then
+    alter table public.purchases
+      add constraint purchases_user_id_product_id_key unique (user_id, product_id);
+  end if;
+end $$;

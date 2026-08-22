@@ -13,6 +13,8 @@
 -- Function, which uses the service-role key and bypasses RLS entirely —
 -- this policy has no effect on that path.
 
+drop policy if exists "users can claim free patterns" on public.purchases;
+
 create policy "users can claim free patterns"
 on public.purchases for insert
 to authenticated

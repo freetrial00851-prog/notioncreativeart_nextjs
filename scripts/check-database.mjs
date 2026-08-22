@@ -31,14 +31,16 @@ console.log(`Checking Supabase project: ${projectRef}`)
 const headers = { apikey: key, Authorization: `Bearer ${key}` }
 
 async function check(table) {
-  const res = await fetch(`${url}/rest/v1/${table}?select=id&limit=1`, { headers })
-  if (res.status === 404 || res.status === 400) {
+  const res = await fetch(`${url}/rest/v1/${table}?select=${table === 'site_settings' ? 'key' : 'id'}&limit=1`, { headers })
+  if (!res.ok) {
     const body = await res.text()
-    if (body.includes('does not exist') || body.includes('relation')) return { ok: false, reason: 'table missing' }
+    if (body.includes('does not exist') || body.includes('relation')) {
+      return { ok: false, reason: 'table missing' }
+    }
+    return { ok: false, reason: `HTTP ${res.status}: ${body.slice(0, 120)}` }
   }
-  if (!res.ok) return { ok: false, reason: `HTTP ${res.status}` }
-  const data = await res.json()
-  return { ok: true, count: data.length }
+  await res.json()
+  return { ok: true }
 }
 
 const tables = ['categories', 'products', 'site_settings', 'profiles']
