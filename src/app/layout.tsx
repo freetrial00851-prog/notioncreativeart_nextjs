@@ -1,8 +1,32 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { Manrope, Playfair_Display } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { buildMetadata, SEO_KEYWORDS, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
+
+/** Manrope — body, nav, UI. Self-hosted via next/font (no layout shift). */
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+  display: 'swap',
+})
+
+/** Playfair Display — hero + section headings only. */
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
+
+/** Critical for mobile — without this, browsers render at desktop width. */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#FCFBF8',
+}
 
 /** Root metadata — applies site-wide defaults; individual pages override via generateMetadata. */
 export const metadata: Metadata = {
@@ -21,9 +45,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${manrope.variable} ${playfair.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {/* Material Symbols — must be a <link>, not only @import, or icons render as plain text on Vercel */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          rel="stylesheet"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -33,9 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
       </head>
-      <body>
+      <body className="font-body antialiased">
         <Providers>{children}</Providers>
-        {/* Lemon Squeezy checkout overlay — loaded once, deferred */}
         <Script src="https://assets.lemonsqueezy.com/lemon.js" strategy="afterInteractive" />
       </body>
     </html>

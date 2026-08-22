@@ -64,7 +64,9 @@ export function AuthSheet() {
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`fixed z-50 inset-x-0 bottom-0 bg-canvas flex flex-col shadow-2xl rounded-t-2xl max-h-[92vh] transition-transform duration-300 ease-out motion-reduce:transition-none ${authSheetOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        aria-hidden={!authSheetOpen}
+        inert={authSheetOpen ? undefined : true}
+        className={`fixed z-50 inset-x-0 bottom-0 bg-canvas flex flex-col shadow-2xl rounded-t-2xl max-h-[92vh] transition-transform duration-300 ease-out motion-reduce:transition-none ${authSheetOpen ? 'translate-y-0' : 'translate-y-full invisible'}`}
       >
         <div className="flex items-center justify-center pt-2.5 pb-1 shrink-0">
           <div className="w-9 h-1 rounded-full bg-line" />

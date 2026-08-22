@@ -1,14 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap');
 @import "tailwindcss";
 
+/* Material Symbols — font-family is REQUIRED or icons show as literal text ("menu", "favorite", etc.) */
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
   line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
   display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
   vertical-align: middle;
   user-select: none;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 @theme {
@@ -53,11 +64,11 @@
   --color-warning-soft: #FFF5DF;
   --color-sale-red: var(--color-sale);
 
-  --font-display: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-subheading: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'Manrope', system-ui, sans-serif;
-  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-display: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-subheading: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-manrope), system-ui, sans-serif;
+  --font-heading: var(--font-playfair), Georgia, serif;
 }
 
 html { background: var(--color-canvas); overflow-x: hidden; }

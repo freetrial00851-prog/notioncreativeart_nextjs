@@ -39,10 +39,12 @@ export function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Cart"
+        aria-hidden={!drawerOpen}
+        inert={drawerOpen ? undefined : true}
         className={`fixed z-50 bg-canvas flex flex-col shadow-2xl transition-transform duration-300 ease-out motion-reduce:transition-none
           inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl
           md:inset-y-0 md:right-0 md:left-auto md:bottom-auto md:max-h-none md:h-full md:w-[420px] md:rounded-none
-          ${drawerOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full'}`}
+          ${drawerOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full invisible'}`}
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-line shrink-0">
           <div>

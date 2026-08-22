@@ -1,31 +1,50 @@
-# Supabase — notioncreativeart_nextjs
+# Supabase — notioncreativeart_nextjs (INDEPENDENT PROJECT)
 
-This Next.js app connects to the **Notion Creative Art** Supabase backend.
+This Next.js app uses its **own** Supabase project — completely separate from the old Vite/React database.
 
 | Setting | Value |
 |---------|--------|
-| Project name | `notioncreativeart_nextjs` |
-| Project ref | `npkqvhdsyyxphcinhcej` |
-| API URL | `https://npkqvhdsyyxphcinhcej.supabase.co` |
+| **Project name** | `notioncreativeart_nextjs` |
+| **Project ref** | `pxfzolhemduyfqpziauo` |
+| **API URL** | `https://pxfzolhemduyfqpziauo.supabase.co` |
+| **Dashboard** | https://supabase.com/dashboard/project/pxfzolhemduyfqpziauo |
 
-## Environment variables (Vercel + local)
+## First-time setup (empty database)
 
-Set these in `.env.local` (local) and Vercel Project Settings → Environment Variables (production):
+```bash
+# 1. Build the combined SQL file
+node scripts/build-setup-sql.mjs
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_LEMON_STORE_SLUG`
-- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
-- `NEXT_PUBLIC_SITE_URL`
+# 2. Open Supabase SQL Editor and paste supabase/full-setup.sql → Run
+#    https://supabase.com/dashboard/project/pxfzolhemduyfqpziauo/sql/new
+
+# 3. Verify tables exist
+node scripts/check-database.mjs
+```
 
 ## Auth redirect URLs
 
-In Supabase Dashboard → Authentication → URL Configuration, add:
+In **Authentication → URL Configuration**, add:
 
-- `https://notioncreativeart.com/**`
-- `https://<your-vercel-url>.vercel.app/**`
 - `http://localhost:3000/**`
+- `https://notioncreativeartnextjs.vercel.app/**`
+- `https://notioncreativeart.com/**` (when custom domain is connected)
+
+## Make yourself admin
+
+After signing up once:
+
+```sql
+update public.profiles set is_admin = true
+where id = (select id from auth.users where email = 'your@email.com');
+```
 
 ## Edge Functions
 
-SQL migrations and Edge Functions live in `supabase/`. Deploy functions separately via Supabase CLI when needed.
+Deploy separately when needed:
+
+```bash
+npx supabase functions deploy lemon-webhook --project-ref pxfzolhemduyfqpziauo
+npx supabase functions deploy create-cart-checkout --project-ref pxfzolhemduyfqpziauo
+npx supabase functions deploy subscribe-newsletter --project-ref pxfzolhemduyfqpziauo
+```
