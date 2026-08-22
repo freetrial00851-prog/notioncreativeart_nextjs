@@ -297,9 +297,7 @@ export function ProductDetail() {
   if (product.is_bundle) tags.push('Bundle')
   if (showNew) tags.push('New')
 
-  const formatLabel = product.pdf_filename
-    ? product.pdf_filename.replace(/\.pdf$/i, '')
-    : 'PDF Download'
+  const formatLabel = 'PDF Download'
 
   const specs: { icon: string; label: string; value: string }[] = [
     ...(skillLabel ? [{ icon: 'track_changes', label: 'Skill Level', value: skillLabel === 'Beginner' ? 'Easy' : skillLabel }] : []),
@@ -423,13 +421,13 @@ export function ProductDetail() {
         <span className="text-ink truncate max-w-[260px]">{product.title}</span>
       </nav>
 
-      {/* Hero: gallery + info / purchase */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-        {/* Gallery */}
-        <div>
+      {/* 3-panel hero: gallery | details | purchase */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(260px,320px)] gap-8 xl:gap-10 items-start">
+        {/* Panel 1 — Gallery */}
+        <div className="min-w-0">
           <div
             className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center touch-pan-y"
-            style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(72vh, 640px)' }}
+            style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)' }}
             onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
             onTouchEnd={(e) => {
               if (touchStartX === null) return
@@ -447,7 +445,7 @@ export function ProductDetail() {
               <img
                 src={images[activeImage]}
                 srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w, ${deriveVariantUrl(images[activeImage], 'full')} 1600w`}
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 36vw"
                 alt={product.title}
                 loading="eager"
                 fetchPriority="high"
@@ -496,16 +494,17 @@ export function ProductDetail() {
               <button
                 onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                 aria-label="Previous image"
-                className="w-8 h-8 shrink-0 rounded-full border border-line flex items-center justify-center hover:bg-surface transition-colors"
+                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-canvas hover:opacity-90 transition-opacity"
+                style={{ background: 'var(--color-sale-green)' }}
               >
                 <MaterialIcon name="chevron_left" size={18} />
               </button>
-              <div className="flex gap-2 overflow-x-auto flex-1 py-0.5" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex gap-2 overflow-x-auto flex-1 py-0.5 justify-center" style={{ scrollbarWidth: 'none' }}>
                 {images.map((img, i) => (
                   <button
                     key={img}
                     onClick={() => setActiveImage(i)}
-                    className={`w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-ink' : 'border-transparent'}`}
+                    className={`w-16 h-16 sm:w-[68px] sm:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-sale-green)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
                     <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
@@ -515,7 +514,8 @@ export function ProductDetail() {
               <button
                 onClick={() => setActiveImage((i) => (i + 1) % images.length)}
                 aria-label="Next image"
-                className="w-8 h-8 shrink-0 rounded-full border border-line flex items-center justify-center hover:bg-surface transition-colors"
+                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-canvas hover:opacity-90 transition-opacity"
+                style={{ background: 'var(--color-sale-green)' }}
               >
                 <MaterialIcon name="chevron_right" size={18} />
               </button>
@@ -523,14 +523,14 @@ export function ProductDetail() {
           )}
         </div>
 
-        {/* Info + purchase card */}
-        <div>
+        {/* Panel 2 — Product details */}
+        <div className="min-w-0 lg:pt-1">
           {category && (
             <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-3" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
               {category.name}
             </span>
           )}
-          <h1 className="font-display font-semibold text-[28px] sm:text-3xl md:text-[2.15rem] leading-tight mb-3 break-words">
+          <h1 className="font-display font-semibold text-[26px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
             {product.title}
           </h1>
 
@@ -549,13 +549,13 @@ export function ProductDetail() {
               <li key={s.label} className="flex items-center gap-3 text-[13px]">
                 <MaterialIcon name={s.icon} size={18} color="var(--color-ink-soft)" />
                 <span className="text-ink-soft">{s.label}:</span>
-                <span className="font-medium text-ink">{s.value}</span>
+                <span className="font-medium text-ink truncate">{s.value}</span>
               </li>
             ))}
           </ul>
 
           {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <span
                   key={tag}
@@ -567,94 +567,107 @@ export function ProductDetail() {
             </div>
           )}
 
-          {/* Purchase card */}
-          <div ref={buyButtonRef} className="rounded-2xl border border-line p-5 sm:p-6 space-y-4">
-            <div>
-              {product.price > 0 && onSale ? (
-                <div className="flex items-baseline gap-3">
-                  <span className="text-2xl sm:text-3xl font-semibold text-ink">${product.price.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
-                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price!.toFixed(2)}</span>
-                </div>
-              ) : (
-                <p className="text-2xl sm:text-3xl font-semibold text-ink">
-                  {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
-                  {product.price > 0 && <span className="text-sm font-normal text-ink-soft ml-1">USD</span>}
-                </p>
-              )}
-              {product.price > 0 && (
-                <p className="text-[12px] text-ink-soft mt-1">One-time purchase · Instant PDF download</p>
-              )}
-            </div>
+          {product.wishlist_count > 0 && (
+            <p className="text-[11px] text-ink-soft mt-5">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
+          )}
+        </div>
 
-            {product.sold_out ? (
-              <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
-            ) : (
-              <div className="space-y-2.5">
-                {product.price > 0 && (
-                  isInCart(product.id) ? (
-                    <Link
-                      href="/cart"
-                      className="block text-center w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      ✓ IN CART — GO TO CART
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={toggleCart}
-                      className="w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      <MaterialIcon name="shopping_bag" size={15} /> ADD TO CART
-                    </button>
-                  )
-                )}
-                <button
-                  onClick={handleBuy}
-                  disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-                  className={product.price === 0
-                    ? 'w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
-                    : 'w-full py-3.5 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
-                  style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
-                >
-                  {product.price === 0
-                    ? (downloadingFree ? 'PREPARING…' : 'FREE — DOWNLOAD NOW')
-                    : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW')}
-                </button>
-                <button
-                  onClick={toggleWishlist}
-                  className="w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
-                >
-                  <MaterialIcon name="favorite" filled={inWishlist} size={15} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
-                  {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
-                </button>
+        {/* Panel 3 — Purchase card */}
+        <div ref={buyButtonRef} className="rounded-2xl border border-line p-5 sm:p-6 space-y-4 lg:sticky lg:top-24">
+          <div>
+            {product.price > 0 && onSale ? (
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span className="text-2xl sm:text-[1.75rem] font-semibold text-ink">${product.price.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
+                <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price!.toFixed(2)}</span>
               </div>
-            )}
-
-            {owned && (
-              <p className="text-[11px] text-ink-soft text-center">
-                You already own this — <Link href="/account/orders" className="underline underline-offset-2 hover:text-ink">go to your downloads</Link>
+            ) : (
+              <p className="text-2xl sm:text-[1.75rem] font-semibold text-ink">
+                {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
+                {product.price > 0 && <span className="text-sm font-normal text-ink-soft ml-1">USD</span>}
               </p>
             )}
-
-            {!product.sold_out && (
-              <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-[11px] text-ink-soft border-t border-line">
-                <span className="flex items-center gap-1.5"><MaterialIcon name="download" size={14} /> Instant Download</span>
-                <span className="flex items-center gap-1.5"><MaterialIcon name="lock" size={14} /> Secure Checkout</span>
-              </div>
+            {product.price > 0 && (
+              <p className="text-[12px] text-ink-soft mt-1">One-time purchase · Instant PDF download</p>
             )}
-
-            <p className="text-[12px] text-ink-soft pt-1">
-              Have questions?{' '}
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="underline underline-offset-2 hover:text-ink">
-                {SUPPORT_EMAIL}
-              </a>
-            </p>
           </div>
 
-          {product.wishlist_count > 0 && (
-            <p className="text-[11px] text-ink-soft mt-4">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
+          {product.sold_out ? (
+            <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
+          ) : (
+            <div className="space-y-2.5">
+              {product.price > 0 && (
+                isInCart(product.id) ? (
+                  <Link
+                    href="/cart"
+                    className="block text-center w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    ✓ IN CART — GO TO CART
+                  </Link>
+                ) : (
+                  <button
+                    onClick={toggleCart}
+                    className="w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    <MaterialIcon name="shopping_bag" size={15} /> ADD TO CART
+                  </button>
+                )
+              )}
+              <button
+                onClick={handleBuy}
+                disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
+                className={product.price === 0
+                  ? 'w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
+                  : 'w-full py-3.5 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
+                style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
+              >
+                {product.price === 0
+                  ? (downloadingFree ? 'PREPARING…' : 'FREE — DOWNLOAD NOW')
+                  : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW')}
+              </button>
+              <button
+                onClick={toggleWishlist}
+                className="w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+              >
+                <MaterialIcon name="favorite" filled={inWishlist} size={15} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
+                {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
+              </button>
+            </div>
           )}
+
+          {owned && (
+            <p className="text-[11px] text-ink-soft text-center">
+              You already own this — <Link href="/account/orders" className="underline underline-offset-2 hover:text-ink">go to your downloads</Link>
+            </p>
+          )}
+
+          {!product.sold_out && (
+            <div className="rounded-xl px-3.5 py-3 space-y-3" style={{ background: 'var(--color-surface)' }}>
+              <div className="flex gap-2.5 items-start">
+                <MaterialIcon name="download" size={16} color="var(--color-sale-green)" />
+                <div>
+                  <p className="text-[12px] font-medium text-ink">Instant Download</p>
+                  <p className="text-[11px] text-ink-soft leading-snug">Your PDF is ready right after purchase.</p>
+                </div>
+              </div>
+              <div className="flex gap-2.5 items-start">
+                <MaterialIcon name="lock" size={16} color="var(--color-sale-green)" />
+                <div>
+                  <p className="text-[12px] font-medium text-ink">Secure Checkout</p>
+                  <p className="text-[11px] text-ink-soft leading-snug">Payments protected by Lemon Squeezy.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <p className="text-[12px] text-ink-soft">
+            Have questions? We&apos;re here to help!
+            <br />
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="underline underline-offset-2 hover:text-ink break-all">
+              {SUPPORT_EMAIL}
+            </a>
+          </p>
         </div>
       </div>
 

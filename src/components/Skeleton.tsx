@@ -32,17 +32,17 @@ export function ListRowSkeleton({ rows = 3 }: { rows?: number }) {
   )
 }
 
-/** Full product detail page placeholder — mirrors gallery + purchase card layout. */
+/** Full product detail page placeholder — mirrors 3-panel gallery | details | purchase layout. */
 export function ProductDetailSkeleton() {
   return (
     <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-8 md:py-10">
       <Bone className="h-3 w-64 mb-8" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(260px,320px)] gap-8 xl:gap-10">
         <div>
           <Bone className="aspect-[1/1.05] rounded-2xl mb-3" />
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-center">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Bone key={i} className="w-[72px] h-[72px] rounded-lg shrink-0" />
+              <Bone key={i} className="w-16 h-16 rounded-lg shrink-0" />
             ))}
           </div>
         </div>
@@ -61,12 +61,13 @@ export function ProductDetailSkeleton() {
               <Bone key={i} className="h-7 w-16 rounded-full" />
             ))}
           </div>
-          <div className="rounded-2xl border border-line p-5 space-y-3 mt-2">
-            <Bone className="h-8 w-32" />
-            <Bone className="h-12 w-full rounded-lg" />
-            <Bone className="h-12 w-full rounded-lg" />
-            <Bone className="h-11 w-full rounded-lg" />
-          </div>
+        </div>
+        <div className="rounded-2xl border border-line p-5 space-y-3">
+          <Bone className="h-8 w-32" />
+          <Bone className="h-12 w-full rounded-lg" />
+          <Bone className="h-12 w-full rounded-lg" />
+          <Bone className="h-11 w-full rounded-lg" />
+          <Bone className="h-20 w-full rounded-xl" />
         </div>
       </div>
       <div className="mt-14 flex gap-6 border-b border-line pb-3">
