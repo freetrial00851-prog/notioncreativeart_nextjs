@@ -73,7 +73,7 @@ export function Admin() {
       {/* Mobile top bar */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 text-white sticky top-0 z-40" style={{ background: '#16233d' }}>
         <div className="flex items-center gap-2.5">
-          <span className="w-7 h-7 rounded-md border border-white/25 flex items-center justify-center text-[10px] font-semibold shrink-0">NCA</span>
+          <img src="/logo-nca.png" alt="" width={28} height={28} className="w-7 h-7 object-contain shrink-0 rounded-md bg-white" />
           <p className="text-[12px] font-semibold tracking-wide">ADMIN</p>
         </div>
         <button onClick={() => setMobileNavOpen(true)} aria-label="Open menu" className="p-1">
@@ -98,7 +98,7 @@ export function Admin() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-[240px] shrink-0 flex-col text-white" style={{ background: '#16233d' }}>
         <div className="px-6 py-6 flex items-center gap-2.5 border-b border-white/10">
-          <span className="w-8 h-8 rounded-md border border-white/25 flex items-center justify-center text-[11px] font-semibold shrink-0">NCA</span>
+          <img src="/logo-nca.png" alt="" width={32} height={32} className="w-8 h-8 object-contain shrink-0 rounded-md bg-white" />
           <div className="leading-tight">
             <p className="text-[12px] font-semibold tracking-wide">NOTION CREATIVE ART</p>
             <p className="text-[10px] tracking-[0.15em] text-white/50">ADMIN</p>
@@ -204,7 +204,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
   const [uploadingImages, setUploadingImages] = useState(false)
   const [uploadingPdf, setUploadingPdf] = useState(false)
   const [pdfUploaded, setPdfUploaded] = useState(false)
-  const [pdfInfo, setPdfInfo] = useState<{ sizeKb: number; date: string } | null>(null)
+  const [pdfInfo, setPdfInfo] = useState<{ sizeKb: number; date: string; originalName: string } | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -256,12 +256,19 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
   }
   const uploadPdf = async (file: File, productId: string) => {
     setUploadingPdf(true)
-    const { error } = await supabase.storage.from('patterns').upload(`${productId}.pdf`, file, { upsert: true })
-    setUploadingPdf(false)
+    const { error } = await supabase.storage.from('patterns').upload(`${productId}.pdf`, file, {
+      upsert: true,
+      contentType: 'application/pdf',
+      metadata: { originalName: file.name },
+    })
     if (!error) {
+      await supabase.from('products').update({ pdf_filename: file.name }).eq('id', productId)
       setPdfUploaded(true)
-      setPdfInfo({ sizeKb: Math.round(file.size / 1024), date: new Date().toLocaleString() })
+      setPdfInfo({ sizeKb: Math.round(file.size / 1024), date: new Date().toLocaleString(), originalName: file.name })
+    } else {
+      alert(`PDF upload failed: ${error.message}`)
     }
+    setUploadingPdf(false)
   }
 
 
@@ -379,7 +386,12 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
         const match = data?.find((f) => f.name === `${p.id}.pdf`)
         if (match) {
           setPdfUploaded(true)
-          setPdfInfo({ sizeKb: Math.round((match.metadata?.size ?? 0) / 1024), date: new Date(match.updated_at ?? match.created_at ?? Date.now()).toLocaleString() })
+          const metaName = (match.metadata as { originalName?: string } | null)?.originalName
+          setPdfInfo({
+            sizeKb: Math.round((match.metadata?.size ?? 0) / 1024),
+            date: new Date(match.updated_at ?? match.created_at ?? Date.now()).toLocaleString(),
+            originalName: p.pdf_filename || metaName || `${p.title}.pdf`,
+          })
         }
       })
     } else {
@@ -632,7 +644,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
                 {form.id ? (
                   <div className="pt-2 border-t border-line">
                     <p className="text-[10px] tracking-[0.1em] text-ink-soft mb-2 mt-4">PATTERN PDF FILE</p>
-                    <PdfDropzone uploading={uploadingPdf} uploaded={pdfUploaded} info={pdfInfo} productId={form.id} onSelect={(file) => uploadPdf(file, form.id)} />
+                    <PdfDropzone uploading={uploadingPdf} uploaded={pdfUploaded} info={pdfInfo} productId={form.id} productTitle={form.title} onSelect={(file) => uploadPdf(file, form.id)} />
                   </div>
                 ) : (
                   <p className="text-[11px] text-ink-soft pt-2 border-t border-line mt-2">Save the product once first — then the PDF upload will appear here.</p>
@@ -1385,11 +1397,20 @@ function TrashAdmin() {
   )
 }
 
-function PdfDropzone({ uploading, uploaded, info, productId, onSelect }: { uploading: boolean; uploaded: boolean; info: { sizeKb: number; date: string } | null; productId: string; onSelect: (file: File) => void }) {
+function PdfDropzone({ uploading, uploaded, info, productId, productTitle, onSelect }: {
+  uploading: boolean
+  uploaded: boolean
+  info: { sizeKb: number; date: string; originalName: string } | null
+  productId: string
+  productTitle: string
+  onSelect: (file: File) => void
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const [fileName, setFileName] = useState<string | null>(null)
   const [testing, setTesting] = useState(false)
+
+  const displayName = info?.originalName || fileName || (productTitle ? `${productTitle}.pdf` : null)
 
   const handleFile = (file?: File) => {
     if (!file) return
@@ -1404,7 +1425,7 @@ function PdfDropzone({ uploading, uploaded, info, productId, onSelect }: { uploa
   const testDownload = async (e: React.MouseEvent) => {
     e.stopPropagation()
     setTesting(true)
-    const ok = await triggerPdfDownload(productId, 'test')
+    const ok = await triggerPdfDownload(productId, displayName?.replace(/\.pdf$/i, '') || productTitle || 'pattern')
     setTesting(false)
     if (!ok) alert("Couldn't retrieve the file from storage — the upload may not have completed, or there's a bucket permissions issue. Check Supabase Dashboard → Storage → patterns bucket.")
   }
@@ -1419,7 +1440,6 @@ function PdfDropzone({ uploading, uploaded, info, productId, onSelect }: { uploa
     >
       <p className="text-[12px] mb-1"><span className="underline underline-offset-2">Choose a file</span> or drop it here</p>
       <p className="text-[11px] text-ink-soft">PDF only</p>
-      {fileName && <p className="text-[11px] mt-2">{fileName}</p>}
       {uploading && <p className="text-[11px] text-ink-soft mt-1">Uploading…</p>}
       {uploaded && !uploading && (
         <div className="text-[11px] text-ink-soft mt-1">
@@ -1429,9 +1449,14 @@ function PdfDropzone({ uploading, uploaded, info, productId, onSelect }: { uploa
               {testing ? 'Testing…' : 'Test download'}
             </button>
           </p>
-          {info && <p className="mt-1">{productId}.pdf · {info.sizeKb} KB · uploaded {info.date}</p>}
+          {info && (
+            <p className="mt-1 text-ink font-medium">
+              {displayName} · {info.sizeKb} KB · uploaded {info.date}
+            </p>
+          )}
         </div>
       )}
+      {!uploaded && fileName && !uploading && <p className="text-[11px] mt-2 text-ink font-medium">{fileName}</p>}
       <input ref={inputRef} type="file" accept="application/pdf" onChange={(e) => { handleFile(e.target.files?.[0]); e.target.value = '' }} className="hidden" />
     </div>
   )

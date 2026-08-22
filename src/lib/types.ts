@@ -30,6 +30,7 @@ export type Product = {
   bundle_includes: string[]
   meta_title: string | null
   meta_description: string | null
+  pdf_filename: string | null
   created_at: string
   deleted_at: string | null
 }
