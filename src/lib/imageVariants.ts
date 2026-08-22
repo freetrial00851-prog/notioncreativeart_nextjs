@@ -16,10 +16,16 @@
  *     demand, purely by string substitution — no extra query, no extra
  *     stored field. Call sites that want responsive srcset opt in one at a
  *     time; everything else keeps working unmodified.
+ *   - Every output variant is forced under MAX_OUTPUT_BYTES (26KB) by
+ *     lowering quality, then shrinking dimensions if still too large.
  */
 
 const SIZES = { micro: 160, thumb: 320, card: 640, large: 1000, full: 1600 } as const
-const QUALITY: Record<keyof typeof SIZES, number> = { micro: 0.55, thumb: 0.6, card: 0.62, large: 0.45, full: 0.4 }
+/** Starting quality per variant — encodeVariant may lower these to hit the size cap. */
+const QUALITY: Record<keyof typeof SIZES, number> = { micro: 0.5, thumb: 0.52, card: 0.55, large: 0.45, full: 0.4 }
+
+/** Hard ceiling for every uploaded image variant (product photos, etc.). */
+export const MAX_OUTPUT_BYTES = 26 * 1024
 
 const SIGNATURES: Record<string, number[]> = {
   jpeg: [0xff, 0xd8, 0xff],
@@ -50,22 +56,60 @@ export function sanitizeFilename(name: string) {
   return /[a-z0-9]/.test(base) ? base : 'image'
 }
 
-async function encodeVariant(bitmap: ImageBitmap, maxDimension: number, quality: number): Promise<Blob> {
+function toBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) =>
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), type, quality),
+  )
+}
+
+/**
+ * Encodes a WebP (or JPEG) under maxDimension, then iteratively lowers quality
+ * and/or dimensions until the blob is ≤ maxBytes.
+ */
+async function encodeVariant(
+  bitmap: ImageBitmap,
+  maxDimension: number,
+  quality: number,
+  type: 'image/webp' | 'image/jpeg' = 'image/webp',
+  maxBytes = MAX_OUTPUT_BYTES,
+): Promise<Blob> {
   let { width, height } = bitmap
   if (width > maxDimension || height > maxDimension) {
     const scale = maxDimension / Math.max(width, height)
     width = Math.round(width * scale)
     height = Math.round(height * scale)
   }
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('Canvas 2D context unavailable')
-  ctx.drawImage(bitmap, 0, 0, width, height)
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/webp', quality)
-  )
+
+  let q = quality
+  let w = width
+  let h = height
+  let blob: Blob | null = null
+
+  for (let attempt = 0; attempt < 16; attempt++) {
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, w)
+    canvas.height = Math.max(1, h)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('Canvas 2D context unavailable')
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    blob = await toBlob(canvas, type, q)
+
+    if (blob.size <= maxBytes) return blob
+
+    if (q > 0.28) {
+      q = Math.max(0.28, q - 0.08)
+    } else if (Math.max(w, h) > 240) {
+      const shrink = 0.82
+      w = Math.max(1, Math.round(w * shrink))
+      h = Math.max(1, Math.round(h * shrink))
+      q = Math.min(quality, 0.5)
+    } else {
+      // Floor reached — return best effort (should still be near the cap)
+      return blob
+    }
+  }
+
+  return blob!
 }
 
 /**
@@ -102,16 +146,8 @@ export async function processAndUploadImage(
     const reason = err instanceof Error ? err.message : String(err)
     console.error('WebP variant pipeline failed, falling back to single JPEG upload:', err)
     const bitmap = await createImageBitmap(file)
-    const canvas = document.createElement('canvas')
-    const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height))
-    canvas.width = Math.round(bitmap.width * scale)
-    canvas.height = Math.round(bitmap.height * scale)
-    const ctx = canvas.getContext('2d')!
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    const blob = await encodeVariant(bitmap, 1600, 0.72, 'image/jpeg')
     bitmap.close()
-    const blob: Blob = await new Promise((resolve, reject) =>
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/jpeg', 0.82)
-    )
     const url = await upload(`${basePath}-card.jpg`, blob)
     return { url, usedFallback: true, fallbackReason: reason }
   }
@@ -127,8 +163,8 @@ export function deriveVariantUrl(cardUrl: string, size: keyof typeof SIZES): str
 }
 
 /** Simple single-size compressor for homepage decorative images (hero,
- * chapter cards, category cards) — unchanged from before, still used as-is. */
-export async function compressSingleImage(file: File, maxDimension = 1600, quality = 0.85): Promise<Blob> {
+ * chapter cards, category cards) — capped at MAX_OUTPUT_BYTES. */
+export async function compressSingleImage(file: File, maxDimension = 1600, quality = 0.7): Promise<Blob> {
   const bitmap = await createImageBitmap(file)
   const blob = await encodeVariant(bitmap, maxDimension, quality)
   bitmap.close()

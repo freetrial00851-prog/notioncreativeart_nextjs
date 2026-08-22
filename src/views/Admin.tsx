@@ -616,7 +616,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' }) {
               <div className="grid gap-4">
                 <DropzoneUpload
                   label="PRODUCT PHOTOS (first image is primary — drag to reorder)"
-                  sizeHint="1200×1600px, portrait (3:4), at least 1200px wide — this is the shape used on shop grid cards; the same photo is also shown larger and closer to square on the product page"
+                  sizeHint="Auto-compressed to ≤26KB WebP on upload (portrait 3:4 works best for shop cards)"
                   urls={form.images}
                   accept="image/jpeg,image/png"
                   acceptLabel="JPEG or PNG"
