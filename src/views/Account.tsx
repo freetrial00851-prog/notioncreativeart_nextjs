@@ -25,15 +25,6 @@ export { StatusBadge } from '../components/StatusBadge'
 const BRAND = '#0f3fc9'
 const BRAND_SOFT = '#e8eefc'
 
-const NAV_ITEMS: { to: string; label: string; icon: string; end?: boolean }[] = [
-  { to: '/account/orders', label: 'Orders', icon: 'receipt_long' },
-  { to: '/account/downloads', label: 'Downloads', icon: 'download' },
-  { to: '/account/wishlist', label: 'Wishlist', icon: 'favorite' },
-  { to: '/account/addresses', label: 'Addresses', icon: 'home' },
-  { to: '/account/profile', label: 'Account Settings', icon: 'settings' },
-  { to: '/account/newsletter', label: 'Newsletter', icon: 'mail' },
-]
-
 const PAGE_TITLES: Record<string, string> = {
   '/account/orders': 'Orders',
   '/account/downloads': 'Downloads',
@@ -53,7 +44,7 @@ export function Account() {
     return (
       <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Sign in to view your account.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME â†’</Link>
+        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
       </div>
     )
   }
@@ -63,20 +54,21 @@ export function Account() {
     ? 'Order Details'
     : (PAGE_TITLES[pathname ?? ''] ?? 'My Account')
   const isAccountHome = pathname === '/account' || pathname === '/account/'
+  const showPageTitle = !isOrderDetail && pathname !== '/account/wishlist' && !isAccountHome && pathname !== '/account/logout'
 
   return (
-    <div className="max-w-[1400px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
+    <div className="max-w-[1100px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
-        <span>â€º</span>
-        <Link href="/account/orders" className="hover:text-ink">My Account</Link>
+        <span>›</span>
+        <span className="text-ink-soft">My Account</span>
         {!isAccountHome && (
           <>
-            <span>â€º</span>
+            <span>›</span>
             {isOrderDetail ? (
               <>
                 <Link href="/account/orders" className="hover:text-ink">Orders</Link>
-                <span>â€º</span>
+                <span>›</span>
                 <span className="text-ink">Details</span>
               </>
             ) : (
@@ -86,64 +78,10 @@ export function Account() {
         )}
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-8 lg:gap-10 items-start">
-        {/* Sidebar */}
-        <aside className="lg:sticky lg:top-24 space-y-4">
-          <nav className="bg-white border border-line rounded-2xl p-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible" style={{ scrollbarWidth: 'none' }}>
-            {NAV_ITEMS.map((t) => {
-              const active = t.to === '/account/orders'
-                ? pathname === '/account/orders' || isOrderDetail
-                : pathname === t.to || pathname.startsWith(t.to + '/')
-              return (
-                <Link
-                  key={t.to + t.label}
-                  href={t.to}
-                  className={`shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] transition-colors ${
-                    active ? 'font-medium' : 'text-ink-soft hover:text-ink hover:bg-surface'
-                  }`}
-                  style={active ? { background: BRAND_SOFT, color: BRAND } : undefined}
-                >
-                  <MaterialIcon name={t.icon} size={18} color={active ? BRAND : 'var(--color-ink-soft)'} />
-                  {t.label}
-                </Link>
-              )
-            })}
-            <Link
-              href="/account/logout"
-              className={`shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] transition-colors ${
-                pathname === '/account/logout' ? 'font-medium' : 'text-ink-soft hover:text-madder hover:bg-surface'
-              }`}
-              style={pathname === '/account/logout' ? { background: '#F5E6E6', color: 'var(--color-madder)' } : undefined}
-            >
-              <MaterialIcon name="logout" size={18} color={pathname === '/account/logout' ? 'var(--color-madder)' : 'var(--color-ink-soft)'} />
-              Log Out
-            </Link>
-          </nav>
-
-          <div className="hidden lg:block rounded-2xl p-5" style={{ background: BRAND_SOFT }}>
-            <div className="flex items-center gap-2 mb-2">
-              <MaterialIcon name="support_agent" size={20} color={BRAND} />
-              <p className="text-[14px] font-semibold text-ink">Need Help?</p>
-            </div>
-            <p className="text-[12px] text-ink-soft mb-4 leading-relaxed">Questions about downloads or orders? We&apos;re happy to help.</p>
-            <Link
-              href="/contact"
-              className="block text-center w-full py-2.5 text-canvas text-[11px] tracking-[0.1em] font-semibold rounded-lg hover:opacity-90 transition-opacity"
-              style={{ background: BRAND }}
-            >
-              CONTACT SUPPORT
-            </Link>
-          </div>
-        </aside>
-
-        {/* Main */}
-        <div className="min-w-0">
-          {!isOrderDetail && pathname !== '/account/wishlist' && !isAccountHome && (
-            <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
-          )}
-          <AccountContent />
-        </div>
-      </div>
+      {showPageTitle && (
+        <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
+      )}
+      <AccountContent />
     </div>
   )
 }

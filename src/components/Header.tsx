@@ -471,11 +471,7 @@ export function Header() {
               <div className="absolute right-0 top-full pt-2 z-50">
                 <div className="w-[260px] bg-white border border-line shadow-[0_8px_30px_rgba(0,0,0,0.12)] text-sm rounded-xl overflow-hidden">
                   <div className="h-1" style={{ background: 'var(--color-accent)' }} />
-                  <Link
-                    href="/account/profile"
-                    onClick={() => setDesktopAccountOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3.5 hover:bg-surface border-b border-line"
-                  >
+                  <div className="flex items-center gap-3 px-4 py-3.5 border-b border-line" style={{ background: 'var(--color-surface)' }}>
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-[14px] font-semibold"
                       style={{ background: 'var(--color-accent)' }}
@@ -486,9 +482,9 @@ export function Header() {
                       <p className="text-[13px] font-semibold text-ink truncate">
                         {[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}
                       </p>
-                      <p className="text-[11px] text-ink-soft">View your profile</p>
+                      <p className="text-[11px] text-ink-soft truncate">{user.email}</p>
                     </div>
-                  </Link>
+                  </div>
                   <div className="py-1.5">
                     <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
                       <MaterialIcon name="receipt_long" size={18} /> Orders
@@ -711,15 +707,15 @@ export function Header() {
             {user ? (
               <>
                 <div className="h-1" style={{ background: 'var(--color-accent)' }} />
-                <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="px-6 py-5 border-b border-line flex items-center gap-3">
+                <div className="px-6 py-5 border-b border-line flex items-center gap-3" style={{ background: 'var(--color-surface)' }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-semibold" style={{ background: 'var(--color-accent)' }}>
                     {(profile?.first_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
                   </div>
                   <div className="min-w-0">
                     <p className="text-[14px] font-medium truncate">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}</p>
-                    <p className="text-[12px] text-ink-soft">View your profile</p>
+                    <p className="text-[12px] text-ink-soft truncate">{user.email}</p>
                   </div>
-                </Link>
+                </div>
                 <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
                   <Link href="/account/orders" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
                     <MaterialIcon name="receipt_long" size={18} /> Orders
