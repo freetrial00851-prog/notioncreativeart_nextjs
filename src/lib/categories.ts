@@ -55,8 +55,8 @@ export async function getCategoriesWithProducts(): Promise<CategoryWithCount[]> 
 export type SubcategoryWithCount = { id: string; name: string; slug: string; image: string | null; count: number }
 
 /** Real subcategories (parent_id = the given category) with real product
- *  counts — used by the header's mega-menu when a top-level category is
- *  hovered/opened. Returns [] for a category with no subcategories. */
+ *  counts — used by the mobile category sheet when a top-level category is
+ *  expanded. Returns [] for a category with no subcategories. */
 export async function getSubcategoriesWithCounts(parentId: string): Promise<SubcategoryWithCount[]> {
   const { data: subs } = await supabase.from('categories').select('id, name, slug, image').eq('parent_id', parentId).order('sort_order')
   if (!subs || subs.length === 0) return []

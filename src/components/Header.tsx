@@ -27,11 +27,6 @@ const CATEGORY_ICONS: Record<string, string> = {
 function categoryIcon(name: string) {
   return CATEGORY_ICONS[name.toLowerCase()] ?? 'category'
 }
-const SKILL_LEVELS: { key: 'beginner' | 'intermediate' | 'advanced'; label: string; icon: string }[] = [
-  { key: 'beginner', label: 'Beginner Friendly', icon: 'health_and_safety' },
-  { key: 'intermediate', label: 'Intermediate', icon: 'trending_up' },
-  { key: 'advanced', label: 'Advanced', icon: 'military_tech' },
-]
 
 const LOGO_BLUE = '#0f3fc9'
 
@@ -80,13 +75,8 @@ export function Header() {
   const desktopAccountWrapRef = useRef<HTMLDivElement>(null)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
-  const [megaCategory, setMegaCategory] = useState<CategoryWithCount | null>(null)
-  const [megaProducts, setMegaProducts] = useState<Product[]>([])
-  const [megaProductIndex, setMegaProductIndex] = useState(0)
-  const [megaSubcategories, setMegaSubcategories] = useState<SubcategoryWithCount[]>([])
   const [mobileExpandedCategory, setMobileExpandedCategory] = useState<string | null>(null)
   const [mobileSubcategoriesCache, setMobileSubcategoriesCache] = useState<Record<string, SubcategoryWithCount[]>>({})
-  const [skillCounts, setSkillCounts] = useState<Record<string, number>>({})
   const [messages, setMessages] = useState<string[]>(['FREE PATTERN WITH EVERY FIRST ORDER — CODE FIRSTSTITCH'])
   const [messageIndex, setMessageIndex] = useState(0)
 
@@ -106,32 +96,6 @@ export function Header() {
     })
     getCategoriesWithProducts().then(setCategories)
   }, [])
-
-  useEffect(() => {
-    if (!categoriesOpen || categories.length === 0) return
-    setMegaCategory((cur) => cur ?? categories[0])
-    if (Object.keys(skillCounts).length > 0) return
-    Promise.all(
-      SKILL_LEVELS.map(({ key }) =>
-        supabase.from('products').select('id', { count: 'exact', head: true }).eq('active', true).eq('skill_level', key).then(({ count }) => [key, count ?? 0] as const)
-      )
-    ).then((entries) => setSkillCounts(Object.fromEntries(entries)))
-  }, [categoriesOpen, categories])
-
-  useEffect(() => {
-    if (!megaCategory) return
-    setMegaProductIndex(0)
-    supabase
-      .from('products')
-      .select('*')
-      .eq('active', true)
-      .eq('category_id', megaCategory.id)
-      .order('featured', { ascending: false })
-      .order('wishlist_count', { ascending: false })
-      .limit(4)
-      .then(({ data }) => setMegaProducts((data as Product[]) ?? []))
-    getSubcategoriesWithCounts(megaCategory.id).then(setMegaSubcategories)
-  }, [megaCategory])
 
   useEffect(() => {
     if (messages.length <= 1) return
@@ -224,148 +188,31 @@ export function Header() {
             {categoriesOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setCategoriesOpen(false)} />
-                <div
-                  className="absolute left-0 top-full mt-3 bg-canvas border border-line shadow-lg z-50 flex"
-                  style={{ width: megaSubcategories.length > 0 ? 'min(1140px, calc(100vw - 48px))' : 'min(880px, calc(100vw - 48px))' }}
-                >
-                  <div className="w-[220px] shrink-0 border-r border-line py-3">
-                    {categories.map((c) => (
-                      <button
-                        key={c.link}
-                        onMouseEnter={() => setMegaCategory(c)}
-                        onClick={() => { setCategoriesOpen(false); router.push(c.link) }}
-                        className={`w-full flex items-center gap-3 px-5 py-2.5 text-[13px] text-left transition-colors ${megaCategory?.link === c.link ? 'bg-surface text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+                <div className="absolute left-0 top-full mt-2 z-50 w-[280px]">
+                  <div className="bg-white border border-line rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden">
+                    <div className="max-h-[min(420px,70vh)] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin' }}>
+                      <Link
+                        href="/shop"
+                        onClick={() => setCategoriesOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-ink hover:bg-surface transition-colors"
                       >
-                        <MaterialIcon name={categoryIcon(c.name)} size={18} />
-                        {c.name}
-                        <MaterialIcon name="chevron_right" size={16} className="ml-auto opacity-50" />
-                      </button>
-                    ))}
-                    <div className="px-5 pt-2 mt-2 border-t border-line">
-                      <Link href="/shop" onClick={() => setCategoriesOpen(false)} className="flex items-center gap-2 text-[12px] font-medium text-ink hover:opacity-70">
-                        <MaterialIcon name="grid_view" size={16} /> View All Categories
+                        <MaterialIcon name="auto_awesome" size={16} color="#e67a2e" />
+                        Recommended categories
                       </Link>
+                      <div className="mx-4 mb-1.5 border-b" style={{ borderColor: LOGO_BLUE }} />
+                      {categories.map((c) => (
+                        <Link
+                          key={c.link}
+                          href={c.link}
+                          onClick={() => setCategoriesOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-ink hover:bg-surface transition-colors"
+                        >
+                          <span className="flex-1 truncate">{c.name}</span>
+                          <MaterialIcon name="chevron_right" size={16} className="text-ink-soft shrink-0" />
+                        </Link>
+                      ))}
                     </div>
                   </div>
-
-                  {megaCategory && (
-                    <div className={`flex-1 grid gap-6 p-6 ${megaSubcategories.length > 0 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                      {megaSubcategories.length > 0 && (
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-[11px] tracking-[0.15em] text-ink-soft font-semibold">
-                              {megaCategory.name.toUpperCase()} CATEGORIES
-                            </p>
-                            <Link href={megaCategory.link} onClick={() => setCategoriesOpen(false)} className="text-[11px] text-ink-soft hover:text-ink whitespace-nowrap">
-                              View All →
-                            </Link>
-                          </div>
-                          <div className="space-y-1">
-                            {megaSubcategories.map((sub) => (
-                              <Link
-                                key={sub.id}
-                                href={`/shop/${sub.slug}`}
-                                onClick={() => setCategoriesOpen(false)}
-                                className="flex items-center gap-3 px-2 py-2 rounded-lg text-[13px] text-ink-soft hover:bg-surface hover:text-ink transition-colors"
-                              >
-                                {sub.image ? (
-                                  <img src={sub.image} alt={sub.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
-                                ) : (
-                                  <div className="w-9 h-9 rounded-full bg-surface shrink-0" />
-                                )}
-                                <span className="flex-1">{sub.name}</span>
-                                <span className="text-[11px] text-ink-soft/70">{sub.count}+ Patterns</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <p className="text-[11px] tracking-[0.15em] text-ink-soft font-semibold">
-                            POPULAR IN {megaCategory.name.toUpperCase()}
-                          </p>
-                          <Link href={megaCategory.link} onClick={() => setCategoriesOpen(false)} className="text-[11px] text-ink-soft hover:text-ink whitespace-nowrap">
-                            View All →
-                          </Link>
-                        </div>
-                        {megaProducts.length > 0 ? (
-                          <>
-                            <Link href={`/pattern/${megaProducts[megaProductIndex].slug}`} onClick={() => setCategoriesOpen(false)} className="group block">
-                              <div className="aspect-square bg-surface rounded-lg overflow-hidden mb-2">
-                                {megaProducts[megaProductIndex].images?.[0] && (
-                                  <img src={deriveVariantUrl(megaProducts[megaProductIndex].images[0], 'thumb')} alt={megaProducts[megaProductIndex].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                )}
-                              </div>
-                              <p className="text-[13px] group-hover:underline underline-offset-2">{megaProducts[megaProductIndex].title}</p>
-                              <p className="text-[13px] mt-0.5">
-                                <span className="text-ink font-semibold">${megaProducts[megaProductIndex].price.toFixed(2)}</span>
-                                {megaProducts[megaProductIndex].compare_at_price && (
-                                  <span className="line-through text-ink-soft ml-2 text-[12px]">${megaProducts[megaProductIndex].compare_at_price!.toFixed(2)}</span>
-                                )}
-                              </p>
-                            </Link>
-                            {megaProducts.length > 1 && (
-                              <div className="flex gap-1.5 mt-3">
-                                {megaProducts.map((_, i) => (
-                                  <button key={i} onClick={() => setMegaProductIndex(i)} aria-label={`Show product ${i + 1}`} className={`w-1.5 h-1.5 rounded-full ${i === megaProductIndex ? 'bg-ink' : 'bg-ink/25'}`} />
-                                ))}
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <p className="text-[12px] text-ink-soft">No patterns in this category yet.</p>
-                        )}
-                        <div className="mt-5 pt-4 border-t border-line">
-                          <p className="text-[12px] font-medium mb-2">Looking for something specific?</p>
-                          <form
-                            onSubmit={(e) => { e.preventDefault(); setCategoriesOpen(false); if (query.trim()) router.push(`/search?q=${encodeURIComponent(query.trim())}`) }}
-                            className="relative"
-                          >
-                            <input
-                              value={query}
-                              onChange={(e) => setQuery(e.target.value)}
-                              placeholder="Search patterns..."
-                              className="w-full border border-line rounded-lg pl-3 pr-9 py-2 text-[12px] bg-canvas focus:outline-none focus:border-ink"
-                            />
-                            <button type="submit" aria-label="Search" className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-soft">
-                              <MaterialIcon name="search" size={16} />
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-
-                      <div>
-                        <p className="text-[11px] tracking-[0.15em] text-ink-soft font-semibold mb-3">SHOP BY SKILL LEVEL</p>
-                        <div className="space-y-1">
-                          {SKILL_LEVELS.map((s) => (
-                            <Link
-                              key={s.key}
-                              href={`/shop?level=${s.key}`}
-                              onClick={() => setCategoriesOpen(false)}
-                              className="flex items-center gap-3 px-2 py-2 rounded-lg text-[13px] text-ink-soft hover:bg-surface hover:text-ink transition-colors"
-                            >
-                              <MaterialIcon name={s.icon} size={18} />
-                              <span>
-                                {s.label}
-                                <span className="block text-[11px] text-ink-soft">{skillCounts[s.key] ?? 0}+ Patterns</span>
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                        <Link href="/shop?bundle=1" onClick={() => setCategoriesOpen(false)} className="block mt-4 rounded-lg overflow-hidden border border-line hover:opacity-90 transition-opacity">
-                          <div className="px-4 py-4" style={{ background: 'var(--color-surface)' }}>
-                            <p className="text-[12px] font-semibold mb-0.5">Save More With Bundles</p>
-                            <p className="text-[11px] text-ink-soft mb-2">Curated pattern bundles at the best prices!</p>
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-ink">
-                              Shop Bundles <MaterialIcon name="arrow_forward" size={14} />
-                            </span>
-                          </div>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </>
             )}
