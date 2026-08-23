@@ -372,14 +372,11 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile row — V2: logo left, icon row right, prominent search bar below */}
+      {/* Mobile row — logo left, icon row right */}
       <div className="flex md:hidden items-center justify-between px-4 h-[58px]">
         <Logo variant="mobile" />
 
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={() => setMobileOpen(true)} aria-label="Categories" className="w-10 h-10 flex items-center justify-center text-ink">
-            <MaterialIcon name="grid_view" size={19} />
-          </button>
           <button
             aria-label="Wishlist"
             onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
@@ -406,37 +403,43 @@ export function Header() {
       </div>
       <div ref={mobileSearchWrapRef} className="md:hidden px-4 pb-3 relative">
         <form onSubmit={submitSearch} className="flex items-center gap-2.5">
-          <div className="relative flex-1">
-            {!searchFocused && (
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-soft pointer-events-none">
-                <SearchIcon />
-              </span>
-            )}
-            <input
-              ref={mobileSearchInputRef}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              placeholder="Search patterns, categories..."
-              className={`w-full border-2 border-ink rounded-full py-2.5 text-[13px] bg-canvas placeholder:text-ink-soft focus:outline-none ${searchFocused ? 'pl-4' : 'pl-10'} pr-11`}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => { setQuery(''); setSuggestions([]) }}
-                aria-label="Clear search"
-                className="absolute right-11 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-ink-soft"
-              >
-                <MaterialIcon name="close" size={14} />
-              </button>
-            )}
+          <div className="relative flex-1 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden">
             <button
-              type="submit"
-              aria-label="Search"
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-sale-green text-white flex items-center justify-center hover:opacity-85 transition-opacity"
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Browse categories"
+              className="shrink-0 pl-3.5 pr-2.5 py-2.5 text-ink hover:bg-surface transition-colors"
             >
-              <MaterialIcon name="search" size={16} />
+              <MaterialIcon name="menu" size={18} />
             </button>
+            <div className="w-px self-stretch my-2 bg-line shrink-0" />
+            <div className="relative flex-1 min-w-0">
+              <input
+                ref={mobileSearchInputRef}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                placeholder="Search patterns, categories..."
+                className="w-full bg-transparent pl-3 pr-20 py-2.5 text-[13px] placeholder:text-ink-soft focus:outline-none"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => { setQuery(''); setSuggestions([]) }}
+                  aria-label="Clear search"
+                  className="absolute right-11 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-ink-soft"
+                >
+                  <MaterialIcon name="close" size={14} />
+                </button>
+              )}
+              <button
+                type="submit"
+                aria-label="Search"
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-sale-green text-white flex items-center justify-center hover:opacity-85 transition-opacity"
+              >
+                <MaterialIcon name="search" size={16} />
+              </button>
+            </div>
           </div>
           {searchFocused && (
             <button
