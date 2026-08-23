@@ -1,5 +1,7 @@
 import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
 import { Home } from '@/views/Home'
+import { createStaticClient } from '@/lib/supabase/static'
+import type { HeroContent } from '@/lib/types'
 
 export const metadata = buildMetadata({
   title: 'Notion Creative Art',
@@ -14,7 +16,19 @@ export const metadata = buildMetadata({
   ],
 })
 
-/** Homepage — server-rendered shell with client-side interactive sections. */
-export default function HomePage() {
-  return <Home />
+/** Prefetch hero so the collage can paint on first load (no gray pulse box on hard refresh). */
+async function getInitialHero(): Promise<HeroContent | null> {
+  try {
+    const supabase = createStaticClient()
+    const { data } = await supabase.from('site_settings').select('value').eq('key', 'hero').maybeSingle()
+    return (data?.value as HeroContent) ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Homepage — server-prefetched hero + client interactive sections. */
+export default async function HomePage() {
+  const initialHero = await getInitialHero()
+  return <Home initialHero={initialHero} />
 }

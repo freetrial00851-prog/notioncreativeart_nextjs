@@ -16,14 +16,14 @@ function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: stri
     return (
       <div className={`grid grid-cols-[1.5fr_1fr] gap-3 ${className}`}>
         <div className="rounded-[18px] overflow-hidden bg-surface">
-          <img src={group[0]} alt="" loading="eager" fetchPriority="high" className="w-full h-full object-cover" />
+          <img src={group[0]} alt="" loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
         </div>
         <div className="grid grid-rows-2 gap-3">
           <div className="rounded-[18px] overflow-hidden bg-surface">
-            <img src={group[1]} alt="" loading="lazy" className="w-full h-full object-cover" />
+            <img src={group[1]} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           </div>
           <div className="rounded-[18px] overflow-hidden bg-surface">
-            <img src={group[2]} alt="" loading="lazy" className="w-full h-full object-cover" />
+            <img src={group[2]} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>
@@ -33,28 +33,28 @@ function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: stri
     return (
       <div className={`grid grid-cols-2 gap-3 ${className}`}>
         <div className="rounded-[18px] overflow-hidden bg-surface">
-          <img src={group[0]} alt="" loading="eager" fetchPriority="high" className="w-full h-full object-cover" />
+          <img src={group[0]} alt="" loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
         </div>
         <div className="rounded-[18px] overflow-hidden bg-surface">
-          <img src={group[1]} alt="" loading="lazy" className="w-full h-full object-cover" />
+          <img src={group[1]} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
         </div>
       </div>
     )
   }
   return (
     <div className={`relative rounded-[18px] overflow-hidden bg-surface ${className}`}>
-      <img src={group[0]} alt="" loading="eager" fetchPriority="high" className="absolute inset-0 w-full h-full object-cover" />
+      <img src={group[0]} alt="" loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
     </div>
   )
 }
 
-export function Home() {
-const [trending, setTrending] = useState<Product[]>([])
+export function Home({ initialHero = null }: { initialHero?: HeroContent | null }) {
+  const [trending, setTrending] = useState<Product[]>([])
   const [newArrivals, setNewArrivals] = useState<Product[]>([])
   const [bundles, setBundles] = useState<Product[]>([])
   const [freeProduct, setFreeProduct] = useState<Product | null>(null)
-  const [hero, setHero] = useState<HeroContent | null>(null)
-  const [heroReady, setHeroReady] = useState(false)
+  const [hero, setHero] = useState<HeroContent | null>(initialHero)
+  const [heroReady, setHeroReady] = useState(Boolean(initialHero?.images?.length))
   const [heroSlide, setHeroSlide] = useState(0)
   const [chapters, setChapters] = useState<ChapterContent[]>([])
   const [testimonials, setTestimonials] = useState<TestimonialContent[]>([])
