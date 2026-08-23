@@ -12,12 +12,12 @@ import { useEffect, useState } from 'react'
 import { QuickView } from './QuickView'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
-import { claimAndDownloadFreePattern } from '../lib/downloads'
+import { downloadFreePattern } from '../lib/downloads'
 import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
-  const { requireAuth } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt } = useUI()
   const { user } = useAuth()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
@@ -61,9 +61,9 @@ export function ProductCard({ product, priority = false }: { product: Product; p
 
   const downloadFree = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!requireAuth({ type: 'buy', productId: product.id })) return
+    maybeOpenNewsletterPrompt()
     setDownloadingFree(true)
-    const ok = await claimAndDownloadFreePattern(user!.id, product.id, product.title)
+    const ok = await downloadFreePattern(product.id, product.title, user?.id ?? null)
     setDownloadingFree(false)
     showToast(ok ? 'Downloading your pattern…' : "This pattern's file isn't uploaded yet — please check back soon.", ok ? 'success' : 'error')
   }

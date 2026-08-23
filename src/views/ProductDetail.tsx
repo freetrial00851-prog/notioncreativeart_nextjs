@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
-import { claimAndDownloadFreePattern } from '../lib/downloads'
+import { downloadFreePattern } from '../lib/downloads'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { FavoriteIcon, ShareIcon } from '../components/icons'
@@ -72,7 +72,7 @@ export function ProductDetail() {
   const params = useParams()
   const slug = typeof params?.slug === 'string' ? params.slug : undefined
   const { user, profile } = useAuth()
-  const { requireAuth } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt } = useUI()
   const router = useRouter()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
@@ -245,14 +245,15 @@ export function ProductDetail() {
   )
 
   const handleBuy = async () => {
-    if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (product.price === 0) {
+      maybeOpenNewsletterPrompt()
       setDownloadingFree(true)
-      const ok = await claimAndDownloadFreePattern(user!.id, product.id, product.title)
+      const ok = await downloadFreePattern(product.id, product.title, user?.id ?? null)
       setDownloadingFree(false)
       showToast(ok ? 'Downloading your pattern…' : "This pattern's file isn't uploaded yet — please check back soon.", ok ? 'success' : 'error')
       return
     }
+    if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
     startCheckout({

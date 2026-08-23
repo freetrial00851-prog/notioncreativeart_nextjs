@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { startCheckout } from '../lib/lemonsqueezy'
-import { claimAndDownloadFreePattern } from '../lib/downloads'
+import { downloadFreePattern } from '../lib/downloads'
 import type { Product } from '../lib/types'
 
 export function PendingActionRunner() {
@@ -31,7 +31,7 @@ export function PendingActionRunner() {
         const product = data as Product | null
         if (product) {
           if (product.price === 0) {
-            await claimAndDownloadFreePattern(user.id, product.id, product.title)
+            await downloadFreePattern(product.id, product.title, user.id)
           } else {
             startCheckout({
               variantId: product.lemon_variant_id,

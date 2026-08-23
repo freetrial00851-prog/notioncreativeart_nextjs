@@ -1,8 +1,9 @@
 'use client'
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
 import { useIsMobile } from '../lib/useIsMobile'
+import { hasBeenNewsletterPrompted } from '../lib/newsletterPrompt'
 
 type RequireAuthAction = { type: 'buy' | 'wishlist' | 'cart'; productId: string }
 type AuthSheetView = 'login' | 'signup'
@@ -16,6 +17,10 @@ type UIContextValue = {
   openAuthSheet: (view?: AuthSheetView) => void
   closeAuthSheet: () => void
   setAuthSheetView: (view: AuthSheetView) => void
+  // Newsletter prompt after free download
+  newsletterPromptOpen: boolean
+  maybeOpenNewsletterPrompt: () => void
+  closeNewsletterPrompt: () => void
 }
 
 const UIContext = createContext<UIContextValue | null>(null)
@@ -25,6 +30,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile()
   const [authSheetOpen, setAuthSheetOpen] = useState(false)
   const [authSheetView, setAuthSheetView] = useState<AuthSheetView>('login')
+  const [newsletterPromptOpen, setNewsletterPromptOpen] = useState(false)
 
   const goToLoginPage = () => {
     const redirect = window.location.pathname + window.location.search
@@ -51,6 +57,13 @@ export function UIProvider({ children }: { children: ReactNode }) {
     return false
   }
 
+  const maybeOpenNewsletterPrompt = useCallback(() => {
+    if (hasBeenNewsletterPrompted()) return
+    setNewsletterPromptOpen(true)
+  }, [])
+
+  const closeNewsletterPrompt = useCallback(() => setNewsletterPromptOpen(false), [])
+
   return (
     <UIContext.Provider
       value={{
@@ -61,6 +74,9 @@ export function UIProvider({ children }: { children: ReactNode }) {
         openAuthSheet,
         closeAuthSheet,
         setAuthSheetView,
+        newsletterPromptOpen,
+        maybeOpenNewsletterPrompt,
+        closeNewsletterPrompt,
       }}
     >
       {children}

@@ -9,13 +9,13 @@ import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { supabase } from '../lib/supabase'
 import { startCheckout } from '../lib/lemonsqueezy'
-import { claimAndDownloadFreePattern } from '../lib/downloads'
+import { downloadFreePattern } from '../lib/downloads'
 import { useToast } from '../context/ToastContext'
 import { deriveVariantUrl } from '../lib/imageVariants'
 
 export function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const { user, profile } = useAuth()
-  const { requireAuth } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt } = useUI()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
   const router = useRouter()
@@ -53,14 +53,15 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
   const prev = () => setActiveImage((i) => (i - 1 + images.length) % images.length)
 
   const handleBuy = async () => {
-    if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (product.price === 0) {
+      maybeOpenNewsletterPrompt()
       setDownloadingFree(true)
-      const ok = await claimAndDownloadFreePattern(user!.id, product.id, product.title)
+      const ok = await downloadFreePattern(product.id, product.title, user?.id ?? null)
       setDownloadingFree(false)
       showToast(ok ? 'Downloading your pattern…' : "This pattern's file isn't uploaded yet — please check back soon.", ok ? 'success' : 'error')
       return
     }
+    if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
     startCheckout({ variantId: product.lemon_variant_id, userId: user!.id, productId: product.id, email: user!.email, name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined, billingCountry: profile?.billing_country, billingState: profile?.billing_state, billingZip: profile?.billing_zip, checkoutMode: product.checkout_mode })
