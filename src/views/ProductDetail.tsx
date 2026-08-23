@@ -459,7 +459,7 @@ export function ProductDetail() {
       {/* Hero: gallery dominates (~65%); info/buy ~35%. Mobile: gallery → buy → details.
           Tablet (md): 2-col gallery | buy; details full-width below.
           Desktop (lg): 3-col gallery | details | buy. */}
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.9fr)_minmax(0,0.6fr)_minmax(240px,0.5fr)] gap-6 md:gap-7 lg:gap-8 items-start overflow-visible">
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,0.55fr)_minmax(240px,0.45fr)] gap-6 md:gap-7 lg:gap-8 items-start overflow-visible">
         {/* Panel 1 — Gallery */}
         <div className={`min-w-0 relative order-1 md:col-start-1 md:row-start-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
@@ -723,7 +723,7 @@ export function ProductDetail() {
         </div>
 
         {/* Panel 3 — Purchase card (mobile: right after gallery/title; tablet: right of gallery) */}
-        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2.5 md:col-start-2 md:row-start-1 lg:col-start-3 lg:sticky lg:top-24 order-2">
+        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2 md:col-start-2 md:row-start-1 lg:col-start-3 lg:sticky lg:top-24 order-2">
           <div className="space-y-0.5">
             {product.price > 0 && onSale ? (
               <div className="flex items-baseline gap-3 flex-wrap">
@@ -737,19 +737,19 @@ export function ProductDetail() {
               </p>
             )}
             {product.price > 0 && (
-              <p className="text-[12px] text-ink-soft">One-time purchase</p>
+              <p className="text-[12px] text-ink-soft leading-tight">One-time purchase</p>
             )}
           </div>
 
           {product.sold_out ? (
             <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {product.price > 0 && (
                 isInCart(product.id) ? (
                   <Link
                     href="/cart"
-                    className="block text-center w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
+                    className="block text-center w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     ✓ IN CART — GO TO CART
@@ -757,7 +757,7 @@ export function ProductDetail() {
                 ) : (
                   <button
                     onClick={toggleCart}
-                    className="w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    className="w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     <MaterialIcon name="shopping_bag" size={15} /> ADD TO CART
@@ -768,8 +768,8 @@ export function ProductDetail() {
                 onClick={handleBuy}
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
                 className={product.price === 0
-                  ? 'w-full py-3.5 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
-                  : 'w-full py-3.5 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
+                  ? 'w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
+                  : 'w-full py-3 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
                 style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
               >
                 {product.price === 0
@@ -778,14 +778,14 @@ export function ProductDetail() {
               </button>
               <button
                 onClick={toggleWishlist}
-                className="w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
               >
                 <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
                 {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
               </button>
               <button
                 onClick={shareListing}
-                className="hidden lg:flex w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors items-center justify-center gap-2"
+                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
               >
                 <ShareIcon size={15} />
                 {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
@@ -800,7 +800,7 @@ export function ProductDetail() {
           )}
 
           {!product.sold_out && (
-            <div className="rounded-xl px-3.5 py-3 space-y-3" style={{ background: 'var(--color-surface)' }}>
+            <div className="rounded-xl px-3.5 py-2.5 space-y-2" style={{ background: 'var(--color-surface)' }}>
               <div className="flex gap-2.5 items-start">
                 <MaterialIcon name="download" size={16} color="var(--color-sale-green)" />
                 <div>
