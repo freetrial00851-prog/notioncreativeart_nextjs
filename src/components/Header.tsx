@@ -13,7 +13,9 @@ import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
-import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, UI_ICON_SIZE } from './icons'
+import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, CartIcon, UI_ICON_SIZE } from './icons'
+
+const HEADER_ICON = '#111111'
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
@@ -150,42 +152,41 @@ export function Header() {
         <span key={messageIndex} className="animate-[fadeIn_0.4s_ease-out]">{messages[messageIndex]}</span>
       </div>
 
-      {/* ── Desktop ≥1024 (lg): Logo | Categories | Search flex | Wishlist | Account | Cart ── */}
+      {/* ── Desktop ≥1024 (lg): Logo | Search (hamburger inside) | Wishlist | Account | Cart ── */}
       <div className="hidden lg:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-[1400px] mx-auto">
         <Logo variant="full" />
 
-        <div ref={categoriesWrapRef} className="relative shrink-0">
-          <button
-            type="button"
-            onClick={() => setCategoriesOpen((v) => !v)}
-            aria-label="Browse categories"
-            aria-expanded={categoriesOpen}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[13px] font-medium text-ink hover:bg-surface transition-colors whitespace-nowrap"
-          >
-            <MaterialIcon name="menu" size={18} />
-            <span>Categories</span>
-            <ChevronIcon open={categoriesOpen} />
-          </button>
-          {categoriesOpen && (
-            <DesktopCategoriesMenu
-              categories={categories}
-              onClose={() => setCategoriesOpen(false)}
-            />
-          )}
-        </div>
-
         <div ref={searchWrapRef} className="relative flex-1 min-w-0">
-          <SearchPill
-            inputRef={desktopSearchInputRef}
-            query={query}
-            setQuery={setQuery}
-            onFocus={() => setSearchFocused(true)}
-            onSubmit={submitSearch}
-            onClear={clearSearch}
-            placeholder="Search patterns, categories..."
-            buttonSize={36}
-            iconSize={18}
-          />
+          <div ref={categoriesWrapRef} className="relative">
+            <SearchPill
+              inputRef={desktopSearchInputRef}
+              query={query}
+              setQuery={setQuery}
+              onFocus={() => setSearchFocused(true)}
+              onSubmit={submitSearch}
+              onClear={clearSearch}
+              placeholder="Search patterns, categories..."
+              buttonSize={36}
+              iconSize={18}
+              leading={
+                <button
+                  type="button"
+                  onClick={() => setCategoriesOpen((v) => !v)}
+                  aria-label="Browse categories"
+                  aria-expanded={categoriesOpen}
+                  className="shrink-0 flex items-center justify-center w-10 h-10 rounded-l-full hover:bg-surface transition-colors"
+                >
+                  <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
+                </button>
+              }
+            />
+            {categoriesOpen && (
+              <DesktopCategoriesMenu
+                categories={categories}
+                onClose={() => setCategoriesOpen(false)}
+              />
+            )}
+          </div>
           {searchFocused && query && (
             <SuggestionsDropdown
               suggestions={suggestions}
@@ -206,27 +207,27 @@ export function Header() {
           </button>
         )}
 
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 text-[#111111]">
           <button
             type="button"
             aria-label="Wishlist"
             title="Wishlist"
             onClick={goWishlist}
-            className="w-10 h-10 flex items-center justify-center text-ink hover:opacity-70 transition-opacity"
+            className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
           >
-            <MaterialIcon name="favorite" size={24} />
+            <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
           </button>
 
           <div ref={desktopAccountWrapRef} className="relative">
             <button
               type="button"
               onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
-              className="w-10 h-10 flex items-center justify-center text-ink hover:opacity-70 transition-opacity"
+              className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
               aria-label="Your account"
               title="Your account"
               aria-expanded={desktopAccountOpen}
             >
-              <MaterialIcon name="person" size={24} />
+              <MaterialIcon name="person" size={24} color={HEADER_ICON} />
             </button>
             {user && desktopAccountOpen && (
               <AccountDropdown
@@ -243,9 +244,9 @@ export function Header() {
             onClick={openCart}
             aria-label="Cart"
             title="Cart"
-            className="relative w-10 h-10 flex items-center justify-center text-ink hover:opacity-70 transition-opacity"
+            className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
           >
-            <MaterialIcon name="shopping_basket" size={24} />
+            <CartIcon size={24} color={HEADER_ICON} />
             {cartCount > 0 && (
               <span
                 className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
@@ -262,9 +263,9 @@ export function Header() {
       <div className="hidden md:block lg:hidden">
         <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-[1400px] mx-auto">
           <Logo variant="full" />
-          <div className="flex items-center gap-0.5 shrink-0">
-            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center text-ink">
-              <MaterialIcon name="favorite" size={22} />
+          <div className="flex items-center gap-0.5 shrink-0 text-[#111111]">
+            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center">
+              <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
             </button>
             <div ref={tabletAccountWrapRef} className="relative">
               <button
@@ -272,10 +273,10 @@ export function Header() {
                 aria-label="Your account"
                 title="Your account"
                 onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
-                className="w-10 h-10 flex items-center justify-center text-ink"
+                className="w-10 h-10 flex items-center justify-center"
                 aria-expanded={desktopAccountOpen}
               >
-                <MaterialIcon name="person" size={22} />
+                <MaterialIcon name="person" size={22} color={HEADER_ICON} />
               </button>
               {user && desktopAccountOpen && (
                 <AccountDropdown
@@ -286,8 +287,8 @@ export function Header() {
                 />
               )}
             </div>
-            <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center text-ink">
-              <MaterialIcon name="shopping_basket" size={22} />
+            <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center">
+              <CartIcon size={22} color={HEADER_ICON} />
               {cartCount > 0 && (
                 <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
                   {cartCount}
@@ -301,9 +302,9 @@ export function Header() {
             type="button"
             aria-label="Browse categories"
             onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
-            className={`w-10 h-10 shrink-0 flex items-center justify-center text-ink rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
+            className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
           >
-            <MaterialIcon name="menu" size={22} />
+            <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
           </button>
           <div ref={tabletSearchWrapRef} className="relative flex-1 min-w-0">
             <SearchPill
@@ -367,9 +368,9 @@ export function Header() {
                 type="button"
                 onClick={() => { setSearchFocused(false); setMobileExpandedCategory(null); setMobileOpen(true) }}
                 aria-label="Browse categories"
-                className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center text-ink ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
+                className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
               >
-                <MaterialIcon name="menu" size={22} />
+                <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
               </button>
 
               <div className="shrink-0 mr-1">
@@ -392,18 +393,18 @@ export function Header() {
                 aria-label="Your account"
                 title="Your account"
                 onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-                className="w-10 h-10 shrink-0 flex items-center justify-center text-ink"
+                className="w-10 h-10 shrink-0 flex items-center justify-center"
               >
-                <MaterialIcon name="person" size={22} />
+                <MaterialIcon name="person" size={22} color={HEADER_ICON} />
               </button>
               <button
                 type="button"
                 aria-label="Cart"
                 title="Cart"
                 onClick={openMobileCart}
-                className="relative w-10 h-10 shrink-0 flex items-center justify-center text-ink"
+                className="relative w-10 h-10 shrink-0 flex items-center justify-center"
               >
-                <MaterialIcon name="shopping_basket" size={22} />
+                <CartIcon size={22} color={HEADER_ICON} />
                 {cartCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
                     {cartCount}
@@ -618,6 +619,7 @@ function SearchPill({
   placeholder,
   buttonSize,
   iconSize,
+  leading,
 }: {
   inputRef: React.RefObject<HTMLInputElement | null>
   query: string
@@ -628,20 +630,23 @@ function SearchPill({
   placeholder: string
   buttonSize: number
   iconSize: number
+  leading?: React.ReactNode
 }) {
   return (
-    <form onSubmit={onSubmit} className="relative flex items-center border-2 border-ink rounded-full bg-white pl-4 pr-1.5 focus-within:ring-2 focus-within:ring-ink/20">
+    <form onSubmit={onSubmit} className="relative flex items-center border-2 border-ink rounded-full bg-white pl-0.5 pr-1.5 focus-within:ring-2 focus-within:ring-ink/20">
+      {leading}
+      {leading && <div className="w-px self-stretch my-2.5 bg-line shrink-0" />}
       <input
         ref={inputRef}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={onFocus}
         placeholder={placeholder}
-        className="flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[14px] placeholder:text-ink-soft focus:outline-none"
+        className={`flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[14px] placeholder:text-ink-soft focus:outline-none ${leading ? 'pl-2' : 'pl-4'}`}
       />
       {query && (
         <button type="button" onClick={onClear} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft hover:text-ink mr-1">
-          <MaterialIcon name="close" size={16} />
+          <MaterialIcon name="close" size={16} color={HEADER_ICON} />
         </button>
       )}
       <button
@@ -784,8 +789,4 @@ function AccountDropdown({
       </div>
     </div>
   )
-}
-
-function ChevronIcon({ open }: { open: boolean }) {
-  return <MaterialIcon name="expand_more" size={16} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
 }
