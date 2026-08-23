@@ -37,8 +37,8 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
     return (
       <Link href="/" className="shrink-0 leading-none block" aria-label="Notion Creative Art — home">
         <span
-          className="font-logo font-bold tracking-tight text-[28px] leading-none"
-          style={{ color: LOGO_BLUE, fontFamily: 'var(--font-logo)' }}
+          className="mobile-nca-logo tracking-tight text-[28px] leading-none"
+          style={{ color: LOGO_BLUE }}
         >
           NCA
         </span>
@@ -377,14 +377,14 @@ export function Header() {
       <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
         {searchFocused ? (
           <form onSubmit={submitSearch} className="flex items-center gap-2.5 h-10">
-            <div className="relative flex-1 min-w-0 h-10 border border-ink rounded-full bg-white overflow-hidden">
+            <div className="relative flex flex-1 min-w-0 h-10 items-center border border-ink rounded-full bg-white pl-4 pr-1.5 gap-1">
               <input
                 ref={mobileSearchInputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 placeholder="Search"
-                className="w-full h-full bg-transparent pl-4 pr-[72px] text-[14px] placeholder:text-ink-soft focus:outline-none"
+                className="flex-1 min-w-0 h-full bg-transparent text-[14px] placeholder:text-ink-soft focus:outline-none"
                 autoFocus
               />
               {query ? (
@@ -392,7 +392,7 @@ export function Header() {
                   type="button"
                   onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }}
                   aria-label="Clear search"
-                  className="absolute right-11 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-ink-soft"
+                  className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft"
                 >
                   <MaterialIcon name="close" size={18} />
                 </button>
@@ -400,7 +400,7 @@ export function Header() {
               <button
                 type="submit"
                 aria-label="Search"
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-white flex items-center justify-center"
+                className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center"
                 style={{ background: 'var(--color-primary)' }}
               >
                 <MaterialIcon name="search" size={16} />
@@ -444,11 +444,11 @@ export function Header() {
                 setSearchFocused(true)
                 requestAnimationFrame(() => mobileSearchInputRef.current?.focus())
               }}
-              className="relative flex-1 min-w-0 h-10 mr-1.5 border border-ink rounded-full bg-white"
+              className="flex flex-1 min-w-0 h-10 mr-1.5 items-center justify-end border border-ink rounded-full bg-white px-1.5"
               aria-label="Search"
             >
               <span
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-white flex items-center justify-center pointer-events-none"
+                className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center pointer-events-none"
                 style={{ background: 'var(--color-primary)' }}
               >
                 <MaterialIcon name="search" size={16} />
@@ -465,11 +465,15 @@ export function Header() {
             <Link
               href="/cart"
               aria-label="Cart"
-              className="relative w-10 h-10 shrink-0 -mr-0.5 flex items-center justify-center text-ink"
+              className="relative w-10 h-10 shrink-0 -mr-0.5 flex items-center justify-center"
+              style={{ color: 'var(--color-primary)' }}
             >
-              <MaterialIcon name="shopping_bag" size={22} />
+              <MaterialIcon name="shopping_bag" size={22} color="var(--color-primary)" />
               {cartCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-white text-[8px] flex items-center justify-center">
+                <span
+                  className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center"
+                  style={{ background: 'var(--color-primary)' }}
+                >
                   {cartCount}
                 </span>
               )}
