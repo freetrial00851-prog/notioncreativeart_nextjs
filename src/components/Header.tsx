@@ -152,7 +152,7 @@ export function Header() {
         <span key={messageIndex} className="animate-[fadeIn_0.4s_ease-out]">{messages[messageIndex]}</span>
       </div>
 
-      {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Wishlist | Account | Cart ── */}
+      {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Account | Wishlist | Cart ── */}
       <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-[1400px] mx-auto">
         <div className="shrink-0">
           <Logo variant="full" />
@@ -211,16 +211,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-1 shrink-0 text-[#111111]">
-          <button
-            type="button"
-            aria-label="Wishlist"
-            title="Wishlist"
-            onClick={goWishlist}
-            className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-          >
-            <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
-          </button>
-
           <HeaderAccountControl
             wrapRef={desktopAccountWrapRef}
             iconSize={24}
@@ -231,6 +221,16 @@ export function Header() {
             requireAuth={requireAuth}
             signOut={signOut}
           />
+
+          <button
+            type="button"
+            aria-label="Wishlist"
+            title="Wishlist"
+            onClick={goWishlist}
+            className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
+          >
+            <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
+          </button>
 
           <button
             type="button"
@@ -257,9 +257,6 @@ export function Header() {
         <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-[1400px] mx-auto">
           <Logo variant="full" />
           <div className="flex items-center gap-0.5 shrink-0 text-[#111111]">
-            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center">
-              <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
-            </button>
             <HeaderAccountControl
               wrapRef={tabletAccountWrapRef}
               iconSize={22}
@@ -270,6 +267,9 @@ export function Header() {
               requireAuth={requireAuth}
               signOut={signOut}
             />
+            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center">
+              <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
+            </button>
             <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center">
               <CartIcon size={22} color={HEADER_ICON} />
               {cartCount > 0 && (
