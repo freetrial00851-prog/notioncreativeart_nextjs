@@ -14,7 +14,7 @@ import { useToast } from '../context/ToastContext'
 import { claimAndDownloadFreePattern } from '../lib/downloads'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
-import { FavoriteIcon, ShareIcon, CloseCircleIcon } from '../components/icons'
+import { FavoriteIcon, ShareIcon } from '../components/icons'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductDetailSkeleton } from '../components/Skeleton'
 import type { Product } from '../lib/types'
@@ -82,9 +82,9 @@ export function ProductDetail() {
   const [activeImage, setActiveImage] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
-  const [zoomOpen, setZoomOpen] = useState(false)
-  const [hoverZoom, setHoverZoom] = useState(false)
-  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 })
+  const [lensZoom, setLensZoom] = useState(false)
+  const [lensPos, setLensPos] = useState({ x: 0, y: 0, lensW: 0, lensH: 0, boxW: 0, boxH: 0 })
+  const galleryRef = useRef<HTMLDivElement>(null)
   const [activeTab, setActiveTab] = useState<Tab>('description')
   const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
   const buyButtonRef = useRef<HTMLDivElement>(null)
@@ -188,17 +188,6 @@ export function ProductDetail() {
   }, [product])
 
   useEffect(() => {
-    if (!zoomOpen) return
-    document.body.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setZoomOpen(false)
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = ''
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [zoomOpen])
-
-  useEffect(() => {
     if (!product) return
     const script = document.createElement('script')
     script.type = 'application/ld+json'
@@ -219,6 +208,26 @@ export function ProductDetail() {
     document.head.appendChild(script)
     return () => { document.head.removeChild(script) }
   }, [product, slug])
+
+  const updateLens = (clientX: number, clientY: number) => {
+    const el = galleryRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const boxW = rect.width
+    const boxH = rect.height
+    if (boxW < 8 || boxH < 8) return
+    const zoom = 2.4
+    const lensW = boxW / zoom
+    const lensH = boxH / zoom
+    const x = Math.min(Math.max(clientX - rect.left - lensW / 2, 0), boxW - lensW)
+    const y = Math.min(Math.max(clientY - rect.top - lensH / 2, 0), boxH - lensH)
+    setLensPos({ x, y, lensW, lensH, boxW, boxH })
+  }
+
+  const canDesktopLensZoom = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    window.matchMedia('(min-width: 1024px)').matches
 
   if (loading) return <ProductDetailSkeleton />
   if (!product) return (
@@ -445,14 +454,18 @@ export function ProductDetail() {
         <span className="text-ink truncate max-w-[260px]">{product.title}</span>
       </nav>
 
-      {/* 3-panel hero: gallery | details | purchase */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(260px,320px)] gap-8 xl:gap-10 items-start">
+      {/* 3-panel hero: gallery | details | purchase — mobile: gallery → buy → details */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(260px,320px)] gap-6 lg:gap-8 xl:gap-10 items-start overflow-visible">
         {/* Panel 1 — Gallery */}
-        <div className="min-w-0">
+        <div className={`min-w-0 relative order-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
           <div
-            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center touch-pan-y cursor-zoom-in"
+            ref={galleryRef}
+            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center touch-pan-y lg:cursor-crosshair select-none"
             style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)' }}
-            onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+            onTouchStart={(e) => {
+              setLensZoom(false)
+              setTouchStartX(e.touches[0].clientX)
+            }}
             onTouchEnd={(e) => {
               if (touchStartX === null) return
               const delta = e.changedTouches[0].clientX - touchStartX
@@ -464,13 +477,16 @@ export function ProductDetail() {
               }
               setTouchStartX(null)
             }}
-            onMouseEnter={() => { if (images[activeImage]) setHoverZoom(true) }}
-            onMouseLeave={() => setHoverZoom(false)}
+            onMouseEnter={(e) => {
+              if (!images[activeImage] || !canDesktopLensZoom()) return
+              setLensZoom(true)
+              updateLens(e.clientX, e.clientY)
+            }}
+            onMouseLeave={() => setLensZoom(false)}
             onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect()
-              const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100))
-              const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100))
-              setZoomOrigin({ x, y })
+              if (!canDesktopLensZoom()) return
+              if (!lensZoom) setLensZoom(true)
+              updateLens(e.clientX, e.clientY)
             }}
           >
             {images[activeImage] ? (
@@ -482,18 +498,28 @@ export function ProductDetail() {
                 loading="eager"
                 fetchPriority="high"
                 className="w-full h-full object-cover pointer-events-none select-none"
-                style={{
-                  transform: hoverZoom ? 'scale(2.25)' : 'scale(1)',
-                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
-                  transition: hoverZoom ? 'none' : 'transform 0.2s ease-out',
-                }}
                 draggable={false}
               />
             ) : (
               <div className="text-ink-soft text-xs">No image yet</div>
             )}
 
-            <div className="absolute top-3 left-3 z-10 flex gap-2">
+            {/* Amazon-style lens — desktop hover only */}
+            {lensZoom && images[activeImage] && (
+              <div
+                className="pointer-events-none absolute hidden lg:block border border-[#7eb6ff]/60"
+                style={{
+                  left: lensPos.x,
+                  top: lensPos.y,
+                  width: lensPos.lensW,
+                  height: lensPos.lensH,
+                  background: 'rgba(145, 200, 255, 0.35)',
+                  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
+                }}
+              />
+            )}
+
+            <div className="absolute top-3 left-3 z-10 flex gap-2 pointer-events-none">
               {badge === 'new' && (
                 <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-sale-green)' }}>
                   New
@@ -510,41 +536,59 @@ export function ProductDetail() {
                 </span>
               )}
             </div>
-
-            <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleWishlist() }}
-                aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
-                style={{ background: 'var(--color-canvas)' }}
-              >
-                <FavoriteIcon size={18} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); shareListing() }}
-                aria-label="Share listing"
-                className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
-                style={{ background: 'var(--color-canvas)' }}
-                title={shareHint ?? 'Share'}
-              >
-                <ShareIcon size={18} />
-              </button>
-            </div>
-
-            {images[activeImage] && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setZoomOpen(true) }}
-                aria-label="Zoom image"
-                className="absolute bottom-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
-                style={{ background: 'var(--color-canvas)' }}
-              >
-                <MaterialIcon name="zoom_in" size={18} />
-              </button>
-            )}
           </div>
 
+          {/* Desktop zoom pane — appears beside gallery while hovering */}
+          {lensZoom && images[activeImage] && lensPos.boxW > 0 && lensPos.lensW > 0 && (
+            <div
+              className="hidden lg:block absolute left-[calc(100%+12px)] top-0 z-30 rounded-xl border border-line overflow-hidden bg-canvas shadow-[0_8px_32px_rgba(0,0,0,0.14)] pointer-events-none"
+              style={{ width: lensPos.boxW, height: lensPos.boxH }}
+              aria-hidden
+            >
+              <img
+                src={deriveVariantUrl(images[activeImage], 'full')}
+                alt=""
+                draggable={false}
+                className="max-w-none object-cover"
+                style={{
+                  width: lensPos.boxW * (lensPos.boxW / lensPos.lensW),
+                  height: lensPos.boxH * (lensPos.boxH / lensPos.lensH),
+                  transform: `translate(${-lensPos.x * (lensPos.boxW / lensPos.lensW)}px, ${-lensPos.y * (lensPos.boxH / lensPos.lensH)}px)`,
+                }}
+              />
+            </div>
+          )}
+
+          {/* Mobile: graduated dots + wishlist / share (Amazon-style) */}
+          {images.length > 0 && (
+            <div className="lg:hidden mt-3 flex items-center justify-between px-0.5">
+              <div className="flex-1" />
+              <GalleryDots count={images.length} active={activeImage} />
+              <div className="flex-1 flex items-center justify-end gap-1">
+                <button
+                  type="button"
+                  onClick={toggleWishlist}
+                  aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                  className="w-9 h-9 flex items-center justify-center text-ink"
+                >
+                  <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
+                </button>
+                <button
+                  type="button"
+                  onClick={shareListing}
+                  aria-label="Share listing"
+                  className="w-9 h-9 flex items-center justify-center text-ink"
+                  title={shareHint ?? 'Share'}
+                >
+                  <ShareIcon size={18} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop thumbnails */}
           {images.length > 1 && (
-            <div className="mt-3 flex items-center gap-2">
+            <div className="hidden lg:flex mt-3 items-center gap-2">
               <button
                 onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                 aria-label="Previous image"
@@ -557,7 +601,8 @@ export function ProductDetail() {
                 {images.map((img, i) => (
                   <button
                     key={img}
-                    onClick={() => setActiveImage(i)}
+                    onClick={() => { setActiveImage(i); setLensZoom(false) }}
+                    onMouseEnter={() => setActiveImage(i)}
                     className={`w-16 h-16 sm:w-[68px] sm:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
@@ -575,21 +620,35 @@ export function ProductDetail() {
               </button>
             </div>
           )}
+
+          {/* Mobile title strip — sits with product before buy box */}
+          <div className="lg:hidden mt-4">
+            {category && (
+              <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-2" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
+                {category.name}
+              </span>
+            )}
+            <h1 className="font-display font-semibold text-[24px] leading-tight break-words">
+              {product.title}
+            </h1>
+          </div>
         </div>
 
-        {/* Panel 2 — Product details */}
-        <div className="min-w-0 lg:pt-1">
-          {category && (
-            <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-3" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
-              {category.name}
-            </span>
-          )}
-          <h1 className="font-display font-semibold text-[26px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
-            {product.title}
-          </h1>
+        {/* Panel 2 — Product details (desktop middle; mobile after buy) */}
+        <div className="min-w-0 lg:pt-1 order-3 lg:order-2">
+          <div className="hidden lg:block">
+            {category && (
+              <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-3" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
+                {category.name}
+              </span>
+            )}
+            <h1 className="font-display font-semibold text-[26px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
+              {product.title}
+            </h1>
+          </div>
 
           {purchaseCount >= 3 && (
-            <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5">
+            <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5 mt-1 lg:mt-0">
               <MaterialIcon name="download_done" size={14} /> {purchaseCount}+ makers have downloaded this pattern
             </p>
           )}
@@ -626,8 +685,8 @@ export function ProductDetail() {
           )}
         </div>
 
-        {/* Panel 3 — Purchase card */}
-        <div ref={buyButtonRef} className="rounded-2xl border border-line p-5 sm:p-6 space-y-4 lg:sticky lg:top-24">
+        {/* Panel 3 — Purchase card (mobile: right after gallery/title) */}
+        <div ref={buyButtonRef} className="rounded-2xl border border-line p-5 sm:p-6 space-y-4 lg:sticky lg:top-24 order-2 lg:order-3">
           <div>
             {product.price > 0 && onSale ? (
               <div className="flex items-baseline gap-3 flex-wrap">
@@ -689,7 +748,7 @@ export function ProductDetail() {
               </button>
               <button
                 onClick={shareListing}
-                className="w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+                className="hidden lg:flex w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors items-center justify-center gap-2"
               >
                 <ShareIcon size={15} />
                 {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
@@ -724,51 +783,8 @@ export function ProductDetail() {
         </div>
       </div>
 
-      {/* Zoom lightbox */}
-      {zoomOpen && images[activeImage] && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(17,17,17,0.92)' }}
-          onClick={() => setZoomOpen(false)}
-        >
-          <button
-            onClick={() => setZoomOpen(false)}
-            aria-label="Close zoom"
-            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
-          >
-            <CloseCircleIcon size={36} />
-          </button>
-          <img
-            src={deriveVariantUrl(images[activeImage], 'full')}
-            alt={product.title}
-            className="max-w-full max-h-full object-contain rounded-lg"
-            onClick={(e) => e.stopPropagation()}
-          />
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i - 1 + images.length) % images.length) }}
-                aria-label="Previous image"
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
-                style={{ background: 'var(--color-canvas)' }}
-              >
-                <MaterialIcon name="chevron_left" size={22} />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i + 1) % images.length) }}
-                aria-label="Next image"
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
-                style={{ background: 'var(--color-canvas)' }}
-              >
-                <MaterialIcon name="chevron_right" size={22} />
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
       {/* Full-width tabs */}
-      <div className="mt-14 md:mt-16 pt-2">
+      <div className="mt-14 md:mt-16 pt-2 order-4">
         <div className="hidden md:flex gap-7 border-b border-line overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {TABS.map((t) => (
             <button
@@ -863,6 +879,32 @@ export function ProductDetail() {
 
 function CheckIcon() {
   return <MaterialIcon name="check" size={15} color="var(--color-sale-green)" />
+}
+
+/** Graduated carousel dots — active largest, neighbors smaller (Instagram/Amazon style). */
+function GalleryDots({ count, active }: { count: number; active: number }) {
+  if (count <= 1) return null
+  const windowSize = Math.min(5, count)
+  const start = Math.max(0, Math.min(active - Math.floor(windowSize / 2), count - windowSize))
+  const indices = Array.from({ length: windowSize }, (_, k) => start + k)
+
+  return (
+    <div className="flex items-center justify-center gap-[5px]" role="tablist" aria-label="Image gallery">
+      {indices.map((i) => {
+        const dist = Math.abs(i - active)
+        const size = i === active ? 7 : dist === 1 ? 5.5 : 4
+        const opacity = i === active ? 1 : dist === 1 ? 0.4 : 0.25
+        return (
+          <span
+            key={i}
+            role="presentation"
+            className="rounded-full bg-ink transition-[width,height,opacity] duration-150"
+            style={{ width: size, height: size, opacity }}
+          />
+        )
+      })}
+    </div>
+  )
 }
 
 function ChevronIcon({ open }: { open: boolean }) {
