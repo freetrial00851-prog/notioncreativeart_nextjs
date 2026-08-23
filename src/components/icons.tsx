@@ -116,18 +116,19 @@ export function OrderIcon({ size = UI_ICON_SIZE, color = 'currentColor', classNa
   )
 }
 
-/** Shopping bag — cart (solid body + round handle) */
+/** Shopping bag — cart (clear bag + arched handle, no lock-like cutout). */
 export function ShoppingBagIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
       <path
-        fill={color}
-        fillRule="evenodd"
-        d="M8.2 8.5h7.6c1 0 1.8.8 1.8 1.8v8.2c0 1-.8 1.8-1.8 1.8H8.2c-1 0-1.8-.8-1.8-1.8v-8.2c0-1 .8-1.8 1.8-1.8zm3.8 1.1c-1.55 0-2.4 1.05-2.4 2.15 0 .35.3.6.65.6s.65-.25.65-.6c0-.45.4-.95 1.1-.95s1.1.5 1.1.95c0 .35.3.6.65.6s.65-.25.65-.6c0-1.1-.85-2.15-2.4-2.15z"
-        clipRule="evenodd"
+        d="M8 9.5h8l-.7 9.2a1.8 1.8 0 0 1-1.8 1.65H10.5a1.8 1.8 0 0 1-1.8-1.65L8 9.5z"
+        stroke={color}
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        fill="none"
       />
       <path
-        d="M9.2 8.5V7.2c0-1.55 1.25-2.8 2.8-2.8s2.8 1.25 2.8 2.8v1.3"
+        d="M9.2 9.5V8.1c0-1.6 1.25-2.9 2.8-2.9s2.8 1.3 2.8 2.9v1.4"
         stroke={color}
         strokeWidth="1.7"
         strokeLinecap="round"

@@ -457,213 +457,215 @@ export function ProductDetail() {
       </nav>
 
       {/* 3-panel hero: gallery | details | purchase — mobile: gallery → buy → details */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(260px,320px)] gap-6 lg:gap-8 xl:gap-10 items-start overflow-visible">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(260px,320px)] gap-6 lg:gap-8 xl:gap-10 items-start overflow-visible">
         {/* Panel 1 — Gallery */}
         <div className={`min-w-0 relative order-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
-          <div
-            ref={galleryRef}
-            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center lg:cursor-crosshair select-none"
-            style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)', touchAction: 'pan-y' }}
-            onTouchStart={(e) => {
-              setLensZoom(false)
-              setTouchStartX(e.touches[0].clientX)
-              setTouchStartY(e.touches[0].clientY)
-            }}
-            onTouchEnd={(e) => {
-              if (touchStartX === null) return
-              const endX = e.changedTouches[0].clientX
-              const endY = e.changedTouches[0].clientY
-              const deltaX = endX - touchStartX
-              const deltaY = endY - (touchStartY ?? endY)
-              // Prefer horizontal swipes over vertical scroll
-              if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) && images.length > 1) {
-                setActiveImage((i) => {
-                  if (deltaX < 0) return (i + 1) % images.length
-                  return (i - 1 + images.length) % images.length
-                })
-              }
-              setTouchStartX(null)
-              setTouchStartY(null)
-            }}
-            onMouseEnter={(e) => {
-              if (!images[activeImage] || !canDesktopLensZoom()) return
-              setLensZoom(true)
-              updateLens(e.clientX, e.clientY)
-            }}
-            onMouseLeave={() => setLensZoom(false)}
-            onMouseMove={(e) => {
-              if (!canDesktopLensZoom()) return
-              if (!lensZoom) setLensZoom(true)
-              updateLens(e.clientX, e.clientY)
-            }}
-          >
-            {images[activeImage] ? (
-              <img
-                src={images[activeImage]}
-                srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w, ${deriveVariantUrl(images[activeImage], 'full')} 1600w`}
-                sizes="(max-width: 1024px) 100vw, 36vw"
-                alt={product.title}
-                loading="eager"
-                fetchPriority="high"
-                className="w-full h-full object-cover pointer-events-none select-none"
-                draggable={false}
-              />
-            ) : (
-              <div className="text-ink-soft text-xs">No image yet</div>
-            )}
-
-            {/* Prev / next arrows — all breakpoints when multiple images */}
+          <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
+            {/* Vertical thumbnails — tablet + desktop (≥768) */}
             {images.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i - 1 + images.length) % images.length); setLensZoom(false) }}
-                  aria-label="Previous image"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
-                >
-                  <MaterialIcon name="chevron_left" size={22} />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i + 1) % images.length); setLensZoom(false) }}
-                  aria-label="Next image"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
-                >
-                  <MaterialIcon name="chevron_right" size={22} />
-                </button>
-              </>
-            )}
-
-            {/* Amazon-style lens — desktop hover only */}
-            {lensZoom && images[activeImage] && (
               <div
-                className="pointer-events-none absolute hidden lg:block border border-[#7eb6ff]/60"
-                style={{
-                  left: lensPos.x,
-                  top: lensPos.y,
-                  width: lensPos.lensW,
-                  height: lensPos.lensH,
-                  background: 'rgba(145, 200, 255, 0.35)',
-                  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
-                }}
-              />
-            )}
-
-            <div className="absolute top-3 left-3 z-10 flex gap-2 pointer-events-none">
-              {badge === 'new' && (
-                <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-sale-green)' }}>
-                  New
-                </span>
-              )}
-              {badge === 'sale' && (
-                <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-madder)' }}>
-                  Sale
-                </span>
-              )}
-              {badge === 'featured' && (
-                <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-ink)' }}>
-                  Featured
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Desktop zoom pane — appears beside gallery while hovering */}
-          {lensZoom && images[activeImage] && lensPos.boxW > 0 && lensPos.lensW > 0 && (
-            <div
-              className="hidden lg:block absolute left-[calc(100%+12px)] top-0 z-30 rounded-xl border border-line overflow-hidden bg-canvas shadow-[0_8px_32px_rgba(0,0,0,0.14)] pointer-events-none"
-              style={{ width: lensPos.boxW, height: lensPos.boxH }}
-              aria-hidden
-            >
-              <img
-                src={deriveVariantUrl(images[activeImage], 'full')}
-                alt=""
-                draggable={false}
-                className="max-w-none object-cover"
-                style={{
-                  width: lensPos.boxW * (lensPos.boxW / lensPos.lensW),
-                  height: lensPos.boxH * (lensPos.boxH / lensPos.lensH),
-                  transform: `translate(${-lensPos.x * (lensPos.boxW / lensPos.lensW)}px, ${-lensPos.y * (lensPos.boxH / lensPos.lensH)}px)`,
-                }}
-              />
-            </div>
-          )}
-
-          {/* Mobile: graduated dots + wishlist / share */}
-          {images.length > 0 && (
-            <div className="lg:hidden mt-3 flex items-center justify-between px-0.5">
-              <div className="flex-1" />
-              <GalleryDots count={images.length} active={activeImage} onSelect={setActiveImage} />
-              <div className="flex-1 flex items-center justify-end gap-1">
-                <button
-                  type="button"
-                  onClick={toggleWishlist}
-                  aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                  className="w-9 h-9 flex items-center justify-center text-ink"
-                >
-                  <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
-                </button>
-                <button
-                  type="button"
-                  onClick={shareListing}
-                  aria-label="Share listing"
-                  className="w-9 h-9 flex items-center justify-center text-ink"
-                  title={shareHint ?? 'Share'}
-                >
-                  <ShareIcon size={18} />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Thumbnail strip — all breakpoints when multiple images */}
-          {images.length > 1 && (
-            <div className="mt-3 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
-                aria-label="Previous image"
-                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center hover:bg-[#d4d4d4] transition-colors"
-                style={{ background: '#e5e5e5', color: '#555' }}
+                className="hidden md:flex flex-col gap-2 shrink-0 overflow-y-auto max-h-[min(68vh,560px)] py-0.5"
+                style={{ scrollbarWidth: 'thin' }}
               >
-                <MaterialIcon name="chevron_left" size={18} />
-              </button>
-              <div className="flex gap-2 overflow-x-auto flex-1 py-0.5 justify-center" style={{ scrollbarWidth: 'none' }}>
                 {images.map((img, i) => (
                   <button
-                    key={`${img}-${i}`}
+                    key={`v-${img}-${i}`}
                     type="button"
                     onClick={() => { setActiveImage(i); setLensZoom(false) }}
                     onMouseEnter={() => { if (canDesktopLensZoom()) setActiveImage(i) }}
-                    className={`w-14 h-14 sm:w-16 sm:h-16 lg:w-[68px] lg:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                    className={`w-16 h-16 lg:w-[68px] lg:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
                     <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => setActiveImage((i) => (i + 1) % images.length)}
-                aria-label="Next image"
-                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center hover:bg-[#d4d4d4] transition-colors"
-                style={{ background: '#e5e5e5', color: '#555' }}
-              >
-                <MaterialIcon name="chevron_right" size={18} />
-              </button>
-            </div>
-          )}
-
-          {/* Mobile title strip — sits with product before buy box */}
-          <div className="lg:hidden mt-4">
-            {category && (
-              <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-2" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
-                {category.name}
-              </span>
             )}
-            <h1 className="font-display font-semibold text-[24px] leading-tight break-words">
-              {product.title}
-            </h1>
+
+            <div className="min-w-0 flex-1 w-full">
+              <div
+                ref={galleryRef}
+                className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center lg:cursor-crosshair select-none"
+                style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)', touchAction: 'pan-y' }}
+                onTouchStart={(e) => {
+                  setLensZoom(false)
+                  setTouchStartX(e.touches[0].clientX)
+                  setTouchStartY(e.touches[0].clientY)
+                }}
+                onTouchEnd={(e) => {
+                  if (touchStartX === null) return
+                  const endX = e.changedTouches[0].clientX
+                  const endY = e.changedTouches[0].clientY
+                  const deltaX = endX - touchStartX
+                  const deltaY = endY - (touchStartY ?? endY)
+                  if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) && images.length > 1) {
+                    setActiveImage((i) => {
+                      if (deltaX < 0) return (i + 1) % images.length
+                      return (i - 1 + images.length) % images.length
+                    })
+                  }
+                  setTouchStartX(null)
+                  setTouchStartY(null)
+                }}
+                onMouseEnter={(e) => {
+                  if (!images[activeImage] || !canDesktopLensZoom()) return
+                  setLensZoom(true)
+                  updateLens(e.clientX, e.clientY)
+                }}
+                onMouseLeave={() => setLensZoom(false)}
+                onMouseMove={(e) => {
+                  if (!canDesktopLensZoom()) return
+                  if (!lensZoom) setLensZoom(true)
+                  updateLens(e.clientX, e.clientY)
+                }}
+              >
+                {images[activeImage] ? (
+                  <img
+                    src={images[activeImage]}
+                    srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w, ${deriveVariantUrl(images[activeImage], 'full')} 1600w`}
+                    sizes="(max-width: 1024px) 100vw, 36vw"
+                    alt={product.title}
+                    loading="eager"
+                    fetchPriority="high"
+                    className="w-full h-full object-cover pointer-events-none select-none"
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="text-ink-soft text-xs">No image yet</div>
+                )}
+
+                {images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i - 1 + images.length) % images.length); setLensZoom(false) }}
+                      aria-label="Previous image"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
+                    >
+                      <MaterialIcon name="chevron_left" size={22} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i + 1) % images.length); setLensZoom(false) }}
+                      aria-label="Next image"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
+                    >
+                      <MaterialIcon name="chevron_right" size={22} />
+                    </button>
+                  </>
+                )}
+
+                {lensZoom && images[activeImage] && (
+                  <div
+                    className="pointer-events-none absolute hidden lg:block border border-[#7eb6ff]/60"
+                    style={{
+                      left: lensPos.x,
+                      top: lensPos.y,
+                      width: lensPos.lensW,
+                      height: lensPos.lensH,
+                      background: 'rgba(145, 200, 255, 0.35)',
+                      boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
+                    }}
+                  />
+                )}
+
+                <div className="absolute top-3 left-3 z-10 flex gap-2 pointer-events-none">
+                  {badge === 'new' && (
+                    <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-sale-green)' }}>
+                      New
+                    </span>
+                  )}
+                  {badge === 'sale' && (
+                    <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-madder)' }}>
+                      Sale
+                    </span>
+                  )}
+                  {badge === 'featured' && (
+                    <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-ink)' }}>
+                      Featured
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {lensZoom && images[activeImage] && lensPos.boxW > 0 && lensPos.lensW > 0 && (
+                <div
+                  className="hidden lg:block absolute left-[calc(100%+12px)] top-0 z-30 rounded-xl border border-line overflow-hidden bg-canvas shadow-[0_8px_32px_rgba(0,0,0,0.14)] pointer-events-none"
+                  style={{ width: lensPos.boxW, height: lensPos.boxH }}
+                  aria-hidden
+                >
+                  <img
+                    src={deriveVariantUrl(images[activeImage], 'full')}
+                    alt=""
+                    draggable={false}
+                    className="max-w-none object-cover"
+                    style={{
+                      width: lensPos.boxW * (lensPos.boxW / lensPos.lensW),
+                      height: lensPos.boxH * (lensPos.boxH / lensPos.lensH),
+                      transform: `translate(${-lensPos.x * (lensPos.boxW / lensPos.lensW)}px, ${-lensPos.y * (lensPos.boxH / lensPos.lensH)}px)`,
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Dots (mobile only) + wishlist / share (mobile + tablet) */}
+              {images.length > 0 && (
+                <div className="lg:hidden mt-3 flex items-center justify-between px-0.5">
+                  <div className="flex-1" />
+                  <div className="md:hidden">
+                    <GalleryDots count={images.length} active={activeImage} onSelect={setActiveImage} />
+                  </div>
+                  <div className="flex-1 flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      onClick={toggleWishlist}
+                      aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                      className="w-9 h-9 flex items-center justify-center text-ink"
+                    >
+                      <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={shareListing}
+                      aria-label="Share listing"
+                      className="w-9 h-9 flex items-center justify-center text-ink"
+                      title={shareHint ?? 'Share'}
+                    >
+                      <ShareIcon size={18} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Horizontal thumbnails — mobile only (<768), no side arrows */}
+              {images.length > 1 && (
+                <div className="md:hidden mt-3 flex gap-2 overflow-x-auto py-0.5" style={{ scrollbarWidth: 'none' }}>
+                  {images.map((img, i) => (
+                    <button
+                      key={`h-${img}-${i}`}
+                      type="button"
+                      onClick={() => { setActiveImage(i); setLensZoom(false) }}
+                      className={`w-14 h-14 shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                      style={{ background: 'var(--color-surface)' }}
+                    >
+                      <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Mobile title strip */}
+              <div className="lg:hidden mt-4">
+                {category && (
+                  <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-2" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
+                    {category.name}
+                  </span>
+                )}
+                <h1 className="font-display font-semibold text-[24px] leading-tight break-words">
+                  {product.title}
+                </h1>
+              </div>
+            </div>
           </div>
         </div>
 

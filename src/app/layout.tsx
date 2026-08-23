@@ -55,7 +55,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${manrope.variable} ${playfair.variable} ${baloo2.variable}`}>
       <head>
+        {/* Brand favicon — app/icon.png + app/apple-icon.png are auto-wired by Next.js */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
         {/* Material Symbols — load early; display=block avoids flashing icon names as text */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

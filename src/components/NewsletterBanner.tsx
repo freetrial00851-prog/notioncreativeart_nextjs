@@ -7,13 +7,15 @@ export function NewsletterBanner(_props: { image?: string }) {
   return (
     <section className="max-w-[1400px] mx-auto px-6 md:px-16 py-5 md:py-7">
       <div
-        className="rounded-2xl px-8 py-10 md:px-14 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8 text-white"
+        className="rounded-2xl px-8 py-10 md:px-14 md:py-12 flex flex-col md:flex-row md:items-center justify-between gap-8 text-white"
         style={{ background: 'var(--color-primary)' }}
       >
         <div className="text-center md:text-left">
           <p className="text-[10px] tracking-[0.2em] opacity-70 mb-2">JOIN OUR MAKER COMMUNITY</p>
           <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-3">Get 10% Off Your Next Order</h2>
-          <p className="text-[13px] opacity-80 max-w-sm">Get exclusive patterns, tips, new releases and special offers directly to your inbox.</p>
+          <p className="text-[13px] opacity-80 max-w-sm mx-auto md:mx-0">
+            Get exclusive patterns, tips, new releases and special offers directly to your inbox.
+          </p>
         </div>
         <NewsletterForm />
       </div>
@@ -34,27 +36,31 @@ function NewsletterForm() {
     setSubmitted(true)
   }
 
-  if (submitted) return <p className="text-[13px] font-medium">You're on the list — thank you.</p>
+  if (submitted) {
+    return <p className="text-[13px] font-medium text-center md:text-left">You're on the list — thank you.</p>
+  }
 
   return (
-    <form onSubmit={subscribe} className="flex flex-col sm:flex-row gap-2.5 w-full md:w-auto shrink-0">
-      <input
-        required
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email address"
-        className="flex-1 md:w-[260px] px-4 py-3 rounded-lg border-0 text-ink text-[13px] focus:outline-none focus:ring-2 focus:ring-ink"
-        style={{ background: 'white' }}
-      />
-      <button
-        type="submit"
-        className="px-6 py-3 rounded-lg text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity shrink-0"
-        style={{ background: 'var(--color-accent)', color: 'white' }}
-      >
-        SUBSCRIBE
-      </button>
-      {error && <p className="text-[11px] text-white/90 mt-1">{error}</p>}
-    </form>
+    <div className="w-full md:w-auto shrink-0">
+      <form onSubmit={subscribe} className="flex flex-col md:flex-row gap-2.5 w-full items-stretch">
+        <input
+          required
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email address"
+          className="w-full md:w-[260px] px-4 py-3 rounded-lg border-0 text-ink text-[13px] text-center md:text-left focus:outline-none focus:ring-2 focus:ring-ink"
+          style={{ background: 'white' }}
+        />
+        <button
+          type="submit"
+          className="px-6 py-3 rounded-lg text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity shrink-0"
+          style={{ background: 'var(--color-accent)', color: 'white' }}
+        >
+          SUBSCRIBE
+        </button>
+      </form>
+      {error && <p className="text-[11px] text-white/90 mt-2 text-center md:text-left">{error}</p>}
+    </div>
   )
 }
