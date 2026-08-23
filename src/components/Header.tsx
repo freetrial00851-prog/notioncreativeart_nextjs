@@ -372,88 +372,61 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile row — logo left, icon row right */}
-      <div className="flex md:hidden items-center justify-between px-4 h-[58px]">
-        <Logo variant="mobile" />
+      {/* Mobile header — Etsy-style single row: menu | logo | search | account | cart */}
+      <div ref={mobileSearchWrapRef} className="md:hidden px-3 py-2.5 relative">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Browse categories"
+            className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
+          >
+            <MaterialIcon name="menu" size={22} />
+          </button>
 
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            aria-label="Wishlist"
-            onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
-            className="w-10 h-10 flex items-center justify-center text-ink"
-          >
-            <HeartIcon size={UI_ICON_SIZE} />
-          </button>
-          <button
-            aria-label="Account"
-            onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-            className="w-10 h-10 flex items-center justify-center text-ink"
-          >
-            <UserIcon size={UI_ICON_SIZE} />
-          </button>
-          <button onClick={openDrawer} aria-label="Cart" className="relative w-10 h-10 flex items-center justify-center text-ink">
-            <CartIcon size={UI_ICON_SIZE} />
-            {cartCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sale-green text-white text-[9px] flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-      <div ref={mobileSearchWrapRef} className="md:hidden px-4 pb-3 relative">
-        <form onSubmit={submitSearch} className="flex items-center gap-2.5">
-          <div className="relative flex-1 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Browse categories"
-              className="shrink-0 pl-3.5 pr-2.5 py-2.5 text-ink hover:bg-surface transition-colors"
-            >
-              <MaterialIcon name="menu" size={18} />
-            </button>
-            <div className="w-px self-stretch my-2 bg-line shrink-0" />
-            <div className="relative flex-1 min-w-0">
+          <div className="shrink-0">
+            <Logo variant="mobile" />
+          </div>
+
+          <form onSubmit={submitSearch} className="relative flex-1 min-w-0">
+            <div className="relative flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-9">
               <input
                 ref={mobileSearchInputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
-                placeholder="Search patterns, categories..."
-                className="w-full bg-transparent pl-3 pr-20 py-2.5 text-[13px] placeholder:text-ink-soft focus:outline-none"
+                placeholder="Search"
+                className="w-full bg-transparent pl-3 pr-10 py-1.5 text-[13px] placeholder:text-ink-soft focus:outline-none"
               />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => { setQuery(''); setSuggestions([]) }}
-                  aria-label="Clear search"
-                  className="absolute right-11 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-ink-soft"
-                >
-                  <MaterialIcon name="close" size={14} />
-                </button>
-              )}
               <button
                 type="submit"
                 aria-label="Search"
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-sale-green text-white flex items-center justify-center hover:opacity-85 transition-opacity"
+                className="absolute right-0.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-sale-green text-white flex items-center justify-center hover:opacity-85 transition-opacity"
               >
-                <MaterialIcon name="search" size={16} />
+                <MaterialIcon name="search" size={15} />
               </button>
             </div>
-          </div>
-          {searchFocused && (
-            <button
-              type="button"
-              onClick={() => { setSearchFocused(false); setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.blur() }}
-              className="text-[13px] text-ink-soft shrink-0"
-            >
-              Cancel
-            </button>
-          )}
-        </form>
+          </form>
+
+          <button
+            aria-label="Account"
+            onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
+            className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
+          >
+            <UserIcon size={UI_ICON_SIZE} />
+          </button>
+          <button onClick={openDrawer} aria-label="Cart" className="relative w-9 h-9 shrink-0 flex items-center justify-center text-ink">
+            <CartIcon size={UI_ICON_SIZE} />
+            {cartCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-sale-green text-white text-[8px] flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
 
         {searchFocused && query && (
-          <div className="absolute left-4 right-4 top-full mt-2 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
+          <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
             {suggestions.length > 0 ? (
               <>
                 {suggestions.map((p) => (
