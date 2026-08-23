@@ -221,26 +221,16 @@ export function Header() {
             <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
           </button>
 
-          <div ref={desktopAccountWrapRef} className="relative">
-            <button
-              type="button"
-              onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
-              className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-              aria-label="Your account"
-              title="Your account"
-              aria-expanded={desktopAccountOpen}
-            >
-              <MaterialIcon name="person" size={24} color={HEADER_ICON} />
-            </button>
-            {user && desktopAccountOpen && (
-              <AccountDropdown
-                profile={profile}
-                email={user.email}
-                onClose={() => setDesktopAccountOpen(false)}
-                onSignOut={() => { signOut(); setDesktopAccountOpen(false) }}
-              />
-            )}
-          </div>
+          <HeaderAccountControl
+            wrapRef={desktopAccountWrapRef}
+            iconSize={24}
+            open={desktopAccountOpen}
+            setOpen={setDesktopAccountOpen}
+            user={user}
+            profile={profile}
+            requireAuth={requireAuth}
+            signOut={signOut}
+          />
 
           <button
             type="button"
@@ -270,26 +260,16 @@ export function Header() {
             <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center">
               <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
             </button>
-            <div ref={tabletAccountWrapRef} className="relative">
-              <button
-                type="button"
-                aria-label="Your account"
-                title="Your account"
-                onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
-                className="w-10 h-10 flex items-center justify-center"
-                aria-expanded={desktopAccountOpen}
-              >
-                <MaterialIcon name="person" size={22} color={HEADER_ICON} />
-              </button>
-              {user && desktopAccountOpen && (
-                <AccountDropdown
-                  profile={profile}
-                  email={user.email}
-                  onClose={() => setDesktopAccountOpen(false)}
-                  onSignOut={() => { signOut(); setDesktopAccountOpen(false) }}
-                />
-              )}
-            </div>
+            <HeaderAccountControl
+              wrapRef={tabletAccountWrapRef}
+              iconSize={22}
+              open={desktopAccountOpen}
+              setOpen={setDesktopAccountOpen}
+              user={user}
+              profile={profile}
+              requireAuth={requireAuth}
+              signOut={signOut}
+            />
             <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center">
               <CartIcon size={22} color={HEADER_ICON} />
               {cartCount > 0 && (
@@ -739,6 +719,61 @@ function DesktopCategoriesMenu({
           ))}
         </div>
       </div>
+    </div>
+  )
+}
+
+function HeaderAccountControl({
+  wrapRef,
+  iconSize,
+  open,
+  setOpen,
+  user,
+  profile,
+  requireAuth,
+  signOut,
+}: {
+  wrapRef: React.RefObject<HTMLDivElement | null>
+  iconSize: number
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  user: { email?: string } | null
+  profile: { first_name?: string | null; last_name?: string | null } | null
+  requireAuth: () => boolean
+  signOut: () => void
+}) {
+  if (!user) {
+    return (
+      <button
+        type="button"
+        onClick={() => { requireAuth() }}
+        className="h-10 px-2.5 text-[13px] font-medium text-ink hover:opacity-70 transition-opacity whitespace-nowrap shrink-0"
+      >
+        Sign in
+      </button>
+    )
+  }
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
+        aria-label="Your account"
+        title="Your account"
+        aria-expanded={open}
+      >
+        <MaterialIcon name="person" size={iconSize} color={HEADER_ICON} />
+      </button>
+      {open && (
+        <AccountDropdown
+          profile={profile}
+          email={user.email}
+          onClose={() => setOpen(false)}
+          onSignOut={() => { signOut(); setOpen(false) }}
+        />
+      )}
     </div>
   )
 }
