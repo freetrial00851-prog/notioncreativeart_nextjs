@@ -5,12 +5,14 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { CartIcon } from '../components/icons'
+import { ContentSkeleton } from '../components/Skeleton'
 
 export function Cart() {
   const { user, loading: authLoading } = useAuth()
   const { items, loading, removeFromCart, clearCart, checkingOut, checkoutError, checkout } = useCart()
 
-  if (authLoading || loading) return null
+  if (authLoading || loading) return <ContentSkeleton />
 
   if (!user) {
     return (
@@ -127,7 +129,7 @@ export function Cart() {
             className="w-full py-4 flex items-center justify-center gap-2 text-white text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: 'var(--color-sale-green)' }}
           >
-            <LockIcon /> {checkingOut ? 'PREPARING…' : `CHECKOUT — $${total.toFixed(2)}`}
+            <CartIcon size={14} /> {checkingOut ? 'PREPARING…' : `CHECKOUT — $${total.toFixed(2)}`}
           </button>
 
           <div className="flex items-center gap-3 rounded-xl px-4 py-3.5 mt-4" style={{ background: 'var(--color-surface)' }}>
@@ -167,9 +169,6 @@ function TrashIcon() {
 }
 function DownloadIcon({ large = false }: { large?: boolean }) {
   return <MaterialIcon name="download" size={large ? 18 : 13} color="var(--color-sale-green)" />
-}
-function LockIcon() {
-  return <MaterialIcon name="lock" size={14} />
 }
 function DigitalIcon() {
   return <MaterialIcon name="download" size={20} color="var(--color-sale-green)" />

@@ -136,3 +136,8 @@ export function ShoppingBagIcon({ size = UI_ICON_SIZE, color = 'currentColor', c
     </svg>
   )
 }
+
+/** Cart — shared site-wide (wraps ShoppingBagIcon). */
+export function CartIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
+  return <ShoppingBagIcon size={size} color={color} className={className} />
+}

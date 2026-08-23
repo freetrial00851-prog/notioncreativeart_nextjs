@@ -12,7 +12,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
-import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, ShoppingBagIcon, UI_ICON_SIZE } from './icons'
+import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, CartIcon, UI_ICON_SIZE } from './icons'
 
 const CATEGORY_ICONS: Record<string, string> = {
   amigurumi: 'toys',
@@ -694,9 +694,6 @@ function ChevronIcon({ open }: { open: boolean }) {
 }
 function SearchIcon() {
   return <MaterialIcon name="search" size={20} />
-}
-function CartIcon({ size = UI_ICON_SIZE }: { size?: number }) {
-  return <ShoppingBagIcon size={size} />
 }
 function HeartIcon({ size = UI_ICON_SIZE }: { size?: number }) {
   return <FavoriteIcon size={size} />
