@@ -462,9 +462,13 @@ export function Header() {
             >
               <UserIcon size={30} />
             </button>
-            <Link
-              href="/cart"
+            <button
+              type="button"
               aria-label="Cart"
+              onClick={() => {
+                if (user) router.push('/cart')
+                else requireAuth()
+              }}
               className="relative w-11 h-11 shrink-0 -mr-0.5 flex items-center justify-center"
               style={{ color: 'var(--color-primary)' }}
             >
@@ -477,7 +481,7 @@ export function Header() {
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </button>
           </div>
         )}
 
