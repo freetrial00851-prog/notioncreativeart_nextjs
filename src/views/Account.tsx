@@ -312,7 +312,7 @@ const COUNTRIES: [string, string][] = [
 function ProfileTab() {
   const { user, profile, refreshProfile } = useAuth()
   const { showToast } = useToast()
-  const [settingsTab, setSettingsTab] = useState<'profile' | 'password'>('profile')
+  const [settingsTab, setSettingsTab] = useState<'profile' | 'password' | 'addresses'>('profile')
   const [firstName, setFirstName] = useState(profile?.first_name ?? '')
   const [lastName, setLastName] = useState(profile?.last_name ?? '')
   const [editingName, setEditingName] = useState(false)
@@ -391,22 +391,23 @@ function ProfileTab() {
 
   return (
     <div>
-      <div className="flex gap-6 border-b border-line mb-8 text-[12px] tracking-[0.08em]">
+      <div className="flex gap-6 border-b border-line mb-8 text-[12px] tracking-[0.08em] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {([
           { key: 'profile' as const, label: 'Profile Information' },
           { key: 'password' as const, label: 'Password' },
+          { key: 'addresses' as const, label: 'Addresses' },
         ]).map((t) => (
           <button
             key={t.key}
             onClick={() => setSettingsTab(t.key)}
-            className={`pb-3 border-b-2 -mb-px ${settingsTab === t.key ? 'border-[var(--color-accent)] text-[var(--color-accent)] font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
+            className={`pb-3 border-b-2 -mb-px shrink-0 ${settingsTab === t.key ? 'border-[var(--color-accent)] text-[var(--color-accent)] font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
           >
             {t.label.toUpperCase()}
           </button>
         ))}
       </div>
 
-      {settingsTab === 'profile' ? (
+      {settingsTab === 'profile' && (
         <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-xl space-y-5 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center gap-4 mb-2">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-[20px] font-semibold shrink-0" style={{ background: BRAND_SOFT, color: BRAND }}>
@@ -450,7 +451,7 @@ function ProfileTab() {
                 className="px-5 py-2 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 style={{ background: BRAND }}
               >
-                {nameSaving ? 'SAVINGâ€¦' : 'SAVE NAME'}
+                {nameSaving ? 'SAVING…' : 'SAVE NAME'}
               </button>
               <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
             </div>
@@ -463,12 +464,10 @@ function ProfileTab() {
             <p>{user?.email}</p>
             <p className="text-ink-soft text-[11px] mt-1">Contact support to change your email address.</p>
           </div>
-          <p className="text-[12px] text-ink-soft pt-2 border-t border-line">
-            Manage your billing address under{' '}
-            <Link href="/account/addresses" className="underline underline-offset-2 font-medium" style={{ color: BRAND }}>Addresses</Link>.
-          </p>
         </div>
-      ) : (
+      )}
+
+      {settingsTab === 'password' && (
         <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-sm space-y-5 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <label className="block">
             <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CURRENT PASSWORD</span>
@@ -503,12 +502,14 @@ function ProfileTab() {
             className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: BRAND }}
           >
-            {pwSaving ? 'UPDATINGâ€¦' : 'UPDATE PASSWORD'}
+            {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
           </button>
           {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
           <p className="text-[11px] text-ink-soft">If you signed up with Google, password changes aren&apos;t available here.</p>
         </div>
       )}
+
+      {settingsTab === 'addresses' && <AddressesPage />}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -89,6 +89,8 @@ export function ProductDetail() {
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
   const [zoomOpen, setZoomOpen] = useState(false)
+  const [hoverZoom, setHoverZoom] = useState(false)
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 })
   const [activeTab, setActiveTab] = useState<Tab>('description')
   const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
   const buyButtonRef = useRef<HTMLDivElement>(null)
@@ -304,8 +306,6 @@ export function ProductDetail() {
     { icon: 'language', label: 'Language', value: 'English (US Terms)' },
     { icon: 'description', label: 'Format', value: formatLabel },
     ...(product.pdf_pages ? [{ icon: 'auto_stories', label: 'Pages', value: `${product.pdf_pages} pages` }] : []),
-    { icon: 'photo_camera', label: 'Step-by-step photos', value: 'Included' },
-    { icon: 'download', label: 'Delivery', value: 'Instant Download' },
   ]
 
   const TABS: { key: Tab; label: string }[] = [
@@ -316,33 +316,41 @@ export function ProductDetail() {
     { key: 'details', label: 'Details' },
   ]
 
+  const tabSideImage = images[1] || images[0] || null
+
+  const wrapTabWithImage = (body: ReactNode) => (
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(240px,380px)] gap-8 lg:gap-12 items-start">
+      <div className="min-w-0">{body}</div>
+      {tabSideImage && (
+        <div className="rounded-2xl overflow-hidden bg-surface flex items-center justify-center p-3 sm:p-4 min-h-[240px] lg:min-h-[320px]">
+          <img
+            src={tabSideImage}
+            srcSet={`${tabSideImage} 640w, ${deriveVariantUrl(tabSideImage, 'large')} 1000w`}
+            sizes="(max-width: 1024px) 100vw, 380px"
+            alt=""
+            loading="lazy"
+            className="w-full h-auto max-h-[420px] object-contain"
+          />
+        </div>
+      )}
+    </div>
+  )
+
   const renderTabContent = (tab: Tab) => {
     if (tab === 'description') {
-      return product.description ? (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(240px,380px)] gap-8 lg:gap-12 items-start">
+      return wrapTabWithImage(
+        product.description ? (
           <div>
             <h3 className="font-subheading font-semibold text-xl mb-4">Pattern Description</h3>
             <DescriptionBlocks text={product.description} />
           </div>
-          {images[1] && (
-            <div className="rounded-2xl overflow-hidden bg-surface aspect-[4/5] lg:aspect-auto lg:min-h-[360px]">
-              <img
-                src={images[1]}
-                srcSet={`${images[1]} 640w, ${deriveVariantUrl(images[1], 'large')} 1000w`}
-                sizes="(max-width: 1024px) 100vw, 380px"
-                alt=""
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <p className="text-[13px] text-ink-soft">No description yet.</p>
+        ) : (
+          <p className="text-[13px] text-ink-soft">No description yet.</p>
+        )
       )
     }
     if (tab === 'included') {
-      return (
+      return wrapTabWithImage(
         <ul className="text-[14px] text-ink-soft space-y-3 max-w-xl">
           {[
             product.pdf_filename ? `PDF pattern file — ${product.pdf_filename}` : 'PDF pattern file (instant download)',
@@ -359,16 +367,18 @@ export function ProductDetail() {
       )
     }
     if (tab === 'materials') {
-      return product.materials ? (
-        <ul className="text-[14px] text-ink-soft space-y-2 list-disc list-inside max-w-xl">
-          {product.materials.split('\n').filter(Boolean).map((line, i) => <li key={i}>{line}</li>)}
-        </ul>
-      ) : (
-        <p className="text-[13px] text-ink-soft">No materials list added for this pattern yet.</p>
+      return wrapTabWithImage(
+        product.materials ? (
+          <ul className="text-[14px] text-ink-soft space-y-2 list-disc list-inside max-w-xl">
+            {product.materials.split('\n').filter(Boolean).map((line, i) => <li key={i}>{line}</li>)}
+          </ul>
+        ) : (
+          <p className="text-[13px] text-ink-soft">No materials list added for this pattern yet.</p>
+        )
       )
     }
     if (tab === 'skill') {
-      return (
+      return wrapTabWithImage(
         <div className="max-w-xl space-y-3 text-[14px] text-ink-soft">
           {skillLabel ? (
             <>
@@ -386,7 +396,7 @@ export function ProductDetail() {
         </div>
       )
     }
-    return (
+    return wrapTabWithImage(
       <div className="rounded-xl px-5 py-4 space-y-2.5 text-[14px] max-w-md" style={{ background: 'var(--color-surface)' }}>
         <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1">PATTERN DETAILS</p>
         {skillLabel && (
@@ -426,7 +436,7 @@ export function ProductDetail() {
         {/* Panel 1 — Gallery */}
         <div className="min-w-0">
           <div
-            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center touch-pan-y"
+            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center touch-pan-y cursor-zoom-in"
             style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)' }}
             onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
             onTouchEnd={(e) => {
@@ -440,6 +450,14 @@ export function ProductDetail() {
               }
               setTouchStartX(null)
             }}
+            onMouseEnter={() => { if (images[activeImage]) setHoverZoom(true) }}
+            onMouseLeave={() => setHoverZoom(false)}
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100))
+              const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100))
+              setZoomOrigin({ x, y })
+            }}
           >
             {images[activeImage] ? (
               <img
@@ -449,7 +467,13 @@ export function ProductDetail() {
                 alt={product.title}
                 loading="eager"
                 fetchPriority="high"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover pointer-events-none select-none"
+                style={{
+                  transform: hoverZoom ? 'scale(2.25)' : 'scale(1)',
+                  transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  transition: hoverZoom ? 'none' : 'transform 0.2s ease-out',
+                }}
+                draggable={false}
               />
             ) : (
               <div className="text-ink-soft text-xs">No image yet</div>
@@ -494,8 +518,8 @@ export function ProductDetail() {
               <button
                 onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                 aria-label="Previous image"
-                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-canvas hover:opacity-90 transition-opacity"
-                style={{ background: 'var(--color-sale-green)' }}
+                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center hover:bg-[#d4d4d4] transition-colors"
+                style={{ background: '#e5e5e5', color: '#555' }}
               >
                 <MaterialIcon name="chevron_left" size={18} />
               </button>
@@ -504,7 +528,7 @@ export function ProductDetail() {
                   <button
                     key={img}
                     onClick={() => setActiveImage(i)}
-                    className={`w-16 h-16 sm:w-[68px] sm:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-sale-green)]' : 'border-transparent'}`}
+                    className={`w-16 h-16 sm:w-[68px] sm:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
                     <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
@@ -514,8 +538,8 @@ export function ProductDetail() {
               <button
                 onClick={() => setActiveImage((i) => (i + 1) % images.length)}
                 aria-label="Next image"
-                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-canvas hover:opacity-90 transition-opacity"
-                style={{ background: 'var(--color-sale-green)' }}
+                className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center hover:bg-[#d4d4d4] transition-colors"
+                style={{ background: '#e5e5e5', color: '#555' }}
               >
                 <MaterialIcon name="chevron_right" size={18} />
               </button>
