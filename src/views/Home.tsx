@@ -93,6 +93,9 @@ export function Home({
   const [layout, setLayout] = useState<LayoutSection[]>(() =>
     initialLayout?.length ? initialLayout : DEFAULT_LAYOUT
   )
+  /** False until product/category/chapter fetches finish — prevents empty
+   *  mid-page sections from collapsing so Newsletter doesn't jump up. */
+  const [catalogReady, setCatalogReady] = useState(false)
   const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>({ beginner: 0, intermediate: 0, advanced: 0 })
   const [activeSkill, setActiveSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [skillProducts, setSkillProducts] = useState<Product[]>([])
@@ -115,24 +118,32 @@ export function Home({
   }, [heroGroups.length])
 
   useEffect(() => {
-    supabase.from('products').select('*').eq('active', true).eq('featured', true).order('created_at', { ascending: false }).limit(6)
-      .then(({ data }) => setTrending((data as Product[]) ?? []))
+    let cancelled = false
 
-    supabase.from('products').select('*').eq('active', true).order('created_at', { ascending: false }).limit(6)
-      .then(({ data }) => setNewArrivals((data as Product[]) ?? []))
+    const featuredP = supabase.from('products').select('*').eq('active', true).eq('featured', true).order('created_at', { ascending: false }).limit(6)
+    const newP = supabase.from('products').select('*').eq('active', true).order('created_at', { ascending: false }).limit(6)
+    const bundlesP = supabase.from('products').select('*').eq('active', true).eq('is_bundle', true).order('created_at', { ascending: false }).limit(4)
+    const freeP = supabase.from('products').select('*').eq('active', true).eq('price', 0).order('featured', { ascending: false }).order('created_at', { ascending: false }).limit(1)
+    const settingsP = supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials'])
+    const categoriesP = getCategoriesWithProducts()
+    const skillCountPs = (['beginner', 'intermediate', 'advanced'] as const).map((level) =>
+      supabase.from('products').select('id', { count: 'exact', head: true }).eq('active', true).eq('skill_level', level)
+        .then(({ count }) => ({ level, count: count ?? 0 }))
+    )
 
-    supabase.from('products').select('*').eq('active', true).eq('is_bundle', true).order('created_at', { ascending: false }).limit(4)
-      .then(({ data }) => setBundles((data as Product[]) ?? []))
+    Promise.all([featuredP, newP, bundlesP, freeP, settingsP, categoriesP, ...skillCountPs])
+      .then(([featuredRes, newRes, bundlesRes, freeRes, settingsRes, cats, ...skillRows]) => {
+        if (cancelled) return
 
-    supabase.from('products').select('*').eq('active', true).eq('price', 0).order('featured', { ascending: false }).order('created_at', { ascending: false }).limit(1)
-      .then(({ data }) => setFreeProduct((data as Product[])?.[0] ?? null))
+        setTrending((featuredRes.data as Product[]) ?? [])
+        setNewArrivals((newRes.data as Product[]) ?? [])
+        setBundles((bundlesRes.data as Product[]) ?? [])
+        setFreeProduct((freeRes.data as Product[])?.[0] ?? null)
+        setCategories(cats)
 
-    supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials'])
-      .then(({ data }) => {
-        for (const row of data ?? []) {
+        for (const row of settingsRes.data ?? []) {
           if (row.key === 'hero') {
             const next = row.value as HeroContent
-            // Avoid remounting hero images when the client refetch returns the same URLs
             setHero((prev) => {
               const prevUrls = (prev?.images ?? []).join('|')
               const nextUrls = (next?.images ?? []).join('|')
@@ -151,15 +162,21 @@ export function Home({
           }
           if (row.key === 'testimonials') setTestimonials((row.value as TestimonialContent[]).filter((t) => t.quote && t.name))
         }
+
+        const nextCounts = { beginner: 0, intermediate: 0, advanced: 0 }
+        for (const row of skillRows as { level: 'beginner' | 'intermediate' | 'advanced'; count: number }[]) {
+          nextCounts[row.level] = row.count
+        }
+        setSkillCounts(nextCounts)
       })
-      .then(() => setHeroReady(true), () => setHeroReady(true))
+      .finally(() => {
+        if (!cancelled) {
+          setHeroReady(true)
+          setCatalogReady(true)
+        }
+      })
 
-    getCategoriesWithProducts().then(setCategories)
-
-    ;(['beginner', 'intermediate', 'advanced'] as const).forEach((level) => {
-      supabase.from('products').select('id', { count: 'exact', head: true }).eq('active', true).eq('skill_level', level)
-        .then(({ count }) => setSkillCounts((prev) => ({ ...prev, [level]: count ?? 0 })))
-    })
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -256,7 +273,12 @@ export function Home({
         </div>
       </section>
     ),
-    categories: categories.length > 0 ? (
+    categories: !catalogReady ? (
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line" aria-hidden>
+        <h2 className="font-heading text-center font-semibold text-3xl mb-10">Shop by Category</h2>
+        <HomeSectionSkeleton count={5} />
+      </section>
+    ) : categories.length > 0 ? (
       <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <div className="relative mb-10">
@@ -304,7 +326,12 @@ export function Home({
         </div>
       </section>
     ) : null,
-    chapters: chapters.length > 0 ? (
+    chapters: !catalogReady ? (
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line" aria-hidden>
+        <h2 className="font-heading text-center font-semibold text-3xl mb-10">Skill Level Chapters</h2>
+        <HomeSectionSkeleton count={3} />
+      </section>
+    ) : chapters.length > 0 ? (
       <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">Skill Level Chapters</h2>
@@ -330,7 +357,12 @@ export function Home({
         </div>
       </section>
     ) : null,
-    trending: trending.length > 0 ? (
+    trending: !catalogReady ? (
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line" aria-hidden>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
+        <HomeSectionSkeleton count={4} />
+      </section>
+    ) : trending.length > 0 ? (
       <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12">
@@ -346,7 +378,12 @@ export function Home({
         </div>
       </section>
     ) : null,
-    new_arrivals: newArrivals.length > 0 ? (
+    new_arrivals: !catalogReady ? (
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line" aria-hidden>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
+        <HomeSectionSkeleton count={4} />
+      </section>
+    ) : newArrivals.length > 0 ? (
       <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
@@ -450,7 +487,11 @@ export function Home({
         </div>
       </section>
     ),
-    free_patterns: freeProduct ? (
+    free_patterns: !catalogReady ? (
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto" aria-hidden>
+        <div className="bg-surface border border-line rounded-2xl p-8 md:p-10 min-h-[180px] animate-pulse" />
+      </section>
+    ) : freeProduct ? (
       <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto">
         <div className="bg-surface border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
@@ -498,7 +539,12 @@ export function Home({
         </div>
       </section>
     ),
-    testimonials: testimonials.length > 0 ? (
+    testimonials: !catalogReady ? (
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line" aria-hidden>
+        <h2 className="font-heading text-center font-semibold text-3xl mb-10">What Our Makers Say</h2>
+        <HomeSectionSkeleton count={3} />
+      </section>
+    ) : testimonials.length > 0 ? (
       <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">What Our Makers Say</h2>

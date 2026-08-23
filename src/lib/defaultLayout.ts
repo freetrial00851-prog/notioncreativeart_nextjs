@@ -1,11 +1,13 @@
 import type { LayoutSection } from './types'
 
+/** Default homepage section order — Newsletter last. Used as fallback and for
+ *  merging newly-added section ids into a saved admin layout. */
 export const DEFAULT_LAYOUT: LayoutSection[] = [
   { id: 'hero', label: 'Hero Banner', visible: true },
   { id: 'trust', label: 'Trust Strip', visible: true },
   { id: 'categories', label: 'Shop by Category', visible: true },
   { id: 'chapters', label: 'Skill Level Chapters', visible: true },
-  { id: 'trending', label: 'Trending Now', visible: true },
+  { id: 'trending', label: 'Featured Items', visible: true },
   { id: 'new_arrivals', label: 'New Arrivals', visible: true },
   { id: 'skill_browse', label: 'Browse by Skill Level', visible: true },
   { id: 'free_patterns', label: 'Free Patterns Banner', visible: true },

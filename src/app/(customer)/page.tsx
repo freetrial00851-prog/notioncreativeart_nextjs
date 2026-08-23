@@ -20,7 +20,7 @@ export const metadata = buildMetadata({
   ],
 })
 
-/** Prefetch hero + layout so first paint matches saved visibility (no off-section flash). */
+/** Prefetch hero + layout so first paint matches saved visibility and section order. */
 async function getHomepageBootstrap(): Promise<{
   initialHero: HeroContent | null
   initialLayout: LayoutSection[]
