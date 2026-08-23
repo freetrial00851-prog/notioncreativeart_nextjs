@@ -16,7 +16,7 @@ export function Cart() {
 
   if (!user) {
     return (
-      <div className="max-w-[1400px] mx-auto px-6 py-32 text-center">
+      <div className="max-w-site w-full mx-auto px-6 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Sign in to see your cart.</p>
         <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
       </div>
@@ -27,7 +27,7 @@ export function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-[1400px] mx-auto px-6 py-32 text-center">
+      <div className="max-w-site w-full mx-auto px-6 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Your cart is empty.</p>
         <Link href="/shop" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">SHOP ALL PATTERNS →</Link>
       </div>
@@ -35,7 +35,7 @@ export function Cart() {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-10">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-10">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>

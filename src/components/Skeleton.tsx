@@ -35,7 +35,7 @@ export function ListRowSkeleton({ rows = 3 }: { rows?: number }) {
 /** Full product detail page placeholder — mirrors 3-panel gallery | details | purchase layout. */
 export function ProductDetailSkeleton() {
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-8 md:py-10">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-8 md:py-10">
       <Bone className="h-3 w-64 mb-8" />
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)_minmax(260px,320px)] gap-8 xl:gap-10">
         <div>
@@ -106,7 +106,7 @@ export function HomeSectionSkeleton({ count = 5 }: { count?: number }) {
 /** Compact page-level fallback for Suspense boundaries. */
 export function PageSkeleton() {
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-16 space-y-8">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-16 space-y-8">
       <Bone className="h-8 w-48" />
       <Bone className="h-4 w-72" />
       <ProductGridSkeleton count={8} />
@@ -117,7 +117,7 @@ export function PageSkeleton() {
 /** Search results loading. */
 export function SearchSkeleton() {
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-12 space-y-8">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-12 space-y-8">
       <Bone className="h-10 w-full max-w-xl rounded-lg" />
       <Bone className="h-4 w-32" />
       <ProductGridSkeleton count={6} />

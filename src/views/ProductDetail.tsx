@@ -232,7 +232,7 @@ export function ProductDetail() {
 
   if (loading) return <ProductDetailSkeleton />
   if (!product) return (
-    <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
+    <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
       {unavailable ? (
         <>
           <p className="font-subheading text-2xl mb-3">This pattern is no longer available.</p>
@@ -443,7 +443,7 @@ export function ProductDetail() {
   const shopLink = category ? `/shop/${category.slug}` : '/shop'
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-8 pb-24 md:pb-14">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-8 pb-24 md:pb-14">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-8 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
         {category && (

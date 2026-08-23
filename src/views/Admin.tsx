@@ -51,7 +51,7 @@ export function Admin() {
   if (loading) return null
   if (!user || !profile?.is_admin) {
     return (
-      <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
+      <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Not authorized.</p>
         <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
       </div>

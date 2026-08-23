@@ -23,7 +23,7 @@ export function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-5 py-4 md:px-8">
-      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center gap-4">
+      <div className="max-w-site w-full mx-auto flex flex-col md:flex-row items-center gap-4">
         <p className="text-[12px] text-ink-soft flex-1 leading-relaxed">
           We use cookies to understand how visitors use this site and improve it. See our{' '}
           <a href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</a> for details.

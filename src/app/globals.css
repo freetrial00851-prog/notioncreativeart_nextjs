@@ -80,6 +80,9 @@ html.icons-ready .material-symbols-outlined {
   --font-mono: var(--font-manrope), system-ui, sans-serif;
   --font-heading: var(--font-playfair), Georgia, serif;
   --font-logo: var(--font-baloo-2), 'Baloo 2', system-ui, sans-serif;
+
+  /* Shared page column — Header, Home, Shop, Product, Footer, etc. use max-w-site */
+  --max-width-site: 1600px;
 }
 
 .mobile-nca-logo {
@@ -88,6 +91,23 @@ html.icons-ready .material-symbols-outlined {
 }
 
 html { background: var(--color-canvas); overflow-x: hidden; }
+
+/* Ensure max-w-site tracks the responsive --max-width-site token */
+@utility max-w-site {
+  max-width: var(--max-width-site);
+}
+
+/* Widen the shared content column on large / ultra-wide monitors */
+@media (min-width: 1920px) {
+  :root, html {
+    --max-width-site: 1800px;
+  }
+}
+@media (min-width: 2560px) {
+  :root, html {
+    --max-width-site: 2000px;
+  }
+}
 
 body {
   margin: 0;

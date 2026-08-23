@@ -135,7 +135,7 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-canvas border-b border-line">
       {/* Promo bar — unchanged */}
       <div
-        className="hidden md:flex items-center justify-between text-white text-[11px] tracking-[0.04em] px-6 lg:px-10 py-2 max-w-[1400px] mx-auto"
+        className="hidden md:flex items-center justify-between text-white text-[11px] tracking-[0.04em] px-6 lg:px-10 py-2 max-w-site w-full mx-auto"
         style={{ background: 'var(--color-primary)' }}
       >
         <div className="flex items-center gap-6">
@@ -153,7 +153,7 @@ export function Header() {
       </div>
 
       {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Account | Wishlist | Cart ── */}
-      <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-[1400px] mx-auto">
+      <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-site w-full mx-auto">
         <div className="shrink-0">
           <Logo variant="full" />
         </div>
@@ -254,7 +254,7 @@ export function Header() {
 
       {/* ── Tablet 768–1023 (md–lg): two rows ── */}
       <div className="hidden md:block lg:hidden">
-        <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-[1400px] mx-auto">
+        <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-site w-full mx-auto">
           <Logo variant="full" />
           <div className="flex items-center gap-0.5 shrink-0 text-[#111111]">
             <HeaderAccountControl
@@ -280,7 +280,7 @@ export function Header() {
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-3 px-5 pb-3 max-w-[1400px] mx-auto">
+        <div className="flex items-center gap-3 px-5 pb-3 max-w-site w-full mx-auto">
           <button
             type="button"
             aria-label="Browse categories"

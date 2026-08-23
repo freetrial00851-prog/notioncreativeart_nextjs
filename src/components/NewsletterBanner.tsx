@@ -10,7 +10,7 @@ import { subscribeToNewsletter } from '../lib/newsletter'
  */
 export function NewsletterBanner(_props: { image?: string }) {
   return (
-    <section className="max-w-[1400px] mx-auto px-6 md:px-16 py-5 md:py-7">
+    <section className="max-w-site w-full mx-auto px-6 md:px-16 py-5 md:py-7">
       <div
         className="rounded-2xl px-8 py-10 md:px-14 md:py-12 flex flex-col text-center gap-6 md:flex-row md:items-center md:justify-between md:text-left md:gap-8 text-white"
         style={{ background: 'var(--color-primary)' }}

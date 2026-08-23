@@ -134,7 +134,7 @@ function BottomBar() {
   const year = new Date().getFullYear()
   return (
     <div
-      className="max-w-[1400px] mx-auto px-6 md:px-16 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-[12px]"
+      className="max-w-site w-full mx-auto px-6 md:px-16 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-[12px]"
       style={{ borderTop: `1px solid ${FOOTER_BORDER}`, color: FOOTER_MUTED }}
     >
       <p>© {year} NotionCreativeArt. All rights reserved.</p>
@@ -183,7 +183,7 @@ export function Footer() {
   return (
     <footer style={{ background: FOOTER_BG }}>
       {/* Desktop: brand + Shop + Categories + Help + Account */}
-      <div className="hidden md:grid max-w-[1400px] mx-auto px-6 md:px-16 py-14 gap-8" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr' }}>
+      <div className="hidden md:grid max-w-site w-full mx-auto px-6 md:px-16 py-14 gap-8" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr' }}>
         <BrandColumn />
         <FooterColumn title="SHOP">
           {SHOP_LINKS.map((l) => <li key={l.to}><Link href={l.to} className="hover:underline">{l.label}</Link></li>)}

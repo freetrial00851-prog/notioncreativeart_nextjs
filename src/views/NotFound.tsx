@@ -5,7 +5,7 @@ import { MaterialIcon } from '../components/MaterialIcon'
 
 export function NotFound() {
   return (
-    <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
+    <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
       <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'var(--color-surface)' }}>
         <MaterialIcon name="shopping_basket" size={36} color="var(--color-sale-green)" />
       </div>

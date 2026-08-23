@@ -125,7 +125,7 @@ const [trending, setTrending] = useState<Product[]>([])
   const sections: Record<LayoutSection['id'], React.ReactNode> = {
     hero: (
       <section className="overflow-hidden" style={{ background: 'var(--color-background)' }}>
-        <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-10 md:py-0 grid grid-cols-1 md:grid-cols-[45%_55%] gap-10 md:gap-12 items-center md:h-[520px]">
+        <div className="max-w-site w-full mx-auto px-6 md:px-16 py-10 md:py-0 grid grid-cols-1 md:grid-cols-[45%_55%] gap-10 md:gap-12 items-center md:h-[520px]">
           <div>
             <p className="text-[11px] font-semibold tracking-[0.2em] mb-4" style={{ color: 'var(--color-accent)' }}>{hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}</p>
             <h1 className="font-heading font-semibold text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5">
@@ -192,7 +192,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ),
     trust: (
-      <section className="max-w-[1400px] mx-auto px-6 md:px-16 -mt-6 md:-mt-8 relative z-10">
+      <section className="max-w-site w-full mx-auto px-6 md:px-16 -mt-6 md:-mt-8 relative z-10">
         <div className="bg-canvas border border-line rounded-xl px-4 md:px-10 py-5 flex flex-nowrap items-start md:items-center justify-between md:justify-center gap-2 md:gap-x-12">
           {[
             { icon: 'bolt', label: 'Instant Digital Access' },
@@ -208,7 +208,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ),
     categories: categories.length > 0 ? (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto border-t border-line">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <div className="relative mb-10">
           <h2 className="font-heading text-center font-semibold text-3xl">Shop by Category</h2>
@@ -256,7 +256,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ) : null,
     chapters: chapters.length > 0 ? (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto border-t border-line">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">Skill Level Chapters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -282,7 +282,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ) : null,
     trending: trending.length > 0 ? (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto border-t border-line">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12">
           {trending.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 4} />)}
@@ -298,7 +298,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ) : null,
     new_arrivals: newArrivals.length > 0 ? (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto border-t border-line">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
           {newArrivals.map((p) => <ProductCard key={p.id} product={p} />)}
@@ -314,7 +314,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ) : null,
     skill_browse: (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto">
         <div className="bg-surface border border-line rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row gap-6">
           <div className="lg:w-[200px] shrink-0">
             <p className="font-heading font-semibold text-lg mb-4">Browse by Skill Level</p>
@@ -402,7 +402,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ),
     free_patterns: freeProduct ? (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto">
         <div className="bg-surface border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FREE PATTERNS</p>
@@ -424,7 +424,7 @@ const [trending, setTrending] = useState<Product[]>([])
     ) : null,
     bundles: null,
     why_us: (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto border-t border-line">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">Why Makers Love NCA</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
@@ -450,7 +450,7 @@ const [trending, setTrending] = useState<Product[]>([])
       </section>
     ),
     testimonials: testimonials.length > 0 ? (
-      <section className="px-6 md:px-16 py-5 md:py-7 max-w-[1400px] mx-auto border-t border-line">
+      <section className="px-6 md:px-16 py-5 md:py-7 max-w-site w-full mx-auto border-t border-line">
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">What Our Makers Say</h2>
         {(() => {

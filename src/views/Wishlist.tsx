@@ -34,7 +34,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
 
   if (!user) {
     return (
-      <div className={embedded ? 'py-16 text-center' : 'max-w-[1400px] mx-auto px-8 py-32 text-center'}>
+      <div className={embedded ? 'py-16 text-center' : 'max-w-site w-full mx-auto px-8 py-32 text-center'}>
         <p className="font-subheading text-2xl mb-4">Sign in to see your wishlist.</p>
         <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
       </div>
@@ -97,7 +97,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-8 md:px-16 py-14">
+    <div className="max-w-site w-full mx-auto px-8 md:px-16 py-14">
       <div className="border-b border-line pb-8 mb-10">
         <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">MY ACCOUNT</p>
         <h1 className="font-display font-semibold text-4xl">Wishlist</h1>

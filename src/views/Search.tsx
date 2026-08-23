@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase'
 import type { Product } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { ProductGridSkeleton } from '../components/Skeleton'
 
 const PAGE_SIZE = 15
 
@@ -48,7 +49,7 @@ export function Search() {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-10 md:py-14">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-10 md:py-14">
       <div className="border-b border-line pb-4 mb-8 flex items-center justify-between">
         <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
         {q && (
@@ -76,7 +77,9 @@ export function Search() {
         <p className="text-ink-soft text-sm">Type above to find patterns by name or description.</p>
       )}
 
-      {results.length > 0 ? (
+      {loading && q ? (
+        <ProductGridSkeleton count={6} />
+      ) : results.length > 0 ? (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
             {pagedResults.map((p) => <ProductCard key={p.id} product={p} />)}

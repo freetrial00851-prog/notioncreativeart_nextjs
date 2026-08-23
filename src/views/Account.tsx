@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -42,9 +42,9 @@ export function Account() {
   if (loading) return <ContentSkeleton />
   if (!user) {
     return (
-      <div className="max-w-[1400px] mx-auto px-8 py-32 text-center">
+      <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Sign in to view your account.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
+        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME ?</Link>
       </div>
     )
   }
@@ -60,15 +60,15 @@ export function Account() {
     <div className="max-w-[1100px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
-        <span>›</span>
+        <span>�</span>
         <span className="text-ink-soft">My Account</span>
         {!isAccountHome && (
           <>
-            <span>›</span>
+            <span>�</span>
             {isOrderDetail ? (
               <>
                 <Link href="/account/orders" className="hover:text-ink">Orders</Link>
-                <span>›</span>
+                <span>�</span>
                 <span className="text-ink">Details</span>
               </>
             ) : (
@@ -236,7 +236,7 @@ function Downloads() {
     setDownloading(productId)
     const ok = await triggerPdfDownload(productId, title)
     setDownloading(null)
-    if (!ok) alert("This pattern's file isn't uploaded yet â€” please check back soon.")
+    if (!ok) alert("This pattern's file isn't uploaded yet — please check back soon.")
   }
 
   if (loading) return <ProductGridSkeleton count={6} />
@@ -287,7 +287,7 @@ function Downloads() {
                     style={{ background: BRAND }}
                   >
                     <MaterialIcon name="download" size={14} />
-                    {downloading === p.product_id ? 'â€¦' : 'DOWNLOAD'}
+                    {downloading === p.product_id ? '…' : 'DOWNLOAD'}
                   </button>
                 </td>
               </tr>
@@ -340,7 +340,7 @@ function ProfileTab() {
       return
     }
     setEditingName(true)
-    showToast('You can change your name once every 7 days â€” make sure it\'s right.', 'info')
+    showToast('You can change your name once every 7 days — make sure it\'s right.', 'info')
   }
 
   const cancelEditingName = () => {
@@ -359,7 +359,7 @@ function ProfileTab() {
     }).eq('id', user.id)
     await refreshProfile()
     setNameSaving(false)
-    if (error) { showToast("Couldn't update your name â€” please try again.", 'error'); return }
+    if (error) { showToast("Couldn't update your name — please try again.", 'error'); return }
     setEditingName(false)
     showToast('Name updated.', 'success')
   }
@@ -451,7 +451,7 @@ function ProfileTab() {
                 className="px-5 py-2 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 style={{ background: BRAND }}
               >
-                {nameSaving ? 'SAVING…' : 'SAVE NAME'}
+                {nameSaving ? 'SAVING�' : 'SAVE NAME'}
               </button>
               <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
             </div>
@@ -502,7 +502,7 @@ function ProfileTab() {
             className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: BRAND }}
           >
-            {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
+            {pwSaving ? 'UPDATING�' : 'UPDATE PASSWORD'}
           </button>
           {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
           <p className="text-[11px] text-ink-soft">If you signed up with Google, password changes aren&apos;t available here.</p>
@@ -614,7 +614,7 @@ function AddressesPage() {
               <label className="block">
                 <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">STATE</span>
                 <select value={billingState} onChange={(e) => { setBillingState(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg">
-                  <option value="">Select a stateâ€¦</option>
+                  <option value="">Select a state…</option>
                   {US_STATES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
                 </select>
               </label>
@@ -638,7 +638,7 @@ function AddressesPage() {
           ) : null}
           <div className="flex items-center gap-3 pt-2">
             <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
-              {saving ? 'SAVINGâ€¦' : 'SAVE ADDRESS'}
+              {saving ? 'SAVING…' : 'SAVE ADDRESS'}
             </button>
             {hasAddress && <button onClick={() => setEditing(false)} className="text-[11px] text-ink-soft hover:text-ink">CANCEL</button>}
             {saved && <span className="text-[12px] text-ink-soft">Saved.</span>}
@@ -658,14 +658,14 @@ function NewsletterPrefs() {
   const save = async () => {
     if (!user?.email) return
     if (!subscribed) {
-      showToast('Uncheck and we wonâ€™t email you â€” leave the box checked to stay subscribed.', 'info')
+      showToast('Uncheck and we won’t email you — leave the box checked to stay subscribed.', 'info')
       return
     }
     setSaving(true)
     const { ok, error } = await subscribeToNewsletter(user.email)
     setSaving(false)
     if (!ok) showToast(error ?? "Couldn't subscribe.", 'error')
-    else showToast('Youâ€™re subscribed to the maker newsletter.', 'success')
+    else showToast('You’re subscribed to the maker newsletter.', 'success')
   }
 
   return (
@@ -688,7 +688,7 @@ function NewsletterPrefs() {
         className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50"
         style={{ background: BRAND }}
       >
-        {saving ? 'SAVINGâ€¦' : 'SAVE PREFERENCES'}
+        {saving ? 'SAVING…' : 'SAVE PREFERENCES'}
       </button>
     </div>
   )
