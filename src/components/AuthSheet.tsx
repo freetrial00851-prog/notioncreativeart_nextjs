@@ -7,6 +7,7 @@ import { useLoginForm } from '../lib/useLoginForm'
 import { useSignUpForm } from '../lib/useSignUpForm'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { MaterialIcon } from './MaterialIcon'
+import { CloseCircleIcon } from './icons'
 import { GoogleIcon } from './GoogleIcon'
 import { PasswordStrength } from './PasswordStrength'
 
@@ -73,8 +74,8 @@ export function AuthSheet() {
         </div>
         <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0">
           <h2 className="font-display font-semibold text-lg">{title}</h2>
-          <button ref={closeButtonRef} onClick={closeAuthSheet} aria-label="Close" className="w-8 h-8 flex items-center justify-center text-ink hover:opacity-60 text-lg">
-            ✕
+          <button ref={closeButtonRef} onClick={closeAuthSheet} aria-label="Close" className="w-8 h-8 flex items-center justify-center hover:opacity-80">
+            <CloseCircleIcon size={28} />
           </button>
         </div>
 

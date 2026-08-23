@@ -14,6 +14,7 @@ import { useToast } from '../context/ToastContext'
 import { claimAndDownloadFreePattern } from '../lib/downloads'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { FavoriteIcon, ShareIcon, CloseCircleIcon } from '../components/icons'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductDetailSkeleton } from '../components/Skeleton'
 import type { Product } from '../lib/types'
@@ -100,6 +101,7 @@ export function ProductDetail() {
   const [downloadingFree, setDownloadingFree] = useState(false)
   const [buying, setBuying] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
+  const [shareHint, setShareHint] = useState<string | null>(null)
   const [purchaseCount, setPurchaseCount] = useState(0)
   const [alsoBought, setAlsoBought] = useState<Product[]>([])
 
@@ -282,6 +284,23 @@ export function ProductDetail() {
     if (!requireAuth({ type: 'cart', productId: product.id })) return
     if (isInCart(product.id)) await removeFromCart(product.id)
     else await addToCart(product.id)
+  }
+
+  const shareListing = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : ''
+    const title = product.title
+    try {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        await navigator.share({ title, text: `Check out this crochet pattern: ${title}`, url })
+        return
+      }
+      await navigator.clipboard.writeText(url)
+      setShareHint('Link copied')
+      showToast('Link copied to clipboard', 'success')
+      setTimeout(() => setShareHint(null), 2000)
+    } catch {
+      /* user cancelled share — ignore */
+    }
   }
 
   const images = product.images ?? []
@@ -492,14 +511,25 @@ export function ProductDetail() {
               )}
             </div>
 
-            <button
-              onClick={(e) => { e.stopPropagation(); toggleWishlist() }}
-              aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-              className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
-              style={{ background: 'var(--color-canvas)' }}
-            >
-              <MaterialIcon name="favorite" filled={inWishlist} size={18} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
-            </button>
+            <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleWishlist() }}
+                aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+                style={{ background: 'var(--color-canvas)' }}
+              >
+                <FavoriteIcon size={18} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); shareListing() }}
+                aria-label="Share listing"
+                className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+                style={{ background: 'var(--color-canvas)' }}
+                title={shareHint ?? 'Share'}
+              >
+                <ShareIcon size={18} />
+              </button>
+            </div>
 
             {images[activeImage] && (
               <button
@@ -654,8 +684,15 @@ export function ProductDetail() {
                 onClick={toggleWishlist}
                 className="w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
               >
-                <MaterialIcon name="favorite" filled={inWishlist} size={15} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
+                <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
                 {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
+              </button>
+              <button
+                onClick={shareListing}
+                className="w-full py-3 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+              >
+                <ShareIcon size={15} />
+                {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
               </button>
             </div>
           )}
@@ -706,9 +743,8 @@ export function ProductDetail() {
             onClick={() => setZoomOpen(false)}
             aria-label="Close zoom"
             className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
-            style={{ background: 'var(--color-canvas)' }}
           >
-            <MaterialIcon name="close" size={20} />
+            <CloseCircleIcon size={36} />
           </button>
           <img
             src={deriveVariantUrl(images[activeImage], 'full')}

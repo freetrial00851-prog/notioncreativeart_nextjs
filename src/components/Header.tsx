@@ -12,6 +12,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
+import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadIcon, CloseCircleIcon } from './icons'
 
 const CATEGORY_ICONS: Record<string, string> = {
   amigurumi: 'toys',
@@ -337,12 +338,12 @@ export function Header() {
                       <MaterialIcon name="receipt_long" size={18} /> Orders
                     </Link>
                     <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <MaterialIcon name="download" size={18} /> Downloads
+                      <DownloadIcon size={18} /> Downloads
                     </Link>
                   </div>
                   <div className="border-t border-line py-1.5">
                     <Link href="/account/profile" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <MaterialIcon name="settings" size={18} /> Account settings
+                      <SettingsIcon size={18} /> Account settings
                     </Link>
                     <button
                       onClick={() => { signOut(); setDesktopAccountOpen(false) }}
@@ -482,7 +483,9 @@ export function Header() {
           <div className="absolute inset-0 bg-canvas flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-line">
               <span className="font-subheading text-lg">Categories</span>
-              <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="text-ink text-xl leading-none">✕</button>
+              <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="p-1">
+                <CloseCircleIcon size={28} />
+              </button>
             </div>
             <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
               <Link href="/shop" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
@@ -548,7 +551,9 @@ export function Header() {
           <div className="absolute inset-0 bg-canvas flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-line">
               <span className="font-subheading text-lg">{user ? 'My Account' : 'Account'}</span>
-              <button aria-label="Close menu" onClick={() => setMobileAccountOpen(false)} className="text-ink text-xl leading-none">✕</button>
+              <button aria-label="Close menu" onClick={() => setMobileAccountOpen(false)} className="p-1">
+                <CloseCircleIcon size={28} />
+              </button>
             </div>
 
             {user ? (
@@ -568,11 +573,11 @@ export function Header() {
                     <MaterialIcon name="receipt_long" size={18} /> Orders
                   </Link>
                   <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <MaterialIcon name="download" size={18} /> Downloads
+                    <DownloadIcon size={18} /> Downloads
                   </Link>
                   <div className="border-t border-line mt-2 pt-2">
                     <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                      <MaterialIcon name="settings" size={18} /> Account settings
+                      <SettingsIcon size={18} /> Account settings
                     </Link>
                   </div>
                   <div className="border-t border-line mt-2 pt-2">
@@ -615,8 +620,8 @@ function CartIcon({ size = 22 }: { size?: number }) {
   return <MaterialIcon name="shopping_bag" size={size} />
 }
 function HeartIcon({ size = 22 }: { size?: number }) {
-  return <MaterialIcon name="favorite" size={size} />
+  return <FavoriteIcon size={size} />
 }
 function UserIcon({ size = 22 }: { size?: number }) {
-  return <MaterialIcon name="person" size={size} />
+  return <PersonIcon size={size} />
 }

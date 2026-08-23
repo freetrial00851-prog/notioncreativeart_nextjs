@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { MaterialIcon } from './MaterialIcon'
+import { CloseCircleIcon } from './icons'
 
 export function CartDrawer() {
   const { items, count, drawerOpen, closeDrawer, justAdded, removeFromCart, checkingOut, checkoutError, checkout } = useCart()
@@ -51,8 +52,8 @@ export function CartDrawer() {
             <h2 className="font-subheading font-semibold text-lg">Your Cart</h2>
             <p className="text-[11px] text-ink-soft mt-0.5">{count} {count === 1 ? 'item' : 'items'}</p>
           </div>
-          <button ref={closeButtonRef} onClick={closeDrawer} aria-label="Close cart" className="w-8 h-8 flex items-center justify-center text-ink hover:opacity-60 text-lg">
-            ✕
+          <button ref={closeButtonRef} onClick={closeDrawer} aria-label="Close cart" className="w-8 h-8 flex items-center justify-center hover:opacity-80">
+            <CloseCircleIcon size={28} />
           </button>
         </div>
 

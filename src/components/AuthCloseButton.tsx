@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MaterialIcon } from './MaterialIcon'
+import { CloseCircleIcon } from './icons'
 
 /**
  * Sits top-right on every auth screen (login, signup, reset-password) so a
@@ -26,9 +26,9 @@ export function AuthCloseButton({ fallbackTo = '/' }: { fallbackTo?: string }) {
       type="button"
       onClick={handleClose}
       aria-label="Close"
-      className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-9 h-9 rounded-full flex items-center justify-center text-ink-soft hover:bg-surface hover:text-ink transition-colors"
+      className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-9 h-9 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
     >
-      <MaterialIcon name="close" size={20} />
+      <CloseCircleIcon size={32} />
     </button>
   )
 }

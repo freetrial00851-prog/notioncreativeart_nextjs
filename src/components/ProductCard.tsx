@@ -14,6 +14,7 @@ import { prefetchProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { claimAndDownloadFreePattern } from '../lib/downloads'
 import { MaterialIcon } from './MaterialIcon'
+import { FavoriteIcon, ShareIcon } from './icons'
 
 const NEW_WINDOW_DAYS = 14
 
@@ -95,13 +96,33 @@ export function ProductCard({ product, priority = false }: { product: Product; p
             <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs">No image yet</div>
           )}
 
-          <button
-            onClick={toggleWishlist}
-            aria-label="Add to wishlist"
-            className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-ink hover:opacity-70 transition-opacity"
-          >
-            <MaterialIcon name="favorite" filled={inWishlist} size={15} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
-          </button>
+          <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
+            <button
+              onClick={toggleWishlist}
+              aria-label="Add to wishlist"
+              className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-ink hover:opacity-70 transition-opacity"
+            >
+              <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
+            </button>
+            <button
+              onClick={async (e) => {
+                e.preventDefault()
+                const url = `${window.location.origin}/pattern/${product.slug}`
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title: product.title, url })
+                  } else {
+                    await navigator.clipboard.writeText(url)
+                    showToast('Link copied', 'success')
+                  }
+                } catch { /* cancelled */ }
+              }}
+              aria-label="Share listing"
+              className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-ink hover:opacity-70 transition-opacity"
+            >
+              <ShareIcon size={14} />
+            </button>
+          </div>
 
           <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
             {product.sold_out && (
