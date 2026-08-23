@@ -37,7 +37,7 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
     return (
       <Link href="/" className="shrink-0 leading-none block" aria-label="Notion Creative Art — home">
         <span
-          className="font-heading font-bold tracking-tight text-[28px] leading-none"
+          className="font-logo font-bold tracking-tight text-[28px] leading-none"
           style={{ color: LOGO_BLUE }}
         >
           NCA
@@ -49,7 +49,7 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
   return (
     <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Notion Creative Art — home">
       <span
-        className="font-display font-extrabold tracking-tight text-[34px] xl:text-[38px] leading-none"
+        className="font-logo font-bold tracking-tight text-[34px] xl:text-[38px] leading-none"
         style={{ color: LOGO_BLUE }}
       >
         NCA

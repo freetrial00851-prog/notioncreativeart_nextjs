@@ -78,6 +78,7 @@ html.icons-ready .material-symbols-outlined {
   --font-body: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: var(--font-manrope), system-ui, sans-serif;
   --font-heading: var(--font-playfair), Georgia, serif;
+  --font-logo: var(--font-lora), Georgia, 'Times New Roman', serif;
 }
 
 html { background: var(--color-canvas); overflow-x: hidden; }
