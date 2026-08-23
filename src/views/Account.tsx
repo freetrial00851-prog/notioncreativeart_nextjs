@@ -60,15 +60,15 @@ export function Account() {
     <div className="max-w-[1100px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
-        <span>›</span>
+        <span>â€º</span>
         <span className="text-ink-soft">My Account</span>
         {!isAccountHome && (
           <>
-            <span>›</span>
+            <span>â€º</span>
             {isOrderDetail ? (
               <>
                 <Link href="/account/orders" className="hover:text-ink">Orders</Link>
-                <span>›</span>
+                <span>â€º</span>
                 <span className="text-ink">Details</span>
               </>
             ) : (
@@ -451,7 +451,7 @@ function ProfileTab() {
                 className="px-5 py-2 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 style={{ background: BRAND }}
               >
-                {nameSaving ? 'SAVING…' : 'SAVE NAME'}
+                {nameSaving ? 'SAVINGâ€¦' : 'SAVE NAME'}
               </button>
               <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
             </div>
@@ -502,7 +502,7 @@ function ProfileTab() {
             className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: BRAND }}
           >
-            {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
+            {pwSaving ? 'UPDATINGâ€¦' : 'UPDATE PASSWORD'}
           </button>
           {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
           <p className="text-[11px] text-ink-soft">If you signed up with Google, password changes aren&apos;t available here.</p>
