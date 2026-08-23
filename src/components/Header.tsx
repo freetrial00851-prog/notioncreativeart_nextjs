@@ -35,9 +35,9 @@ const LOGO_BLUE = '#0f3fc9'
 function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
   if (variant === 'mobile') {
     return (
-      <Link href="/" className="shrink-0 leading-none" aria-label="Notion Creative Art — home">
+      <Link href="/" className="shrink-0 leading-none block" aria-label="Notion Creative Art — home">
         <span
-          className="font-display font-extrabold tracking-tight text-[24px]"
+          className="font-heading font-bold tracking-tight text-[28px] leading-none"
           style={{ color: LOGO_BLUE }}
         >
           NCA
@@ -372,19 +372,19 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile header — Etsy-style single row; search expands on focus */}
+      {/* Mobile header — single row: menu · logo · search · account · cart */}
       <div className="md:hidden relative z-50">
-      <div ref={mobileSearchWrapRef} className="px-2.5 py-2.5 relative z-[2] bg-canvas">
+      <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
         {searchFocused ? (
-          <form onSubmit={submitSearch} className="flex items-center gap-2">
-            <div className="relative flex-1 min-w-0 flex items-center border border-ink rounded-full bg-white overflow-hidden h-10">
+          <form onSubmit={submitSearch} className="flex items-center gap-2.5 h-10">
+            <div className="relative flex-1 min-w-0 h-10 border border-ink rounded-full bg-white overflow-hidden">
               <input
                 ref={mobileSearchInputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 placeholder="Search"
-                className="w-full bg-transparent pl-4 pr-[72px] py-2 text-[14px] placeholder:text-ink-soft focus:outline-none"
+                className="w-full h-full bg-transparent pl-4 pr-[72px] text-[14px] placeholder:text-ink-soft focus:outline-none"
                 autoFocus
               />
               {query ? (
@@ -400,7 +400,8 @@ export function Header() {
               <button
                 type="submit"
                 aria-label="Search"
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center"
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-white flex items-center justify-center"
+                style={{ background: LOGO_BLUE }}
               >
                 <MaterialIcon name="search" size={16} />
               </button>
@@ -413,13 +414,13 @@ export function Header() {
                 setSuggestions([])
                 mobileSearchInputRef.current?.blur()
               }}
-              className="text-[15px] font-medium text-ink shrink-0 px-0.5"
+              className="text-[15px] font-medium text-ink shrink-0"
             >
               Cancel
             </button>
           </form>
         ) : (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center h-10">
             <button
               type="button"
               onClick={() => {
@@ -428,12 +429,12 @@ export function Header() {
                 setMobileOpen(true)
               }}
               aria-label="Browse categories"
-              className={`w-10 h-10 shrink-0 flex items-center justify-center text-ink ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
+              className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center text-ink ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
             >
-              <MaterialIcon name="menu" size={24} />
+              <MaterialIcon name="menu" size={22} />
             </button>
 
-            <div className="shrink-0">
+            <div className="shrink-0 ml-0.5 mr-2">
               <Logo variant="mobile" />
             </div>
 
@@ -443,10 +444,13 @@ export function Header() {
                 setSearchFocused(true)
                 requestAnimationFrame(() => mobileSearchInputRef.current?.focus())
               }}
-              className="relative flex-1 min-w-0 h-10 border border-ink rounded-full bg-white text-left"
+              className="relative flex-1 min-w-0 h-10 mr-1.5 border border-ink rounded-full bg-white"
               aria-label="Search"
             >
-              <span className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center pointer-events-none">
+              <span
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-white flex items-center justify-center pointer-events-none"
+                style={{ background: LOGO_BLUE }}
+              >
                 <MaterialIcon name="search" size={16} />
               </span>
             </button>
@@ -456,12 +460,19 @@ export function Header() {
               onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
               className="w-10 h-10 shrink-0 flex items-center justify-center text-ink"
             >
-              <UserIcon size={24} />
+              <UserIcon size={22} />
             </button>
-            <button onClick={openDrawer} aria-label="Cart" className="relative w-10 h-10 shrink-0 flex items-center justify-center text-ink">
-              <CartIcon size={24} />
+            <button
+              onClick={openDrawer}
+              aria-label="Cart"
+              className="relative w-10 h-10 shrink-0 -mr-0.5 flex items-center justify-center text-ink"
+            >
+              <CartIcon size={22} />
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-ink text-white text-[8px] flex items-center justify-center">
+                <span
+                  className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center"
+                  style={{ background: LOGO_BLUE }}
+                >
                   {cartCount}
                 </span>
               )}
@@ -470,7 +481,7 @@ export function Header() {
         )}
 
         {searchFocused && query && (
-          <div className="absolute left-2.5 right-2.5 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
+          <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
             {suggestions.length > 0 ? (
               <>
                 {suggestions.map((p) => (
