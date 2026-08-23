@@ -377,7 +377,7 @@ export function Header() {
       <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
         {searchFocused ? (
           <form onSubmit={submitSearch} className="flex items-center gap-2.5 h-10">
-            <div className="relative flex flex-1 min-w-0 h-10 items-center border border-ink rounded-full bg-white pl-4 pr-1.5 gap-1">
+            <div className="relative flex flex-1 min-w-0 h-10 items-center border-2 border-ink rounded-full bg-white pl-4 pr-1.5 gap-1">
               <input
                 ref={mobileSearchInputRef}
                 value={query}
@@ -444,7 +444,7 @@ export function Header() {
                 setSearchFocused(true)
                 requestAnimationFrame(() => mobileSearchInputRef.current?.focus())
               }}
-              className="flex flex-1 min-w-0 h-10 mr-1.5 items-center justify-end border border-ink rounded-full bg-white px-1.5"
+              className="flex flex-1 min-w-0 h-10 mr-1.5 items-center justify-end border-2 border-ink rounded-full bg-white px-1.5"
               aria-label="Search"
             >
               <span
