@@ -6,6 +6,9 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const nextConfig: NextConfig = {
   images: {
+    // Origin storage sometimes sends Cache-Control: no-cache; keep optimized
+    // /_next/image responses warm for a month so hero/product art isn't re-fetched every reload.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       {
         protocol: 'https',

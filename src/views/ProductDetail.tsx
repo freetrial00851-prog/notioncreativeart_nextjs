@@ -83,9 +83,6 @@ export function ProductDetail() {
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
-  const [lensZoom, setLensZoom] = useState(false)
-  const [lensPos, setLensPos] = useState({ x: 0, y: 0, lensW: 0, lensH: 0, boxW: 0, boxH: 0 })
-  const galleryRef = useRef<HTMLDivElement>(null)
   const [activeTab, setActiveTab] = useState<Tab>('description')
   const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
   const buyButtonRef = useRef<HTMLDivElement>(null)
@@ -209,26 +206,6 @@ export function ProductDetail() {
     document.head.appendChild(script)
     return () => { document.head.removeChild(script) }
   }, [product, slug])
-
-  const updateLens = (clientX: number, clientY: number) => {
-    const el = galleryRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const boxW = rect.width
-    const boxH = rect.height
-    if (boxW < 8 || boxH < 8) return
-    const zoom = 2.4
-    const lensW = boxW / zoom
-    const lensH = boxH / zoom
-    const x = Math.min(Math.max(clientX - rect.left - lensW / 2, 0), boxW - lensW)
-    const y = Math.min(Math.max(clientY - rect.top - lensH / 2, 0), boxH - lensH)
-    setLensPos({ x, y, lensW, lensH, boxW, boxH })
-  }
-
-  const canDesktopLensZoom = () =>
-    typeof window !== 'undefined' &&
-    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
-    window.matchMedia('(min-width: 1024px)').matches
 
   if (loading) return <ProductDetailSkeleton />
   if (!product) return (
@@ -461,7 +438,7 @@ export function ProductDetail() {
           Desktop (lg): 3-col gallery | details | buy. */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,0.55fr)_minmax(240px,0.45fr)] gap-6 md:gap-7 lg:gap-8 items-start overflow-visible">
         {/* Panel 1 — Gallery */}
-        <div className={`min-w-0 relative order-1 md:col-start-1 md:row-start-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
+        <div className="min-w-0 relative order-1 md:col-start-1 md:row-start-1 z-20">
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
             {/* Vertical thumbnails — tablet + desktop (≥768) */}
             {images.length > 1 && (
@@ -473,8 +450,7 @@ export function ProductDetail() {
                   <button
                     key={`v-${img}-${i}`}
                     type="button"
-                    onClick={() => { setActiveImage(i); setLensZoom(false) }}
-                    onMouseEnter={() => { if (canDesktopLensZoom()) setActiveImage(i) }}
+                    onClick={() => setActiveImage(i)}
                     className={`w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
@@ -486,11 +462,9 @@ export function ProductDetail() {
 
             <div className="min-w-0 flex-1 w-full">
               <div
-                ref={galleryRef}
-                className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center lg:cursor-crosshair select-none w-full"
+                className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center select-none w-full"
                 style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(78vh, 720px)', touchAction: 'pan-y' }}
                 onTouchStart={(e) => {
-                  setLensZoom(false)
                   setTouchStartX(e.touches[0].clientX)
                   setTouchStartY(e.touches[0].clientY)
                 }}
@@ -508,17 +482,6 @@ export function ProductDetail() {
                   }
                   setTouchStartX(null)
                   setTouchStartY(null)
-                }}
-                onMouseEnter={(e) => {
-                  if (!images[activeImage] || !canDesktopLensZoom()) return
-                  setLensZoom(true)
-                  updateLens(e.clientX, e.clientY)
-                }}
-                onMouseLeave={() => setLensZoom(false)}
-                onMouseMove={(e) => {
-                  if (!canDesktopLensZoom()) return
-                  if (!lensZoom) setLensZoom(true)
-                  updateLens(e.clientX, e.clientY)
                 }}
               >
                 {images[activeImage] ? (
@@ -540,7 +503,7 @@ export function ProductDetail() {
                   <>
                     <button
                       type="button"
-                      onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i - 1 + images.length) % images.length); setLensZoom(false) }}
+                      onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i - 1 + images.length) % images.length) }}
                       aria-label="Previous image"
                       className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
                     >
@@ -548,27 +511,13 @@ export function ProductDetail() {
                     </button>
                     <button
                       type="button"
-                      onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i + 1) % images.length); setLensZoom(false) }}
+                      onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i + 1) % images.length) }}
                       aria-label="Next image"
                       className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
                     >
                       <MaterialIcon name="chevron_right" size={22} />
                     </button>
                   </>
-                )}
-
-                {lensZoom && images[activeImage] && (
-                  <div
-                    className="pointer-events-none absolute hidden lg:block border border-[#7eb6ff]/60"
-                    style={{
-                      left: lensPos.x,
-                      top: lensPos.y,
-                      width: lensPos.lensW,
-                      height: lensPos.lensH,
-                      background: 'rgba(145, 200, 255, 0.35)',
-                      boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
-                    }}
-                  />
                 )}
 
                 <div className="absolute top-3 left-3 z-10 flex gap-2 pointer-events-none">
@@ -589,26 +538,6 @@ export function ProductDetail() {
                   )}
                 </div>
               </div>
-
-              {lensZoom && images[activeImage] && lensPos.boxW > 0 && lensPos.lensW > 0 && (
-                <div
-                  className="hidden lg:block absolute left-[calc(100%+12px)] top-0 z-30 rounded-xl border border-line overflow-hidden bg-canvas shadow-[0_8px_32px_rgba(0,0,0,0.14)] pointer-events-none"
-                  style={{ width: lensPos.boxW, height: lensPos.boxH }}
-                  aria-hidden
-                >
-                  <img
-                    src={deriveVariantUrl(images[activeImage], 'full')}
-                    alt=""
-                    draggable={false}
-                    className="max-w-none object-cover"
-                    style={{
-                      width: lensPos.boxW * (lensPos.boxW / lensPos.lensW),
-                      height: lensPos.boxH * (lensPos.boxH / lensPos.lensH),
-                      transform: `translate(${-lensPos.x * (lensPos.boxW / lensPos.lensW)}px, ${-lensPos.y * (lensPos.boxH / lensPos.lensH)}px)`,
-                    }}
-                  />
-                </div>
-              )}
 
               {/* Dots (mobile only) + wishlist / share (mobile + tablet) */}
               {images.length > 0 && (
@@ -646,7 +575,7 @@ export function ProductDetail() {
                     <button
                       key={`h-${img}-${i}`}
                       type="button"
-                      onClick={() => { setActiveImage(i); setLensZoom(false) }}
+                      onClick={() => setActiveImage(i)}
                       className={`w-14 h-14 shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                       style={{ background: 'var(--color-surface)' }}
                     >

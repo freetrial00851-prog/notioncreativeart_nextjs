@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { getCategoriesWithProducts, type CategoryWithCount } from '../lib/categories'
@@ -11,19 +12,42 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { HomeSectionSkeleton } from '../components/Skeleton'
 
+function HeroImage({
+  src,
+  priority = false,
+  sizes,
+  className = 'object-cover',
+}: {
+  src: string
+  priority?: boolean
+  sizes: string
+  className?: string
+}) {
+  return (
+    <Image
+      src={src}
+      alt=""
+      fill
+      sizes={sizes}
+      priority={priority}
+      className={className}
+    />
+  )
+}
+
 function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: string[]; className?: string }) {
   if (group.length >= 3) {
     return (
       <div className={`grid grid-cols-[1.5fr_1fr] gap-3 ${className}`}>
-        <div className="rounded-[18px] overflow-hidden bg-surface">
-          <img src={group[0]} alt="" loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
+        <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+          <HeroImage src={group[0]} priority sizes="(max-width: 768px) 60vw, 35vw" />
         </div>
-        <div className="grid grid-rows-2 gap-3">
-          <div className="rounded-[18px] overflow-hidden bg-surface">
-            <img src={group[1]} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+        <div className="grid grid-rows-2 gap-3 min-h-0">
+          <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+            <HeroImage src={group[1]} sizes="(max-width: 768px) 40vw, 20vw" />
           </div>
-          <div className="rounded-[18px] overflow-hidden bg-surface">
-            <img src={group[2]} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+            <HeroImage src={group[2]} sizes="(max-width: 768px) 40vw, 20vw" />
           </div>
         </div>
       </div>
@@ -32,18 +56,18 @@ function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: stri
   if (group.length === 2) {
     return (
       <div className={`grid grid-cols-2 gap-3 ${className}`}>
-        <div className="rounded-[18px] overflow-hidden bg-surface">
-          <img src={group[0]} alt="" loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
+        <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+          <HeroImage src={group[0]} priority sizes="(max-width: 768px) 50vw, 28vw" />
         </div>
-        <div className="rounded-[18px] overflow-hidden bg-surface">
-          <img src={group[1]} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+        <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+          <HeroImage src={group[1]} sizes="(max-width: 768px) 50vw, 28vw" />
         </div>
       </div>
     )
   }
   return (
     <div className={`relative rounded-[18px] overflow-hidden bg-surface ${className}`}>
-      <img src={group[0]} alt="" loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+      <HeroImage src={group[0]} priority sizes="(max-width: 768px) 100vw, 55vw" />
     </div>
   )
 }
@@ -97,7 +121,15 @@ export function Home({ initialHero = null }: { initialHero?: HeroContent | null 
     supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials'])
       .then(({ data }) => {
         for (const row of data ?? []) {
-          if (row.key === 'hero') setHero(row.value as HeroContent)
+          if (row.key === 'hero') {
+            const next = row.value as HeroContent
+            // Avoid remounting hero images when the client refetch returns the same URLs
+            setHero((prev) => {
+              const prevUrls = (prev?.images ?? []).join('|')
+              const nextUrls = (next?.images ?? []).join('|')
+              return prevUrls === nextUrls ? prev : next
+            })
+          }
           if (row.key === 'chapters') setChapters(row.value as ChapterContent[])
           if (row.key === 'homepage_layout') setLayout(mergeLayout(row.value as LayoutSection[]))
           if (row.key === 'testimonials') setTestimonials((row.value as TestimonialContent[]).filter((t) => t.quote && t.name))
