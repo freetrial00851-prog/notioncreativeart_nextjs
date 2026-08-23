@@ -38,7 +38,7 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
       <Link href="/" className="shrink-0 leading-none block" aria-label="Notion Creative Art — home">
         <span
           className="font-logo font-bold tracking-tight text-[28px] leading-none"
-          style={{ color: LOGO_BLUE }}
+          style={{ color: LOGO_BLUE, fontFamily: 'var(--font-logo)' }}
         >
           NCA
         </span>
@@ -49,7 +49,7 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
   return (
     <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Notion Creative Art — home">
       <span
-        className="font-logo font-bold tracking-tight text-[34px] xl:text-[38px] leading-none"
+        className="font-display font-extrabold tracking-tight text-[34px] xl:text-[38px] leading-none"
         style={{ color: LOGO_BLUE }}
       >
         NCA
@@ -401,7 +401,7 @@ export function Header() {
                 type="submit"
                 aria-label="Search"
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-white flex items-center justify-center"
-                style={{ background: LOGO_BLUE }}
+                style={{ background: 'var(--color-primary)' }}
               >
                 <MaterialIcon name="search" size={16} />
               </button>
@@ -449,7 +449,7 @@ export function Header() {
             >
               <span
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-white flex items-center justify-center pointer-events-none"
-                style={{ background: LOGO_BLUE }}
+                style={{ background: 'var(--color-primary)' }}
               >
                 <MaterialIcon name="search" size={16} />
               </span>
@@ -462,21 +462,18 @@ export function Header() {
             >
               <UserIcon size={22} />
             </button>
-            <button
-              onClick={openDrawer}
+            <Link
+              href="/cart"
               aria-label="Cart"
               className="relative w-10 h-10 shrink-0 -mr-0.5 flex items-center justify-center text-ink"
             >
-              <CartIcon size={22} />
+              <MaterialIcon name="shopping_bag" size={22} />
               {cartCount > 0 && (
-                <span
-                  className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center"
-                  style={{ background: LOGO_BLUE }}
-                >
+                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-white text-[8px] flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
-            </button>
+            </Link>
           </div>
         )}
 
