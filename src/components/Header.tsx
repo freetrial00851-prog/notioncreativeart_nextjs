@@ -133,23 +133,15 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-canvas border-b border-line">
-      {/* Promo bar — unchanged */}
+      {/* Announcement bar — one shared strip above all header breakpoints */}
       <div
-        className="hidden md:flex items-center justify-between text-white text-[11px] tracking-[0.04em] px-6 lg:px-10 py-2 max-w-site w-full mx-auto"
+        className="w-full text-white text-[11px] sm:text-[12px] tracking-[0.04em] text-center py-2.5 px-4"
         style={{ background: 'var(--color-primary)' }}
+        role="status"
       >
-        <div className="flex items-center gap-6">
-          <span className="flex items-center gap-1.5"><MaterialIcon name="download" size={13} /> Instant PDF Download</span>
-          <span className="flex items-center gap-1.5"><MaterialIcon name="menu_book" size={13} /> Easy to Follow</span>
-          <span className="flex items-center gap-1.5"><MaterialIcon name="favorite" size={13} /> Made with Love</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <Link href="/shop?price=free" className="hover:opacity-80 transition-opacity">Free Patterns</Link>
-          <Link href="/faq" className="hover:opacity-80 transition-opacity">Help &amp; FAQ</Link>
-        </div>
-      </div>
-      <div className="md:hidden text-white text-[11px] tracking-[0.1em] text-center py-2 px-4 h-[32px] flex items-center justify-center overflow-hidden" style={{ background: 'var(--color-primary)' }}>
-        <span key={messageIndex} className="animate-[fadeIn_0.4s_ease-out]">{messages[messageIndex]}</span>
+        <p key={messageIndex} className="max-w-site mx-auto leading-snug animate-[fadeIn_0.4s_ease-out]">
+          {messages[messageIndex]}
+        </p>
       </div>
 
       {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Account | Wishlist | Cart ── */}
