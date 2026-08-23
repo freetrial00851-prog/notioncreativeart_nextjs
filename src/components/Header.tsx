@@ -401,7 +401,7 @@ export function Header() {
                 type="submit"
                 aria-label="Search"
                 className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center"
-                style={{ background: 'var(--color-primary)' }}
+                style={{ background: 'var(--color-accent)' }}
               >
                 <MaterialIcon name="search" size={16} />
               </button>
@@ -449,7 +449,7 @@ export function Header() {
             >
               <span
                 className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center pointer-events-none"
-                style={{ background: 'var(--color-primary)' }}
+                style={{ background: 'var(--color-accent)' }}
               >
                 <MaterialIcon name="search" size={16} />
               </span>
