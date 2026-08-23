@@ -37,7 +37,7 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
     return (
       <Link href="/" className="shrink-0 leading-none" aria-label="Notion Creative Art — home">
         <span
-          className="font-display font-extrabold tracking-tight text-[26px]"
+          className="font-display font-extrabold tracking-tight text-[22px]"
           style={{ color: LOGO_BLUE }}
         >
           NCA
@@ -374,9 +374,9 @@ export function Header() {
 
       {/* Mobile header — Etsy-style single row; search expands on focus */}
       <div className="md:hidden relative z-50">
-      <div ref={mobileSearchWrapRef} className="px-3 py-2.5 relative z-[2] bg-canvas">
+      <div ref={mobileSearchWrapRef} className="px-2 py-2 relative z-[2] bg-canvas">
         {searchFocused ? (
-          <form onSubmit={submitSearch} className="flex items-center gap-2.5">
+          <form onSubmit={submitSearch} className="flex items-center gap-2">
             <div className="relative flex-1 min-w-0 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-10">
               <input
                 ref={mobileSearchInputRef}
@@ -412,7 +412,7 @@ export function Header() {
             </button>
           </form>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => {
@@ -421,12 +421,12 @@ export function Header() {
                 setMobileOpen(true)
               }}
               aria-label="Browse categories"
-              className={`w-9 h-9 shrink-0 flex items-center justify-center text-ink rounded-full ${mobileOpen ? 'bg-[#e8e8e8]' : ''}`}
+              className={`w-10 h-10 shrink-0 flex items-center justify-center text-ink rounded-full ${mobileOpen ? 'bg-[#e8e8e8]' : ''}`}
             >
               <MaterialIcon name="menu" size={22} />
             </button>
 
-            <div className="shrink-0">
+            <div className="shrink-0 pr-0.5">
               <Logo variant="mobile" />
             </div>
 
@@ -436,24 +436,24 @@ export function Header() {
                 setSearchFocused(true)
                 requestAnimationFrame(() => mobileSearchInputRef.current?.focus())
               }}
-              className="relative flex-1 min-w-0 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-9 text-left"
+              className="relative flex-1 min-w-0 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-10 text-left"
               aria-label="Search"
             >
-              <span className="pl-3 pr-10 text-[13px] text-ink-soft truncate">Search</span>
-              <span className="absolute right-0.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-sale-green text-white flex items-center justify-center pointer-events-none">
-                <MaterialIcon name="search" size={15} />
+              <span className="pl-3.5 pr-11 text-[14px] text-ink-soft truncate">Search</span>
+              <span className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-sale-green text-white flex items-center justify-center pointer-events-none">
+                <MaterialIcon name="search" size={16} />
               </span>
             </button>
 
             <button
               aria-label="Account"
               onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-              className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
+              className="w-10 h-10 shrink-0 flex items-center justify-center text-ink"
             >
-              <UserIcon size={UI_ICON_SIZE} />
+              <UserIcon size={22} />
             </button>
-            <button onClick={openDrawer} aria-label="Cart" className="relative w-9 h-9 shrink-0 flex items-center justify-center text-ink">
-              <CartIcon size={UI_ICON_SIZE} />
+            <button onClick={openDrawer} aria-label="Cart" className="relative w-10 h-10 shrink-0 flex items-center justify-center text-ink">
+              <CartIcon size={22} />
               {cartCount > 0 && (
                 <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-sale-green text-white text-[8px] flex items-center justify-center">
                   {cartCount}
@@ -464,7 +464,7 @@ export function Header() {
         )}
 
         {searchFocused && query && (
-          <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
+          <div className="absolute left-2 right-2 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
             {suggestions.length > 0 ? (
               <>
                 {suggestions.map((p) => (
