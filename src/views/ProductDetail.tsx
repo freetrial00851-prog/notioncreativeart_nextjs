@@ -486,7 +486,7 @@ export function ProductDetail() {
               >
                 {images[activeImage] ? (
                   <img
-                    src={images[activeImage]}
+                    src={deriveVariantUrl(images[activeImage], 'full')}
                     srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w, ${deriveVariantUrl(images[activeImage], 'full')} 1600w`}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw"
                     alt={product.title}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { compressImage } from '../lib/imageCompress'
+import { IMAGE_MAX } from '../lib/imageVariants'
 import type { HeroContent, ChapterContent, CategoryContent, AnnouncementsContent, SocialContent, LayoutSection, TestimonialContent } from '../lib/types'
 import { mergeLayout } from '../lib/defaultLayout'
 import { DropzoneUpload } from '../components/DropzoneUpload'
@@ -48,9 +49,14 @@ export function HomepageAdmin() {
 
   const uploadImages = async (files: File[], onDone: (urls: string[]) => void, tag: string) => {
     setUploadingKey(tag)
+    const maxDim =
+      tag === 'hero' ? IMAGE_MAX.hero
+      : tag.startsWith('chapter') ? IMAGE_MAX.chapter
+      : tag.startsWith('testimonial') ? 400
+      : IMAGE_MAX.general
     const urls: string[] = []
     for (const rawFile of files) {
-      const file = await compressImage(rawFile)
+      const file = await compressImage(rawFile, maxDim, 0.8)
       const path = `homepage/${tag}-${crypto.randomUUID()}-${file.name}`
       const { error } = await supabase.storage.from('product-images').upload(path, file, { cacheControl: '31536000' })
       if (!error) {

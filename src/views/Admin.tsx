@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { NavLink } from '@/components/NavLink'
 import { supabase } from '../lib/supabase'
-import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl } from '../lib/imageVariants'
+import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, IMAGE_MAX } from '../lib/imageVariants'
 import { compressImage } from '../lib/imageCompress'
 import { useAuth } from '../context/AuthContext'
 import type { Product, Category } from '../lib/types'
@@ -772,7 +772,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                 <h2 className="text-[16px] font-semibold">Photos &amp; files</h2>
                 <DropzoneUpload
                   label="Photos (first image is primary — drag to reorder)"
-                  sizeHint="Auto-compressed to ≤26KB WebP on upload"
+                  sizeHint="Resized to ≤1600px long edge, saved as WebP at ~80% quality (micro→full variants)"
                   urls={form.images}
                   accept="image/jpeg,image/png"
                   acceptLabel="JPEG or PNG"
@@ -1140,7 +1140,7 @@ function CategoriesAdmin() {
 
   const uploadImage = async (file: File) => {
     setUploading(true)
-    const compressed = await compressImage(file)
+    const compressed = await compressImage(file, IMAGE_MAX.category, 0.8)
     const path = `categories/${crypto.randomUUID()}-${compressed.name}`
     const { error: err } = await supabase.storage.from('product-images').upload(path, compressed, { cacheControl: '31536000' })
     if (!err) {
