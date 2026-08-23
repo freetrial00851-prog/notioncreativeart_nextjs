@@ -56,9 +56,9 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
     if (product.price === 0) {
       maybeOpenNewsletterPrompt()
       setDownloadingFree(true)
-      const ok = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+      const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
       setDownloadingFree(false)
-      showToast(ok ? 'Downloading your pattern…' : "This pattern's file isn't uploaded yet — please check back soon.", ok ? 'success' : 'error')
+      showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
       return
     }
     if (!requireAuth({ type: 'buy', productId: product.id })) return

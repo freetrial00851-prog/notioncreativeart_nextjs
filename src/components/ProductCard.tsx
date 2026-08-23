@@ -63,9 +63,9 @@ export function ProductCard({ product, priority = false }: { product: Product; p
     e.preventDefault()
     maybeOpenNewsletterPrompt()
     setDownloadingFree(true)
-    const ok = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+    const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
     setDownloadingFree(false)
-    showToast(ok ? 'Downloading your pattern…' : "This pattern's file isn't uploaded yet — please check back soon.", ok ? 'success' : 'error')
+    showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
   }
 
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price

@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     if (product.sold_out) {
       return new Response(JSON.stringify({ error: 'This pattern is no longer available.' }), { status: 403, headers: corsHeaders })
     }
-    if (product.price !== 0) {
+    if (Number(product.price) !== 0) {
       return new Response(JSON.stringify({ error: 'This pattern is not free.' }), { status: 403, headers: corsHeaders })
     }
 

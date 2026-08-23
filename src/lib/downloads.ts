@@ -37,29 +37,36 @@ export async function claimAndDownloadFreePattern(userId: string, productId: str
 
 /** Guest/anonymous free download — server verifies price === 0 and mints a
  *  signed URL via the download-free-pattern Edge Function. */
-async function downloadFreePatternAsGuest(productId: string, title?: string): Promise<boolean> {
+async function downloadFreePatternAsGuest(productId: string, title?: string): Promise<{ ok: boolean; error?: string }> {
   const { data, error } = await supabase.functions.invoke('download-free-pattern', { body: { productId } })
   if (error) {
     try {
       const context = (error as { context?: Response }).context
       if (context && typeof context.json === 'function') {
         const body = await context.json()
-        if (body?.error) console.error('Free download failed:', body.error)
+        if (body?.error) return { ok: false, error: body.error }
       }
     } catch {
       /* ignore */
     }
-    return false
+    return { ok: false, error: "Couldn't start the download — please try again." }
   }
-  if (data?.error || !data?.signedUrl) return false
+  if (data?.error) return { ok: false, error: data.error }
+  if (!data?.signedUrl) return { ok: false, error: "This pattern's file isn't uploaded yet — please check back soon." }
   const filename = data.filename ?? `${(title ?? 'pattern').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`
   triggerBrowserDownload(data.signedUrl, filename)
-  return true
+  return { ok: true }
 }
 
 /** Download a $0 pattern — logged-in users get a purchases row; guests use
  *  the Edge Function path. Paid products must not call this. */
-export async function downloadFreePattern(productId: string, title?: string, userId?: string | null): Promise<boolean> {
-  if (userId) return claimAndDownloadFreePattern(userId, productId, title)
+export async function downloadFreePattern(productId: string, title?: string, userId?: string | null): Promise<{ ok: boolean; error?: string }> {
+  if (userId) {
+    const ok = await claimAndDownloadFreePattern(userId, productId, title)
+    return {
+      ok,
+      error: ok ? undefined : "This pattern's file isn't uploaded yet — please check back soon.",
+    }
+  }
   return downloadFreePatternAsGuest(productId, title)
 }
