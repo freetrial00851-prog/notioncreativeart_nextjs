@@ -372,58 +372,91 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile header — Etsy-style single row: menu | logo | search | account | cart */}
+      {/* Mobile header — Etsy-style single row; search expands on focus */}
       <div ref={mobileSearchWrapRef} className="md:hidden px-3 py-2.5 relative">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Browse categories"
-            className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
-          >
-            <MaterialIcon name="menu" size={22} />
-          </button>
-
-          <div className="shrink-0">
-            <Logo variant="mobile" />
-          </div>
-
-          <form onSubmit={submitSearch} className="relative flex-1 min-w-0">
-            <div className="relative flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-9">
+        {searchFocused ? (
+          <form onSubmit={submitSearch} className="flex items-center gap-2.5">
+            <div className="relative flex-1 min-w-0 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-10">
               <input
                 ref={mobileSearchInputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 placeholder="Search"
-                className="w-full bg-transparent pl-3 pr-10 py-1.5 text-[13px] placeholder:text-ink-soft focus:outline-none"
+                className="w-full bg-transparent pl-4 pr-10 py-2 text-[14px] placeholder:text-ink-soft focus:outline-none"
+                autoFocus
               />
-              <button
-                type="submit"
-                aria-label="Search"
-                className="absolute right-0.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-sale-green text-white flex items-center justify-center hover:opacity-85 transition-opacity"
-              >
-                <MaterialIcon name="search" size={15} />
-              </button>
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-ink"
+                >
+                  <MaterialIcon name="close" size={18} />
+                </button>
+              ) : null}
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchFocused(false)
+                setQuery('')
+                setSuggestions([])
+                mobileSearchInputRef.current?.blur()
+              }}
+              className="text-[15px] font-medium text-ink shrink-0 px-0.5"
+            >
+              Cancel
+            </button>
           </form>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Browse categories"
+              className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
+            >
+              <MaterialIcon name="menu" size={22} />
+            </button>
 
-          <button
-            aria-label="Account"
-            onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-            className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
-          >
-            <UserIcon size={UI_ICON_SIZE} />
-          </button>
-          <button onClick={openDrawer} aria-label="Cart" className="relative w-9 h-9 shrink-0 flex items-center justify-center text-ink">
-            <CartIcon size={UI_ICON_SIZE} />
-            {cartCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-sale-green text-white text-[8px] flex items-center justify-center">
-                {cartCount}
+            <div className="shrink-0">
+              <Logo variant="mobile" />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearchFocused(true)
+                requestAnimationFrame(() => mobileSearchInputRef.current?.focus())
+              }}
+              className="relative flex-1 min-w-0 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-9 text-left"
+              aria-label="Search"
+            >
+              <span className="pl-3 pr-10 text-[13px] text-ink-soft truncate">Search</span>
+              <span className="absolute right-0.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-sale-green text-white flex items-center justify-center pointer-events-none">
+                <MaterialIcon name="search" size={15} />
               </span>
-            )}
-          </button>
-        </div>
+            </button>
+
+            <button
+              aria-label="Account"
+              onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
+              className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
+            >
+              <UserIcon size={UI_ICON_SIZE} />
+            </button>
+            <button onClick={openDrawer} aria-label="Cart" className="relative w-9 h-9 shrink-0 flex items-center justify-center text-ink">
+              <CartIcon size={UI_ICON_SIZE} />
+              {cartCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-sale-green text-white text-[8px] flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
 
         {searchFocused && query && (
           <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
