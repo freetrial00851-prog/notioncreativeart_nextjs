@@ -1,9 +1,18 @@
 import { supabase } from './supabase'
+import { env } from './env'
 
 function triggerBrowserDownload(signedUrl: string, filename: string): void {
+  // iOS Safari often ignores `<a download>` for cross-origin URLs — opening
+  // the signed URL directly is more reliable on mobile.
+  const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  if (isMobile) {
+    window.location.assign(signedUrl)
+    return
+  }
   const a = document.createElement('a')
   a.href = signedUrl
   a.download = filename
+  a.rel = 'noopener'
   document.body.appendChild(a)
   a.click()
   a.remove()
@@ -35,38 +44,63 @@ export async function claimAndDownloadFreePattern(userId: string, productId: str
   return triggerPdfDownload(productId, title)
 }
 
-/** Guest/anonymous free download — server verifies price === 0 and mints a
- *  signed URL via the download-free-pattern Edge Function. */
-async function downloadFreePatternAsGuest(productId: string, title?: string): Promise<{ ok: boolean; error?: string }> {
+type FreeDownloadResponse = { signedUrl?: string; filename?: string; error?: string }
+
+async function requestFreeDownloadUrl(productId: string): Promise<FreeDownloadResponse> {
   const { data, error } = await supabase.functions.invoke('download-free-pattern', { body: { productId } })
+  if (!error && data?.signedUrl) return data as FreeDownloadResponse
+
   if (error) {
     try {
       const context = (error as { context?: Response }).context
       if (context && typeof context.json === 'function') {
         const body = await context.json()
-        if (body?.error) return { ok: false, error: body.error }
+        if (body?.error) return { error: body.error }
       }
     } catch {
       /* ignore */
     }
-    return { ok: false, error: "Couldn't start the download — please try again." }
   }
-  if (data?.error) return { ok: false, error: data.error }
-  if (!data?.signedUrl) return { ok: false, error: "This pattern's file isn't uploaded yet — please check back soon." }
+
+  // Some mobile browsers / supabase-js versions mishandle functions.invoke —
+  // fall back to a direct fetch against the same Edge Function endpoint.
+  try {
+    const res = await fetch(`${env.supabaseUrl}/functions/v1/download-free-pattern`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.supabaseAnonKey}`,
+        apikey: env.supabaseAnonKey,
+      },
+      body: JSON.stringify({ productId }),
+    })
+    const body = (await res.json()) as FreeDownloadResponse
+    if (res.ok && body.signedUrl) return body
+    return { error: body.error ?? "Couldn't start the download — please try again." }
+  } catch {
+    return { error: "Couldn't start the download — please try again." }
+  }
+}
+
+/** Guest/anonymous free download — server verifies price === 0 and mints a
+ *  signed URL via the download-free-pattern Edge Function. */
+async function downloadFreePatternViaServer(productId: string, title?: string): Promise<{ ok: boolean; error?: string }> {
+  const data = await requestFreeDownloadUrl(productId)
+  if (data.error) return { ok: false, error: data.error }
+  if (!data.signedUrl) return { ok: false, error: "This pattern's file isn't uploaded yet — please check back soon." }
   const filename = data.filename ?? `${(title ?? 'pattern').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`
   triggerBrowserDownload(data.signedUrl, filename)
   return { ok: true }
 }
 
-/** Download a $0 pattern — logged-in users get a purchases row; guests use
- *  the Edge Function path. Paid products must not call this. */
+/** Download a $0 pattern. Everyone gets the file via the Edge Function
+ *  (reliable signed URL). Logged-in users also get a best-effort purchases
+ *  row so the pattern shows up under Account → Downloads. */
 export async function downloadFreePattern(productId: string, title?: string, userId?: string | null): Promise<{ ok: boolean; error?: string }> {
   if (userId) {
-    const ok = await claimAndDownloadFreePattern(userId, productId, title)
-    return {
-      ok,
-      error: ok ? undefined : "This pattern's file isn't uploaded yet — please check back soon.",
-    }
+    void supabase.from('purchases').insert({ user_id: userId, product_id: productId, order_id: null }).then(({ error }) => {
+      if (error && error.code !== '23505') console.error('Failed to record free-pattern purchase:', error)
+    })
   }
-  return downloadFreePatternAsGuest(productId, title)
+  return downloadFreePatternViaServer(productId, title)
 }
