@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Domine, Manrope, Playfair_Display } from 'next/font/google'
+import { Baloo_2, Manrope, Playfair_Display } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
@@ -20,11 +20,11 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
-/** Domine — NCA logo wordmark. */
-const domine = Domine({
+/** Baloo 2 — logo wordmark only (NCA / NotionCreativeArt). */
+const baloo2 = Baloo_2({
   subsets: ['latin'],
-  weight: ['700'],
-  variable: '--font-domine',
+  weight: ['700', '800'],
+  variable: '--font-baloo-2',
   display: 'swap',
 })
 
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={`${manrope.variable} ${playfair.variable} ${domine.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${playfair.variable} ${baloo2.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         {/* Material Symbols — load early; display=block avoids flashing icon names as text */}

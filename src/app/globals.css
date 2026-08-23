@@ -41,6 +41,7 @@ html.icons-ready .material-symbols-outlined {
   --color-accent: #1f249c;
   --color-accent-hover: #191d7d;
   --color-accent-soft: #e9eaf5;
+  --color-logo-accent: #D68A3E;
   --color-secondary: #6F8760;
   --color-secondary-soft: #EEF2E8;
   --color-text: #1F2933;
@@ -78,12 +79,12 @@ html.icons-ready .material-symbols-outlined {
   --font-body: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: var(--font-manrope), system-ui, sans-serif;
   --font-heading: var(--font-playfair), Georgia, serif;
-  --font-logo: var(--font-domine), Georgia, 'Times New Roman', serif;
+  --font-logo: var(--font-baloo-2), 'Baloo 2', system-ui, sans-serif;
 }
 
 .mobile-nca-logo {
-  font-family: var(--font-domine), Georgia, 'Times New Roman', serif;
-  font-weight: 700;
+  font-family: var(--font-logo);
+  font-weight: 800;
 }
 
 html { background: var(--color-canvas); overflow-x: hidden; }

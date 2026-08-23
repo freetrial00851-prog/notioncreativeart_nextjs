@@ -12,56 +12,8 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
-import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, CartIcon, UI_ICON_SIZE } from './icons'
-
-const CATEGORY_ICONS: Record<string, string> = {
-  amigurumi: 'toys',
-  wearables: 'checkroom',
-  'baby & kids': 'child_care',
-  'home decor': 'cottage',
-  accessories: 'shopping_bag',
-  'seasonal & holiday': 'park',
-  seasonal: 'park',
-  bundles: 'inventory_2',
-  'tools & guides': 'construction',
-}
-function categoryIcon(name: string) {
-  return CATEGORY_ICONS[name.toLowerCase()] ?? 'category'
-}
-
-const LOGO_BLUE = '#1f249c'
-
-/** Desktop: large blue NCA + stacked NOTION / CREATIVE / ART. Mobile: blue NCA only. */
-function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
-  if (variant === 'mobile') {
-    return (
-      <Link href="/" className="shrink-0 leading-none block" aria-label="Notion Creative Art — home">
-        <span
-          className="mobile-nca-logo tracking-tight text-[28px] leading-none"
-          style={{ color: LOGO_BLUE }}
-        >
-          NCA
-        </span>
-      </Link>
-    )
-  }
-
-  return (
-    <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Notion Creative Art — home">
-      <span
-        className="font-extrabold tracking-tight text-[34px] xl:text-[38px] leading-none"
-        style={{ color: LOGO_BLUE, fontFamily: 'var(--font-logo)' }}
-      >
-        NCA
-      </span>
-      <span className="flex flex-col justify-center leading-[1.05] text-[10px] xl:text-[11px] font-semibold tracking-[0.06em] uppercase text-ink">
-        <span>Notion</span>
-        <span>Creative</span>
-        <span>Art</span>
-      </span>
-    </Link>
-  )
-}
+import { Logo } from './Logo'
+import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, UI_ICON_SIZE } from './icons'
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
@@ -74,20 +26,23 @@ export function Header() {
   useBodyScrollLock(mobileOpen || mobileAccountOpen)
   const [desktopAccountOpen, setDesktopAccountOpen] = useState(false)
   const desktopAccountWrapRef = useRef<HTMLDivElement>(null)
+  const tabletAccountWrapRef = useRef<HTMLDivElement>(null)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
+  const categoriesWrapRef = useRef<HTMLDivElement>(null)
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [mobileExpandedCategory, setMobileExpandedCategory] = useState<string | null>(null)
   const [mobileSubcategoriesCache, setMobileSubcategoriesCache] = useState<Record<string, SubcategoryWithCount[]>>({})
   const [messages, setMessages] = useState<string[]>(['FREE PATTERN WITH EVERY FIRST ORDER — CODE FIRSTSTITCH'])
   const [messageIndex, setMessageIndex] = useState(0)
 
-  // Search
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Product[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapRef = useRef<HTMLDivElement>(null)
+  const tabletSearchWrapRef = useRef<HTMLDivElement>(null)
   const mobileSearchWrapRef = useRef<HTMLDivElement>(null)
   const desktopSearchInputRef = useRef<HTMLInputElement>(null)
+  const tabletSearchInputRef = useRef<HTMLInputElement>(null)
   const mobileSearchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -120,18 +75,24 @@ export function Header() {
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const insideDesktopSearch = searchWrapRef.current?.contains(e.target as Node) ?? false
-      const insideMobileSearch = mobileSearchWrapRef.current?.contains(e.target as Node) ?? false
-      if (!insideDesktopSearch && !insideMobileSearch) setSearchFocused(false)
-      if (desktopAccountWrapRef.current && !desktopAccountWrapRef.current.contains(e.target as Node)) setDesktopAccountOpen(false)
+      const t = e.target as Node
+      const insideSearch =
+        (searchWrapRef.current?.contains(t) ?? false) ||
+        (tabletSearchWrapRef.current?.contains(t) ?? false) ||
+        (mobileSearchWrapRef.current?.contains(t) ?? false)
+      if (!insideSearch) setSearchFocused(false)
+      if (
+        !(desktopAccountWrapRef.current?.contains(t) ?? false) &&
+        !(tabletAccountWrapRef.current?.contains(t) ?? false)
+      ) {
+        setDesktopAccountOpen(false)
+      }
+      if (categoriesWrapRef.current && !categoriesWrapRef.current.contains(t)) setCategoriesOpen(false)
     }
     document.addEventListener('mousedown', onClick)
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
-  // Keep the header search input showing whatever's actually being searched —
-  // otherwise a fresh load, shared link, or back/forward nav to /search?q=X
-  // left the bar looking empty while the results below were for a real query.
   useEffect(() => {
     if (pathname !== '/search') return
     const activeQuery = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('q') ?? ''
@@ -143,12 +104,34 @@ export function Header() {
     if (!query.trim()) return
     setSearchFocused(false)
     desktopSearchInputRef.current?.blur()
+    tabletSearchInputRef.current?.blur()
     mobileSearchInputRef.current?.blur()
     router.push(`/search?q=${encodeURIComponent(query.trim())}`)
   }
 
+  const clearSearch = () => {
+    setQuery('')
+    setSuggestions([])
+    if (pathname === '/search') router.push('/search')
+  }
+
+  const goWishlist = () => {
+    if (requireAuth()) window.location.href = '/account/wishlist'
+  }
+
+  const openCart = () => {
+    if (user) openDrawer()
+    else requireAuth()
+  }
+
+  const openMobileCart = () => {
+    if (user) router.push('/cart')
+    else requireAuth()
+  }
+
   return (
     <header className="sticky top-0 z-40 bg-canvas border-b border-line">
+      {/* Promo bar — unchanged */}
       <div
         className="hidden md:flex items-center justify-between text-white text-[11px] tracking-[0.04em] px-6 lg:px-10 py-2 max-w-[1400px] mx-auto"
         style={{ background: 'var(--color-primary)' }}
@@ -167,204 +150,107 @@ export function Header() {
         <span key={messageIndex} className="animate-[fadeIn_0.4s_ease-out]">{messages[messageIndex]}</span>
       </div>
 
-      {/* Main row — logo, separate Categories button, dominant search bar, labeled icons */}
-      <div className="hidden md:flex items-center gap-4 lg:gap-6 px-4 lg:px-8 py-4 max-w-[1400px] mx-auto">
-        <div className="flex items-center min-w-0 shrink-0">
-          <Logo />
+      {/* ── Desktop ≥1024 (lg): Logo | Categories | Search flex | Wishlist | Account | Cart ── */}
+      <div className="hidden lg:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-[1400px] mx-auto">
+        <Logo variant="full" />
+
+        <div ref={categoriesWrapRef} className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setCategoriesOpen((v) => !v)}
+            aria-label="Browse categories"
+            aria-expanded={categoriesOpen}
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[13px] font-medium text-ink hover:bg-surface transition-colors whitespace-nowrap"
+          >
+            <MaterialIcon name="menu" size={18} />
+            <span>Categories</span>
+            <ChevronIcon open={categoriesOpen} />
+          </button>
+          {categoriesOpen && (
+            <DesktopCategoriesMenu
+              categories={categories}
+              onClose={() => setCategoriesOpen(false)}
+            />
+          )}
         </div>
 
-        {/* Categories + Search — merged into a single unified control on desktop, Amazon/Etsy-style */}
-        <div className="flex items-center flex-1 min-w-0 border-2 border-ink rounded-full bg-canvas focus-within:ring-2 focus-within:ring-ink">
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setCategoriesOpen((v) => !v)}
-              aria-label="Browse categories"
-              className="flex items-center gap-1.5 pl-4 pr-3 lg:pl-5 lg:pr-4 py-3 rounded-l-full text-[13px] text-ink hover:bg-surface transition-colors whitespace-nowrap"
-            >
-              <MaterialIcon name="menu" size={16} />
-              <span className="hidden lg:inline">Categories</span>
-              <ChevronIcon open={categoriesOpen} />
-            </button>
-
-            {categoriesOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setCategoriesOpen(false)} />
-                <div className="absolute left-0 top-full mt-2 z-50 w-[280px]">
-                  <div className="bg-white border border-line rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden">
-                    <div className="max-h-[min(420px,70vh)] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin' }}>
-                      <Link
-                        href="/shop"
-                        onClick={() => setCategoriesOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-ink hover:bg-surface transition-colors"
-                      >
-                        <MaterialIcon name="auto_awesome" size={16} color="#e67a2e" />
-                        Recommended categories
-                      </Link>
-                      <div className="mx-4 mb-1.5 border-b" style={{ borderColor: LOGO_BLUE }} />
-                      {categories.map((c) => (
-                        <Link
-                          key={c.link}
-                          href={c.link}
-                          onClick={() => setCategoriesOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-ink hover:bg-surface transition-colors"
-                        >
-                          <span className="flex-1 truncate">{c.name}</span>
-                          <MaterialIcon name="chevron_right" size={16} className="text-ink-soft shrink-0" />
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="w-px self-stretch my-2.5 bg-line shrink-0" />
-
-          {/* Search — same visual control, no border/rounding of its own now */}
-          <div ref={searchWrapRef} className="relative flex-1 min-w-0">
-            <form onSubmit={submitSearch} className="relative">
-              <input
-                ref={desktopSearchInputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                placeholder="Search patterns, categories..."
-                className="w-full bg-transparent pl-4 pr-12 py-3 text-[14px] placeholder:text-ink-soft focus:outline-none"
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setQuery('')
-                    setSuggestions([])
-                    if (pathname === '/search') router.push('/search')
-                  }}
-                  aria-label="Clear search"
-                  className="absolute right-12 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-ink-soft hover:text-ink"
-                >
-                  ✕
-                </button>
-              )}
-              <button
-                type="submit"
-                aria-label="Search"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-sale-green text-white flex items-center justify-center hover:opacity-85 transition-opacity"
-              >
-                <SearchIcon />
-              </button>
-            </form>
-
-            {searchFocused && query && (
-              <div className="absolute left-0 right-0 top-full mt-2 bg-canvas border border-line shadow-lg z-50 max-h-96 overflow-y-auto rounded-lg">
-                {suggestions.length > 0 ? (
-                  <>
-                    {suggestions.map((p) => (
-                      <Link
-                        key={p.id}
-                        href={`/pattern/${p.slug}`}
-                        onClick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-surface"
-                      >
-                        <div className="w-10 h-10 shrink-0 bg-surface rounded-md overflow-hidden">
-                          {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
-                        </div>
-                        <span className="text-[13px] truncate">{p.title}</span>
-                        <span className="ml-auto text-[12px] text-ink-soft shrink-0">${p.price.toFixed(2)}</span>
-                      </Link>
-                    ))}
-                    <button onClick={() => submitSearch()} className="block w-full text-left px-4 py-3 text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink border-t border-line">
-                      SEE ALL RESULTS FOR "{query.toUpperCase()}" →
-                    </button>
-                  </>
-                ) : (
-                  <p className="px-4 py-4 text-[13px] text-ink-soft">No patterns matched "{query}"</p>
-                )}
-              </div>
-            )}
-          </div>
+        <div ref={searchWrapRef} className="relative flex-1 min-w-0">
+          <SearchPill
+            inputRef={desktopSearchInputRef}
+            query={query}
+            setQuery={setQuery}
+            onFocus={() => setSearchFocused(true)}
+            onSubmit={submitSearch}
+            onClear={clearSearch}
+            placeholder="Search patterns, categories..."
+            buttonSize={36}
+            iconSize={18}
+          />
+          {searchFocused && query && (
+            <SuggestionsDropdown
+              suggestions={suggestions}
+              query={query}
+              onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
+              onSeeAll={() => submitSearch()}
+            />
+          )}
         </div>
 
         {pathname === '/search' && (
           <button
-            onClick={() => { setQuery(''); setSuggestions([]); router.push('/'); desktopSearchInputRef.current?.blur() }}
+            type="button"
+            onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
             className="text-[13px] text-ink-soft hover:text-ink shrink-0"
           >
             Cancel
           </button>
         )}
 
-        {/* Right: labeled icons — Wishlist, Account, Cart in that order */}
-        <div className="flex items-center gap-5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <button
+            type="button"
             aria-label="Wishlist"
-            onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
-            className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
+            title="Wishlist"
+            onClick={goWishlist}
+            className="w-10 h-10 flex items-center justify-center text-ink hover:opacity-70 transition-opacity"
           >
-            <HeartIcon size={UI_ICON_SIZE} />
-            <span className="text-[13px]">Wishlist</span>
+            <MaterialIcon name="favorite" size={24} />
           </button>
+
           <div ref={desktopAccountWrapRef} className="relative">
             <button
+              type="button"
               onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
-              className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
-              aria-label="Account"
+              className="w-10 h-10 flex items-center justify-center text-ink hover:opacity-70 transition-opacity"
+              aria-label="Your account"
+              title="Your account"
               aria-expanded={desktopAccountOpen}
             >
-              <UserIcon size={UI_ICON_SIZE} />
-              <span className="text-[13px]">Account</span>
-              {user && <ChevronIcon open={desktopAccountOpen} />}
+              <MaterialIcon name="person" size={24} />
             </button>
             {user && desktopAccountOpen && (
-              <div className="absolute right-0 top-full pt-2 z-50">
-                <div className="w-[260px] bg-white border border-line shadow-[0_8px_30px_rgba(0,0,0,0.12)] text-sm rounded-xl overflow-hidden">
-                  <div className="h-1" style={{ background: 'var(--color-accent)' }} />
-                  <div className="flex items-center gap-3 px-4 py-3.5 border-b border-line" style={{ background: 'var(--color-surface)' }}>
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-[14px] font-semibold"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      {(profile?.first_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[13px] font-semibold text-ink truncate">
-                        {[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}
-                      </p>
-                      <p className="text-[11px] text-ink-soft truncate">{user.email}</p>
-                    </div>
-                  </div>
-                  <div className="py-1.5">
-                    <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <OrderIcon size={UI_ICON_SIZE} /> Orders
-                    </Link>
-                    <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
-                    </Link>
-                  </div>
-                  <div className="border-t border-line py-1.5">
-                    <Link href="/account/profile" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <SettingsIcon size={UI_ICON_SIZE} /> Account settings
-                    </Link>
-                    <button
-                      onClick={() => { signOut(); setDesktopAccountOpen(false) }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink text-left"
-                    >
-                      <MaterialIcon name="logout" size={18} /> Sign out
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <AccountDropdown
+                profile={profile}
+                email={user.email}
+                onClose={() => setDesktopAccountOpen(false)}
+                onSignOut={() => { signOut(); setDesktopAccountOpen(false) }}
+              />
             )}
           </div>
+
           <button
-            onClick={openDrawer}
+            type="button"
+            onClick={openCart}
             aria-label="Cart"
-            className="relative flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
+            title="Cart"
+            className="relative w-10 h-10 flex items-center justify-center text-ink hover:opacity-70 transition-opacity"
           >
-            <CartIcon size={UI_ICON_SIZE} />
-            <span className="text-[13px]">Cart</span>
+            <MaterialIcon name="shopping_basket" size={24} />
             {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-sale-green text-white text-[9px] flex items-center justify-center">
+              <span
+                className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
+                style={{ background: 'var(--color-accent)' }}
+              >
                 {cartCount}
               </span>
             )}
@@ -372,257 +258,289 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile header — single row: menu · logo · search · account · cart */}
-      <div className="md:hidden relative z-50">
-      <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
-        {searchFocused ? (
-          <form onSubmit={submitSearch} className="flex items-center gap-2.5 h-10">
-            <div className="relative flex flex-1 min-w-0 h-10 items-center border-2 border-ink rounded-full bg-white pl-4 pr-1.5 gap-1">
-              <input
-                ref={mobileSearchInputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                placeholder="Search"
-                className="flex-1 min-w-0 h-full bg-transparent text-[14px] placeholder:text-ink-soft focus:outline-none"
-                autoFocus
-              />
-              {query ? (
-                <button
-                  type="button"
-                  onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }}
-                  aria-label="Clear search"
-                  className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft"
-                >
-                  <MaterialIcon name="close" size={18} />
-                </button>
-              ) : null}
+      {/* ── Tablet 768–1023 (md–lg): two rows ── */}
+      <div className="hidden md:block lg:hidden">
+        <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-[1400px] mx-auto">
+          <Logo variant="full" />
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center text-ink">
+              <MaterialIcon name="favorite" size={22} />
+            </button>
+            <div ref={tabletAccountWrapRef} className="relative">
               <button
-                type="submit"
-                aria-label="Search"
-                className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center"
-                style={{ background: 'var(--color-accent)' }}
+                type="button"
+                aria-label="Your account"
+                title="Your account"
+                onClick={() => (user ? setDesktopAccountOpen((v) => !v) : requireAuth())}
+                className="w-10 h-10 flex items-center justify-center text-ink"
+                aria-expanded={desktopAccountOpen}
               >
-                <MaterialIcon name="search" size={16} />
+                <MaterialIcon name="person" size={22} />
               </button>
+              {user && desktopAccountOpen && (
+                <AccountDropdown
+                  profile={profile}
+                  email={user.email}
+                  onClose={() => setDesktopAccountOpen(false)}
+                  onSignOut={() => { signOut(); setDesktopAccountOpen(false) }}
+                />
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchFocused(false)
-                setQuery('')
-                setSuggestions([])
-                mobileSearchInputRef.current?.blur()
-              }}
-              className="text-[15px] font-medium text-ink shrink-0"
-            >
-              Cancel
-            </button>
-          </form>
-        ) : (
-          <div className="flex items-center h-10">
-            <button
-              type="button"
-              onClick={() => {
-                setSearchFocused(false)
-                setMobileExpandedCategory(null)
-                setMobileOpen(true)
-              }}
-              aria-label="Browse categories"
-              className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center text-ink ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
-            >
-              <MaterialIcon name="menu" size={22} />
-            </button>
-
-            <div className="shrink-0 ml-0.5 mr-2">
-              <Logo variant="mobile" />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSearchFocused(true)
-                requestAnimationFrame(() => mobileSearchInputRef.current?.focus())
-              }}
-              className="flex flex-1 min-w-0 h-10 mr-1.5 items-center justify-end border-2 border-ink rounded-full bg-white px-1.5"
-              aria-label="Search"
-            >
-              <span
-                className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center pointer-events-none"
-                style={{ background: 'var(--color-accent)' }}
-              >
-                <MaterialIcon name="search" size={16} />
-              </span>
-            </button>
-
-            <button
-              aria-label="Account"
-              onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-              className="w-11 h-11 shrink-0 flex items-center justify-center text-ink"
-            >
-              <UserIcon size={30} />
-            </button>
-            <button
-              type="button"
-              aria-label="Cart"
-              onClick={() => {
-                if (user) router.push('/cart')
-                else requireAuth()
-              }}
-              className="relative w-11 h-11 shrink-0 -mr-0.5 flex items-center justify-center"
-              style={{ color: 'var(--color-primary)' }}
-            >
-              <CartIcon size={30} />
+            <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center text-ink">
+              <MaterialIcon name="shopping_basket" size={22} />
               {cartCount > 0 && (
-                <span
-                  className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center"
-                  style={{ background: 'var(--color-primary)' }}
-                >
+                <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
                   {cartCount}
                 </span>
               )}
             </button>
           </div>
-        )}
-
-        {searchFocused && query && (
-          <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
-            {suggestions.length > 0 ? (
-              <>
-                {suggestions.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/pattern/${p.slug}`}
-                    onClick={() => { setSearchFocused(false); mobileSearchInputRef.current?.blur() }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-surface"
-                  >
-                    <div className="w-10 h-10 shrink-0 bg-surface rounded-md overflow-hidden">
-                      {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
-                    </div>
-                    <span className="text-[13px] truncate">{p.title}</span>
-                    <span className="ml-auto text-[12px] text-ink-soft shrink-0">${p.price.toFixed(2)}</span>
-                  </Link>
-                ))}
-                <button onClick={() => submitSearch()} className="block w-full text-left px-4 py-3 text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink border-t border-line">
-                  SEE ALL RESULTS FOR "{query.toUpperCase()}" →
-                </button>
-              </>
-            ) : (
-              <p className="px-4 py-4 text-[13px] text-ink-soft">No patterns matched "{query}"</p>
+        </div>
+        <div className="flex items-center gap-3 px-5 pb-3 max-w-[1400px] mx-auto">
+          <button
+            type="button"
+            aria-label="Browse categories"
+            onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
+            className={`w-10 h-10 shrink-0 flex items-center justify-center text-ink rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
+          >
+            <MaterialIcon name="menu" size={22} />
+          </button>
+          <div ref={tabletSearchWrapRef} className="relative flex-1 min-w-0">
+            <SearchPill
+              inputRef={tabletSearchInputRef}
+              query={query}
+              setQuery={setQuery}
+              onFocus={() => setSearchFocused(true)}
+              onSubmit={submitSearch}
+              onClear={clearSearch}
+              placeholder="Search patterns, categories..."
+              buttonSize={34}
+              iconSize={17}
+            />
+            {searchFocused && query && (
+              <SuggestionsDropdown
+                suggestions={suggestions}
+                query={query}
+                onPick={() => { setSearchFocused(false); tabletSearchInputRef.current?.blur() }}
+                onSeeAll={() => submitSearch()}
+              />
             )}
           </div>
-        )}
+        </div>
       </div>
 
-      {mobileOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[1] bg-black/25 md:hidden"
-            onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
-          />
-          <div className="absolute left-0 right-0 top-full z-[2] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] max-h-[min(78vh,640px)] overflow-y-auto">
-            <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
-              <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
-                Browse Categories
-              </h2>
+      {/* ── Mobile <768: hamburger | compact logo | search | account | cart ── */}
+      <div className="md:hidden relative z-50">
+        <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
+          {searchFocused ? (
+            <form onSubmit={submitSearch} className="flex items-center gap-2.5 h-10">
+              <div className="relative flex flex-1 min-w-0 h-10 items-center border-2 border-ink rounded-full bg-white pl-4 pr-1.5 gap-1">
+                <input
+                  ref={mobileSearchInputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  placeholder="Search"
+                  className="flex-1 min-w-0 h-full bg-transparent text-[14px] placeholder:text-ink-soft focus:outline-none"
+                  autoFocus
+                />
+                {query ? (
+                  <button type="button" onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft">
+                    <MaterialIcon name="close" size={18} />
+                  </button>
+                ) : null}
+                <button type="submit" aria-label="Search" className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
+                  <MaterialIcon name="search" size={16} />
+                </button>
+              </div>
               <button
-                aria-label="Close categories"
-                onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
+                type="button"
+                onClick={() => { setSearchFocused(false); setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.blur() }}
+                className="text-[15px] font-medium text-ink shrink-0"
               >
-                <MaterialIcon name="close" size={22} />
+                Cancel
+              </button>
+            </form>
+          ) : (
+            <div className="flex items-center h-10 gap-0.5">
+              <button
+                type="button"
+                onClick={() => { setSearchFocused(false); setMobileExpandedCategory(null); setMobileOpen(true) }}
+                aria-label="Browse categories"
+                className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center text-ink ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
+              >
+                <MaterialIcon name="menu" size={22} />
+              </button>
+
+              <div className="shrink-0 mr-1">
+                <Logo variant="compact" />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => { setSearchFocused(true); requestAnimationFrame(() => mobileSearchInputRef.current?.focus()) }}
+                className="flex flex-1 min-w-0 h-10 mr-1 items-center justify-end border-2 border-ink rounded-full bg-white px-1.5"
+                aria-label="Search"
+              >
+                <span className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center pointer-events-none" style={{ background: 'var(--color-accent)' }}>
+                  <MaterialIcon name="search" size={16} />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                aria-label="Your account"
+                title="Your account"
+                onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
+                className="w-10 h-10 shrink-0 flex items-center justify-center text-ink"
+              >
+                <MaterialIcon name="person" size={22} />
+              </button>
+              <button
+                type="button"
+                aria-label="Cart"
+                title="Cart"
+                onClick={openMobileCart}
+                className="relative w-10 h-10 shrink-0 flex items-center justify-center text-ink"
+              >
+                <MaterialIcon name="shopping_basket" size={22} />
+                {cartCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
+                    {cartCount}
+                  </span>
+                )}
               </button>
             </div>
-            <nav className="pb-3">
-              <Link
-                href="/shop/new"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
-              >
-                New Arrivals
-              </Link>
-              {categories.map((c) => {
-                const expanded = mobileExpandedCategory === c.id
-                const subs = mobileSubcategoriesCache[c.id]
-                const hasSubsCached = subs !== undefined
-                return (
-                  <div key={c.link} className="border-b border-[#ebe8e2]">
-                    <div className="flex items-stretch">
-                      <Link
-                        href={c.link}
-                        onClick={() => setMobileOpen(false)}
-                        className="flex-1 px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
-                      >
-                        {c.name}
-                      </Link>
-                      <button
-                        type="button"
-                        aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
-                        aria-expanded={expanded}
-                        onClick={() => {
-                          const opening = !expanded
-                          setMobileExpandedCategory(opening ? c.id : null)
-                          if (opening && !hasSubsCached) {
-                            getSubcategoriesWithCounts(c.id).then((list) =>
-                              setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
-                            )
-                          }
-                        }}
-                        className="px-4 text-black"
-                      >
-                        <MaterialIcon
-                          name="chevron_right"
-                          size={22}
-                          style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
-                        />
-                      </button>
-                    </div>
-                    {expanded && (
-                      <div className="bg-[#f0eee8] pb-1">
-                        {(subs?.length ?? 0) === 0 && hasSubsCached ? (
-                          <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
-                        ) : (
-                          (subs ?? []).map((sub) => (
-                            <Link
-                              key={sub.id}
-                              href={`/shop/${sub.slug}`}
-                              onClick={() => setMobileOpen(false)}
-                              className="block px-8 py-2.5 text-[15px] font-bold text-black tracking-[-0.015em]"
-                            >
-                              {sub.name}
-                            </Link>
-                          ))
-                        )}
+          )}
+
+          {searchFocused && query && (
+            <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
+              {suggestions.length > 0 ? (
+                <>
+                  {suggestions.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={`/pattern/${p.slug}`}
+                      onClick={() => { setSearchFocused(false); mobileSearchInputRef.current?.blur() }}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-surface"
+                    >
+                      <div className="w-10 h-10 shrink-0 bg-surface rounded-md overflow-hidden">
+                        {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
                       </div>
-                    )}
-                  </div>
-                )
-              })}
-              <Link
-                href="/shop"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
-              >
-                All Patterns
-              </Link>
-              <Link
-                href="/shop?price=free"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
-              >
-                Free Patterns
-              </Link>
-              <Link
-                href="/shop/sale"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
-              >
-                Sale
-              </Link>
-            </nav>
-          </div>
-        </>
-      )}
+                      <span className="text-[13px] truncate">{p.title}</span>
+                      <span className="ml-auto text-[12px] text-ink-soft shrink-0">${p.price.toFixed(2)}</span>
+                    </Link>
+                  ))}
+                  <button type="button" onClick={() => submitSearch()} className="block w-full text-left px-4 py-3 text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink border-t border-line">
+                    SEE ALL RESULTS FOR "{query.toUpperCase()}" →
+                  </button>
+                </>
+              ) : (
+                <p className="px-4 py-4 text-[13px] text-ink-soft">No patterns matched "{query}"</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile + tablet categories panel */}
+        {mobileOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-[1] bg-black/25 lg:hidden"
+              onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
+            />
+            <div className="absolute left-0 right-0 top-full z-[2] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] max-h-[min(78vh,640px)] overflow-y-auto lg:hidden">
+              <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
+                <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
+                  Browse Categories
+                </h2>
+                <button
+                  type="button"
+                  aria-label="Close categories"
+                  onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
+                >
+                  <MaterialIcon name="close" size={22} />
+                </button>
+              </div>
+              <nav className="pb-3">
+                <Link
+                  href="/shop/new"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+                >
+                  New Arrivals
+                </Link>
+                {categories.map((c) => {
+                  const expanded = mobileExpandedCategory === c.id
+                  const subs = mobileSubcategoriesCache[c.id]
+                  const hasSubsCached = subs !== undefined
+                  return (
+                    <div key={c.link} className="border-b border-[#ebe8e2]">
+                      <div className="flex items-stretch">
+                        <Link
+                          href={c.link}
+                          onClick={() => setMobileOpen(false)}
+                          className="flex-1 px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
+                        >
+                          {c.name}
+                        </Link>
+                        <button
+                          type="button"
+                          aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
+                          aria-expanded={expanded}
+                          onClick={() => {
+                            const opening = !expanded
+                            setMobileExpandedCategory(opening ? c.id : null)
+                            if (opening && !hasSubsCached) {
+                              getSubcategoriesWithCounts(c.id).then((list) =>
+                                setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
+                              )
+                            }
+                          }}
+                          className="px-4 text-black"
+                        >
+                          <MaterialIcon
+                            name="chevron_right"
+                            size={22}
+                            style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
+                          />
+                        </button>
+                      </div>
+                      {expanded && (
+                        <div className="bg-[#f0eee8] pb-1">
+                          {(subs?.length ?? 0) === 0 && hasSubsCached ? (
+                            <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
+                          ) : (
+                            (subs ?? []).map((sub) => (
+                              <Link
+                                key={sub.id}
+                                href={`/shop/${sub.slug}`}
+                                onClick={() => setMobileOpen(false)}
+                                className="block px-8 py-2.5 text-[15px] font-bold text-black tracking-[-0.015em]"
+                              >
+                                {sub.name}
+                              </Link>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                <Link href="/shop" onClick={() => setMobileOpen(false)} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+                  All Patterns
+                </Link>
+                <Link href="/shop?price=free" onClick={() => setMobileOpen(false)} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+                  Free Patterns
+                </Link>
+                <Link href="/shop/sale" onClick={() => setMobileOpen(false)} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug">
+                  Sale
+                </Link>
+              </nav>
+            </div>
+          </>
+        )}
       </div>
 
       {mobileAccountOpen && (
@@ -630,7 +548,7 @@ export function Header() {
           <div className="absolute inset-0 bg-canvas flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-line">
               <span className="font-subheading text-lg">{user ? 'My Account' : 'Account'}</span>
-              <button aria-label="Close menu" onClick={() => setMobileAccountOpen(false)} className="p-1">
+              <button type="button" aria-label="Close menu" onClick={() => setMobileAccountOpen(false)} className="p-1">
                 <CloseCircleIcon size={28} />
               </button>
             </div>
@@ -654,16 +572,16 @@ export function Header() {
                   <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
                     <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
                   </Link>
+                  <Link href="/account/wishlist" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
+                    <MaterialIcon name="favorite" size={18} /> Wishlist
+                  </Link>
                   <div className="border-t border-line mt-2 pt-2">
                     <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
                       <SettingsIcon size={UI_ICON_SIZE} /> Account settings
                     </Link>
                   </div>
                   <div className="border-t border-line mt-2 pt-2">
-                    <button
-                      onClick={() => { signOut(); setMobileAccountOpen(false) }}
-                      className="w-full flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink"
-                    >
+                    <button type="button" onClick={() => { signOut(); setMobileAccountOpen(false) }} className="w-full flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
                       <MaterialIcon name="logout" size={18} /> Sign out
                     </button>
                   </div>
@@ -671,9 +589,10 @@ export function Header() {
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
-                <UserIcon size={36} />
+                <MaterialIcon name="person" size={36} />
                 <p className="text-[14px] text-ink-soft">Sign in to see your orders and downloads.</p>
                 <button
+                  type="button"
                   onClick={() => { setMobileAccountOpen(false); requireAuth() }}
                   className="px-6 py-3 rounded-lg text-white text-[13px] font-semibold"
                   style={{ background: 'var(--color-accent)' }}
@@ -689,15 +608,184 @@ export function Header() {
   )
 }
 
+function SearchPill({
+  inputRef,
+  query,
+  setQuery,
+  onFocus,
+  onSubmit,
+  onClear,
+  placeholder,
+  buttonSize,
+  iconSize,
+}: {
+  inputRef: React.RefObject<HTMLInputElement | null>
+  query: string
+  setQuery: (v: string) => void
+  onFocus: () => void
+  onSubmit: (e?: React.FormEvent) => void
+  onClear: () => void
+  placeholder: string
+  buttonSize: number
+  iconSize: number
+}) {
+  return (
+    <form onSubmit={onSubmit} className="relative flex items-center border-2 border-ink rounded-full bg-white pl-4 pr-1.5 focus-within:ring-2 focus-within:ring-ink/20">
+      <input
+        ref={inputRef}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={onFocus}
+        placeholder={placeholder}
+        className="flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[14px] placeholder:text-ink-soft focus:outline-none"
+      />
+      {query && (
+        <button type="button" onClick={onClear} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft hover:text-ink mr-1">
+          <MaterialIcon name="close" size={16} />
+        </button>
+      )}
+      <button
+        type="submit"
+        aria-label="Search"
+        className="shrink-0 rounded-full text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+        style={{ width: buttonSize, height: buttonSize, background: 'var(--color-accent)' }}
+      >
+        <MaterialIcon name="search" size={iconSize} />
+      </button>
+    </form>
+  )
+}
+
+function SuggestionsDropdown({
+  suggestions,
+  query,
+  onPick,
+  onSeeAll,
+}: {
+  suggestions: Product[]
+  query: string
+  onPick: () => void
+  onSeeAll: () => void
+}) {
+  return (
+    <div className="absolute left-0 right-0 top-full mt-2 bg-canvas border border-line shadow-lg z-50 max-h-96 overflow-y-auto rounded-lg">
+      {suggestions.length > 0 ? (
+        <>
+          {suggestions.map((p) => (
+            <Link
+              key={p.id}
+              href={`/pattern/${p.slug}`}
+              onClick={onPick}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-surface"
+            >
+              <div className="w-10 h-10 shrink-0 bg-surface rounded-md overflow-hidden">
+                {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
+              </div>
+              <span className="text-[13px] truncate">{p.title}</span>
+              <span className="ml-auto text-[12px] text-ink-soft shrink-0">${p.price.toFixed(2)}</span>
+            </Link>
+          ))}
+          <button type="button" onClick={onSeeAll} className="block w-full text-left px-4 py-3 text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink border-t border-line">
+            SEE ALL RESULTS FOR "{query.toUpperCase()}" →
+          </button>
+        </>
+      ) : (
+        <p className="px-4 py-4 text-[13px] text-ink-soft">No patterns matched "{query}"</p>
+      )}
+    </div>
+  )
+}
+
+function DesktopCategoriesMenu({
+  categories,
+  onClose,
+}: {
+  categories: CategoryWithCount[]
+  onClose: () => void
+}) {
+  return (
+    <div className="absolute left-0 top-full mt-2 z-50 w-[280px]">
+      <div className="bg-white border border-line rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden">
+        <div className="max-h-[min(420px,70vh)] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin' }}>
+          <Link
+            href="/shop"
+            onClick={onClose}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-ink hover:bg-surface transition-colors"
+          >
+            <MaterialIcon name="auto_awesome" size={16} color="var(--color-logo-accent)" />
+            Recommended categories
+          </Link>
+          <div className="mx-4 mb-1.5 border-b" style={{ borderColor: 'var(--color-accent)' }} />
+          {categories.map((c) => (
+            <Link
+              key={c.link}
+              href={c.link}
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-ink hover:bg-surface transition-colors"
+            >
+              <span className="flex-1 truncate">{c.name}</span>
+              <MaterialIcon name="chevron_right" size={16} className="text-ink-soft shrink-0" />
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AccountDropdown({
+  profile,
+  email,
+  onClose,
+  onSignOut,
+}: {
+  profile: { first_name?: string | null; last_name?: string | null } | null
+  email?: string
+  onClose: () => void
+  onSignOut: () => void
+}) {
+  return (
+    <div className="absolute right-0 top-full pt-2 z-50">
+      <div className="w-[260px] bg-white border border-line shadow-[0_8px_30px_rgba(0,0,0,0.12)] text-sm rounded-xl overflow-hidden">
+        <div className="h-1" style={{ background: 'var(--color-accent)' }} />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-line" style={{ background: 'var(--color-surface)' }}>
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-[14px] font-semibold"
+            style={{ background: 'var(--color-accent)' }}
+          >
+            {(profile?.first_name?.[0] ?? email?.[0] ?? '?').toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-ink truncate">
+              {[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}
+            </p>
+            <p className="text-[11px] text-ink-soft truncate">{email}</p>
+          </div>
+        </div>
+        <div className="py-1.5">
+          <Link href="/account/orders" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+            <OrderIcon size={UI_ICON_SIZE} /> Orders
+          </Link>
+          <Link href="/account/downloads" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+            <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
+          </Link>
+          <Link href="/account/wishlist" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+            <MaterialIcon name="favorite" size={18} /> Wishlist
+          </Link>
+        </div>
+        <div className="border-t border-line py-1.5">
+          <Link href="/account/profile" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
+            <SettingsIcon size={UI_ICON_SIZE} /> Account settings
+          </Link>
+          <button type="button" onClick={onSignOut} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink text-left">
+            <MaterialIcon name="logout" size={18} /> Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ChevronIcon({ open }: { open: boolean }) {
   return <MaterialIcon name="expand_more" size={16} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-}
-function SearchIcon() {
-  return <MaterialIcon name="search" size={20} />
-}
-function HeartIcon({ size = UI_ICON_SIZE }: { size?: number }) {
-  return <FavoriteIcon size={size} />
-}
-function UserIcon({ size = UI_ICON_SIZE }: { size?: number }) {
-  return <PersonIcon size={size} />
 }
