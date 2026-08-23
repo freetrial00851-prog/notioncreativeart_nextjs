@@ -18,6 +18,8 @@ export function MaterialIcon({
       className={`material-symbols-outlined ${className}`}
       style={{
         fontSize: size,
+        width: size,
+        height: size,
         color,
         fontVariationSettings: `'FILL' ${filled ? 1 : 0}, 'wght' 400, 'GRAD' 0, 'opsz' 24`,
         ...style,

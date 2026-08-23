@@ -20,6 +20,15 @@
   vertical-align: middle;
   user-select: none;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  /* Clip ligature names if font is late; hide until icons-ready (see layout.tsx) */
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  opacity: 0;
+}
+
+html.icons-ready .material-symbols-outlined {
+  opacity: 1;
 }
 
 @theme {
