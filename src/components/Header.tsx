@@ -460,7 +460,7 @@ export function Header() {
               onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
               className="w-10 h-10 shrink-0 flex items-center justify-center text-ink"
             >
-              <UserIcon size={22} />
+              <UserIcon size={26} />
             </button>
             <Link
               href="/cart"
@@ -468,7 +468,7 @@ export function Header() {
               className="relative w-10 h-10 shrink-0 -mr-0.5 flex items-center justify-center"
               style={{ color: 'var(--color-primary)' }}
             >
-              <MaterialIcon name="shopping_bag" size={22} color="var(--color-primary)" />
+              <CartIcon size={26} />
               {cartCount > 0 && (
                 <span
                   className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center"
