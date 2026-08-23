@@ -72,7 +72,14 @@ function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: stri
   )
 }
 
-export function Home({ initialHero = null }: { initialHero?: HeroContent | null }) {
+export function Home({
+  initialHero = null,
+  initialLayout,
+}: {
+  initialHero?: HeroContent | null
+  /** Server-prefetched layout — avoids flashing off sections as "visible" before client fetch. */
+  initialLayout?: LayoutSection[]
+}) {
   const [trending, setTrending] = useState<Product[]>([])
   const [newArrivals, setNewArrivals] = useState<Product[]>([])
   const [bundles, setBundles] = useState<Product[]>([])
@@ -83,7 +90,9 @@ export function Home({ initialHero = null }: { initialHero?: HeroContent | null 
   const [chapters, setChapters] = useState<ChapterContent[]>([])
   const [testimonials, setTestimonials] = useState<TestimonialContent[]>([])
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
-  const [layout, setLayout] = useState<LayoutSection[]>(DEFAULT_LAYOUT)
+  const [layout, setLayout] = useState<LayoutSection[]>(() =>
+    initialLayout?.length ? initialLayout : DEFAULT_LAYOUT
+  )
   const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>({ beginner: 0, intermediate: 0, advanced: 0 })
   const [activeSkill, setActiveSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [skillProducts, setSkillProducts] = useState<Product[]>([])
@@ -131,7 +140,15 @@ export function Home({ initialHero = null }: { initialHero?: HeroContent | null 
             })
           }
           if (row.key === 'chapters') setChapters(row.value as ChapterContent[])
-          if (row.key === 'homepage_layout') setLayout(mergeLayout(row.value as LayoutSection[]))
+          if (row.key === 'homepage_layout') {
+            const next = mergeLayout(row.value as LayoutSection[])
+            setLayout((prev) => {
+              const same =
+                prev.length === next.length &&
+                prev.every((s, i) => s.id === next[i].id && s.visible === next[i].visible)
+              return same ? prev : next
+            })
+          }
           if (row.key === 'testimonials') setTestimonials((row.value as TestimonialContent[]).filter((t) => t.quote && t.name))
         }
       })
