@@ -456,15 +456,17 @@ export function ProductDetail() {
         <span className="text-ink truncate max-w-[260px]">{product.title}</span>
       </nav>
 
-      {/* 3-panel hero: gallery | details | purchase — mobile: gallery → buy → details */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(260px,320px)] gap-6 lg:gap-8 xl:gap-10 items-start overflow-visible">
+      {/* Hero: gallery dominates (~65%); info/buy ~35%. Mobile: gallery → buy → details.
+          Tablet (md): 2-col gallery | buy; details full-width below.
+          Desktop (lg): 3-col gallery | details | buy. */}
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.9fr)_minmax(0,0.6fr)_minmax(240px,0.5fr)] gap-6 md:gap-7 lg:gap-8 items-start overflow-visible">
         {/* Panel 1 — Gallery */}
-        <div className={`min-w-0 relative order-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
+        <div className={`min-w-0 relative order-1 md:col-start-1 md:row-start-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
             {/* Vertical thumbnails — tablet + desktop (≥768) */}
             {images.length > 1 && (
               <div
-                className="hidden md:flex flex-col gap-2 shrink-0 overflow-y-auto max-h-[min(68vh,560px)] py-0.5"
+                className="hidden md:flex flex-col gap-2.5 shrink-0 overflow-y-auto max-h-[min(78vh,720px)] py-0.5"
                 style={{ scrollbarWidth: 'thin' }}
               >
                 {images.map((img, i) => (
@@ -473,7 +475,7 @@ export function ProductDetail() {
                     type="button"
                     onClick={() => { setActiveImage(i); setLensZoom(false) }}
                     onMouseEnter={() => { if (canDesktopLensZoom()) setActiveImage(i) }}
-                    className={`w-16 h-16 lg:w-[68px] lg:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                    className={`w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
                     <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
@@ -485,8 +487,8 @@ export function ProductDetail() {
             <div className="min-w-0 flex-1 w-full">
               <div
                 ref={galleryRef}
-                className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center lg:cursor-crosshair select-none"
-                style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)', touchAction: 'pan-y' }}
+                className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center lg:cursor-crosshair select-none w-full"
+                style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(78vh, 720px)', touchAction: 'pan-y' }}
                 onTouchStart={(e) => {
                   setLensZoom(false)
                   setTouchStartX(e.touches[0].clientX)
@@ -523,7 +525,7 @@ export function ProductDetail() {
                   <img
                     src={images[activeImage]}
                     srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w, ${deriveVariantUrl(images[activeImage], 'full')} 1600w`}
-                    sizes="(max-width: 1024px) 100vw, 36vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw"
                     alt={product.title}
                     loading="eager"
                     fetchPriority="high"
@@ -669,8 +671,8 @@ export function ProductDetail() {
           </div>
         </div>
 
-        {/* Panel 2 — Product details (desktop middle; mobile after buy) */}
-        <div className="min-w-0 lg:pt-1 order-3 lg:order-2">
+        {/* Panel 2 — Product details (desktop middle; tablet full-width under gallery|buy; mobile after buy) */}
+        <div className="min-w-0 lg:pt-1 order-3 md:col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-1">
           <div className="hidden lg:block">
             {category && (
               <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-3" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
@@ -720,9 +722,9 @@ export function ProductDetail() {
           )}
         </div>
 
-        {/* Panel 3 — Purchase card (mobile: right after gallery/title) */}
-        <div ref={buyButtonRef} className="rounded-2xl border border-line p-5 sm:p-6 space-y-4 lg:sticky lg:top-24 order-2 lg:order-3">
-          <div>
+        {/* Panel 3 — Purchase card (mobile: right after gallery/title; tablet: right of gallery) */}
+        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2.5 md:col-start-2 md:row-start-1 lg:col-start-3 lg:sticky lg:top-24 order-2">
+          <div className="space-y-0.5">
             {product.price > 0 && onSale ? (
               <div className="flex items-baseline gap-3 flex-wrap">
                 <span className="text-2xl sm:text-[1.75rem] font-semibold text-ink">${product.price.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
@@ -735,14 +737,14 @@ export function ProductDetail() {
               </p>
             )}
             {product.price > 0 && (
-              <p className="text-[12px] text-ink-soft mt-1">One-time purchase</p>
+              <p className="text-[12px] text-ink-soft">One-time purchase</p>
             )}
           </div>
 
           {product.sold_out ? (
             <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {product.price > 0 && (
                 isInCart(product.id) ? (
                   <Link
