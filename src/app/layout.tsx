@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Lora, Manrope, Playfair_Display } from 'next/font/google'
+import { Domine, Manrope, Playfair_Display } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
@@ -20,11 +20,11 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
-/** Lora — NCA logo wordmark. */
-const lora = Lora({
+/** Domine — NCA logo wordmark. */
+const domine = Domine({
   subsets: ['latin'],
-  weight: ['600', '700'],
-  variable: '--font-lora',
+  weight: ['700'],
+  variable: '--font-domine',
   display: 'swap',
 })
 
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={`${manrope.variable} ${playfair.variable} ${lora.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${playfair.variable} ${domine.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         {/* Material Symbols — load early; display=block avoids flashing icon names as text */}

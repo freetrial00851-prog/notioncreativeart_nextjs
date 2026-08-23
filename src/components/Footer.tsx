@@ -73,7 +73,7 @@ function BrandColumn() {
   return (
     <div className="max-w-xs">
       <Link href="/" className="flex items-center gap-2.5 mb-3" aria-label="Notion Creative Art — home">
-        <span className="font-display font-extrabold tracking-tight text-[36px] leading-none" style={{ color: FOOTER_GREEN }}>NCA</span>
+        <span className="font-extrabold tracking-tight text-[36px] leading-none" style={{ color: FOOTER_GREEN, fontFamily: 'var(--font-logo)' }}>NCA</span>
         <span className="flex flex-col justify-center leading-[1.05] text-[10px] font-semibold tracking-[0.06em] uppercase" style={{ color: FOOTER_TEXT }}>
           <span>Notion</span>
           <span>Creative</span>

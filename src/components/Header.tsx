@@ -49,8 +49,8 @@ function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
   return (
     <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Notion Creative Art — home">
       <span
-        className="font-display font-extrabold tracking-tight text-[34px] xl:text-[38px] leading-none"
-        style={{ color: LOGO_BLUE }}
+        className="font-extrabold tracking-tight text-[34px] xl:text-[38px] leading-none"
+        style={{ color: LOGO_BLUE, fontFamily: 'var(--font-logo)' }}
       >
         NCA
       </span>
