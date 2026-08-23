@@ -18,12 +18,13 @@ const base = (size: number, className: string) => ({
   focusable: false as const,
 })
 
-/** Person silhouette — account */
+/** Person in circle — account (account_circle style) */
 export function PersonIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
-      <circle cx="12" cy="8" r="3.5" fill={color} />
-      <path d="M4.5 19.5c0-3.6 3.1-6 7.5-6s7.5 2.4 7.5 6" fill={color} />
+      <circle cx="12" cy="12" r="9.25" stroke={color} strokeWidth="1.75" fill="none" />
+      <circle cx="12" cy="9" r="2.75" fill={color} />
+      <path d="M6.8 17.6c1.2-2.1 3-3.1 5.2-3.1s4 1 5.2 3.1" fill={color} />
     </svg>
   )
 }
@@ -104,6 +105,40 @@ export function DownloadIcon({ size = 22, color = 'currentColor', className = ''
     <svg {...base(size, className)}>
       <path d="M12 3v11M12 14l-3.5-3.5M12 14l3.5-3.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M5 19h14" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/** Order / receipt with check badge */
+export function OrderIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <path
+        fill={color}
+        d="M7 3.5h10c.8 0 1.5.7 1.5 1.5v12.2l-1.2-.7-1.3.8-1.3-.8-1.2.7-1.3-.7-1.2.7-1.3-.8-1.3.8-1.2-.7V5c0-.8.7-1.5 1.5-1.5zm1.8 4.2h7.4v1.3H8.8V7.7zm0 3h7.4v1.3H8.8v-1.3zm0 3h4.6v1.3H8.8v-1.3z"
+      />
+      <circle cx="17.2" cy="17.2" r="4" fill={color} />
+      <path d="M15.4 17.2l1.1 1.1 2.2-2.3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  )
+}
+
+/** Shopping bag — cart */
+export function ShoppingBagIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <path
+        fill={color}
+        d="M7.2 8.2h9.6c.7 0 1.2.6 1.1 1.3l-.9 8.2c-.1.8-.8 1.4-1.6 1.4H8.6c-.8 0-1.5-.6-1.6-1.4l-.9-8.2c-.1-.7.4-1.3 1.1-1.3z"
+      />
+      <path
+        d="M9 8.2V6.8c0-1.7 1.3-3 3-3s3 1.3 3 3v1.4"
+        stroke={color}
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path d="M9.2 11.2c0 1.6 1.3 2.6 2.8 2.6s2.8-1 2.8-2.6" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" fill="none" />
     </svg>
   )
 }

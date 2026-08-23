@@ -12,7 +12,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
-import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadIcon, CloseCircleIcon } from './icons'
+import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, ShoppingBagIcon } from './icons'
 
 const CATEGORY_ICONS: Record<string, string> = {
   amigurumi: 'toys',
@@ -174,7 +174,7 @@ export function Header() {
         </div>
 
         {/* Categories + Search — merged into a single unified control on desktop, Amazon/Etsy-style */}
-        <div className="flex items-center flex-1 min-w-0 border border-line rounded-full bg-canvas focus-within:ring-2 focus-within:ring-ink">
+        <div className="flex items-center flex-1 min-w-0 border-2 border-ink rounded-full bg-canvas focus-within:ring-2 focus-within:ring-ink">
           <div className="relative shrink-0">
             <button
               onClick={() => setCategoriesOpen((v) => !v)}
@@ -335,10 +335,10 @@ export function Header() {
                   </div>
                   <div className="py-1.5">
                     <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <MaterialIcon name="receipt_long" size={18} /> Orders
+                      <OrderIcon size={18} /> Orders
                     </Link>
                     <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <DownloadIcon size={18} /> Downloads
+                      <DownloadCircleIcon size={18} /> Downloads
                     </Link>
                   </div>
                   <div className="border-t border-line py-1.5">
@@ -418,7 +418,7 @@ export function Header() {
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               placeholder="Search patterns, categories..."
-              className={`w-full border border-line rounded-full py-2.5 text-[13px] bg-canvas placeholder:text-ink-soft focus:outline-none ${searchFocused ? 'pl-4' : 'pl-10'} pr-11`}
+              className={`w-full border-2 border-ink rounded-full py-2.5 text-[13px] bg-canvas placeholder:text-ink-soft focus:outline-none ${searchFocused ? 'pl-4' : 'pl-10'} pr-11`}
             />
             {query && (
               <button
@@ -570,10 +570,10 @@ export function Header() {
                 </div>
                 <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
                   <Link href="/account/orders" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <MaterialIcon name="receipt_long" size={18} /> Orders
+                    <OrderIcon size={18} /> Orders
                   </Link>
                   <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <DownloadIcon size={18} /> Downloads
+                    <DownloadCircleIcon size={18} /> Downloads
                   </Link>
                   <div className="border-t border-line mt-2 pt-2">
                     <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
@@ -617,7 +617,7 @@ function SearchIcon() {
   return <MaterialIcon name="search" size={20} />
 }
 function CartIcon({ size = 22 }: { size?: number }) {
-  return <MaterialIcon name="shopping_bag" size={size} />
+  return <ShoppingBagIcon size={size} />
 }
 function HeartIcon({ size = 22 }: { size?: number }) {
   return <FavoriteIcon size={size} />
