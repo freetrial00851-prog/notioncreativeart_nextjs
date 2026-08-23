@@ -458,17 +458,17 @@ export function Header() {
             <button
               aria-label="Account"
               onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-              className="w-10 h-10 shrink-0 flex items-center justify-center text-ink"
+              className="w-11 h-11 shrink-0 flex items-center justify-center text-ink"
             >
-              <UserIcon size={26} />
+              <UserIcon size={30} />
             </button>
             <Link
               href="/cart"
               aria-label="Cart"
-              className="relative w-10 h-10 shrink-0 -mr-0.5 flex items-center justify-center"
+              className="relative w-11 h-11 shrink-0 -mr-0.5 flex items-center justify-center"
               style={{ color: 'var(--color-primary)' }}
             >
-              <CartIcon size={26} />
+              <CartIcon size={30} />
               {cartCount > 0 && (
                 <span
                   className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center"
