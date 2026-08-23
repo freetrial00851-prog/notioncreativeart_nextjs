@@ -309,28 +309,27 @@ export function Header() {
           >
             <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
           </button>
-          <div className="flex-1 flex justify-center min-w-0">
-            <div ref={tabletSearchWrapRef} className="relative w-full max-w-[600px] min-w-0">
-              <SearchPill
-                inputRef={tabletSearchInputRef}
+          {/* Tablet row 2: full remaining width — no max-w cap (cap is lg+ only) */}
+          <div ref={tabletSearchWrapRef} className="relative flex-1 min-w-0 w-full">
+            <SearchPill
+              inputRef={tabletSearchInputRef}
+              query={query}
+              setQuery={setQuery}
+              onFocus={() => setSearchFocused(true)}
+              onSubmit={submitSearch}
+              onClear={clearSearch}
+              placeholder="Search"
+              buttonSize={34}
+              iconSize={17}
+            />
+            {searchFocused && query && (
+              <SuggestionsDropdown
+                suggestions={suggestions}
                 query={query}
-                setQuery={setQuery}
-                onFocus={() => setSearchFocused(true)}
-                onSubmit={submitSearch}
-                onClear={clearSearch}
-                placeholder="Search"
-                buttonSize={34}
-                iconSize={17}
+                onPick={() => { setSearchFocused(false); tabletSearchInputRef.current?.blur() }}
+                onSeeAll={() => submitSearch()}
               />
-              {searchFocused && query && (
-                <SuggestionsDropdown
-                  suggestions={suggestions}
-                  query={query}
-                  onPick={() => { setSearchFocused(false); tabletSearchInputRef.current?.blur() }}
-                  onSeeAll={() => submitSearch()}
-                />
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
