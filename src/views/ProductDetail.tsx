@@ -66,14 +66,7 @@ function DescriptionBlocks({ text }: { text: string }) {
   )
 }
 
-function isNewProduct(createdAt: string) {
-  const ageMs = Date.now() - new Date(createdAt).getTime()
-  return ageMs < 30 * 24 * 60 * 60 * 1000
-}
-
 type Tab = 'description' | 'included' | 'materials' | 'skill' | 'details'
-
-const SUPPORT_EMAIL = 'engg.muhammadsufyan@gmail.com'
 
 export function ProductDetail() {
   const params = useParams()
@@ -305,8 +298,8 @@ export function ProductDetail() {
 
   const images = product.images ?? []
   const shortBlurb = product.description?.split('\n').find((l) => l.trim())?.trim() ?? ''
-  const showNew = isNewProduct(product.created_at)
   const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
+  const badge = product.card_badge
   const skillLabel = product.skill_level
     ? product.skill_level.charAt(0).toUpperCase() + product.skill_level.slice(1)
     : null
@@ -316,7 +309,9 @@ export function ProductDetail() {
   if (skillLabel) tags.push(skillLabel === 'Beginner' ? 'Beginner Friendly' : skillLabel)
   if (product.price === 0) tags.push('Free')
   if (product.is_bundle) tags.push('Bundle')
-  if (showNew) tags.push('New')
+  if (badge === 'new') tags.push('New')
+  if (badge === 'sale') tags.push('Sale')
+  if (badge === 'featured') tags.push('Featured')
 
   const formatLabel = 'PDF Download'
 
@@ -499,14 +494,19 @@ export function ProductDetail() {
             )}
 
             <div className="absolute top-3 left-3 z-10 flex gap-2">
-              {showNew && (
+              {badge === 'new' && (
                 <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-sale-green)' }}>
                   New
                 </span>
               )}
-              {onSale && (
+              {badge === 'sale' && (
                 <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-madder)' }}>
                   Sale
+                </span>
+              )}
+              {badge === 'featured' && (
+                <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-ink)' }}>
+                  Featured
                 </span>
               )}
             </div>
@@ -721,14 +721,6 @@ export function ProductDetail() {
               </div>
             </div>
           )}
-
-          <p className="text-[12px] text-ink-soft">
-            Have questions? We&apos;re here to help!
-            <br />
-            <a href={`mailto:${SUPPORT_EMAIL}`} className="underline underline-offset-2 hover:text-ink break-all">
-              {SUPPORT_EMAIL}
-            </a>
-          </p>
         </div>
       </div>
 

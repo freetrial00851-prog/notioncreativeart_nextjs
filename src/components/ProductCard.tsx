@@ -14,9 +14,7 @@ import { prefetchProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { claimAndDownloadFreePattern } from '../lib/downloads'
 import { MaterialIcon } from './MaterialIcon'
-import { FavoriteIcon, ShareIcon } from './icons'
-
-const NEW_WINDOW_DAYS = 14
+import { FavoriteIcon } from './icons'
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const { requireAuth } = useUI()
@@ -70,8 +68,8 @@ export function ProductCard({ product, priority = false }: { product: Product; p
     showToast(ok ? 'Downloading your pattern…' : "This pattern's file isn't uploaded yet — please check back soon.", ok ? 'success' : 'error')
   }
 
-  const isNew = (Date.now() - new Date(product.created_at).getTime()) / (1000 * 60 * 60 * 24) <= NEW_WINDOW_DAYS
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
+  const badge = product.card_badge
 
   return (
     <>
@@ -104,24 +102,6 @@ export function ProductCard({ product, priority = false }: { product: Product; p
             >
               <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
             </button>
-            <button
-              onClick={async (e) => {
-                e.preventDefault()
-                const url = `${window.location.origin}/pattern/${product.slug}`
-                try {
-                  if (navigator.share) {
-                    await navigator.share({ title: product.title, url })
-                  } else {
-                    await navigator.clipboard.writeText(url)
-                    showToast('Link copied', 'success')
-                  }
-                } catch { /* cancelled */ }
-              }}
-              aria-label="Share listing"
-              className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-ink hover:opacity-70 transition-opacity"
-            >
-              <ShareIcon size={14} />
-            </button>
           </div>
 
           <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
@@ -131,14 +111,14 @@ export function ProductCard({ product, priority = false }: { product: Product; p
             {!product.sold_out && product.price === 0 && (
               <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>FREE</span>
             )}
-            {!product.sold_out && isOnSale && (
+            {!product.sold_out && badge === 'sale' && (
               <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SALE</span>
             )}
-            {!product.sold_out && !isOnSale && product.price > 0 && product.featured && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">FEATURED</span>
-            )}
-            {!product.sold_out && isNew && (
+            {!product.sold_out && badge === 'new' && (
               <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>NEW</span>
+            )}
+            {!product.sold_out && badge === 'featured' && (
+              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">FEATURED</span>
             )}
           </div>
 

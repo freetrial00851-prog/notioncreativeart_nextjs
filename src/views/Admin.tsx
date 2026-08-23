@@ -260,6 +260,7 @@ const emptyForm = {
   lemon_numeric_variant_id: '',
   active: true,
   featured: false,
+  card_badge: '' as '' | 'sale' | 'new' | 'featured',
   sold_out: false,
   checkout_mode: 'overlay' as 'overlay' | 'hosted',
   is_bundle: false,
@@ -492,6 +493,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
         lemon_numeric_variant_id: p.lemon_numeric_variant_id ?? '',
         active: p.active,
         featured: p.featured,
+        card_badge: p.card_badge ?? '',
         sold_out: p.sold_out,
         checkout_mode: p.checkout_mode,
         is_bundle: p.is_bundle ?? false,
@@ -552,6 +554,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       lemon_numeric_variant_id: '',
       active: false,
       featured: false,
+      card_badge: p.card_badge ?? '',
       sold_out: false,
       checkout_mode: p.checkout_mode,
       is_bundle: p.is_bundle ?? false,
@@ -595,6 +598,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       lemon_numeric_variant_id: form.lemon_numeric_variant_id || null,
       active: publish,
       featured: form.featured,
+      card_badge: form.card_badge || null,
       sold_out: form.sold_out,
       checkout_mode: form.checkout_mode,
       is_bundle: form.is_bundle,
@@ -744,6 +748,19 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                 <label className="flex items-center gap-2 text-[13px]">
                   <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured on homepage
                 </label>
+                <Field label="Card badge">
+                  <select
+                    value={form.card_badge}
+                    onChange={(e) => setForm({ ...form, card_badge: e.target.value as typeof form.card_badge })}
+                    className="input"
+                  >
+                    <option value="">None (default)</option>
+                    <option value="sale">SALE</option>
+                    <option value="new">NEW</option>
+                    <option value="featured">FEATURED</option>
+                  </select>
+                </Field>
+                <p className="text-[12px] text-ink-soft -mt-3">Shown on shop cards and the product page. Leave as None unless you want a badge.</p>
                 <label className="flex items-center gap-2 text-[13px]">
                   <input type="checkbox" checked={form.sold_out} onChange={(e) => setForm({ ...form, sold_out: e.target.checked })} /> Mark as sold out
                 </label>
@@ -787,8 +804,9 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                   <Field label="Compare-at (optional)"><input value={form.compare_at_price} onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })} className="input" /></Field>
                 </div>
                 {form.compare_at_price && parseFloat(form.compare_at_price) <= (parseFloat(form.price) || 0) && (
-                  <p className="text-[12px] text-madder -mt-2">Compare-at should be higher than the price for the Sale badge to show.</p>
+                  <p className="text-[12px] text-madder -mt-2">Compare-at should be higher than the price to show a strikethrough.</p>
                 )}
+                <p className="text-[12px] text-ink-soft -mt-2">Compare-at only affects the strikethrough price. To show a SALE badge, set Card badge under Details.</p>
                 <Field label="Lemon Squeezy checkout ID"><input value={form.lemon_variant_id} onChange={(e) => setForm({ ...form, lemon_variant_id: e.target.value })} className="input" placeholder="a208e95b-8f17-407f-b7a7-115583bed5a5" /></Field>
                 <Field label="Lemon Squeezy numeric variant ID"><input value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value })} className="input" placeholder="1255414" /></Field>
                 <div>

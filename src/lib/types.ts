@@ -24,6 +24,8 @@ export type Product = {
   lemon_numeric_variant_id: string | null
   active: boolean
   featured: boolean
+  /** Optional card badge. null = none. Admin-controlled; default none. */
+  card_badge: 'sale' | 'new' | 'featured' | null
   sold_out: boolean
   checkout_mode: 'overlay' | 'hosted'
   is_bundle: boolean
