@@ -152,60 +152,63 @@ export function Header() {
         <span key={messageIndex} className="animate-[fadeIn_0.4s_ease-out]">{messages[messageIndex]}</span>
       </div>
 
-      {/* ── Desktop ≥1024 (lg): Logo | Search (hamburger inside) | Wishlist | Account | Cart ── */}
-      <div className="hidden lg:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-[1400px] mx-auto">
-        <Logo variant="full" />
+      {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Wishlist | Account | Cart ── */}
+      <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-[1400px] mx-auto">
+        <div className="shrink-0">
+          <Logo variant="full" />
+        </div>
 
-        <div ref={searchWrapRef} className="relative flex-1 min-w-0">
-          <div ref={categoriesWrapRef} className="relative">
-            <SearchPill
-              inputRef={desktopSearchInputRef}
-              query={query}
-              setQuery={setQuery}
-              onFocus={() => setSearchFocused(true)}
-              onSubmit={submitSearch}
-              onClear={clearSearch}
-              placeholder="Search"
-              buttonSize={36}
-              iconSize={18}
-              leading={
-                <button
-                  type="button"
-                  onClick={() => setCategoriesOpen((v) => !v)}
-                  aria-label="Browse categories"
-                  aria-expanded={categoriesOpen}
-                  className="shrink-0 flex items-center justify-center w-10 h-10 rounded-l-full hover:bg-surface transition-colors"
-                >
-                  <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
-                </button>
-              }
-            />
-            {categoriesOpen && (
-              <DesktopCategoriesMenu
-                categories={categories}
-                onClose={() => setCategoriesOpen(false)}
+        <div className="flex-1 flex items-center justify-center min-w-0 px-2">
+          <div ref={searchWrapRef} className="relative w-full max-w-[600px] min-w-0">
+            <div ref={categoriesWrapRef} className="relative">
+              <SearchPill
+                inputRef={desktopSearchInputRef}
+                query={query}
+                setQuery={setQuery}
+                onFocus={() => setSearchFocused(true)}
+                onSubmit={submitSearch}
+                onClear={clearSearch}
+                placeholder="Search"
+                buttonSize={36}
+                iconSize={18}
+                leading={
+                  <button
+                    type="button"
+                    onClick={() => setCategoriesOpen((v) => !v)}
+                    aria-label="Browse categories"
+                    aria-expanded={categoriesOpen}
+                    className="shrink-0 flex items-center justify-center w-10 h-10 rounded-l-full hover:bg-surface transition-colors"
+                  >
+                    <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
+                  </button>
+                }
+              />
+              {categoriesOpen && (
+                <DesktopCategoriesMenu
+                  categories={categories}
+                  onClose={() => setCategoriesOpen(false)}
+                />
+              )}
+            </div>
+            {searchFocused && query && (
+              <SuggestionsDropdown
+                suggestions={suggestions}
+                query={query}
+                onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
+                onSeeAll={() => submitSearch()}
               />
             )}
           </div>
-          {searchFocused && query && (
-            <SuggestionsDropdown
-              suggestions={suggestions}
-              query={query}
-              onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
-              onSeeAll={() => submitSearch()}
-            />
+          {pathname === '/search' && (
+            <button
+              type="button"
+              onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
+              className="text-[13px] text-ink-soft hover:text-ink shrink-0 ml-3"
+            >
+              Cancel
+            </button>
           )}
         </div>
-
-        {pathname === '/search' && (
-          <button
-            type="button"
-            onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
-            className="text-[13px] text-ink-soft hover:text-ink shrink-0"
-          >
-            Cancel
-          </button>
-        )}
 
         <div className="flex items-center gap-1 shrink-0 text-[#111111]">
           <button
@@ -306,26 +309,28 @@ export function Header() {
           >
             <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
           </button>
-          <div ref={tabletSearchWrapRef} className="relative flex-1 min-w-0">
-            <SearchPill
-              inputRef={tabletSearchInputRef}
-              query={query}
-              setQuery={setQuery}
-              onFocus={() => setSearchFocused(true)}
-              onSubmit={submitSearch}
-              onClear={clearSearch}
-              placeholder="Search"
-              buttonSize={34}
-              iconSize={17}
-            />
-            {searchFocused && query && (
-              <SuggestionsDropdown
-                suggestions={suggestions}
+          <div className="flex-1 flex justify-center min-w-0">
+            <div ref={tabletSearchWrapRef} className="relative w-full max-w-[600px] min-w-0">
+              <SearchPill
+                inputRef={tabletSearchInputRef}
                 query={query}
-                onPick={() => { setSearchFocused(false); tabletSearchInputRef.current?.blur() }}
-                onSeeAll={() => submitSearch()}
+                setQuery={setQuery}
+                onFocus={() => setSearchFocused(true)}
+                onSubmit={submitSearch}
+                onClear={clearSearch}
+                placeholder="Search"
+                buttonSize={34}
+                iconSize={17}
               />
-            )}
+              {searchFocused && query && (
+                <SuggestionsDropdown
+                  suggestions={suggestions}
+                  query={query}
+                  onPick={() => { setSearchFocused(false); tabletSearchInputRef.current?.blur() }}
+                  onSeeAll={() => submitSearch()}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
