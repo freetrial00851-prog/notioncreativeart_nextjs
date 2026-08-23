@@ -22,8 +22,8 @@ import type { Purchase, Product } from '../lib/types'
 export type { OrderRow } from '../components/StatusBadge'
 export { StatusBadge } from '../components/StatusBadge'
 
-const BRAND = '#0f3fc9'
-const BRAND_SOFT = '#e8eefc'
+const BRAND = '#1f249c'
+const BRAND_SOFT = '#e9eaf5'
 
 const PAGE_TITLES: Record<string, string> = {
   '/account/orders': 'Orders',

@@ -151,7 +151,7 @@ export function AdminDashboard() {
     <div className="max-w-[1100px]">
       {/* Welcome header */}
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
-        <div className="w-14 h-14 rounded-full shrink-0 flex items-center justify-center text-white text-lg font-semibold" style={{ background: '#0f3fc9' }}>
+        <div className="w-14 h-14 rounded-full shrink-0 flex items-center justify-center text-white text-lg font-semibold" style={{ background: '#1f249c' }}>
           {(shopName[0] || 'N').toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
@@ -179,7 +179,7 @@ export function AdminDashboard() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-2.5 text-[14px] -mb-px border-b-2 transition-colors ${
-              tab === t.id ? 'border-[#0f3fc9] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'
+              tab === t.id ? 'border-[#1f249c] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'
             }`}
           >
             {t.label}
@@ -293,7 +293,7 @@ export function AdminDashboard() {
                         <p className="text-[13px] text-ink-soft mt-0.5">
                           USD {item.amount.toFixed(2)} · {timeAgo(item.created_at)}
                         </p>
-                        <Link href="/admin/orders" className="inline-block mt-2 text-[13px] text-[#0f3fc9] hover:underline">
+                        <Link href="/admin/orders" className="inline-block mt-2 text-[13px] text-[#1f249c] hover:underline">
                           View orders
                         </Link>
                       </div>
@@ -314,7 +314,7 @@ export function AdminDashboard() {
                           Someone favourited <span className="font-medium">{item.productTitle}</span>
                         </p>
                         <p className="text-[13px] text-ink-soft mt-0.5">{timeAgo(item.created_at)}</p>
-                        <Link href="/admin/listings" className="inline-block mt-2 text-[13px] text-[#0f3fc9] hover:underline">
+                        <Link href="/admin/listings" className="inline-block mt-2 text-[13px] text-[#1f249c] hover:underline">
                           View listings
                         </Link>
                       </div>
@@ -348,7 +348,7 @@ function TaskCard({
       <ul className="space-y-2">
         {links.map((l) => (
           <li key={l.href + l.label}>
-            <Link href={l.href} className="text-[13px] text-[#0f3fc9] hover:underline inline-flex items-center gap-1.5">
+            <Link href={l.href} className="text-[13px] text-[#1f249c] hover:underline inline-flex items-center gap-1.5">
               {l.label}
               {typeof l.count === 'number' && (
                 <span className="text-ink-soft">({l.count})</span>

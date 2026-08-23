@@ -8,8 +8,8 @@ export type OrderRow = {
   created_at: string
 }
 
-const BRAND = '#0f3fc9'
-const BRAND_SOFT = '#e8eefc'
+const BRAND = '#1f249c'
+const BRAND_SOFT = '#e9eaf5'
 
 export function StatusBadge({ status }: { status: string }) {
   const style =

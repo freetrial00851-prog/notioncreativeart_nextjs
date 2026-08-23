@@ -17,7 +17,7 @@ import { triggerPdfDownload } from '../lib/downloads'
 
 const SHELL_BG = '#f9f8f6'
 const SIDEBAR_BG = '#f3f1ec'
-const ACCENT = '#0f3fc9'
+const ACCENT = '#1f249c'
 
 type NavItem =
   | { kind: 'link'; to: string; label: string; icon: string; end?: boolean }
@@ -704,7 +704,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`px-4 py-2.5 text-[13px] whitespace-nowrap -mb-px border-b-2 transition-colors ${activeTab === key ? 'border-[#0f3fc9] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
+              className={`px-4 py-2.5 text-[13px] whitespace-nowrap -mb-px border-b-2 transition-colors ${activeTab === key ? 'border-[#1f249c] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
             >
               {tabLabels[key]}
             </button>
@@ -829,7 +829,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                           <button onClick={() => setForm({ ...form, bundle_includes: form.bundle_includes.filter((_, idx) => idx !== i) })} className="px-3 text-[12px] text-ink-soft hover:text-madder">✕</button>
                         </div>
                       ))}
-                      <button onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })} className="text-[13px] text-[#0f3fc9] hover:underline">+ Add included pattern</button>
+                      <button onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })} className="text-[13px] text-[#1f249c] hover:underline">+ Add included pattern</button>
                     </div>
                   )}
                 </div>
@@ -932,7 +932,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
               const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
               const isDuplicateVariant = !!p.lemon_variant_id && variantCounts[p.lemon_variant_id] > 1
               return (
-                <div key={p.id} className={`bg-white border rounded-xl overflow-hidden ${selected.has(p.id) ? 'border-[#0f3fc9]' : 'border-[#e4e1db]'}`}>
+                <div key={p.id} className={`bg-white border rounded-xl overflow-hidden ${selected.has(p.id) ? 'border-[#1f249c]' : 'border-[#e4e1db]'}`}>
                   <div className="relative aspect-[4/3] bg-[#f3f1ec]">
                     {p.images?.[0] ? (
                       <img src={deriveVariantUrl(p.images[0], 'thumb')} alt="" className="w-full h-full object-cover" />
@@ -1019,7 +1019,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                       <td className="px-4 py-3">{p.active ? 'Active' : 'Draft'}</td>
                       <td className="px-4 py-3 text-ink-soft">{c.sales} · {c.wishlist} fav</td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => startEdit(p)} className="text-[#0f3fc9] hover:underline">Edit</button>
+                        <button onClick={() => startEdit(p)} className="text-[#1f249c] hover:underline">Edit</button>
                       </td>
                     </tr>
                   )
@@ -1099,7 +1099,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="text-[13px] font-semibold text-ink">Sections</p>
-            <Link href="/admin/categories" className="text-[12px] text-[#0f3fc9] hover:underline">Manage</Link>
+            <Link href="/admin/categories" className="text-[12px] text-[#1f249c] hover:underline">Manage</Link>
           </div>
           <p className="text-[12px] text-ink-soft">Filter by category from the listing editor, or manage shop sections in Categories.</p>
         </div>

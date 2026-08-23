@@ -29,7 +29,7 @@ function categoryIcon(name: string) {
   return CATEGORY_ICONS[name.toLowerCase()] ?? 'category'
 }
 
-const LOGO_BLUE = '#0f3fc9'
+const LOGO_BLUE = '#1f249c'
 
 /** Desktop: large blue NCA + stacked NOTION / CREATIVE / ART. Mobile: blue NCA only. */
 function Logo({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {

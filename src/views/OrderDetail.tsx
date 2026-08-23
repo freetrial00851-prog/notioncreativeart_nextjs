@@ -11,7 +11,7 @@ import { ContentSkeleton } from '../components/Skeleton'
 import { StatusBadge, type OrderRow } from '../components/StatusBadge'
 import type { Product } from '../lib/types'
 
-const BRAND = '#0f3fc9'
+const BRAND = '#1f249c'
 
 type OrderItem = { product: Product | null }
 
