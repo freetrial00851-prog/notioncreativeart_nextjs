@@ -81,6 +81,7 @@ export function ProductDetail() {
   const [related, setRelated] = useState<Product[]>([])
   const [activeImage, setActiveImage] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
   const [lensZoom, setLensZoom] = useState(false)
   const [lensPos, setLensPos] = useState({ x: 0, y: 0, lensW: 0, lensH: 0, boxW: 0, boxH: 0 })
@@ -461,22 +462,28 @@ export function ProductDetail() {
         <div className={`min-w-0 relative order-1 ${lensZoom ? 'z-40' : 'z-20'}`}>
           <div
             ref={galleryRef}
-            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center touch-pan-y lg:cursor-crosshair select-none"
-            style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)' }}
+            className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center lg:cursor-crosshair select-none"
+            style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(68vh, 560px)', touchAction: 'pan-y' }}
             onTouchStart={(e) => {
               setLensZoom(false)
               setTouchStartX(e.touches[0].clientX)
+              setTouchStartY(e.touches[0].clientY)
             }}
             onTouchEnd={(e) => {
               if (touchStartX === null) return
-              const delta = e.changedTouches[0].clientX - touchStartX
-              if (Math.abs(delta) > 50 && images.length > 1) {
+              const endX = e.changedTouches[0].clientX
+              const endY = e.changedTouches[0].clientY
+              const deltaX = endX - touchStartX
+              const deltaY = endY - (touchStartY ?? endY)
+              // Prefer horizontal swipes over vertical scroll
+              if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) && images.length > 1) {
                 setActiveImage((i) => {
-                  if (delta < 0) return (i + 1) % images.length
+                  if (deltaX < 0) return (i + 1) % images.length
                   return (i - 1 + images.length) % images.length
                 })
               }
               setTouchStartX(null)
+              setTouchStartY(null)
             }}
             onMouseEnter={(e) => {
               if (!images[activeImage] || !canDesktopLensZoom()) return
@@ -503,6 +510,28 @@ export function ProductDetail() {
               />
             ) : (
               <div className="text-ink-soft text-xs">No image yet</div>
+            )}
+
+            {/* Prev / next arrows — all breakpoints when multiple images */}
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i - 1 + images.length) % images.length); setLensZoom(false) }}
+                  aria-label="Previous image"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
+                >
+                  <MaterialIcon name="chevron_left" size={22} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setActiveImage((i) => (i + 1) % images.length); setLensZoom(false) }}
+                  aria-label="Next image"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 shadow-md hover:bg-white transition-colors"
+                >
+                  <MaterialIcon name="chevron_right" size={22} />
+                </button>
+              </>
             )}
 
             {/* Amazon-style lens — desktop hover only */}
@@ -560,11 +589,11 @@ export function ProductDetail() {
             </div>
           )}
 
-          {/* Mobile: graduated dots + wishlist / share (Amazon-style) */}
+          {/* Mobile: graduated dots + wishlist / share */}
           {images.length > 0 && (
             <div className="lg:hidden mt-3 flex items-center justify-between px-0.5">
               <div className="flex-1" />
-              <GalleryDots count={images.length} active={activeImage} />
+              <GalleryDots count={images.length} active={activeImage} onSelect={setActiveImage} />
               <div className="flex-1 flex items-center justify-end gap-1">
                 <button
                   type="button"
@@ -587,10 +616,11 @@ export function ProductDetail() {
             </div>
           )}
 
-          {/* Desktop thumbnails */}
+          {/* Thumbnail strip — all breakpoints when multiple images */}
           {images.length > 1 && (
-            <div className="hidden lg:flex mt-3 items-center gap-2">
+            <div className="mt-3 flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                 aria-label="Previous image"
                 className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center hover:bg-[#d4d4d4] transition-colors"
@@ -601,10 +631,11 @@ export function ProductDetail() {
               <div className="flex gap-2 overflow-x-auto flex-1 py-0.5 justify-center" style={{ scrollbarWidth: 'none' }}>
                 {images.map((img, i) => (
                   <button
-                    key={img}
+                    key={`${img}-${i}`}
+                    type="button"
                     onClick={() => { setActiveImage(i); setLensZoom(false) }}
-                    onMouseEnter={() => setActiveImage(i)}
-                    className={`w-16 h-16 sm:w-[68px] sm:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                    onMouseEnter={() => { if (canDesktopLensZoom()) setActiveImage(i) }}
+                    className={`w-14 h-14 sm:w-16 sm:h-16 lg:w-[68px] lg:h-[68px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
                     <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
@@ -612,6 +643,7 @@ export function ProductDetail() {
                 ))}
               </div>
               <button
+                type="button"
                 onClick={() => setActiveImage((i) => (i + 1) % images.length)}
                 aria-label="Next image"
                 className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center hover:bg-[#d4d4d4] transition-colors"
@@ -701,7 +733,7 @@ export function ProductDetail() {
               </p>
             )}
             {product.price > 0 && (
-              <p className="text-[12px] text-ink-soft mt-1">One-time purchase · Instant PDF download</p>
+              <p className="text-[12px] text-ink-soft mt-1">One-time purchase</p>
             )}
           </div>
 
@@ -883,7 +915,7 @@ function CheckIcon() {
 }
 
 /** Graduated carousel dots — active largest, neighbors smaller (Instagram/Amazon style). */
-function GalleryDots({ count, active }: { count: number; active: number }) {
+function GalleryDots({ count, active, onSelect }: { count: number; active: number; onSelect?: (i: number) => void }) {
   if (count <= 1) return null
   const windowSize = Math.min(5, count)
   const start = Math.max(0, Math.min(active - Math.floor(windowSize / 2), count - windowSize))
@@ -896,10 +928,14 @@ function GalleryDots({ count, active }: { count: number; active: number }) {
         const size = i === active ? 7 : dist === 1 ? 5.5 : 4
         const opacity = i === active ? 1 : dist === 1 ? 0.4 : 0.25
         return (
-          <span
+          <button
             key={i}
-            role="presentation"
-            className="rounded-full bg-ink transition-[width,height,opacity] duration-150"
+            type="button"
+            role="tab"
+            aria-selected={i === active}
+            aria-label={`Show image ${i + 1}`}
+            onClick={() => onSelect?.(i)}
+            className="rounded-full bg-ink transition-[width,height,opacity] duration-150 p-0 border-0"
             style={{ width: size, height: size, opacity }}
           />
         )

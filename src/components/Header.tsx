@@ -165,7 +165,7 @@ export function Header() {
               onFocus={() => setSearchFocused(true)}
               onSubmit={submitSearch}
               onClear={clearSearch}
-              placeholder="Search patterns, categories..."
+              placeholder="Search"
               buttonSize={36}
               iconSize={18}
               leading={
@@ -314,7 +314,7 @@ export function Header() {
               onFocus={() => setSearchFocused(true)}
               onSubmit={submitSearch}
               onClear={clearSearch}
-              placeholder="Search patterns, categories..."
+              placeholder="Search"
               buttonSize={34}
               iconSize={17}
             />
@@ -333,86 +333,87 @@ export function Header() {
       {/* ── Mobile <768: hamburger | compact logo | search | account | cart ── */}
       <div className="md:hidden relative z-50">
         <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
-          {searchFocused ? (
-            <form onSubmit={submitSearch} className="flex items-center gap-2.5 h-10">
-              <div className="relative flex flex-1 min-w-0 h-10 items-center border-2 border-ink rounded-full bg-white pl-4 pr-1.5 gap-1">
-                <input
-                  ref={mobileSearchInputRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  placeholder="Search"
-                  className="flex-1 min-w-0 h-full bg-transparent text-[14px] placeholder:text-ink-soft focus:outline-none"
-                  autoFocus
-                />
-                {query ? (
-                  <button type="button" onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft">
-                    <MaterialIcon name="close" size={18} />
-                  </button>
-                ) : null}
-                <button type="submit" aria-label="Search" className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                  <MaterialIcon name="search" size={16} />
+          <div className="flex items-center h-10 gap-0.5">
+            {!searchFocused && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { setMobileExpandedCategory(null); setMobileOpen(true) }}
+                  aria-label="Browse categories"
+                  className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
+                >
+                  <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
                 </button>
-              </div>
+
+                <div className="shrink-0 mr-1">
+                  <Logo variant="compact" />
+                </div>
+              </>
+            )}
+
+            <form
+              onSubmit={submitSearch}
+              className={`relative flex items-center h-10 border-2 border-ink rounded-full bg-white pl-3 pr-1.5 gap-1 min-w-0 ${searchFocused ? 'flex-1' : 'flex-1 mr-1'}`}
+            >
+              <input
+                ref={mobileSearchInputRef}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                placeholder="Search"
+                className="flex-1 min-w-0 h-full bg-transparent text-[14px] placeholder:text-ink-soft focus:outline-none"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }}
+                  aria-label="Clear search"
+                  className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft"
+                >
+                  <MaterialIcon name="close" size={18} />
+                </button>
+              ) : null}
+              <button type="submit" aria-label="Search" className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
+                <MaterialIcon name="search" size={16} />
+              </button>
+            </form>
+
+            {searchFocused ? (
               <button
                 type="button"
-                onClick={() => { setSearchFocused(false); setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.blur() }}
-                className="text-[15px] font-medium text-ink shrink-0"
+                onClick={() => { setSearchFocused(false); mobileSearchInputRef.current?.blur() }}
+                className="text-[15px] font-medium text-ink shrink-0 ml-1.5"
               >
                 Cancel
               </button>
-            </form>
-          ) : (
-            <div className="flex items-center h-10 gap-0.5">
-              <button
-                type="button"
-                onClick={() => { setSearchFocused(false); setMobileExpandedCategory(null); setMobileOpen(true) }}
-                aria-label="Browse categories"
-                className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
-              >
-                <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
-              </button>
-
-              <div className="shrink-0 mr-1">
-                <Logo variant="compact" />
-              </div>
-
-              <button
-                type="button"
-                onClick={() => { setSearchFocused(true); requestAnimationFrame(() => mobileSearchInputRef.current?.focus()) }}
-                className="flex flex-1 min-w-0 h-10 mr-1 items-center justify-end border-2 border-ink rounded-full bg-white px-1.5"
-                aria-label="Search"
-              >
-                <span className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center pointer-events-none" style={{ background: 'var(--color-accent)' }}>
-                  <MaterialIcon name="search" size={16} />
-                </span>
-              </button>
-
-              <button
-                type="button"
-                aria-label="Your account"
-                title="Your account"
-                onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-                className="w-10 h-10 shrink-0 flex items-center justify-center"
-              >
-                <MaterialIcon name="person" size={22} color={HEADER_ICON} />
-              </button>
-              <button
-                type="button"
-                aria-label="Cart"
-                title="Cart"
-                onClick={openMobileCart}
-                className="relative w-10 h-10 shrink-0 flex items-center justify-center"
-              >
-                <CartIcon size={22} color={HEADER_ICON} />
-                {cartCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                    {cartCount}
-                  </span>
-                )}
-              </button>
-            </div>
-          )}
+            ) : (
+              <>
+                <button
+                  type="button"
+                  aria-label="Your account"
+                  title="Your account"
+                  onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
+                  className="w-10 h-10 shrink-0 flex items-center justify-center"
+                >
+                  <MaterialIcon name="person" size={22} color={HEADER_ICON} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Cart"
+                  title="Cart"
+                  onClick={openMobileCart}
+                  className="relative w-10 h-10 shrink-0 flex items-center justify-center"
+                >
+                  <CartIcon size={22} color={HEADER_ICON} />
+                  {cartCount > 0 && (
+                    <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+              </>
+            )}
+          </div>
 
           {searchFocused && query && (
             <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">

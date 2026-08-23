@@ -9,6 +9,7 @@ import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialCo
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
+import { HomeSectionSkeleton } from '../components/Skeleton'
 
 function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: string[]; className?: string }) {
   if (group.length >= 3) {
@@ -53,6 +54,7 @@ const [trending, setTrending] = useState<Product[]>([])
   const [bundles, setBundles] = useState<Product[]>([])
   const [freeProduct, setFreeProduct] = useState<Product | null>(null)
   const [hero, setHero] = useState<HeroContent | null>(null)
+  const [heroReady, setHeroReady] = useState(false)
   const [heroSlide, setHeroSlide] = useState(0)
   const [chapters, setChapters] = useState<ChapterContent[]>([])
   const [testimonials, setTestimonials] = useState<TestimonialContent[]>([])
@@ -69,8 +71,8 @@ const [trending, setTrending] = useState<Product[]>([])
   const heroImages = hero?.images ?? []
   const heroGroups = heroImages.length > 0
     ? Array.from({ length: Math.ceil(heroImages.length / HERO_GROUP_SIZE) }, (_, i) => heroImages.slice(i * HERO_GROUP_SIZE, i * HERO_GROUP_SIZE + HERO_GROUP_SIZE))
-    : [['/hero-bunny.jpg']]
-  const currentHeroGroup = heroGroups[Math.min(heroSlide, heroGroups.length - 1)]
+    : []
+  const currentHeroGroup = heroGroups[Math.min(heroSlide, Math.max(heroGroups.length - 1, 0))] ?? []
 
   useEffect(() => {
     if (heroGroups.length <= 1) return
@@ -101,6 +103,7 @@ const [trending, setTrending] = useState<Product[]>([])
           if (row.key === 'testimonials') setTestimonials((row.value as TestimonialContent[]).filter((t) => t.quote && t.name))
         }
       })
+      .then(() => setHeroReady(true), () => setHeroReady(true))
 
     getCategoriesWithProducts().then(setCategories)
 
@@ -151,27 +154,39 @@ const [trending, setTrending] = useState<Product[]>([])
 
             {/* Mobile: image sits here, right after the CTAs, before the benefits row */}
             <div className="md:hidden mb-8">
-              <HeroCollage group={currentHeroGroup} />
-              {heroGroups.length > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  {heroGroups.map((_, i) => (
-                    <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-border)' }} />
-                  ))}
-                </div>
-              )}
+              {!heroReady ? (
+                <div className="h-[280px] rounded-[18px] bg-surface animate-pulse" aria-hidden />
+              ) : currentHeroGroup.length > 0 ? (
+                <>
+                  <HeroCollage group={currentHeroGroup} />
+                  {heroGroups.length > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-3">
+                      {heroGroups.map((_, i) => (
+                        <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-border)' }} />
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : null}
             </div>
           </div>
 
           {/* Desktop: collage lives in the right column */}
           <div className="hidden md:block">
-            <HeroCollage group={currentHeroGroup} className="h-[420px]" />
-            {heroGroups.length > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-4">
-                {heroGroups.map((_, i) => (
-                  <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-border)' }} />
-                ))}
-              </div>
-            )}
+            {!heroReady ? (
+              <div className="h-[420px] rounded-[18px] bg-surface animate-pulse" aria-hidden />
+            ) : currentHeroGroup.length > 0 ? (
+              <>
+                <HeroCollage group={currentHeroGroup} className="h-[420px]" />
+                {heroGroups.length > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-4">
+                    {heroGroups.map((_, i) => (
+                      <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-border)' }} />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : null}
           </div>
         </div>
       </section>
@@ -327,7 +342,7 @@ const [trending, setTrending] = useState<Product[]>([])
 
           <div className="flex-1 min-w-0">
             {skillLoading ? (
-              <div className="h-40 flex items-center justify-center text-ink-soft text-[13px]">Loading…</div>
+              <HomeSectionSkeleton count={3} />
             ) : skillProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-6">
                 {skillProducts.slice(0, 3).map((p) => (
