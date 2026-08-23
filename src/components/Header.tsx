@@ -12,7 +12,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
-import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, ShoppingBagIcon } from './icons'
+import { PersonIcon, FavoriteIcon, SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, ShoppingBagIcon, UI_ICON_SIZE } from './icons'
 
 const CATEGORY_ICONS: Record<string, string> = {
   amigurumi: 'toys',
@@ -301,7 +301,7 @@ export function Header() {
             onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
             className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
           >
-            <HeartIcon size={20} />
+            <HeartIcon size={UI_ICON_SIZE} />
             <span className="text-[13px]">Wishlist</span>
           </button>
           <div ref={desktopAccountWrapRef} className="relative">
@@ -311,7 +311,7 @@ export function Header() {
               aria-label="Account"
               aria-expanded={desktopAccountOpen}
             >
-              <UserIcon size={20} />
+              <UserIcon size={UI_ICON_SIZE} />
               <span className="text-[13px]">Account</span>
               {user && <ChevronIcon open={desktopAccountOpen} />}
             </button>
@@ -335,15 +335,15 @@ export function Header() {
                   </div>
                   <div className="py-1.5">
                     <Link href="/account/orders" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <OrderIcon size={18} /> Orders
+                      <OrderIcon size={UI_ICON_SIZE} /> Orders
                     </Link>
                     <Link href="/account/downloads" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <DownloadCircleIcon size={18} /> Downloads
+                      <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
                     </Link>
                   </div>
                   <div className="border-t border-line py-1.5">
                     <Link href="/account/profile" onClick={() => setDesktopAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-                      <SettingsIcon size={18} /> Account settings
+                      <SettingsIcon size={UI_ICON_SIZE} /> Account settings
                     </Link>
                     <button
                       onClick={() => { signOut(); setDesktopAccountOpen(false) }}
@@ -361,7 +361,7 @@ export function Header() {
             aria-label="Cart"
             className="relative flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors"
           >
-            <CartIcon size={20} />
+            <CartIcon size={UI_ICON_SIZE} />
             <span className="text-[13px]">Cart</span>
             {cartCount > 0 && (
               <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-sale-green text-white text-[9px] flex items-center justify-center">
@@ -385,17 +385,17 @@ export function Header() {
             onClick={() => requireAuth() && (window.location.href = '/account/wishlist')}
             className="w-10 h-10 flex items-center justify-center text-ink"
           >
-            <HeartIcon size={19} />
+            <HeartIcon size={UI_ICON_SIZE} />
           </button>
           <button
             aria-label="Account"
             onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
             className="w-10 h-10 flex items-center justify-center text-ink"
           >
-            <UserIcon size={19} />
+            <UserIcon size={UI_ICON_SIZE} />
           </button>
           <button onClick={openDrawer} aria-label="Cart" className="relative w-10 h-10 flex items-center justify-center text-ink">
-            <CartIcon size={19} />
+            <CartIcon size={UI_ICON_SIZE} />
             {cartCount > 0 && (
               <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sale-green text-white text-[9px] flex items-center justify-center">
                 {cartCount}
@@ -570,14 +570,14 @@ export function Header() {
                 </div>
                 <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
                   <Link href="/account/orders" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <OrderIcon size={18} /> Orders
+                    <OrderIcon size={UI_ICON_SIZE} /> Orders
                   </Link>
                   <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <DownloadCircleIcon size={18} /> Downloads
+                    <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
                   </Link>
                   <div className="border-t border-line mt-2 pt-2">
                     <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                      <SettingsIcon size={18} /> Account settings
+                      <SettingsIcon size={UI_ICON_SIZE} /> Account settings
                     </Link>
                   </div>
                   <div className="border-t border-line mt-2 pt-2">
@@ -616,12 +616,12 @@ function ChevronIcon({ open }: { open: boolean }) {
 function SearchIcon() {
   return <MaterialIcon name="search" size={20} />
 }
-function CartIcon({ size = 22 }: { size?: number }) {
+function CartIcon({ size = UI_ICON_SIZE }: { size?: number }) {
   return <ShoppingBagIcon size={size} />
 }
-function HeartIcon({ size = 22 }: { size?: number }) {
+function HeartIcon({ size = UI_ICON_SIZE }: { size?: number }) {
   return <FavoriteIcon size={size} />
 }
-function UserIcon({ size = 22 }: { size?: number }) {
+function UserIcon({ size = UI_ICON_SIZE }: { size?: number }) {
   return <PersonIcon size={size} />
 }

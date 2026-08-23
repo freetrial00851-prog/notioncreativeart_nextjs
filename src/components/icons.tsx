@@ -7,55 +7,44 @@ type IconProps = {
   title?: string
 }
 
+/** Shared size for header / account menu icons so they stay visually consistent. */
+export const UI_ICON_SIZE = 20
+
 const base = (size: number, className: string) => ({
   width: size,
   height: size,
   viewBox: '0 0 24 24',
-  fill: 'none',
+  fill: 'none' as const,
   xmlns: 'http://www.w3.org/2000/svg',
   className,
   'aria-hidden': true as const,
   focusable: false as const,
 })
 
-/** Person in circle — account (account_circle style) */
-export function PersonIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+/** Person in circle — account */
+export function PersonIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
-      <circle cx="12" cy="12" r="9.25" stroke={color} strokeWidth="1.75" fill="none" />
-      <circle cx="12" cy="9" r="2.75" fill={color} />
-      <path d="M6.8 17.6c1.2-2.1 3-3.1 5.2-3.1s4 1 5.2 3.1" fill={color} />
+      <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.6" fill="none" />
+      <circle cx="12" cy="9.2" r="2.6" fill={color} />
+      <path d="M7.2 17.8c1.1-2 2.9-3 4.8-3s3.7 1 4.8 3" fill={color} />
     </svg>
   )
 }
 
 /** Filled heart — wishlist / favorite */
-export function FavoriteIcon({ size = 22, color = 'currentColor', className = '', filled = true }: IconProps & { filled?: boolean }) {
-  if (!filled) {
-    return (
-      <svg {...base(size, className)}>
-        <path
-          d="M12 20.2l-1.45-1.32C5.4 14.36 2 11.28 2 7.5 2 4.42 4.42 2 7.5 2c1.74 0 3.41.81 4.5 2.09C13.09 2.81 14.76 2 16.5 2 19.58 2 22 4.42 22 7.5c0 3.78-3.4 6.86-8.55 11.38L12 20.2z"
-          fill="none"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-      </svg>
-    )
-  }
+export function FavoriteIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '', filled = true }: IconProps & { filled?: boolean }) {
+  const path =
+    'M12 20.15l-1.35-1.23C5.7 14.4 2.5 11.5 2.5 8.1 2.5 5.4 4.6 3.3 7.3 3.3c1.55 0 3.05.72 4.05 1.86C12.35 4.02 13.85 3.3 15.4 3.3c2.7 0 4.8 2.1 4.8 4.8 0 3.4-3.2 6.3-8.15 10.82L12 20.15z'
   return (
     <svg {...base(size, className)}>
-      <path
-        d="M12 20.2l-1.45-1.32C5.4 14.36 2 11.28 2 7.5 2 4.42 4.42 2 7.5 2c1.74 0 3.41.81 4.5 2.09C13.09 2.81 14.76 2 16.5 2 19.58 2 22 4.42 22 7.5c0 3.78-3.4 6.86-8.55 11.38L12 20.2z"
-        fill={color}
-      />
+      <path d={path} fill={filled ? color : 'none'} stroke={color} strokeWidth={filled ? 0 : 1.7} strokeLinejoin="round" />
     </svg>
   )
 }
 
 /** Gear — account settings */
-export function SettingsIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+export function SettingsIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
       <path
@@ -67,7 +56,7 @@ export function SettingsIcon({ size = 22, color = 'currentColor', className = ''
 }
 
 /** Share network — share listing */
-export function ShareIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+export function ShareIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
       <circle cx="18" cy="5" r="2.6" fill={color} />
@@ -79,7 +68,7 @@ export function ShareIcon({ size = 22, color = 'currentColor', className = '' }:
 }
 
 /** Close — dark circle with white X (for popups) */
-export function CloseCircleIcon({ size = 24, className = '', bg = '#4a4a4a', fg = '#ffffff' }: IconProps & { bg?: string; fg?: string }) {
+export function CloseCircleIcon({ size = UI_ICON_SIZE, className = '', bg = '#4a4a4a', fg = '#ffffff' }: IconProps & { bg?: string; fg?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden focusable={false}>
       <circle cx="12" cy="12" r="11" fill={bg} />
@@ -88,19 +77,20 @@ export function CloseCircleIcon({ size = 24, className = '', bg = '#4a4a4a', fg 
   )
 }
 
-/** Download — dark circle with white arrow (for downloads) */
-export function DownloadCircleIcon({ size = 22, className = '', bg = '#4a4a4a', fg = '#ffffff' }: IconProps & { bg?: string; fg?: string }) {
+/** Download — dark circle with arrow (for downloads) */
+export function DownloadCircleIcon({ size = UI_ICON_SIZE, className = '', bg = '#4a4a4a', fg = '#111111' }: IconProps & { bg?: string; fg?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden focusable={false}>
       <circle cx="12" cy="12" r="11" fill={bg} />
-      <path d="M12 6.5v7.2M12 13.7l-3-3M12 13.7l3-3" stroke={fg} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7.5 17.5h9" stroke={fg} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M12 6.8v7" stroke={fg} strokeWidth="2" strokeLinecap="round" />
+      <path d="M8.8 11.8L12 15l3.2-3.2" stroke={fg} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 17.2h8" stroke={fg} strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
 
-/** Plain download glyph (no circle) for compact menus */
-export function DownloadIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+/** Plain download glyph (no circle) */
+export function DownloadIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
       <path d="M12 3v11M12 14l-3.5-3.5M12 14l3.5-3.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -109,36 +99,40 @@ export function DownloadIcon({ size = 22, color = 'currentColor', className = ''
   )
 }
 
-/** Order / receipt with check badge */
-export function OrderIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+/** Open box / package — orders */
+export function OrderIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
       <path
         fill={color}
-        d="M7 3.5h10c.8 0 1.5.7 1.5 1.5v12.2l-1.2-.7-1.3.8-1.3-.8-1.2.7-1.3-.7-1.2.7-1.3-.8-1.3.8-1.2-.7V5c0-.8.7-1.5 1.5-1.5zm1.8 4.2h7.4v1.3H8.8V7.7zm0 3h7.4v1.3H8.8v-1.3zm0 3h4.6v1.3H8.8v-1.3z"
+        d="M4.8 9.2h14.4v10.2c0 .7-.5 1.2-1.2 1.2H6c-.7 0-1.2-.5-1.2-1.2V9.2zm1.8 4.2h2.2v1.4H6.6v-1.4z"
       />
-      <circle cx="17.2" cy="17.2" r="4" fill={color} />
-      <path d="M15.4 17.2l1.1 1.1 2.2-2.3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path
+        fill={color}
+        d="M4.2 9.4L8.2 5.2h2.2l-2.8 4.2H4.2zm15.6 0h-3.4L13.6 5.2h2.2l4 4.2z"
+      />
+      <path fill={color} d="M8.5 5.2h7v1.5h-7V5.2z" />
     </svg>
   )
 }
 
-/** Shopping bag — cart */
-export function ShoppingBagIcon({ size = 22, color = 'currentColor', className = '' }: IconProps) {
+/** Shopping bag — cart (solid body + round handle) */
+export function ShoppingBagIcon({ size = UI_ICON_SIZE, color = 'currentColor', className = '' }: IconProps) {
   return (
     <svg {...base(size, className)}>
       <path
         fill={color}
-        d="M7.2 8.2h9.6c.7 0 1.2.6 1.1 1.3l-.9 8.2c-.1.8-.8 1.4-1.6 1.4H8.6c-.8 0-1.5-.6-1.6-1.4l-.9-8.2c-.1-.7.4-1.3 1.1-1.3z"
+        fillRule="evenodd"
+        d="M8.2 8.5h7.6c1 0 1.8.8 1.8 1.8v8.2c0 1-.8 1.8-1.8 1.8H8.2c-1 0-1.8-.8-1.8-1.8v-8.2c0-1 .8-1.8 1.8-1.8zm3.8 1.1c-1.55 0-2.4 1.05-2.4 2.15 0 .35.3.6.65.6s.65-.25.65-.6c0-.45.4-.95 1.1-.95s1.1.5 1.1.95c0 .35.3.6.65.6s.65-.25.65-.6c0-1.1-.85-2.15-2.4-2.15z"
+        clipRule="evenodd"
       />
       <path
-        d="M9 8.2V6.8c0-1.7 1.3-3 3-3s3 1.3 3 3v1.4"
+        d="M9.2 8.5V7.2c0-1.55 1.25-2.8 2.8-2.8s2.8 1.25 2.8 2.8v1.3"
         stroke={color}
-        strokeWidth="1.75"
+        strokeWidth="1.7"
         strokeLinecap="round"
         fill="none"
       />
-      <path d="M9.2 11.2c0 1.6 1.3 2.6 2.8 2.6s2.8-1 2.8-2.6" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" fill="none" />
     </svg>
   )
 }
