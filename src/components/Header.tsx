@@ -373,7 +373,8 @@ export function Header() {
       </div>
 
       {/* Mobile header — Etsy-style single row; search expands on focus */}
-      <div ref={mobileSearchWrapRef} className="md:hidden px-3 py-2.5 relative">
+      <div className="md:hidden relative z-50">
+      <div ref={mobileSearchWrapRef} className="px-3 py-2.5 relative z-[2] bg-canvas">
         {searchFocused ? (
           <form onSubmit={submitSearch} className="flex items-center gap-2.5">
             <div className="relative flex-1 min-w-0 flex items-center border-2 border-ink rounded-full bg-canvas overflow-hidden h-10">
@@ -414,9 +415,13 @@ export function Header() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setMobileOpen(true)}
+              onClick={() => {
+                setSearchFocused(false)
+                setMobileExpandedCategory(null)
+                setMobileOpen(true)
+              }}
               aria-label="Browse categories"
-              className="w-9 h-9 shrink-0 flex items-center justify-center text-ink"
+              className={`w-9 h-9 shrink-0 flex items-center justify-center text-ink rounded-full ${mobileOpen ? 'bg-[#e8e8e8]' : ''}`}
             >
               <MaterialIcon name="menu" size={22} />
             </button>
@@ -488,72 +493,115 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-canvas flex flex-col">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-line">
-              <span className="font-subheading text-lg">Categories</span>
-              <button aria-label="Close menu" onClick={() => setMobileOpen(false)} className="p-1">
-                <CloseCircleIcon size={28} />
+        <>
+          <div
+            className="fixed inset-0 z-[1] bg-black/25 md:hidden"
+            onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
+          />
+          <div className="absolute left-0 right-0 top-full z-[2] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] max-h-[min(78vh,640px)] overflow-y-auto">
+            <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
+              <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
+                Browse Categories
+              </h2>
+              <button
+                aria-label="Close categories"
+                onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
+              >
+                <MaterialIcon name="close" size={22} />
               </button>
             </div>
-            <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
-              <Link href="/shop" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                <MaterialIcon name="grid_view" size={18} /> All Patterns
+            <nav className="pb-3">
+              <Link
+                href="/shop/new"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+              >
+                New Arrivals
               </Link>
-              <Link href="/shop/new" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                <MaterialIcon name="star" size={18} /> New Arrivals
-              </Link>
-              <Link href="/shop/bestsellers" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                <MaterialIcon name="star" size={18} /> Featured Items
-              </Link>
-              <Link href="/shop?price=free" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                <MaterialIcon name="card_giftcard" size={18} color="var(--color-primary)" /> Free Patterns
-              </Link>
-
-              <div className="border-t border-line mt-2 pt-2">
-                {categories.map((c) => (
-                  <div key={c.link}>
-                    <div className="flex items-center">
-                      <Link href={c.link} onClick={() => setMobileOpen(false)} className="flex-1 flex items-center gap-3 pl-6 pr-3 py-3.5 text-[13px] text-ink">
-                        <MaterialIcon name={categoryIcon(c.name)} size={18} />
+              {categories.map((c) => {
+                const expanded = mobileExpandedCategory === c.id
+                const subs = mobileSubcategoriesCache[c.id]
+                const hasSubsCached = subs !== undefined
+                return (
+                  <div key={c.link} className="border-b border-[#ebe8e2]">
+                    <div className="flex items-stretch">
+                      <Link
+                        href={c.link}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex-1 px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
+                      >
                         {c.name}
                       </Link>
                       <button
-                        aria-label={`Show ${c.name} subcategories`}
+                        type="button"
+                        aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
+                        aria-expanded={expanded}
                         onClick={() => {
-                          const opening = mobileExpandedCategory !== c.id
+                          const opening = !expanded
                           setMobileExpandedCategory(opening ? c.id : null)
-                          if (opening && !mobileSubcategoriesCache[c.id]) {
-                            getSubcategoriesWithCounts(c.id).then((subs) => setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: subs })))
+                          if (opening && !hasSubsCached) {
+                            getSubcategoriesWithCounts(c.id).then((list) =>
+                              setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
+                            )
                           }
                         }}
-                        className="px-4 py-3.5 text-ink-soft"
+                        className="px-4 text-black"
                       >
-                        <MaterialIcon name="chevron_right" size={16} style={{ transform: mobileExpandedCategory === c.id ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                        <MaterialIcon
+                          name="chevron_right"
+                          size={22}
+                          style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
+                        />
                       </button>
                     </div>
-                    {mobileExpandedCategory === c.id && (mobileSubcategoriesCache[c.id]?.length ?? 0) > 0 && (
-                      <div className="pb-1">
-                        {mobileSubcategoriesCache[c.id].map((sub) => (
-                          <Link key={sub.id} href={`/shop/${sub.slug}`} onClick={() => setMobileOpen(false)} className="block pl-16 pr-6 py-2 text-[12px] text-ink-soft">
-                            {sub.name}
-                          </Link>
-                        ))}
+                    {expanded && (
+                      <div className="bg-[#f0eee8] pb-1">
+                        {(subs?.length ?? 0) === 0 && hasSubsCached ? (
+                          <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
+                        ) : (
+                          (subs ?? []).map((sub) => (
+                            <Link
+                              key={sub.id}
+                              href={`/shop/${sub.slug}`}
+                              onClick={() => setMobileOpen(false)}
+                              className="block px-8 py-2.5 text-[15px] font-bold text-black tracking-[-0.015em]"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))
+                        )}
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-
-              <div className="border-t border-line mt-2 pt-2">
-                <Link href="/shop/sale" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                  <MaterialIcon name="sell" size={18} /> Sale
-                </Link>
-              </div>
+                )
+              })}
+              <Link
+                href="/shop"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+              >
+                All Patterns
+              </Link>
+              <Link
+                href="/shop?price=free"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+              >
+                Free Patterns
+              </Link>
+              <Link
+                href="/shop/sale"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
+              >
+                Sale
+              </Link>
             </nav>
           </div>
-        </div>
+        </>
       )}
+      </div>
 
       {mobileAccountOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
