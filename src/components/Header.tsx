@@ -290,7 +290,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* ── Mobile <481: single row — hamburger, logo, search, account, wishlist, cart ── */}
+      {/* ── Mobile <481: single row — hamburger, logo, search (flex-1), account, cart ── */}
       <div className="tablet:hidden relative z-50">
         <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
           <div className="flex items-center h-10 gap-0.5">
@@ -356,15 +356,6 @@ export function Header() {
                   className="w-10 h-10 shrink-0 flex items-center justify-center"
                 >
                   <MaterialIcon name="person" size={22} color={HEADER_ICON} />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Wishlist"
-                  title="Wishlist"
-                  onClick={goWishlist}
-                  className="w-10 h-10 shrink-0 flex items-center justify-center"
-                >
-                  <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
                 </button>
                 <button
                   type="button"
