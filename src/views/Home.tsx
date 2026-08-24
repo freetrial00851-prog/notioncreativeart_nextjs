@@ -16,7 +16,7 @@ import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialCo
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
-import { HomeSectionSkeleton } from '../components/Skeleton'
+import { ProductGridSkeleton, CategoryRowSkeleton, ChaptersSkeleton, SkillBrowseSkeleton, TestimonialsSkeleton } from '../components/Skeleton'
 import { SectionBand } from '../components/SectionBand'
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
@@ -333,7 +333,7 @@ export function Home({
     categories: !catalogReady ? (
       <div aria-hidden>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">Shop by Category</h2>
-        <HomeSectionSkeleton count={5} />
+        <CategoryRowSkeleton count={6} />
       </div>
     ) : categories.length > 0 ? (
       <div>
@@ -386,7 +386,7 @@ export function Home({
     chapters: !catalogReady ? (
       <div aria-hidden>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">Skill Level Chapters</h2>
-        <HomeSectionSkeleton count={3} />
+        <ChaptersSkeleton count={3} />
       </div>
     ) : chapters.length > 0 ? (
       <div>
@@ -417,7 +417,7 @@ export function Home({
     trending: !catalogReady ? (
       <div>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <HomeSectionSkeleton count={4} />
+        <ProductGridSkeleton variant="featured" count={6} />
       </div>
     ) : featuredError ? (
       <div className="text-center py-4">
@@ -455,7 +455,7 @@ export function Home({
     new_arrivals: !catalogReady ? (
       <div aria-hidden>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
-        <HomeSectionSkeleton count={4} />
+        <ProductGridSkeleton variant="newArrivals" count={6} />
       </div>
     ) : newArrivals.length > 0 ? (
       <div>
@@ -502,7 +502,7 @@ export function Home({
 
           <div className="flex-1 min-w-0">
             {skillLoading ? (
-              <HomeSectionSkeleton count={3} />
+              <SkillBrowseSkeleton count={3} />
             ) : skillProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-6">
                 {skillProducts.slice(0, 3).map((p) => (
@@ -616,7 +616,7 @@ export function Home({
     testimonials: !catalogReady ? (
       <div aria-hidden>
         <h2 className="font-heading text-center font-semibold text-3xl mb-10">What Our Makers Say</h2>
-        <HomeSectionSkeleton count={3} />
+        <TestimonialsSkeleton count={3} />
       </div>
     ) : testimonials.length > 0 ? (
       <div>

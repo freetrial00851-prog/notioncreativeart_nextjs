@@ -284,7 +284,7 @@ useEffect(() => {
 
         <div className="min-w-0">
           {loading ? (
-            <ProductGridSkeleton />
+            <ProductGridSkeleton variant="shop" />
           ) : sortedProducts.length === 0 ? (
             <EmptyState
               icon="auto_awesome"

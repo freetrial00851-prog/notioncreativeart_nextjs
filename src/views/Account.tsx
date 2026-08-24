@@ -10,7 +10,7 @@ import { useUI } from '../context/UIContext'
 import { US_STATES } from '../lib/usStates'
 import { isValidPostalCode } from '../lib/billingAddress'
 import { EmptyState } from '../components/EmptyState'
-import { ProductGridSkeleton, ListRowSkeleton, ContentSkeleton } from '../components/Skeleton'
+import { ListRowSkeleton, ContentSkeleton, DownloadsTableSkeleton } from '../components/Skeleton'
 import { useToast } from '../context/ToastContext'
 import { triggerPdfDownload } from '../lib/downloads'
 import { MaterialIcon } from '../components/MaterialIcon'
@@ -243,7 +243,7 @@ function Downloads() {
     if (!ok) alert("This pattern's file isn't uploaded yet — please check back soon.")
   }
 
-  if (loading) return <ProductGridSkeleton count={6} />
+  if (loading) return <DownloadsTableSkeleton rows={4} />
   if (purchases.length === 0) return (
     <EmptyState
       icon="download"

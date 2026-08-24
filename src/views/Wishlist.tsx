@@ -32,7 +32,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
       })
   }, [user])
 
-  if (authLoading) return <ProductGridSkeleton count={4} />
+  if (authLoading) return <ProductGridSkeleton variant="wishlist" />
 
   if (!user) {
     return (
@@ -55,7 +55,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
   const body = (
     <>
       {loading ? (
-        <ProductGridSkeleton count={4} />
+        <ProductGridSkeleton variant="wishlist" />
       ) : products.length === 0 ? (
         <EmptyState
           icon="favorite"

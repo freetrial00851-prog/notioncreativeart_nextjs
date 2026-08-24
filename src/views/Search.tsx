@@ -88,7 +88,7 @@ export function Search() {
       )}
 
       {loading && q ? (
-        <ProductGridSkeleton count={6} />
+        <ProductGridSkeleton variant="search" />
       ) : results.length > 0 ? (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
