@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
+import { searchProducts } from '../lib/productSearch'
 import type { Product } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
@@ -17,22 +18,31 @@ export function Search() {
   const q = searchParams?.get('q') ?? ''
   const [results, setResults] = useState<Product[]>([])
   const [suggestions, setSuggestions] = useState<Product[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(() => Boolean(q.trim()))
   const [page, setPage] = useState(1)
 
   useEffect(() => {
+    let cancelled = false
     setPage(1)
-    if (!q.trim()) return setResults([])
+    if (!q.trim()) {
+      setResults([])
+      setLoading(false)
+      return
+    }
     setLoading(true)
-    supabase
-      .from('products')
-      .select('*')
-      .eq('active', true)
-      .or(`title.ilike.%${q}%,description.ilike.%${q}%`)
-      .then(({ data }) => {
-        setResults((data as Product[]) ?? [])
-        setLoading(false)
+    searchProducts(q)
+      .then((data) => {
+        if (cancelled) return
+        setResults(data)
       })
+      .catch((err) => {
+        console.error('Search failed:', err)
+        if (!cancelled) setResults([])
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
   }, [q])
 
   useEffect(() => {

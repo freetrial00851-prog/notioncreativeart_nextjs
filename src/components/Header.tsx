@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { supabase } from '../lib/supabase'
+import { searchProducts } from '../lib/productSearch'
 import { getCategoriesWithProducts, getSubcategoriesWithCounts, type CategoryWithCount, type SubcategoryWithCount } from '../lib/categories'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
@@ -76,13 +77,7 @@ export function Header() {
   useEffect(() => {
     if (!query.trim()) return setSuggestions([])
     const timer = setTimeout(() => {
-      supabase
-        .from('products')
-        .select('*')
-        .eq('active', true)
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
-        .limit(5)
-        .then(({ data }) => setSuggestions((data as Product[]) ?? []))
+      searchProducts(query, 5).then(setSuggestions)
     }, 250)
     return () => clearTimeout(timer)
   }, [query])
