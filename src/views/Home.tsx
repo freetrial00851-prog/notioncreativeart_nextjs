@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase'
 import type { CategoryWithCount } from '../lib/categories'
 import { DEFAULT_LAYOUT } from '../lib/defaultLayout'
 import {
+  clearHomeCatalogCache,
   fetchHomeCatalog,
   getHomeCatalogCache,
   type HomeCatalogSnapshot,
@@ -155,6 +156,9 @@ export function Home({
   )
   /** False until product/category/chapter data is ready (cache hit or network). */
   const [catalogReady, setCatalogReady] = useState(() => Boolean(seed))
+  /** Featured query failed — show retry; do not treat as a real empty catalog. */
+  const [featuredError, setFeaturedError] = useState<string | null>(null)
+  const [catalogReloadKey, setCatalogReloadKey] = useState(0)
   const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>(
     () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
   )
@@ -194,18 +198,30 @@ export function Home({
     }
 
     // Fresh module cache → paint instantly, skip network for this visit.
-    const cached = getHomeCatalogCache()
+    // Dev-only ?failFeatured=1 bypasses cache so we can simulate query failure.
+    const forceFeaturedFail =
+      process.env.NODE_ENV !== 'production' &&
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('failFeatured') === '1'
+    const cached = forceFeaturedFail ? null : getHomeCatalogCache()
     if (cached) {
       applyCatalogSnapshot(cached, setters)
+      setFeaturedError(null)
       setHeroReady(true)
       setCatalogReady(true)
       return () => { cancelled = true }
     }
 
     fetchHomeCatalog()
-      .then((snap) => {
+      .then((result) => {
         if (cancelled) return
-        applyCatalogSnapshot(snap, setters)
+        applyCatalogSnapshot(result.snapshot, setters)
+        setFeaturedError(result.featuredError)
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        const message = err instanceof Error ? err.message : 'Failed to load featured items'
+        setFeaturedError(message)
       })
       .finally(() => {
         if (!cancelled) {
@@ -215,7 +231,14 @@ export function Home({
       })
 
     return () => { cancelled = true }
-  }, [])
+  }, [catalogReloadKey])
+
+  const retryFeaturedCatalog = () => {
+    clearHomeCatalogCache()
+    setFeaturedError(null)
+    setCatalogReady(false)
+    setCatalogReloadKey((k) => k + 1)
+  }
 
   useEffect(() => {
     setSkillLoading(true)
@@ -392,9 +415,21 @@ export function Home({
       </div>
     ) : null,
     trending: !catalogReady ? (
-      <div aria-hidden>
+      <div>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <HomeSectionSkeleton count={4} />
+      </div>
+    ) : featuredError ? (
+      <div className="text-center py-4">
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-4">Featured Items</h2>
+        <p className="text-[14px] text-ink-soft mb-5">Couldn&apos;t load featured items. Please try again.</p>
+        <button
+          type="button"
+          onClick={retryFeaturedCatalog}
+          className="inline-block px-7 py-3 rounded-lg border text-[12px] font-semibold tracking-[0.06em] transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+        >
+          Try again
+        </button>
       </div>
     ) : trending.length > 0 ? (
       <div>
@@ -411,7 +446,12 @@ export function Home({
           </Link>
         </div>
       </div>
-    ) : null,
+    ) : (
+      <div className="text-center py-6">
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-4">Featured Items</h2>
+        <p className="text-[14px] text-ink-soft">No featured items yet.</p>
+      </div>
+    ),
     new_arrivals: !catalogReady ? (
       <div aria-hidden>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>

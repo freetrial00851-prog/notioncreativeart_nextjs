@@ -20,6 +20,8 @@
   --color-surface: #F8F4ED;
   --color-surface-card: #FFFFFF;
   --color-border: #E7E1D8;
+  /* Pulse placeholders — contrasts with both --color-background and --color-surface bands */
+  --color-skeleton: #E5DFD4;
   --color-sale: #E24B4A;
   --color-sale-dark: #C13332;
   --color-error: #B94A48;

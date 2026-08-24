@@ -1,7 +1,7 @@
 /** Shared pulse skeleton building blocks for loading states. */
 
 function Bone({ className = '' }: { className?: string }) {
-  return <div className={`bg-surface rounded animate-pulse ${className}`} />
+  return <div className={`bg-skeleton rounded animate-pulse ${className}`} />
 }
 
 export function ProductGridSkeleton({ count = 8 }: { count?: number }) {

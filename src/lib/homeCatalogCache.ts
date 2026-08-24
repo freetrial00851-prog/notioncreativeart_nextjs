@@ -25,10 +25,16 @@ export type HomeCatalogSnapshot = {
   skillCounts: Record<'beginner' | 'intermediate' | 'advanced', number>
 }
 
+export type HomeCatalogFetchResult = {
+  snapshot: HomeCatalogSnapshot
+  /** Present when the featured-products query failed — trending will be []. */
+  featuredError: string | null
+}
+
 type CacheEntry = { data: HomeCatalogSnapshot; at: number }
 
 let entry: CacheEntry | null = null
-let inflight: Promise<HomeCatalogSnapshot> | null = null
+let inflight: Promise<HomeCatalogFetchResult> | null = null
 
 export function getHomeCatalogCache(): HomeCatalogSnapshot | null {
   if (!entry) return null
@@ -43,7 +49,17 @@ export function setHomeCatalogCache(data: HomeCatalogSnapshot) {
   entry = { data, at: Date.now() }
 }
 
-async function loadHomeCatalog(): Promise<HomeCatalogSnapshot> {
+export function clearHomeCatalogCache() {
+  entry = null
+}
+
+function shouldSimulateFeaturedFailure(): boolean {
+  if (typeof window === 'undefined') return false
+  if (process.env.NODE_ENV === 'production') return false
+  return new URLSearchParams(window.location.search).get('failFeatured') === '1'
+}
+
+async function loadHomeCatalog(): Promise<HomeCatalogFetchResult> {
   const featuredP = supabase
     .from('products')
     .select('*')
@@ -115,8 +131,14 @@ async function loadHomeCatalog(): Promise<HomeCatalogSnapshot> {
     skillCounts[row.level] = row.count
   }
 
-  return {
-    trending: (featuredRes.data as Product[]) ?? [],
+  const simulateFail = shouldSimulateFeaturedFailure()
+  const featuredError = simulateFail
+    ? 'Simulated featured failure'
+    : featuredRes.error?.message ?? null
+
+  const snapshot: HomeCatalogSnapshot = {
+    // On featured query failure, do not treat null data as a legitimate empty list.
+    trending: featuredError ? [] : ((featuredRes.data as Product[]) ?? []),
     newArrivals: (newRes.data as Product[]) ?? [],
     bundles: (bundlesRes.data as Product[]) ?? [],
     freeProduct: (freeRes.data as Product[])?.[0] ?? null,
@@ -127,15 +149,22 @@ async function loadHomeCatalog(): Promise<HomeCatalogSnapshot> {
     layout,
     skillCounts,
   }
+
+  return { snapshot, featuredError }
 }
 
-/** Deduped fetch; always writes the module cache on success. */
-export function fetchHomeCatalog(): Promise<HomeCatalogSnapshot> {
+/**
+ * Deduped fetch. Successful featured queries (including a real empty list) are
+ * cached; featured query failures are never written to the module cache.
+ */
+export function fetchHomeCatalog(): Promise<HomeCatalogFetchResult> {
   if (inflight) return inflight
   inflight = loadHomeCatalog()
-    .then((data) => {
-      setHomeCatalogCache(data)
-      return data
+    .then((result) => {
+      if (!result.featuredError) {
+        setHomeCatalogCache(result.snapshot)
+      }
+      return result
     })
     .finally(() => {
       inflight = null
