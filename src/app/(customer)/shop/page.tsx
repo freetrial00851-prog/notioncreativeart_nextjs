@@ -1,11 +1,6 @@
 import { Suspense } from 'react'
 import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
-import { getShopCatalogServer } from '@/lib/data/shop'
-import { parseShopFilters } from '@/lib/shopCatalog'
-
-/** Keep shop listings fresh enough that admin product changes appear without a full redeploy. */
-export const revalidate = 60
 
 export const metadata = buildMetadata({
   title: 'Shop All Patterns',
@@ -15,19 +10,19 @@ export const metadata = buildMetadata({
   keywords: [...SEO_KEYWORDS, 'shop crochet patterns', 'crochet pattern catalog'],
 })
 
-type Props = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>
+function ShopLoading() {
+  return (
+    <div className="max-w-[1400px] mx-auto px-8 py-32 text-center text-ink-soft text-sm">
+      Loading…
+    </div>
+  )
 }
 
-/** Shop index — all patterns; filters from query params are applied on the server. */
-export default async function ShopPage({ searchParams }: Props) {
-  const sp = await searchParams
-  const filters = parseShopFilters(null, sp)
-  const initialCatalog = await getShopCatalogServer(filters)
-
+/** Shop index — all patterns, filterable via query params. */
+export default function ShopPage() {
   return (
-    <Suspense fallback={null}>
-      <Shop initialCatalog={initialCatalog} />
+    <Suspense fallback={<ShopLoading />}>
+      <Shop />
     </Suspense>
   )
 }

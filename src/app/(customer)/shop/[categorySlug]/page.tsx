@@ -2,16 +2,8 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
-import { getShopCatalogServer } from '@/lib/data/shop'
-import { parseShopFilters } from '@/lib/shopCatalog'
 
-/** Keep category shop pages in sync with catalog edits. */
-export const revalidate = 60
-
-type Props = {
-  params: Promise<{ categorySlug: string }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}
+type Props = { params: Promise<{ categorySlug: string }> }
 
 /** Dynamic SEO metadata per shop category — critical for category landing pages. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -28,16 +20,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-/** Category shop page — e.g. /shop/amigurumi, /shop/new, /shop/sale */
-export default async function CategoryShopPage({ params, searchParams }: Props) {
-  const { categorySlug } = await params
-  const sp = await searchParams
-  const filters = parseShopFilters(categorySlug, sp)
-  const initialCatalog = await getShopCatalogServer(filters)
-
+function ShopLoading() {
   return (
-    <Suspense fallback={null}>
-      <Shop initialCatalog={initialCatalog} />
+    <div className="max-w-[1400px] mx-auto px-8 py-32 text-center text-ink-soft text-sm">
+      Loading…
+    </div>
+  )
+}
+
+/** Category shop page — e.g. /shop/amigurumi, /shop/new, /shop/sale */
+export default function CategoryShopPage() {
+  return (
+    <Suspense fallback={<ShopLoading />}>
+      <Shop />
     </Suspense>
   )
 }
