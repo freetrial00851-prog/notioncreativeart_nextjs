@@ -68,7 +68,7 @@ npx supabase functions deploy chat-escalate --project-ref anlsellghialszuuvipw
 npx supabase secrets set GROQ_API_KEY=your_groq_api_key --project-ref anlsellghialszuuvipw
 ```
 
-Get a free key at https://console.groq.com (Phase 1 uses `llama-3.1-8b-instant`).
+Get a free key at https://console.groq.com (uses `openai/gpt-oss-20b`; `llama-3.1-8b-instant` was decommissioned 16 Aug 2026).
 
 ### `chat-escalate` secrets
 
@@ -76,4 +76,4 @@ Get a free key at https://console.groq.com (Phase 1 uses `llama-3.1-8b-instant`)
 npx supabase secrets set RESEND_API_KEY=your_resend_api_key --project-ref anlsellghialszuuvipw
 ```
 
-Get a free key at https://resend.com. Escalations email `freetrail00851@gmail.com` via Resend (`from: onboarding@resend.dev` until a custom domain is verified).
+Get a free key at https://resend.com. Escalations email `freetrial00851@gmail.com` via Resend (`from: onboarding@resend.dev` until a custom domain is verified).

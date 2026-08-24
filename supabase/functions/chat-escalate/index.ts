@@ -16,7 +16,7 @@ const corsHeaders = {
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
-const SUPPORT_TO = 'freetrail00851@gmail.com'
+const SUPPORT_TO = 'freetrial00851@gmail.com'
 const FROM = 'Notion Creative Art <onboarding@resend.dev>'
 
 const MAX_PER_WINDOW = 8

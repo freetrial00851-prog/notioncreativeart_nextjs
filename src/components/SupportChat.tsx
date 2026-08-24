@@ -14,8 +14,17 @@ type DownloadLink = { title: string; signedUrl: string; filename: string }
 
 const WELCOME = 'Hi! How can I help you today?'
 
+const QUICK_REPLIES = ['Order/download issue', 'Refund policy', 'How does delivery work?']
+
+const ASKED_HUMAN_RE =
+  /\b(talk to (a )?(human|person|agent)|human|agent|customer service|support)\b/i
+
 function uid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function isBotFailure(reply: string) {
+  return /trouble answering|couldn't reach support|couldn't form a reply|isn't fully configured/i.test(reply)
 }
 
 export function SupportChat() {
@@ -28,6 +37,7 @@ export function SupportChat() {
   ])
   const [downloadsByMsg, setDownloadsByMsg] = useState<Record<string, DownloadLink[]>>({})
   const [showHumanBtnFor, setShowHumanBtnFor] = useState<Record<string, boolean>>({})
+  const [followUpsFor, setFollowUpsFor] = useState<string | null>(null)
   const [escalateOpen, setEscalateOpen] = useState(false)
   const [escalateEmail, setEscalateEmail] = useState('')
   const [escalateMessage, setEscalateMessage] = useState('')
@@ -36,6 +46,8 @@ export function SupportChat() {
   const [lockPage, setLockPage] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const userTurnCount = messages.filter((m) => m.role === 'user').length
+  const showWelcomeChips = userTurnCount === 0 && !sending && !escalateOpen
 
   useBodyScrollLock(lockPage)
 
@@ -54,7 +66,7 @@ export function SupportChat() {
   useEffect(() => {
     if (!open) return
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
-  }, [open, messages, sending, downloadsByMsg, escalateOpen, showHumanBtnFor])
+  }, [open, messages, sending, downloadsByMsg, escalateOpen, showHumanBtnFor, followUpsFor])
 
   useEffect(() => {
     if (!open) return
@@ -80,9 +92,8 @@ export function SupportChat() {
     setEscalateOpen(true)
   }
 
-  const send = async (e?: FormEvent) => {
-    e?.preventDefault()
-    const text = input.trim()
+  const sendText = async (raw: string) => {
+    const text = raw.trim()
     if (!text || sending || escalateOpen) return
 
     const userMsg: ChatMsg = { id: uid(), role: 'user', content: text }
@@ -90,8 +101,10 @@ export function SupportChat() {
       role: m.role,
       content: m.content,
     }))
+    const nextUserCount = userTurnCount + 1
 
     setInput('')
+    setFollowUpsFor(null)
     setMessages((prev) => [...prev, userMsg])
     setSending(true)
 
@@ -102,7 +115,7 @@ export function SupportChat() {
 
       let reply = typeof data?.reply === 'string' ? data.reply : null
       if (fnError || !reply) {
-        reply = "Couldn't reach support chat — please try again, or use Talk to a human below."
+        reply = "Couldn't reach support chat — please try again."
         try {
           const context = (fnError as { context?: Response })?.context
           if (context && typeof context.json === 'function') {
@@ -121,11 +134,17 @@ export function SupportChat() {
       if (Array.isArray(data?.downloads) && data.downloads.length > 0) {
         setDownloadsByMsg((prev) => ({ ...prev, [assistantId]: data.downloads as DownloadLink[] }))
       }
+
       const offer =
         data?.offerHuman === true ||
-        /\b(human|real person|agent|talk to (a )?(person|human)|customer service)\b/i.test(text)
-      if (offer || fnError) {
+        ASKED_HUMAN_RE.test(text) ||
+        Boolean(fnError) ||
+        isBotFailure(reply!) ||
+        nextUserCount >= 3
+      if (offer) {
         setShowHumanBtnFor((prev) => ({ ...prev, [assistantId]: true }))
+      } else if (nextUserCount === 1) {
+        setFollowUpsFor(assistantId)
       }
     } catch {
       const assistantId = uid()
@@ -134,13 +153,18 @@ export function SupportChat() {
         {
           id: assistantId,
           role: 'assistant',
-          content: "Couldn't reach support chat — please try again, or use Talk to a human below.",
+          content: "Couldn't reach support chat — please try again.",
         },
       ])
       setShowHumanBtnFor((prev) => ({ ...prev, [assistantId]: true }))
     } finally {
       setSending(false)
     }
+  }
+
+  const send = async (e?: FormEvent) => {
+    e?.preventDefault()
+    await sendText(input)
   }
 
   const submitEscalate = async (e: FormEvent) => {
@@ -260,6 +284,20 @@ export function SupportChat() {
                 >
                   {m.content}
                 </div>
+                {m.id === 'welcome' && showWelcomeChips && (
+                  <div className="mt-2 flex flex-wrap gap-1.5 max-w-[95%]">
+                    {QUICK_REPLIES.map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => void sendText(label)}
+                        className="px-3 py-1.5 rounded-full text-[12px] font-medium border border-line bg-white text-ink hover:bg-surface transition-colors"
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {downloadsByMsg[m.id]?.map((d) => (
                   <a
                     key={d.signedUrl}
@@ -272,6 +310,17 @@ export function SupportChat() {
                     Download {d.title}
                   </a>
                 ))}
+                {followUpsFor === m.id && !escalateOpen && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => void sendText('Anything else I should know?')}
+                      className="px-3 py-1.5 rounded-full text-[12px] font-medium border border-line bg-white text-ink hover:bg-surface transition-colors"
+                    >
+                      Anything else?
+                    </button>
+                  </div>
+                )}
                 {showHumanBtnFor[m.id] && !escalateOpen && (
                   <button
                     type="button"
@@ -287,10 +336,10 @@ export function SupportChat() {
             {sending && (
               <div className="flex items-center gap-2 text-[12px] text-ink-soft pl-1">
                 <span
-                  className="h-3.5 w-3.5 rounded-full border-2 border-ink-soft/30 border-t-[var(--color-accent)] animate-spin"
+                  className="h-3.5 w-3.5 rounded-full border-2 border-ink-soft/30 border-t-[var(--color-accent)] animate-spin motion-reduce:animate-none"
                   aria-hidden
                 />
-                Thinking…
+                Sending…
               </div>
             )}
 
@@ -337,7 +386,17 @@ export function SupportChat() {
                     className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white disabled:opacity-40 hover:opacity-90"
                     style={{ background: 'var(--color-accent)' }}
                   >
-                    {escalateSending ? 'Sending…' : 'Send message'}
+                    {escalateSending ? (
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <span
+                          className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin motion-reduce:animate-none"
+                          aria-hidden
+                        />
+                        Sending…
+                      </span>
+                    ) : (
+                      'Send message'
+                    )}
                   </button>
                   <button
                     type="button"
@@ -375,13 +434,6 @@ export function SupportChat() {
                   <MaterialIcon name="send" size={18} />
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={() => openEscalate()}
-                className="mt-2 text-[11px] text-ink-soft hover:text-ink underline-offset-2 hover:underline"
-              >
-                Talk to a human
-              </button>
             </form>
           ) : (
             <div className="shrink-0 border-t border-line bg-white px-4 py-3">
