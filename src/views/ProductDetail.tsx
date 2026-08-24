@@ -477,12 +477,12 @@ export function ProductDetail() {
         <span className="text-ink truncate max-w-[260px]">{product.title}</span>
       </nav>
 
-      {/* Hero: gallery dominates (~65%); info/buy ~35%. Mobile: gallery → buy → details.
-          Tablet (md): 2-col gallery | buy; details full-width below.
-          Desktop (lg): 3-col gallery | details | buy. */}
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,0.55fr)_minmax(240px,0.45fr)] gap-6 md:gap-7 lg:gap-8 items-start overflow-visible">
+      {/* Hero layout
+          < lg (mobile + tablet): single column — gallery → title/badges → buy → details
+          ≥ lg: 3-col gallery | details | buy */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,0.55fr)_minmax(240px,0.45fr)] gap-6 lg:gap-8 items-start overflow-visible">
         {/* Panel 1 — Gallery */}
-        <div className="min-w-0 relative order-1 md:col-start-1 md:row-start-1 z-20">
+        <div className="min-w-0 relative order-1 lg:col-start-1 lg:row-start-1 z-20">
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
             {/* Vertical thumbnails — tablet + desktop (≥768) */}
             {images.length > 1 && (
@@ -629,12 +629,20 @@ export function ProductDetail() {
                 </div>
               )}
 
-              {/* Mobile title strip */}
+              {/* Title + badges — mobile & tablet (< lg); stacks above buy box */}
               <div className="lg:hidden mt-4">
-                {category && (
-                  <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-2" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
-                    {category.name}
-                  </span>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
+                        style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 )}
                 <h1 className="font-display font-semibold text-[24px] leading-tight break-words">
                   {product.title}
@@ -644,13 +652,21 @@ export function ProductDetail() {
           </div>
         </div>
 
-        {/* Panel 2 — Product details (desktop middle; tablet full-width under gallery|buy; mobile after buy) */}
-        <div className="min-w-0 lg:pt-1 order-3 md:col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-1">
+        {/* Panel 2 — Product details (desktop middle; below buy on mobile/tablet) */}
+        <div className="min-w-0 lg:pt-1 order-3 lg:col-start-2 lg:row-start-1">
           <div className="hidden lg:block">
-            {category && (
-              <span className="inline-block text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full mb-3" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}>
-                {category.name}
-              </span>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
+                    style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             )}
             <h1 className="font-display font-semibold text-[26px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
               {product.title}
@@ -677,26 +693,13 @@ export function ProductDetail() {
             ))}
           </ul>
 
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[11px] px-3 py-1 rounded-full border border-line text-ink-soft"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
           {product.wishlist_count > 0 && (
             <p className="text-[11px] text-ink-soft mt-5">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
           )}
         </div>
 
-        {/* Panel 3 — Purchase card (mobile: right after gallery/title; tablet: right of gallery) */}
-        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2 md:col-start-2 md:row-start-1 lg:col-start-3 lg:sticky lg:top-24 order-2">
+        {/* Panel 3 — Purchase card (after title on mobile/tablet; right column on desktop) */}
+        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2 order-2 lg:col-start-3 lg:row-start-1 lg:sticky lg:top-24">
           <div className="space-y-0.5">
             {product.price > 0 && onSale ? (
               <div className="flex items-baseline gap-3 flex-wrap">
