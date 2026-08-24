@@ -626,7 +626,7 @@ export function Home({
           key={s.id}
           index={i}
           compact={s.id === 'trust'}
-          className={s.id === 'hero' ? 'md:pt-0 overflow-hidden' : undefined}
+          className={s.id === 'hero' ? 'md:pt-0 md:pb-5 overflow-hidden' : undefined}
           innerClassName={s.id === 'hero' ? 'py-10 md:py-0 md:h-[520px] grid grid-cols-1 md:grid-cols-[45%_55%] gap-10 md:gap-12 items-center' : undefined}
         >
           {s.node}
