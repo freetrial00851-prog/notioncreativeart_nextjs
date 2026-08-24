@@ -89,7 +89,7 @@ function DescriptionBlocks({ text }: { text: string }) {
   )
 }
 
-type Tab = 'description' | 'included' | 'materials' | 'skill' | 'details'
+type Tab = 'included' | 'materials' | 'skill' | 'details'
 
 export function ProductDetail() {
   const params = useParams()
@@ -106,8 +106,8 @@ export function ProductDetail() {
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
-  const [activeTab, setActiveTab] = useState<Tab>('description')
-  const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
+  const [activeTab, setActiveTab] = useState<Tab>('included')
+  const [openAccordion, setOpenAccordion] = useState<Tab | null>(null)
   const buyButtonRef = useRef<HTMLDivElement>(null)
   const [owned, setOwned] = useState(false)
   const [inWishlist, setInWishlist] = useState(false)
@@ -140,7 +140,8 @@ export function ProductDetail() {
         setUnavailable(!!everExisted)
       }
       setLoading(false)
-      setActiveTab('description')
+      setActiveTab('included')
+      setOpenAccordion(null)
       setActiveImage(0)
     })
   }, [slug])
@@ -329,7 +330,6 @@ export function ProductDetail() {
   }
 
   const images = product.images ?? []
-  const shortBlurb = product.description?.split('\n').find((l) => l.trim())?.trim() ?? ''
   const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
   const badge = product.card_badge
   const skillLabel = product.skill_level
@@ -358,8 +358,8 @@ export function ProductDetail() {
     ...(product.pdf_pages ? [{ icon: 'auto_stories', label: 'Pages', value: `${product.pdf_pages} pages` }] : []),
   ]
 
+  /** Description + specs live only in the hero content stack — not repeated in tabs. */
   const TABS: { key: Tab; label: string }[] = [
-    { key: 'description', label: 'Description' },
     { key: 'included', label: "What's Included" },
     { key: 'materials', label: 'Materials' },
     { key: 'skill', label: 'Skill Level' },
@@ -387,18 +387,6 @@ export function ProductDetail() {
   )
 
   const renderTabContent = (tab: Tab) => {
-    if (tab === 'description') {
-      return wrapTabWithImage(
-        product.description ? (
-          <div>
-            <h3 className="font-subheading font-semibold text-xl mb-4">Pattern Description</h3>
-            <DescriptionBlocks text={product.description} />
-          </div>
-        ) : (
-          <p className="text-[13px] text-ink-soft">No description yet.</p>
-        )
-      )
-    }
     if (tab === 'included') {
       return wrapTabWithImage(
         <ul className="text-[14px] text-ink-soft space-y-3 max-w-xl">
@@ -449,18 +437,11 @@ export function ProductDetail() {
     return wrapTabWithImage(
       <div className="rounded-xl px-5 py-4 space-y-2.5 text-[14px] max-w-md" style={{ background: 'var(--color-surface)' }}>
         <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1">PATTERN DETAILS</p>
-        {skillLabel && (
-          <div className="flex justify-between gap-4"><span className="text-ink-soft">Skill Level</span><span className="capitalize">{product.skill_level}</span></div>
-        )}
-        <div className="flex justify-between gap-4"><span className="text-ink-soft">Language</span><span>English (US terms)</span></div>
-        <div className="flex justify-between gap-4"><span className="text-ink-soft">Format</span><span>PDF (Printable)</span></div>
         {product.pdf_filename && (
           <div className="flex justify-between gap-4"><span className="text-ink-soft">File</span><span className="text-right truncate max-w-[200px]">{product.pdf_filename}</span></div>
         )}
-        {product.pdf_pages && (
-          <div className="flex justify-between gap-4"><span className="text-ink-soft">Pages</span><span>{product.pdf_pages}</span></div>
-        )}
         <div className="flex justify-between gap-4"><span className="text-ink-soft">Delivery</span><span>Instant download</span></div>
+        <div className="flex justify-between gap-4"><span className="text-ink-soft">Returns</span><span>Non-refundable</span></div>
       </div>
     )
   }
@@ -753,16 +734,16 @@ export function ProductDetail() {
             )}
           </div>
 
-          {(purchaseCount >= 3 || shortBlurb) && (
+          {(purchaseCount >= 3 || product.description) && (
             <div>
               {purchaseCount >= 3 && (
                 <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5">
                   <MaterialIcon name="download_done" size={14} /> {purchaseCount}+ makers have downloaded this pattern
                 </p>
               )}
-              {shortBlurb && (
-                <p className="text-[14px] text-ink-soft leading-relaxed">{shortBlurb}</p>
-              )}
+              {product.description ? (
+                <DescriptionBlocks text={product.description} />
+              ) : null}
             </div>
           )}
 
