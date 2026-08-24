@@ -160,103 +160,106 @@ export function Header() {
         </div>
       )}
 
-      {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Account | Wishlist | Cart ── */}
-      <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-site w-full mx-auto">
+      {/* ── Desktop ≥1024 (lg): Logo | Search (≤600) | Sign in → Wishlist → Cart ── */}
+      <div className="hidden lg:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-site w-full mx-auto">
         <div className="shrink-0">
           <Logo variant="full" />
         </div>
 
-        <div className="flex-1 flex items-center justify-center min-w-0 px-2">
-          <div ref={searchWrapRef} className="relative w-full max-w-[600px] min-w-0">
-            <div ref={categoriesWrapRef} className="relative">
-              <SearchPill
-                inputRef={desktopSearchInputRef}
-                query={query}
-                setQuery={setQuery}
-                onFocus={() => setSearchFocused(true)}
-                onSubmit={submitSearch}
-                onClear={clearSearch}
-                placeholder="Search"
-                buttonSize={36}
-                iconSize={18}
-                leading={
-                  <button
-                    type="button"
-                    onClick={() => setCategoriesOpen((v) => !v)}
-                    aria-label="Browse categories"
-                    aria-expanded={categoriesOpen}
-                    className="shrink-0 flex items-center justify-center w-10 h-10 rounded-l-full hover:bg-surface transition-colors"
-                  >
-                    <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
-                  </button>
-                }
-              />
-              {categoriesOpen && (
-                <DesktopCategoriesMenu
-                  categories={categories}
-                  onClose={() => setCategoriesOpen(false)}
+        {/* Search + icon cluster: ~32px (gap-8) between search and icons */}
+        <div className="flex-1 min-w-0 flex items-center gap-8">
+          <div className="flex items-center gap-3 w-full max-w-[600px] min-w-0">
+            <div ref={searchWrapRef} className="relative flex-1 min-w-0">
+              <div ref={categoriesWrapRef} className="relative">
+                <SearchPill
+                  inputRef={desktopSearchInputRef}
+                  query={query}
+                  setQuery={setQuery}
+                  onFocus={() => setSearchFocused(true)}
+                  onSubmit={submitSearch}
+                  onClear={clearSearch}
+                  placeholder="Search"
+                  buttonSize={36}
+                  iconSize={18}
+                  leading={
+                    <button
+                      type="button"
+                      onClick={() => setCategoriesOpen((v) => !v)}
+                      aria-label="Browse categories"
+                      aria-expanded={categoriesOpen}
+                      className="shrink-0 flex items-center justify-center w-10 h-10 rounded-l-full hover:bg-surface transition-colors"
+                    >
+                      <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
+                    </button>
+                  }
+                />
+                {categoriesOpen && (
+                  <DesktopCategoriesMenu
+                    categories={categories}
+                    onClose={() => setCategoriesOpen(false)}
+                  />
+                )}
+              </div>
+              {searchFocused && query && (
+                <SuggestionsDropdown
+                  suggestions={suggestions}
+                  query={query}
+                  onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
+                  onSeeAll={() => submitSearch()}
                 />
               )}
             </div>
-            {searchFocused && query && (
-              <SuggestionsDropdown
-                suggestions={suggestions}
-                query={query}
-                onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
-                onSeeAll={() => submitSearch()}
-              />
+            {pathname === '/search' && (
+              <button
+                type="button"
+                onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
+                className="text-[13px] text-ink-soft hover:text-ink shrink-0"
+              >
+                Cancel
+              </button>
             )}
           </div>
-          {pathname === '/search' && (
+
+          <div className="flex items-center gap-5 shrink-0 text-[#111111]">
+            <HeaderAccountControl
+              wrapRef={desktopAccountWrapRef}
+              iconSize={24}
+              open={desktopAccountOpen}
+              setOpen={setDesktopAccountOpen}
+              user={user}
+              profile={profile}
+              requireAuth={requireAuth}
+              signOut={signOut}
+            />
+
             <button
               type="button"
-              onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
-              className="text-[13px] text-ink-soft hover:text-ink shrink-0 ml-3"
+              aria-label="Wishlist"
+              title="Wishlist"
+              onClick={goWishlist}
+              className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
             >
-              Cancel
+              <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
             </button>
-          )}
-        </div>
 
-        <div className="flex items-center gap-1 shrink-0 text-[#111111]">
-          <HeaderAccountControl
-            wrapRef={desktopAccountWrapRef}
-            iconSize={24}
-            open={desktopAccountOpen}
-            setOpen={setDesktopAccountOpen}
-            user={user}
-            profile={profile}
-            requireAuth={requireAuth}
-            signOut={signOut}
-          />
-
-          <button
-            type="button"
-            aria-label="Wishlist"
-            title="Wishlist"
-            onClick={goWishlist}
-            className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-          >
-            <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
-          </button>
-
-          <button
-            type="button"
-            onClick={openCart}
-            aria-label="Cart"
-            title="Cart"
-            className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-          >
-            <CartIcon size={24} color={HEADER_ICON} />
-            {cartCount > 0 && (
-              <span
-                className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
-                style={{ background: 'var(--color-accent)' }}
-              >
-                {cartCount}
-              </span>
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label="Cart"
+              title="Cart"
+              className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
+            >
+              <CartIcon size={24} color={HEADER_ICON} />
+              {cartCount > 0 && (
+                <span
+                  className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
+                  style={{ background: 'var(--color-accent)' }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -264,7 +267,7 @@ export function Header() {
       <div className="hidden md:block lg:hidden">
         <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-site w-full mx-auto">
           <Logo variant="full" />
-          <div className="flex items-center gap-0.5 shrink-0 text-[#111111]">
+          <div className="flex items-center gap-5 shrink-0 text-[#111111]">
             <HeaderAccountControl
               wrapRef={tabletAccountWrapRef}
               iconSize={22}
@@ -275,10 +278,10 @@ export function Header() {
               requireAuth={requireAuth}
               signOut={signOut}
             />
-            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center">
+            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity">
               <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
             </button>
-            <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center">
+            <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity">
               <CartIcon size={22} color={HEADER_ICON} />
               {cartCount > 0 && (
                 <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
@@ -755,7 +758,7 @@ function HeaderAccountControl({
       <button
         type="button"
         onClick={() => { requireAuth() }}
-        className="h-10 px-2.5 text-[13px] font-medium text-ink hover:opacity-70 transition-opacity whitespace-nowrap shrink-0"
+        className="h-10 px-1 text-[13px] font-medium text-ink hover:opacity-70 transition-opacity whitespace-nowrap shrink-0"
       >
         Sign in
       </button>
