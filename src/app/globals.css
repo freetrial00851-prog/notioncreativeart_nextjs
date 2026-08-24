@@ -52,6 +52,11 @@
 
   /* Shared page column — Header, Home, Shop, Product, Footer, etc. use max-w-site */
   --max-width-site: 1600px;
+
+  /* Header layout tiers only — do not remap md/lg (those drive page grids).
+     Mobile: default <481px · Tablet: 481–1024px · Desktop: 1025px+ */
+  --breakpoint-tablet: 481px;
+  --breakpoint-desktop: 1025px;
 }
 
 .mobile-nca-logo {

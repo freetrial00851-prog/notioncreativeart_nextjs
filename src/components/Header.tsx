@@ -145,6 +145,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-canvas border-b border-line">
+      <div className="relative z-[3] bg-canvas">
       {showAnnouncement && (
         <div
           className="w-full text-[11px] sm:text-[12px] tracking-[0.04em] text-center py-2.5 px-4"
@@ -160,46 +161,45 @@ export function Header() {
         </div>
       )}
 
-      {/* ── Desktop ≥1024 (lg): Logo | Search (≤600) | Sign in → Wishlist → Cart ── */}
-      <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-site">
-        <div className="shrink-0">
+      {/* ── Desktop ≥1025: logo + Categories | capped search | icons immediately after ── */}
+      <div className="hidden desktop:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-site">
+        <div className="flex items-center gap-3 shrink-0">
           <Logo variant="full" />
+          <div ref={categoriesWrapRef} className="relative">
+            <button
+              type="button"
+              onClick={() => { setMobileOpen(false); setCategoriesOpen((v) => !v) }}
+              aria-label="Browse categories"
+              aria-expanded={categoriesOpen}
+              className="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-surface transition-colors"
+            >
+              <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
+              <span className="text-[13px] font-medium text-ink whitespace-nowrap">Categories</span>
+            </button>
+            {categoriesOpen && (
+              <DesktopCategoriesMenu
+                categories={categories}
+                onClose={() => setCategoriesOpen(false)}
+              />
+            )}
+          </div>
         </div>
 
-        {/* Search + icons pack to the trailing edge; ~32px between search and icon group */}
-        <div className="flex items-center gap-8 min-w-0 flex-1 justify-end">
-          <div className="flex items-center gap-3 w-full max-w-[600px] min-w-0">
+        {/* Search capped (~680px); icon group sits ~32px after it — leftover space is to the right */}
+        <div className="flex items-center gap-8 min-w-0 flex-1">
+          <div className="flex items-center gap-3 min-w-0 flex-1 max-w-[680px]">
             <div ref={searchWrapRef} className="relative flex-1 min-w-0">
-              <div ref={categoriesWrapRef} className="relative">
-                <SearchPill
-                  inputRef={desktopSearchInputRef}
-                  query={query}
-                  setQuery={setQuery}
-                  onFocus={() => setSearchFocused(true)}
-                  onSubmit={submitSearch}
-                  onClear={clearSearch}
-                  placeholder="Search"
-                  buttonSize={36}
-                  iconSize={18}
-                  leading={
-                    <button
-                      type="button"
-                      onClick={() => setCategoriesOpen((v) => !v)}
-                      aria-label="Browse categories"
-                      aria-expanded={categoriesOpen}
-                      className="shrink-0 flex items-center justify-center w-10 h-10 rounded-l-full hover:bg-surface transition-colors"
-                    >
-                      <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
-                    </button>
-                  }
-                />
-                {categoriesOpen && (
-                  <DesktopCategoriesMenu
-                    categories={categories}
-                    onClose={() => setCategoriesOpen(false)}
-                  />
-                )}
-              </div>
+              <SearchPill
+                inputRef={desktopSearchInputRef}
+                query={query}
+                setQuery={setQuery}
+                onFocus={() => setSearchFocused(true)}
+                onSubmit={submitSearch}
+                onClear={clearSearch}
+                placeholder="Search"
+                buttonSize={36}
+                iconSize={18}
+              />
               {searchFocused && query && (
                 <SuggestionsDropdown
                   suggestions={suggestions}
@@ -220,88 +220,53 @@ export function Header() {
             )}
           </div>
 
-          <div className="flex items-center gap-5 shrink-0 text-[#111111]">
-            <HeaderAccountControl
-              wrapRef={desktopAccountWrapRef}
-              iconSize={24}
-              open={desktopAccountOpen}
-              setOpen={setDesktopAccountOpen}
-              user={user}
-              profile={profile}
-              requireAuth={requireAuth}
-              signOut={signOut}
-            />
-
-            <button
-              type="button"
-              aria-label="Wishlist"
-              title="Wishlist"
-              onClick={goWishlist}
-              className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-            >
-              <MaterialIcon name="favorite" size={24} color={HEADER_ICON} filled />
-            </button>
-
-            <button
-              type="button"
-              onClick={openCart}
-              aria-label="Cart"
-              title="Cart"
-              className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-            >
-              <CartIcon size={24} color={HEADER_ICON} />
-              {cartCount > 0 && (
-                <span
-                  className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
-                  style={{ background: 'var(--color-accent)' }}
-                >
-                  {cartCount}
-                </span>
-              )}
-            </button>
-          </div>
+          <HeaderActions
+            wrapRef={desktopAccountWrapRef}
+            iconSize={24}
+            cartCount={cartCount}
+            onCart={openCart}
+            user={user}
+            profile={profile}
+            requireAuth={requireAuth}
+            signOut={signOut}
+            accountOpen={desktopAccountOpen}
+            setAccountOpen={setDesktopAccountOpen}
+            onWishlist={goWishlist}
+          />
         </div>
       </div>
 
-      {/* ── Tablet 768–1023 (md–lg): two rows ── */}
-      <div className="hidden md:block lg:hidden">
+      {/* ── Tablet 481–1024: row 1 hamburger+logo | icons; row 2 full-width search ── */}
+      <div className="hidden tablet:block desktop:hidden">
         <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-site">
-          <Logo variant="full" />
-          <div className="flex items-center gap-5 shrink-0 text-[#111111]">
-            <HeaderAccountControl
-              wrapRef={tabletAccountWrapRef}
-              iconSize={22}
-              open={desktopAccountOpen}
-              setOpen={setDesktopAccountOpen}
-              user={user}
-              profile={profile}
-              requireAuth={requireAuth}
-              signOut={signOut}
-            />
-            <button type="button" aria-label="Wishlist" title="Wishlist" onClick={goWishlist} className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity">
-              <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
+          <div className="flex items-center gap-1 min-w-0">
+            <button
+              type="button"
+              aria-label="Browse categories"
+              onClick={() => { setCategoriesOpen(false); setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
+              className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
+            >
+              <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
             </button>
-            <button type="button" aria-label="Cart" title="Cart" onClick={openCart} className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity">
-              <CartIcon size={22} color={HEADER_ICON} />
-              {cartCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            <Logo variant="full" />
           </div>
+          <HeaderActions
+            wrapRef={tabletAccountWrapRef}
+            iconSize={22}
+            cartCount={cartCount}
+            onCart={openCart}
+            user={user}
+            profile={profile}
+            requireAuth={requireAuth}
+            signOut={signOut}
+            accountOpen={desktopAccountOpen}
+            setAccountOpen={setDesktopAccountOpen}
+            onWishlist={goWishlist}
+            gapClass="gap-4"
+          />
         </div>
-        <div className="flex items-center gap-3 px-5 pb-3 max-w-site">
-          <button
-            type="button"
-            aria-label="Browse categories"
-            onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
-            className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
-          >
-            <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
-          </button>
-          {/* Tablet row 2: full remaining width — no max-w cap (cap is lg+ only) */}
-          <div ref={tabletSearchWrapRef} className="relative flex-1 min-w-0 w-full">
+        <div className="px-5 pb-3 max-w-site">
+          <div ref={tabletSearchWrapRef} className="relative w-full min-w-0">
             <SearchPill
               inputRef={tabletSearchInputRef}
               query={query}
@@ -325,8 +290,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* ── Mobile <768: hamburger | compact logo | search | account | cart ── */}
-      <div className="md:hidden relative z-50">
+      {/* ── Mobile <481: single row — hamburger, logo, search, account, wishlist, cart ── */}
+      <div className="tablet:hidden relative z-50">
         <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
           <div className="flex items-center h-10 gap-0.5">
             {!searchFocused && (
@@ -394,6 +359,15 @@ export function Header() {
                 </button>
                 <button
                   type="button"
+                  aria-label="Wishlist"
+                  title="Wishlist"
+                  onClick={goWishlist}
+                  className="w-10 h-10 shrink-0 flex items-center justify-center"
+                >
+                  <MaterialIcon name="favorite" size={22} color={HEADER_ICON} filled />
+                </button>
+                <button
+                  type="button"
                   aria-label="Cart"
                   title="Cart"
                   onClick={openMobileCart}
@@ -438,15 +412,17 @@ export function Header() {
             </div>
           )}
         </div>
+      </div>
+      </div>
 
-        {/* Mobile + tablet categories panel */}
-        {mobileOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-[1] bg-black/25 lg:hidden"
-              onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
-            />
-            <div className="absolute left-0 right-0 top-full z-[2] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] max-h-[min(78vh,640px)] overflow-y-auto lg:hidden">
+      {/* Browse panel — mobile + tablet (hidden on desktop, which uses the Categories dropdown) */}
+      {mobileOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-[1] bg-black/25 desktop:hidden"
+            onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
+          />
+          <div className="absolute left-0 right-0 top-full z-[2] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] max-h-[min(78vh,640px)] overflow-y-auto desktop:hidden">
               <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
                 <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
                   Browse Categories
@@ -538,10 +514,9 @@ export function Header() {
             </div>
           </>
         )}
-      </div>
 
       {mobileAccountOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 tablet:hidden">
           <div className="absolute inset-0 bg-canvas flex flex-col">
             <div className="flex items-center justify-between px-6 py-5 border-b border-line">
               <span className="font-subheading text-lg">{user ? 'My Account' : 'Account'}</span>
@@ -602,6 +577,75 @@ export function Header() {
         </div>
       )}
     </header>
+  )
+}
+
+function HeaderActions({
+  wrapRef,
+  iconSize,
+  cartCount,
+  onCart,
+  onWishlist,
+  user,
+  profile,
+  requireAuth,
+  signOut,
+  accountOpen,
+  setAccountOpen,
+  gapClass = 'gap-5',
+}: {
+  wrapRef: React.RefObject<HTMLDivElement | null>
+  iconSize: number
+  cartCount: number
+  onCart: () => void
+  onWishlist: () => void
+  user: { email?: string } | null
+  profile: { first_name?: string | null; last_name?: string | null } | null
+  requireAuth: () => boolean
+  signOut: () => void
+  accountOpen: boolean
+  setAccountOpen: React.Dispatch<React.SetStateAction<boolean>>
+  gapClass?: string
+}) {
+  return (
+    <div className={`flex items-center ${gapClass} shrink-0 text-[#111111]`}>
+      <HeaderAccountControl
+        wrapRef={wrapRef}
+        iconSize={iconSize}
+        open={accountOpen}
+        setOpen={setAccountOpen}
+        user={user}
+        profile={profile}
+        requireAuth={requireAuth}
+        signOut={signOut}
+      />
+      <button
+        type="button"
+        aria-label="Wishlist"
+        title="Wishlist"
+        onClick={onWishlist}
+        className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
+      >
+        <MaterialIcon name="favorite" size={iconSize} color={HEADER_ICON} filled />
+      </button>
+      <button
+        type="button"
+        onClick={onCart}
+        aria-label="Cart"
+        title="Cart"
+        className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
+      >
+        <CartIcon size={iconSize} color={HEADER_ICON} />
+        {cartCount > 0 && (
+          <span
+            className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
+            style={{ background: 'var(--color-accent)' }}
+          >
+            {cartCount}
+          </span>
+        )}
+      </button>
+    </div>
   )
 }
 

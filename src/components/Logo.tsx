@@ -46,7 +46,7 @@ function FullMark() {
         />
       </span>
       <span
-        className="text-[19px] lg:text-[21px] font-bold tracking-tight leading-none"
+        className="text-[19px] desktop:text-[21px] font-bold tracking-tight leading-none"
         style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-logo)' }}
       >
         NotionCreativeArt
