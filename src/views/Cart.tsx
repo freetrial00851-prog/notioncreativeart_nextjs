@@ -130,10 +130,11 @@ export function Cart() {
           <button
             onClick={checkout}
             disabled={checkingOut}
-            className="w-full py-4 flex items-center justify-center gap-2 text-white text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            aria-busy={checkingOut}
+            className="w-full py-4 flex items-center justify-center gap-2 text-white text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
             style={{ background: 'var(--color-sale-green)' }}
           >
-            <CartIcon size={14} /> {checkingOut ? 'PREPARING…' : `CHECKOUT — $${total.toFixed(2)}`}
+            <CartIcon size={14} /> CHECKOUT — ${total.toFixed(2)}
           </button>
 
           <div className="flex items-center gap-3 rounded-xl px-4 py-3.5 mt-4" style={{ background: 'var(--color-surface)' }}>

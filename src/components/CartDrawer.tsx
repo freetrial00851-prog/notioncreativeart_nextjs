@@ -17,12 +17,14 @@ export function CartDrawer() {
   useEffect(() => {
     if (!drawerOpen) return
     closeButtonRef.current?.focus()
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeDrawer()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !checkingOut) closeDrawer()
+    }
     window.addEventListener('keydown', onKey)
     return () => {
       window.removeEventListener('keydown', onKey)
     }
-  }, [drawerOpen, closeDrawer])
+  }, [drawerOpen, closeDrawer, checkingOut])
 
   const total = items.reduce((sum, i) => sum + (i.product?.price ?? 0), 0)
 
@@ -31,7 +33,7 @@ export function CartDrawer() {
       {/* Backdrop */}
       <div
         aria-hidden="true"
-        onClick={closeDrawer}
+        onClick={() => { if (!checkingOut) closeDrawer() }}
         className={`fixed inset-0 z-50 bg-ink/30 transition-opacity duration-200 motion-reduce:transition-none ${drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       />
 
@@ -124,10 +126,11 @@ export function CartDrawer() {
                 <button
                   onClick={checkout}
                   disabled={checkingOut}
-                  className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  aria-busy={checkingOut}
+                  className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
                   style={{ background: 'var(--color-cart-blue)' }}
                 >
-                  {checkingOut ? 'Preparing…' : `Checkout — $${total.toFixed(2)}`}
+                  Checkout — ${total.toFixed(2)}
                 </button>
                 <Link
                   href="/cart"

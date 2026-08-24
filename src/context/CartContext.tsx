@@ -171,7 +171,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         billingZip: profile?.billing_zip,
       },
     })
-    setCheckingOut(false)
     if (fnError || !data?.url) {
       // Try to pull the real reason out of the Edge Function's response body —
       // supabase-js only sets `fnError` (with `data` null) on a non-2xx status,
@@ -193,6 +192,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       console.error('Cart checkout failed:', fnError, data)
       setCheckoutError(message)
+      setCheckingOut(false)
       return
     }
     if (data.hosted) {
@@ -200,6 +200,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } else {
       openCheckout(data.url)
     }
+    setCheckingOut(false)
   }
 
   return (
