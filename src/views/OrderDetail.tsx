@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { ContentSkeleton } from '../components/Skeleton'
 import { StatusBadge, type OrderRow } from '../components/StatusBadge'
+import { DownloadReceiptButton } from '../components/DownloadReceiptButton'
 import type { Product } from '../lib/types'
 
 const BRAND = '#1f249c'
@@ -71,6 +72,9 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <h1 className="font-heading font-semibold text-2xl md:text-3xl">Order #{order.lemon_order_id || order.id.slice(0, 8)}</h1>
         <StatusBadge status={order.status} />
+        <div className="ml-auto">
+          <DownloadReceiptButton orderId={order.id} variant="header" />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5 mb-6">

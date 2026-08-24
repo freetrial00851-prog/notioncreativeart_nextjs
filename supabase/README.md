@@ -57,7 +57,7 @@ Deploy separately when needed:
 npx supabase functions deploy lemon-webhook --project-ref anlsellghialszuuvipw --no-verify-jwt
 npx supabase functions deploy create-cart-checkout --project-ref anlsellghialszuuvipw
 npx supabase functions deploy subscribe-newsletter --project-ref anlsellghialszuuvipw
-npx supabase functions deploy download-free-pattern --project-ref anlsellghialszuuvipw
+npx supabase functions deploy download-order-receipt --project-ref anlsellghialszuuvipw
 npx supabase functions deploy chat-support --project-ref anlsellghialszuuvipw
 npx supabase functions deploy chat-escalate --project-ref anlsellghialszuuvipw
 ```

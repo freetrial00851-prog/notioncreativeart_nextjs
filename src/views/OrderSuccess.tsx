@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { DownloadReceiptButton } from '../components/DownloadReceiptButton'
 
 type RecentOrder = {
   id: string
@@ -71,6 +72,7 @@ const { user, loading: authLoading } = useAuth()
         <Link href="/account/downloads" className="block w-full py-3.5 text-canvas text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity" style={{ background: 'var(--color-sale-green)' }}>
           DOWNLOAD YOUR PATTERNS
         </Link>
+        {order && <DownloadReceiptButton orderId={order.id} />}
         <Link href="/account/orders" className="block w-full py-3.5 border border-line rounded-lg text-[12px] tracking-[0.12em] text-ink hover:bg-surface transition-colors">
           VIEW MY ORDERS
         </Link>
