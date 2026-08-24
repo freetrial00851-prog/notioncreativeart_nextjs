@@ -18,12 +18,6 @@ export type ShopCatalogSnapshot = {
   filters: ShopFilters
 }
 
-/** Columns needed for ProductCard + sorting/filtering — avoids pulling PDF/body blobs. */
-const PRODUCT_LIST_COLUMNS =
-  'id, slug, title, price, compare_at_price, images, sold_out, card_badge, skill_level, is_bundle, category_id, created_at, wishlist_count, active'
-
-const CATEGORY_LIST_COLUMNS = 'id, name, slug, parent_id, sort_order'
-
 export function parseShopFilters(
   categorySlug: string | null | undefined,
   searchParams: Record<string, string | string[] | undefined> | URLSearchParams,
@@ -63,51 +57,50 @@ export async function loadShopCatalog(
   supabase: SupabaseClient,
   filters: ShopFilters,
 ): Promise<ShopCatalogSnapshot> {
-  const { data: categoriesData } = await supabase
-    .from('categories')
-    .select(CATEGORY_LIST_COLUMNS)
-    .order('sort_order')
+  const { data: categoriesData } = await supabase.from('categories').select('*').order('sort_order')
   const categories = (categoriesData as Category[]) ?? []
 
-  const categorySlug = filters.categorySlug
-  const currentCategory = categories.find((c) => c.slug === categorySlug)
-
-  let query = supabase.from('products').select(PRODUCT_LIST_COLUMNS).eq('active', true)
+  let query = supabase.from('products').select('*').eq('active', true)
   if (filters.level) query = query.eq('skill_level', filters.level)
   if (filters.price === 'free') query = query.eq('price', 0)
   if (filters.bundle) query = query.eq('is_bundle', true)
 
+  const categorySlug = filters.categorySlug
   if (categorySlug === 'sale') {
     query = query.not('compare_at_price', 'is', null)
   } else if (categorySlug === 'bestsellers') {
     query = query.eq('featured', true)
-  } else if (categorySlug && categorySlug !== 'new' && currentCategory) {
-    if (currentCategory.parent_id) {
-      query = query.eq('category_id', currentCategory.id)
-    } else {
-      const subIds = categories.filter((c) => c.parent_id === currentCategory.id).map((c) => c.id)
-      query = query.in('category_id', [currentCategory.id, ...subIds])
+  } else if (categorySlug && categorySlug !== 'new') {
+    const cat = categories.find((c) => c.slug === categorySlug)
+    if (cat) {
+      if (cat.parent_id) {
+        query = query.eq('category_id', cat.id)
+      } else {
+        const subIds = categories.filter((c) => c.parent_id === cat.id).map((c) => c.id)
+        query = query.in('category_id', [cat.id, ...subIds])
+      }
     }
   }
 
-  // Products + sidebar counts in parallel (sidebar only needs category ids, not products).
-  const productsP = query.order('created_at', { ascending: false })
-  const sidebarP = currentCategory
-    ? getSubcategoriesWithCounts(supabase, currentCategory.parent_id ?? currentCategory.id)
-    : Promise.resolve([] as SubcategoryWithCount[])
-
-  const [{ data: productsData }, sidebarCategories] = await Promise.all([productsP, sidebarP])
-
+  const { data: productsData } = await query.order('created_at', { ascending: false })
   let products = (productsData as Product[]) ?? []
+
   if (filters.sale) {
     products = products.filter((p) => p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price)
+  }
+
+  let sidebarCategories: SubcategoryWithCount[] = []
+  const currentCategory = categories.find((c) => c.slug === categorySlug)
+  if (currentCategory) {
+    const parentId = currentCategory.parent_id ?? currentCategory.id
+    sidebarCategories = await getSubcategoriesWithCounts(supabase, parentId)
   }
 
   let suggestions: Product[] = []
   if (products.length === 0) {
     const { data: suggestionData } = await supabase
       .from('products')
-      .select(PRODUCT_LIST_COLUMNS)
+      .select('*')
       .eq('active', true)
       .order('wishlist_count', { ascending: false })
       .limit(4)
