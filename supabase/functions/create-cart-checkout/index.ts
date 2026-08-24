@@ -106,7 +106,14 @@ Deno.serve(async (req) => {
           type: 'checkouts',
           attributes: {
             custom_price: totalCents,
-            product_options: { name, description, media, redirect_url: 'https://notioncreativeart.com/order-success' },
+            product_options: {
+              name,
+              description,
+              media,
+              redirect_url: 'https://notioncreativeartnextjs.vercel.app/order-success',
+              receipt_link_url: 'https://notioncreativeartnextjs.vercel.app/order-success',
+              receipt_button_text: 'View your order',
+            },
             checkout_options: { embed: !isHosted, desc: true },
             checkout_data: {
               email,

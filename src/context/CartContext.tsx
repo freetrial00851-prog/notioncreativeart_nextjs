@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { supabase } from '../lib/supabase'
 import { useAuth } from './AuthContext'
 import { useToast } from './ToastContext'
-import { openCheckout } from '../lib/lemonsqueezy'
+import { startApiCheckout } from '../lib/lemonsqueezy'
 import type { Product } from '../lib/types'
 
 type CartItem = {
@@ -160,9 +160,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return
     }
     setCheckingOut(true)
-    const { data, error: fnError } = await supabase.functions.invoke('create-cart-checkout', {
-      body: {
-        productIds: items.map((i) => i.product_id),
+    const result = await startApiCheckout(
+      items.map((i) => i.product_id),
+      {
         userId: user.id,
         email: user.email,
         name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined,
@@ -170,36 +170,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         billingState: profile?.billing_state,
         billingZip: profile?.billing_zip,
       },
-    })
-    if (fnError || !data?.url) {
-      // Try to pull the real reason out of the Edge Function's response body —
-      // supabase-js only sets `fnError` (with `data` null) on a non-2xx status,
-      // but the function still returns a JSON body with a specific `error`
-      // message (e.g. "Missing Lemon Squeezy numeric variant ID for: X",
-      // "Could not resolve store/variant from Lemon Squeezy..."). Fall back to
-      // the generic message only if we truly can't read a specific one.
-      let message = "Couldn't start checkout — please try again in a moment."
-      try {
-        const context = (fnError as { context?: Response })?.context
-        if (context && typeof context.json === 'function') {
-          const body = await context.json()
-          if (body?.error) message = body.error
-        } else if (data?.error) {
-          message = data.error
-        }
-      } catch {
-        // context wasn't valid JSON (e.g. a network-level failure) — keep the generic message
-      }
-      console.error('Cart checkout failed:', fnError, data)
-      setCheckoutError(message)
-      setCheckingOut(false)
-      return
-    }
-    if (data.hosted) {
-      window.open(data.url, '_blank', 'noopener')
-    } else {
-      openCheckout(data.url)
-    }
+    )
+    if (!result.ok) setCheckoutError(result.error)
     setCheckingOut(false)
   }
 

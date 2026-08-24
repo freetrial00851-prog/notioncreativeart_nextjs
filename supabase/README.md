@@ -54,13 +54,27 @@ where id = (select id from auth.users where email = 'your@email.com');
 Deploy separately when needed:
 
 ```bash
-npx supabase functions deploy lemon-webhook --project-ref anlsellghialszuuvipw
+npx supabase functions deploy lemon-webhook --project-ref anlsellghialszuuvipw --no-verify-jwt
 npx supabase functions deploy create-cart-checkout --project-ref anlsellghialszuuvipw
 npx supabase functions deploy subscribe-newsletter --project-ref anlsellghialszuuvipw
 npx supabase functions deploy download-free-pattern --project-ref anlsellghialszuuvipw
 npx supabase functions deploy chat-support --project-ref anlsellghialszuuvipw
 npx supabase functions deploy chat-escalate --project-ref anlsellghialszuuvipw
 ```
+
+Callback URL for Lemon Squeezy → Settings → Webhooks (Test mode):
+
+`https://anlsellghialszuuvipw.supabase.co/functions/v1/lemon-webhook`
+
+Subscribe to `order_created` and `order_refunded`. JWT verification is off because Lemon signs with HMAC, not a Supabase JWT.
+
+### `lemon-webhook` secrets
+
+```bash
+npx supabase secrets set LEMON_WEBHOOK_SECRET=your_test_mode_signing_secret --project-ref anlsellghialszuuvipw
+```
+
+Copy the signing secret from the **test-mode** webhook in Lemon Squeezy (test and live secrets are different).
 
 ### `chat-support` secrets
 

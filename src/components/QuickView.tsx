@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { supabase } from '../lib/supabase'
-import { startCheckout } from '../lib/lemonsqueezy'
+import { startApiCheckout } from '../lib/lemonsqueezy'
 import { downloadFreePattern } from '../lib/downloads'
 import { useToast } from '../context/ToastContext'
 import { deriveVariantUrl } from '../lib/imageVariants'
@@ -68,11 +68,17 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
     if (buying) return
     setBuying(true)
     showBusyOverlay('checkout')
-    startCheckout({ variantId: product.lemon_variant_id, userId: user!.id, productId: product.id, email: user!.email, name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined, billingCountry: profile?.billing_country, billingState: profile?.billing_state, billingZip: profile?.billing_zip, checkoutMode: product.checkout_mode })
-    setTimeout(() => {
-      hideBusyOverlay()
-      setBuying(false)
-    }, 400)
+    const result = await startApiCheckout([product.id], {
+      userId: user!.id,
+      email: user!.email,
+      name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined,
+      billingCountry: profile?.billing_country,
+      billingState: profile?.billing_state,
+      billingZip: profile?.billing_zip,
+    })
+    hideBusyOverlay()
+    setBuying(false)
+    if (!result.ok) showToast(result.error, 'error')
   }
 
   const toggleWishlist = async () => {

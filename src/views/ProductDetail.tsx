@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
-import { startCheckout } from '../lib/lemonsqueezy'
+import { startApiCheckout } from '../lib/lemonsqueezy'
 import { getPrefetchedProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useAuth } from '../context/AuthContext'
@@ -278,22 +278,17 @@ export function ProductDetail() {
     if (buying) return
     setBuying(true)
     showBusyOverlay('checkout')
-    startCheckout({
-      variantId: product.lemon_variant_id,
+    const result = await startApiCheckout([product.id], {
       userId: user!.id,
-      productId: product.id,
       email: user!.email,
       name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined,
       billingCountry: profile?.billing_country,
       billingState: profile?.billing_state,
       billingZip: profile?.billing_zip,
-      checkoutMode: product.checkout_mode,
     })
-    // Lemon opens sync; keep overlay briefly so the blur paints, then clear.
-    setTimeout(() => {
-      hideBusyOverlay()
-      setBuying(false)
-    }, 400)
+    hideBusyOverlay()
+    setBuying(false)
+    if (!result.ok) showToast(result.error, 'error')
   }
 
   const toggleWishlist = async () => {

@@ -9,53 +9,17 @@ declare global {
   }
 }
 
-const LEMON_STORE_SLUG = process.env.NEXT_PUBLIC_LEMON_STORE_SLUG as string | undefined
+import { supabase } from './supabase'
 
-/**
- * Builds a Lemon Squeezy checkout URL for a single variant.
- * No server call needed for a basic checkout — Lemon Squeezy's overlay.js
- * script (loaded once in index.html) intercepts links to *.lemonsqueezy.com/checkout/*
- * and opens them as an in-page overlay instead of a redirect.
- *
- * We pass user_id + product_id as custom checkout data so the webhook
- * (Supabase Edge Function) can match the completed order back to our DB
- * without needing its own createCheckout() API call.
- *
- * `embed` controls the resulting page's own layout, independent of how we
- * choose to open it: embed=1 forces Lemon Squeezy's narrow single-column
- * design (meant for use inside our overlay/iframe); omitting it renders
- * their normal wide, side-by-side hosted checkout page.
- */
-export function buildCheckoutUrl(params: {
-  variantId: string
+const FALLBACK_CHECKOUT_ERROR = "Couldn't start checkout — please try again in a moment."
+
+export type ApiCheckoutCustomer = {
   userId: string
-  productId: string
-  email?: string
+  email?: string | null
   name?: string
   billingCountry?: string | null
   billingState?: string | null
   billingZip?: string | null
-  embed?: boolean
-}) {
-  if (!LEMON_STORE_SLUG) {
-    console.error('VITE_LEMON_STORE_SLUG is not set')
-    return '#'
-  }
-  const url = new URL(`https://${LEMON_STORE_SLUG}.lemonsqueezy.com/checkout/buy/${params.variantId}`)
-  url.searchParams.set('checkout[custom][user_id]', params.userId)
-  url.searchParams.set('checkout[custom][product_id]', params.productId)
-  if (params.email) url.searchParams.set('checkout[email]', params.email)
-  if (params.name) url.searchParams.set('checkout[name]', params.name)
-  if (params.billingCountry) url.searchParams.set('checkout[billing_address][country]', params.billingCountry)
-  if (params.billingState) url.searchParams.set('checkout[billing_address][state]', params.billingState)
-  if (params.billingZip) url.searchParams.set('checkout[billing_address][zip]', params.billingZip)
-  if (params.embed !== false) url.searchParams.set('embed', '1')
-  url.searchParams.set('desc', '0') // hide the long product description on checkout — it's already shown on our product page
-  // Send buyers straight to their downloads after paying, on every product —
-  // overrides that product's own "Confirmation Modal / Button Link" dashboard
-  // setting (which is per-product and easy to forget to set on new listings).
-  url.searchParams.set('checkout[redirect_url]', 'https://notioncreativeart.com/order-success')
-  return url.toString()
 }
 
 /**
@@ -67,33 +31,59 @@ export function openCheckout(url: string) {
   if (window.LemonSqueezy) {
     window.LemonSqueezy.Url.Open(url)
   } else {
-    // lemon.js hasn't loaded yet (slow network / blocked) — fall back to a plain redirect
     window.location.href = url
   }
 }
 
-/**
- * Single entry point for starting checkout on any product — respects that
- * product's own checkout_mode (set per-listing in the admin panel):
- *   'overlay' → stays on our site, opens as an in-page modal (narrower layout)
- *   'hosted'  → opens Lemon Squeezy's full checkout page in a new tab (wide layout)
- */
-export function startCheckout(params: {
-  variantId: string
-  userId: string
-  productId: string
-  email?: string
-  name?: string
-  billingCountry?: string | null
-  billingState?: string | null
-  billingZip?: string | null
-  checkoutMode: 'overlay' | 'hosted'
-}) {
-  const isHosted = params.checkoutMode === 'hosted'
-  const url = buildCheckoutUrl({ ...params, embed: !isHosted })
-  if (isHosted) {
-    window.open(url, '_blank', 'noopener')
-  } else {
-    openCheckout(url)
+async function readFunctionError(
+  fnError: unknown,
+  data: { error?: string } | null,
+): Promise<string> {
+  try {
+    const context = (fnError as { context?: Response })?.context
+    if (context && typeof context.json === 'function') {
+      const body = await context.json()
+      if (body?.error) return body.error
+    } else if (data?.error) {
+      return data.error
+    }
+  } catch {
+    /* keep generic */
   }
+  return FALLBACK_CHECKOUT_ERROR
+}
+
+/**
+ * Creates a Lemon Squeezy checkout via the Checkouts API (create-cart-checkout)
+ * so product_options.redirect_url is actually applied. Shareable buy-link query
+ * params like checkout[redirect_url] are ignored by Lemon.
+ */
+export async function startApiCheckout(
+  productIds: string[],
+  customer: ApiCheckoutCustomer,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { data, error: fnError } = await supabase.functions.invoke('create-cart-checkout', {
+    body: {
+      productIds,
+      userId: customer.userId,
+      email: customer.email,
+      name: customer.name,
+      billingCountry: customer.billingCountry,
+      billingState: customer.billingState,
+      billingZip: customer.billingZip,
+    },
+  })
+
+  if (fnError || !data?.url) {
+    const error = await readFunctionError(fnError, data)
+    console.error('Checkout creation failed:', fnError, data)
+    return { ok: false, error }
+  }
+
+  if (data.hosted) {
+    window.open(data.url, '_blank', 'noopener')
+  } else {
+    openCheckout(data.url)
+  }
+  return { ok: true }
 }

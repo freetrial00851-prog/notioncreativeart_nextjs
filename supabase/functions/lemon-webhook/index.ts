@@ -33,16 +33,25 @@ Deno.serve(async (req) => {
 
   const rawBody = await req.text()
   const signature = req.headers.get('x-signature')
-  const secret = Deno.env.get('LEMON_WEBHOOK_SECRET')!
+  const secret = Deno.env.get('LEMON_WEBHOOK_SECRET')
+  if (!secret) {
+    console.error('lemon-webhook: LEMON_WEBHOOK_SECRET is not set')
+    return new Response('Webhook not configured', { status: 500 })
+  }
 
   const valid = await verifySignature(rawBody, signature, secret)
-  if (!valid) return new Response('Invalid signature', { status: 401 })
+  if (!valid) {
+    console.error('lemon-webhook: invalid signature')
+    return new Response('Invalid signature', { status: 401 })
+  }
 
   const payload = JSON.parse(rawBody)
   const eventName = payload.meta?.event_name as string
   const customData = payload.meta?.custom_data ?? {}
   const attrs = payload.data?.attributes ?? {}
-  const lemonOrderId = String(payload.data?.id ?? '')
+  // Prefer the customer-facing order number (#43285338) so Account + support lookup match the receipt.
+  const lemonOrderId = String(attrs.order_number ?? payload.data?.id ?? '')
+  console.log('lemon-webhook event:', eventName, lemonOrderId || '(no id)')
 
   try {
     if (eventName === 'order_created') {
