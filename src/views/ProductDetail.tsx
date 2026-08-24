@@ -787,8 +787,11 @@ export function ProductDetail() {
       </div>
 
       {alsoBought.length > 0 && (
-        <div className="mt-16 md:mt-20 pt-10 border-t border-line">
-          <div className="flex items-end justify-between gap-4 mb-6">
+        <div
+          className="-mx-6 md:-mx-16 mt-16 px-6 md:px-16 py-14 md:py-20"
+          style={{ background: 'var(--color-surface)' }}
+        >
+          <div className="flex items-end justify-between gap-4 mb-8">
             <h2 className="font-subheading font-semibold text-2xl">Customers Also Bought</h2>
             <Link href={shopLink} className="text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink shrink-0">
               View all →
@@ -805,8 +808,11 @@ export function ProductDetail() {
       )}
 
       {related.length > 0 && (
-        <div className="mt-16 md:mt-20 pt-10 border-t border-line">
-          <div className="flex items-end justify-between gap-4 mb-6">
+        <div
+          className="-mx-6 md:-mx-16 mt-0 px-6 md:px-16 py-14 md:py-20"
+          style={{ background: alsoBought.length > 0 ? 'var(--color-background)' : 'var(--color-surface)' }}
+        >
+          <div className="flex items-end justify-between gap-4 mb-8">
             <h2 className="font-subheading font-semibold text-2xl">You May Also Like</h2>
             <Link href={shopLink} className="text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink shrink-0">
               View all →
@@ -822,7 +828,7 @@ export function ProductDetail() {
         </div>
       )}
 
-      <div className="-mx-6 md:-mx-16 mt-12">
+      <div className="-mx-6 md:-mx-16 px-6 md:px-16 py-14 md:py-20" style={{ background: 'var(--color-surface)' }}>
         <NewsletterBanner image={images[0]} />
       </div>
 

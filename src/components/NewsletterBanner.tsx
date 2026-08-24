@@ -8,25 +8,36 @@ import { subscribeToNewsletter } from '../lib/newsletter'
  *   < 768px       → stacked, centered
  *   768–1023 (md) → stacked, left-aligned: text block on top, full-width email+button row below
  *   ≥ 1024 (lg)   → side-by-side: text left, email+button right
+ *
+ * Homepage wraps this in SectionBand for alternating bg + padding.
+ * Elsewhere, pass `standalone` for its own max-width + vertical padding.
  */
-export function NewsletterBanner(_props: { image?: string }) {
-  return (
-    <section className="max-w-site w-full mx-auto px-6 md:px-16 py-5 md:py-7">
-      <div
-        className="rounded-2xl px-8 py-10 md:px-14 md:py-12 flex flex-col text-center gap-6 md:text-left md:gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8 text-white"
-        style={{ background: 'var(--color-primary)' }}
-      >
-        <div className="min-w-0 w-full lg:flex-1">
-          <p className="text-[10px] tracking-[0.2em] opacity-70 mb-2">JOIN OUR MAKER COMMUNITY</p>
-          <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2 md:mb-3">Get 10% Off Your Next Order</h2>
-          <p className="text-[13px] opacity-80 max-w-sm mx-auto md:mx-0 md:max-w-none lg:max-w-sm">
-            Get exclusive patterns, tips, new releases and special offers directly to your inbox.
-          </p>
-        </div>
-        <NewsletterForm />
+export function NewsletterBanner(_props: { image?: string; standalone?: boolean }) {
+  const card = (
+    <div
+      className="rounded-2xl px-8 py-10 md:px-14 md:py-12 flex flex-col text-center gap-6 md:text-left md:gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8 text-white"
+      style={{ background: 'var(--color-primary)' }}
+    >
+      <div className="min-w-0 w-full lg:flex-1">
+        <p className="text-[10px] tracking-[0.2em] opacity-70 mb-2">JOIN OUR MAKER COMMUNITY</p>
+        <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2 md:mb-3">Get 10% Off Your Next Order</h2>
+        <p className="text-[13px] opacity-80 max-w-sm mx-auto md:mx-0 md:max-w-none lg:max-w-sm">
+          Get exclusive patterns, tips, new releases and special offers directly to your inbox.
+        </p>
       </div>
-    </section>
+      <NewsletterForm />
+    </div>
   )
+
+  if (_props.standalone) {
+    return (
+      <section className="max-w-site px-6 md:px-16 py-14 md:py-24">
+        {card}
+      </section>
+    )
+  }
+
+  return card
 }
 
 function NewsletterForm() {
