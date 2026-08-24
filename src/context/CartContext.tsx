@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './AuthContext'
+import { useToast } from './ToastContext'
 import { openCheckout } from '../lib/lemonsqueezy'
 import type { Product } from '../lib/types'
 
@@ -33,6 +34,7 @@ const CartContext = createContext<CartContextValue | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user, profile } = useAuth()
+  const { showToast } = useToast()
   const [items, setItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -58,13 +60,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // product: null here (RLS only exposes active products) — rather than
     // let a stale row linger and crash the cart UI on missing product data,
     // quietly drop it from both local state and the cart_items table.
-    const valid = rows.filter((r) => r.product)
+    const withProduct = rows.filter((r) => r.product)
     const staleIds = rows.filter((r) => !r.product).map((r) => r.product_id)
-    if (staleIds.length > 0) {
-      supabase.from('cart_items').delete().eq('user_id', user.id).in('product_id', staleIds)
+
+    // Free ($0) patterns download directly — they must never sit in the cart
+    // (legacy rows from before this rule are stripped on every load).
+    const freeIds = withProduct
+      .filter((r) => Number(r.product?.price) === 0)
+      .map((r) => r.product_id)
+    const paid = withProduct.filter((r) => Number(r.product?.price) > 0)
+
+    const dropIds = [...staleIds, ...freeIds]
+    if (dropIds.length > 0) {
+      await supabase.from('cart_items').delete().eq('user_id', user.id).in('product_id', dropIds)
+    }
+    if (freeIds.length > 0) {
+      showToast(
+        freeIds.length === 1
+          ? 'A free pattern was removed from your cart — use Download Free on its product page.'
+          : 'Free patterns were removed from your cart — use Download Free on each product page.',
+        'info',
+      )
     }
 
-    setItems(valid)
+    setItems(paid)
     setLoading(false)
   }
 
@@ -100,6 +119,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = async (productId: string) => {
     if (!user) return
+    const { data: product } = await supabase
+      .from('products')
+      .select('price')
+      .eq('id', productId)
+      .maybeSingle()
+    if (!product || Number(product.price) === 0) {
+      showToast('Free patterns download directly — they can’t be added to cart.', 'info')
+      return
+    }
     await supabase.from('cart_items').upsert({ user_id: user.id, product_id: productId })
     await load()
     setJustAdded(true)
@@ -126,6 +154,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const checkout = async () => {
     if (!user || items.length === 0) return
     setCheckoutError(null)
+    const freeInCart = items.filter((i) => Number(i.product?.price) === 0)
+    if (freeInCart.length > 0) {
+      setCheckoutError('Free patterns can’t be checked out — remove them and use Download Free on the product page.')
+      return
+    }
     setCheckingOut(true)
     const { data, error: fnError } = await supabase.functions.invoke('create-cart-checkout', {
       body: {

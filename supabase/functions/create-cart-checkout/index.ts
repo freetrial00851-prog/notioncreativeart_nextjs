@@ -34,6 +34,16 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Could not load cart products' }), { status: 400, headers: corsHeaders })
     }
 
+    const free = products.filter((p) => Number(p.price) === 0)
+    if (free.length > 0) {
+      return new Response(
+        JSON.stringify({
+          error: `Free patterns can’t be checked out (${free.map((p) => p.title).join(', ')}). Use Download Free on the product page instead.`,
+        }),
+        { status: 400, headers: corsHeaders },
+      )
+    }
+
     const firstNumericId = products[0].lemon_numeric_variant_id
     const missing = products.filter((p) => !p.lemon_numeric_variant_id)
     if (missing.length > 0) {

@@ -19,7 +19,19 @@ export function PendingActionRunner() {
       }
 
       if (pendingAction.type === 'cart') {
-        await supabase.from('cart_items').upsert({ user_id: user.id, product_id: pendingAction.productId })
+        const { data } = await supabase
+          .from('products')
+          .select('id, title, price')
+          .eq('id', pendingAction.productId)
+          .maybeSingle()
+        const product = data as Pick<Product, 'id' | 'title' | 'price'> | null
+        // Free patterns never go in the cart — download instead if the user
+        // signed in after an accidental cart intent on a $0 listing.
+        if (product && Number(product.price) === 0) {
+          await downloadFreePattern(product.id, product.title, user.id)
+        } else if (product) {
+          await supabase.from('cart_items').upsert({ user_id: user.id, product_id: pendingAction.productId })
+        }
       }
 
       if (pendingAction.type === 'buy') {

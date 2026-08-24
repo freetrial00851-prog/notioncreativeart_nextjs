@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useAuth } from '../context/AuthContext'
@@ -313,10 +313,24 @@ const COUNTRIES: [string, string][] = [
   ['PT', 'Portugal'], ['BE', 'Belgium'], ['CH', 'Switzerland'], ['AT', 'Austria'], ['JP', 'Japan'],
 ]
 
+type SettingsTab = 'profile' | 'password' | 'addresses'
+
+function settingsTabFromSearch(tab: string | null): SettingsTab {
+  if (tab === 'password' || tab === 'addresses') return tab
+  return 'profile'
+}
+
 function ProfileTab() {
   const { user, profile, refreshProfile } = useAuth()
   const { showToast } = useToast()
-  const [settingsTab, setSettingsTab] = useState<'profile' | 'password' | 'addresses'>('profile')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const settingsTab = settingsTabFromSearch(searchParams.get('tab'))
+
+  const selectSettingsTab = (key: SettingsTab) => {
+    const href = key === 'profile' ? '/account/profile' : `/account/profile?tab=${key}`
+    router.replace(href, { scroll: false })
+  }
   const [firstName, setFirstName] = useState(profile?.first_name ?? '')
   const [lastName, setLastName] = useState(profile?.last_name ?? '')
   const [editingName, setEditingName] = useState(false)
@@ -396,14 +410,16 @@ function ProfileTab() {
   return (
     <div>
       <div className="flex gap-6 border-b border-line mb-8 text-[12px] tracking-[0.08em] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-        {([
+          {([
           { key: 'profile' as const, label: 'Profile Information' },
           { key: 'password' as const, label: 'Password' },
           { key: 'addresses' as const, label: 'Addresses' },
         ]).map((t) => (
           <button
             key={t.key}
-            onClick={() => setSettingsTab(t.key)}
+            type="button"
+            onClick={() => selectSettingsTab(t.key)}
+            aria-current={settingsTab === t.key ? 'page' : undefined}
             className={`pb-3 border-b-2 -mb-px shrink-0 ${settingsTab === t.key ? 'border-[var(--color-accent)] text-[var(--color-accent)] font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
           >
             {t.label.toUpperCase()}

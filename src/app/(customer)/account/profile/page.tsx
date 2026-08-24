@@ -1,5 +1,7 @@
+import { Suspense } from 'react'
 import { buildMetadata } from '@/lib/seo'
 import { Account } from '@/views/Account'
+import { ContentSkeleton } from '@/components/Skeleton'
 
 export const metadata = buildMetadata({
   title: 'Account Settings',
@@ -9,5 +11,9 @@ export const metadata = buildMetadata({
 })
 
 export default function AccountProfilePage() {
-  return <Account />
+  return (
+    <Suspense fallback={<ContentSkeleton />}>
+      <Account />
+    </Suspense>
+  )
 }

@@ -153,7 +153,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                 <button
                   onClick={downloadFree}
                   disabled={downloadingFree}
-                  aria-label="Free — download now"
+                  aria-label="Download free"
                   className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-opacity disabled:opacity-60"
                   style={{ background: 'var(--color-accent)' }}
                 >

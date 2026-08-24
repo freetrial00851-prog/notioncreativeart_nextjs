@@ -301,6 +301,7 @@ export function ProductDetail() {
   }
 
   const toggleCart = async () => {
+    if (product.price === 0) return
     if (!requireAuth({ type: 'cart', productId: product.id })) return
     if (isInCart(product.id)) await removeFromCart(product.id)
     else await addToCart(product.id)
@@ -741,7 +742,7 @@ export function ProductDetail() {
                 style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
               >
                 {product.price === 0
-                  ? (downloadingFree ? 'PREPARING…' : 'FREE — DOWNLOAD NOW')
+                  ? (downloadingFree ? 'PREPARING…' : 'DOWNLOAD FREE')
                   : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW')}
               </button>
               <button
@@ -880,7 +881,7 @@ export function ProductDetail() {
             className="flex-1 py-3 text-canvas text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
             style={{ background: 'var(--color-sale-green)' }}
           >
-            {product.price === 0 ? (downloadingFree ? 'PREPARING…' : 'FREE — DOWNLOAD NOW') : (buying ? 'OPENING…' : 'BUY NOW')}
+            {product.price === 0 ? (downloadingFree ? 'PREPARING…' : 'DOWNLOAD FREE') : (buying ? 'OPENING…' : 'BUY NOW')}
           </button>
         </div>
       )}

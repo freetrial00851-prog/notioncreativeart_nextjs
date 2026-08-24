@@ -82,6 +82,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
   }
 
   const toggleCart = async () => {
+    if (product.price === 0) return
     if (!requireAuth({ type: 'cart', productId: product.id })) return
     if (inCart) await removeFromCart(product.id)
     else await addToCart(product.id)
@@ -172,7 +173,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
                 className="w-full py-3.5 bg-ink text-canvas text-[12px] tracking-[0.15em] hover:opacity-85 transition-opacity rounded-lg disabled:opacity-60"
               >
-                {product.price === 0 ? (downloadingFree ? 'PREPARING…' : 'FREE — DOWNLOAD NOW') : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW — INSTANT DOWNLOAD')}
+                {product.price === 0 ? (downloadingFree ? 'PREPARING…' : 'DOWNLOAD FREE') : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW — INSTANT DOWNLOAD')}
               </button>
             )}
             <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-3'}>
