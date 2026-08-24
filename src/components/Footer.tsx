@@ -165,7 +165,7 @@ export function Footer() {
   const [openSection, setOpenSection] = useState<string | null>(null)
 
   useEffect(() => {
-    getCategoriesWithProducts().then(setCategories)
+    getCategoriesWithProducts(supabase).then(setCategories)
   }, [])
 
   const AccountLinks = (

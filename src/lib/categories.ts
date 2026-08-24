@@ -1,15 +1,15 @@
-import { supabase } from './supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CategoryContent } from './types'
 
 export type CategoryWithCount = CategoryContent & { id: string; count: number }
 
-export async function getCategoriesWithProducts(): Promise<CategoryWithCount[]> {
+export async function getCategoriesWithProducts(supabase: SupabaseClient): Promise<CategoryWithCount[]> {
   // Real categories table is the source of truth — every real top-level
   // category shows automatically here, whether or not the admin has manually
   // added a homepage "card" (image/description) for it. Cards, when present,
   // are just an overlay for image/description; their absence never hides a
   // real category. Subcategories (parent_id set) are intentionally excluded
-  // from this list — they show inside their parent's mega-menu/filter instead.
+  // from this list — they show under their parent in filters/mobile expand instead.
   const [{ data: realCategories }, { data: cardsRow }] = await Promise.all([
     supabase.from('categories').select('id, name, slug, image').is('parent_id', null).order('sort_order'),
     supabase.from('site_settings').select('value').eq('key', 'categories').maybeSingle(),
@@ -57,7 +57,10 @@ export type SubcategoryWithCount = { id: string; name: string; slug: string; ima
 /** Real subcategories (parent_id = the given category) with real product
  *  counts — used by the mobile category sheet when a top-level category is
  *  expanded. Returns [] for a category with no subcategories. */
-export async function getSubcategoriesWithCounts(parentId: string): Promise<SubcategoryWithCount[]> {
+export async function getSubcategoriesWithCounts(
+  supabase: SupabaseClient,
+  parentId: string,
+): Promise<SubcategoryWithCount[]> {
   const { data: subs } = await supabase.from('categories').select('id, name, slug, image').eq('parent_id', parentId).order('sort_order')
   if (!subs || subs.length === 0) return []
 

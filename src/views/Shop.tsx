@@ -42,7 +42,7 @@ useEffect(() => {
   useEffect(() => {
     if (!currentCategory) { setSidebarCategories([]); return }
     const parentId = currentCategory.parent_id ?? currentCategory.id
-    getSubcategoriesWithCounts(parentId).then(setSidebarCategories)
+    getSubcategoriesWithCounts(supabase, parentId).then(setSidebarCategories)
   }, [currentCategory?.id])
 
   useEffect(() => {

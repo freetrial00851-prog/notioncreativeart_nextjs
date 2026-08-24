@@ -10,6 +10,7 @@ import {
   clearHomeCatalogCache,
   fetchHomeCatalog,
   getHomeCatalogCache,
+  setHomeCatalogCache,
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
 import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialContent } from '../lib/types'
@@ -37,6 +38,9 @@ function applyCatalogSnapshot(
     setHero: Dispatch<SetStateAction<HeroContent | null>>
     setLayout: Dispatch<SetStateAction<LayoutSection[]>>
     setSkillCounts: (v: Record<'beginner' | 'intermediate' | 'advanced', number>) => void
+    setActiveSkill: (v: 'beginner' | 'intermediate' | 'advanced') => void
+    setSkillProducts: (v: Product[]) => void
+    setSkillLoading: (v: boolean) => void
   },
 ) {
   setters.setTrending(snap.trending)
@@ -47,6 +51,11 @@ function applyCatalogSnapshot(
   setters.setChapters(snap.chapters)
   setters.setTestimonials(snap.testimonials)
   setters.setSkillCounts(snap.skillCounts)
+  if (snap.skillPreviewLevel || snap.skillPreview) {
+    setters.setActiveSkill(snap.skillPreviewLevel ?? 'beginner')
+    setters.setSkillProducts(snap.skillPreview ?? [])
+    setters.setSkillLoading(false)
+  }
   if (snap.hero) {
     setters.setHero((prev) => {
       const prevUrls = (prev?.images ?? []).join('|')
@@ -127,14 +136,19 @@ function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: stri
 }
 
 export function Home({
+  initialCatalog = null,
+  initialFeaturedError = null,
   initialHero = null,
   initialLayout,
 }: {
+  /** Full public catalog from the Server Component — eliminates first-load skeletons. */
+  initialCatalog?: HomeCatalogSnapshot | null
+  initialFeaturedError?: string | null
   initialHero?: HeroContent | null
   /** Server-prefetched layout — avoids flashing off sections as "visible" before client fetch. */
   initialLayout?: LayoutSection[]
 }) {
-  const seed = readCachedCatalog()
+  const seed = readCachedCatalog() ?? initialCatalog ?? null
   const [trending, setTrending] = useState<Product[]>(() => seed?.trending ?? [])
   const [newArrivals, setNewArrivals] = useState<Product[]>(() => seed?.newArrivals ?? [])
   const [bundles, setBundles] = useState<Product[]>(() => seed?.bundles ?? [])
@@ -154,19 +168,24 @@ export function Home({
         ? initialLayout
         : DEFAULT_LAYOUT,
   )
-  /** False until product/category/chapter data is ready (cache hit or network). */
+  /** False until product/category/chapter data is ready (SSR, cache hit, or network). */
   const [catalogReady, setCatalogReady] = useState(() => Boolean(seed))
   /** Featured query failed — show retry; do not treat as a real empty catalog. */
-  const [featuredError, setFeaturedError] = useState<string | null>(null)
+  const [featuredError, setFeaturedError] = useState<string | null>(() => initialFeaturedError ?? null)
   const [catalogReloadKey, setCatalogReloadKey] = useState(0)
   const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>(
     () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
   )
-  const [activeSkill, setActiveSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
-  const [skillProducts, setSkillProducts] = useState<Product[]>([])
-  const [skillLoading, setSkillLoading] = useState(true)
+  const [activeSkill, setActiveSkill] = useState<'beginner' | 'intermediate' | 'advanced'>(
+    () => seed?.skillPreviewLevel ?? 'beginner',
+  )
+  const [skillProducts, setSkillProducts] = useState<Product[]>(() => seed?.skillPreview ?? [])
+  const [skillLoading, setSkillLoading] = useState(() => !seed?.skillPreview)
   const [testimonialPage, setTestimonialPage] = useState(0)
   const categoryScrollRef = useRef<HTMLDivElement>(null)
+  const skipSkillFetchFor = useRef<'beginner' | 'intermediate' | 'advanced' | null>(
+    seed?.skillPreview?.length ? (seed.skillPreviewLevel ?? 'beginner') : null,
+  )
 
   const HERO_GROUP_SIZE = 3
   const heroImages = hero?.images ?? []
@@ -195,6 +214,9 @@ export function Home({
       setHero,
       setLayout,
       setSkillCounts,
+      setActiveSkill,
+      setSkillProducts,
+      setSkillLoading,
     }
 
     // Fresh module cache → paint instantly, skip network for this visit.
@@ -207,6 +229,16 @@ export function Home({
     if (cached) {
       applyCatalogSnapshot(cached, setters)
       setFeaturedError(null)
+      setHeroReady(true)
+      setCatalogReady(true)
+      return () => { cancelled = true }
+    }
+
+    // SSR payload already on the page — warm the client cache for back-nav; no skeleton.
+    if (!forceFeaturedFail && initialCatalog && catalogReloadKey === 0) {
+      setHomeCatalogCache(initialCatalog)
+      applyCatalogSnapshot(initialCatalog, setters)
+      setFeaturedError(initialFeaturedError)
       setHeroReady(true)
       setCatalogReady(true)
       return () => { cancelled = true }
@@ -231,7 +263,7 @@ export function Home({
       })
 
     return () => { cancelled = true }
-  }, [catalogReloadKey])
+  }, [catalogReloadKey, initialCatalog, initialFeaturedError])
 
   const retryFeaturedCatalog = () => {
     clearHomeCatalogCache()
@@ -241,12 +273,19 @@ export function Home({
   }
 
   useEffect(() => {
+    if (skipSkillFetchFor.current === activeSkill) {
+      skipSkillFetchFor.current = null
+      return
+    }
+    let cancelled = false
     setSkillLoading(true)
     supabase.from('products').select('*').eq('active', true).eq('skill_level', activeSkill).order('created_at', { ascending: false }).limit(5)
       .then(({ data }) => {
+        if (cancelled) return
         setSkillProducts((data as Product[]) ?? [])
         setSkillLoading(false)
       })
+    return () => { cancelled = true }
   }, [activeSkill])
 
   const sections: Record<LayoutSection['id'], React.ReactNode> = {

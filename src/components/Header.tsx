@@ -61,7 +61,7 @@ export function Header() {
     supabase.from('site_settings').select('value').eq('key', 'announcements').maybeSingle().then(({ data }) => {
       setAnnouncement(normalizeAnnouncements(data?.value))
     })
-    getCategoriesWithProducts().then(setCategories)
+    getCategoriesWithProducts(supabase).then(setCategories)
   }, [])
 
   useEffect(() => {
@@ -452,7 +452,7 @@ export function Header() {
                             const opening = !expanded
                             setMobileExpandedCategory(opening ? c.id : null)
                             if (opening && !hasSubsCached) {
-                              getSubcategoriesWithCounts(c.id).then((list) =>
+                              getSubcategoriesWithCounts(supabase, c.id).then((list) =>
                                 setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
                               )
                             }
