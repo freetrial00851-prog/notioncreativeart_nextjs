@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { MaterialIcon } from '../components/MaterialIcon'
@@ -10,6 +11,7 @@ import { ContentSkeleton } from '../components/Skeleton'
 
 export function Cart() {
   const { user, loading: authLoading } = useAuth()
+  const { openAuthModal } = useUI()
   const { items, loading, removeFromCart, clearCart, checkingOut, checkoutError, checkout } = useCart()
 
   if (authLoading || loading) return <ContentSkeleton />
@@ -18,7 +20,9 @@ export function Cart() {
     return (
       <div className="max-w-site w-full mx-auto px-6 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Sign in to see your cart.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
+        <button type="button" onClick={() => openAuthModal()} className="text-[12px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-70">
+          SIGN IN →
+        </button>
       </div>
     )
   }

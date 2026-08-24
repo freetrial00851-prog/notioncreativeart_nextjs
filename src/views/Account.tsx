@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { US_STATES } from '../lib/usStates'
 import { isValidPostalCode } from '../lib/billingAddress'
 import { EmptyState } from '../components/EmptyState'
@@ -37,6 +38,7 @@ const PAGE_TITLES: Record<string, string> = {
 
 export function Account() {
   const { user, loading } = useAuth()
+  const { openAuthModal } = useUI()
   const pathname = usePathname()
 
   if (loading) return <ContentSkeleton />
@@ -44,7 +46,9 @@ export function Account() {
     return (
       <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Sign in to view your account.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME ?</Link>
+        <button type="button" onClick={() => openAuthModal()} className="text-[12px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-70">
+          SIGN IN →
+        </button>
       </div>
     )
   }

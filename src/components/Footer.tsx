@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { getCategoriesWithProducts } from '../lib/categories'
 import type { SocialContent, CategoryContent } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
@@ -159,6 +160,7 @@ function BottomBar() {
 
 export function Footer() {
   const { user, signOut } = useAuth()
+  const { openAuthModal } = useUI()
   const [categories, setCategories] = useState<CategoryContent[]>([])
   const [openSection, setOpenSection] = useState<string | null>(null)
 
@@ -173,9 +175,9 @@ export function Footer() {
       <li><Link href="/account/wishlist" className="hover:underline">Wishlist</Link></li>
       <li><Link href="/cart" className="hover:underline">Cart</Link></li>
       {user ? (
-        <li><button onClick={() => signOut()} className="hover:underline text-left">Logout</button></li>
+        <li><button type="button" onClick={() => signOut()} className="hover:underline text-left">Logout</button></li>
       ) : (
-        <li><Link href="/account" className="hover:underline">Sign In</Link></li>
+        <li><button type="button" onClick={() => openAuthModal()} className="hover:underline text-left">Sign In</button></li>
       )}
     </>
   )

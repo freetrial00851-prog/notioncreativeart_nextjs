@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { ProductCard } from '../components/ProductCard'
 import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
@@ -14,6 +15,7 @@ const PAGE_SIZE = 15
 /** Wishlist grid — use `embedded` inside the account shell so sidebar nav stays visible. */
 export function Wishlist({ embedded = false }: { embedded?: boolean }) {
   const { user, loading: authLoading } = useAuth()
+  const { openAuthModal } = useUI()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -36,7 +38,9 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
     return (
       <div className={embedded ? 'py-16 text-center' : 'max-w-site w-full mx-auto px-8 py-32 text-center'}>
         <p className="font-subheading text-2xl mb-4">Sign in to see your wishlist.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
+        <button type="button" onClick={() => openAuthModal()} className="text-[12px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-70">
+          SIGN IN →
+        </button>
       </div>
     )
   }
