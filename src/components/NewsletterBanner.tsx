@@ -31,7 +31,7 @@ export function NewsletterBanner(_props: { image?: string; standalone?: boolean 
 
   if (_props.standalone) {
     return (
-      <section className="max-w-site px-6 md:px-16 py-14 md:py-24">
+      <section className="max-w-site px-6 md:px-16 pt-8 md:pt-14 pb-10 md:pb-16">
         {card}
       </section>
     )

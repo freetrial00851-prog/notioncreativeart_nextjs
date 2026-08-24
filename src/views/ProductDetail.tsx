@@ -788,7 +788,7 @@ export function ProductDetail() {
 
       {alsoBought.length > 0 && (
         <div
-          className="-mx-6 md:-mx-16 mt-16 px-6 md:px-16 py-14 md:py-20"
+          className="-mx-6 md:-mx-16 mt-10 px-6 md:px-16 pt-8 md:pt-14 pb-8 md:pb-14"
           style={{ background: 'var(--color-surface)' }}
         >
           <div className="flex items-end justify-between gap-4 mb-8">
@@ -809,7 +809,7 @@ export function ProductDetail() {
 
       {related.length > 0 && (
         <div
-          className="-mx-6 md:-mx-16 mt-0 px-6 md:px-16 py-14 md:py-20"
+          className="-mx-6 md:-mx-16 px-6 md:px-16 pt-8 md:pt-14 pb-8 md:pb-14"
           style={{ background: alsoBought.length > 0 ? 'var(--color-background)' : 'var(--color-surface)' }}
         >
           <div className="flex items-end justify-between gap-4 mb-8">
@@ -828,7 +828,7 @@ export function ProductDetail() {
         </div>
       )}
 
-      <div className="-mx-6 md:-mx-16 px-6 md:px-16 py-14 md:py-20" style={{ background: 'var(--color-surface)' }}>
+      <div className="-mx-6 md:-mx-16 px-6 md:px-16 pt-8 md:pt-14 pb-10 md:pb-16" style={{ background: 'var(--color-surface)' }}>
         <NewsletterBanner image={images[0]} />
       </div>
 
