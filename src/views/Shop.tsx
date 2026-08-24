@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
 import type { SubcategoryWithCount } from '../lib/categories'
 import {
@@ -42,7 +42,8 @@ function applySnapshot(
     setSidebarCategories: (v: SubcategoryWithCount[]) => void
     setSuggestions: (v: Product[]) => void
     setLoadedKey: (v: string) => void
-    setLoading: (v: boolean) => void
+    setInitialLoading: (v: boolean) => void
+    setFilterFetching: (v: boolean) => void
   },
 ) {
   setters.setProducts(snap.products)
@@ -50,7 +51,8 @@ function applySnapshot(
   setters.setSidebarCategories(snap.sidebarCategories)
   setters.setSuggestions(snap.suggestions)
   setters.setLoadedKey(shopFiltersKey(snap.filters))
-  setters.setLoading(false)
+  setters.setInitialLoading(false)
+  setters.setFilterFetching(false)
 }
 
 export function Shop({
@@ -60,21 +62,20 @@ export function Shop({
   initialCatalog?: ShopCatalogSnapshot | null
 }) {
   const params = useParams()
+  const router = useRouter()
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
-  const [searchParams, setSearchParams] = useUpdateSearchParams()
+  const [searchParams, setSearchParams, searchPending] = useUpdateSearchParams()
+  const [navPending, startNavTransition] = useTransition()
 
   const urlFilters = filtersFromUrl(categorySlug, searchParams)
   const urlKey = shopFiltersKey(urlFilters)
 
-  // Prefer module cache (back-nav), then SSR props when they match this URL.
   const bootSeed = (() => {
     if (typeof window !== 'undefined') {
       const cached = getShopCatalogCache(urlFilters)
       if (cached) return cached
     }
     if (initialCatalog && shopFiltersKey(initialCatalog.filters) === urlKey) return initialCatalog
-    // During client-component SSR, useSearchParams may not mirror the request yet —
-    // still trust the server snapshot for first paint.
     if (initialCatalog) return initialCatalog
     return null
   })()
@@ -85,7 +86,10 @@ export function Shop({
     () => bootSeed?.sidebarCategories ?? [],
   )
   const [suggestions, setSuggestions] = useState<Product[]>(() => bootSeed?.suggestions ?? [])
-  const [loading, setLoading] = useState(() => !bootSeed)
+  /** True only on cold first paint with no SSR/cache seed — never for filter changes. */
+  const [initialLoading, setInitialLoading] = useState(() => !bootSeed)
+  /** Client refetch in flight while previous results stay on screen. */
+  const [filterFetching, setFilterFetching] = useState(false)
   const [loadedKey, setLoadedKey] = useState<string | null>(() =>
     bootSeed ? shopFiltersKey(bootSeed.filters) : null,
   )
@@ -102,20 +106,29 @@ export function Shop({
   const categoryName =
     categorySlug === 'sale' ? 'Sale' : categorySlug === 'new' ? 'New Arrivals' : currentCategory?.name
 
+  const filterPending = searchPending || navPending || filterFetching
+
   const setters = {
     setProducts,
     setCategories,
     setSidebarCategories,
     setSuggestions,
     setLoadedKey,
-    setLoading,
+    setInitialLoading,
+    setFilterFetching,
+  }
+
+  /** Soft-navigate shop paths (category) without a hard reload; keep prior UI via transition. */
+  const goShop = (href: string) => {
+    startNavTransition(() => {
+      router.push(href, { scroll: false })
+    })
   }
 
   // Warm cache + apply fresh SSR props after soft navigations.
   useEffect(() => {
     if (!initialCatalog) return
     const key = shopFiltersKey(initialCatalog.filters)
-    if (key !== urlKey && loadedKey === urlKey) return
     if (key === urlKey) {
       setShopCatalogCache(initialCatalog)
       applySnapshot(initialCatalog, setters)
@@ -123,9 +136,12 @@ export function Shop({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCatalog, urlKey])
 
-  // Client refetch only when the URL no longer matches loaded data (filter toggles).
+  // Client refetch when URL diverges from loaded data — keep prior grid visible.
   useEffect(() => {
-    if (loadedKey === urlKey) return
+    if (loadedKey === urlKey) {
+      setFilterFetching(false)
+      return
+    }
 
     const cached = getShopCatalogCache(urlFilters)
     if (cached) {
@@ -140,7 +156,10 @@ export function Shop({
     }
 
     let cancelled = false
-    setLoading(true)
+    const hasPriorResults = loadedKey !== null
+    if (hasPriorResults) setFilterFetching(true)
+    else setInitialLoading(true)
+
     fetchShopCatalog(urlFilters).then((snap) => {
       if (cancelled) return
       applySnapshot(snap, setters)
@@ -275,7 +294,11 @@ export function Shop({
           <div className="space-y-0.5">
             <Link
               href={`/shop/${(parentCategory ?? currentCategory)!.slug}`}
-              onClick={() => setMobileFiltersOpen(false)}
+              onClick={(e) => {
+                e.preventDefault()
+                setMobileFiltersOpen(false)
+                goShop(`/shop/${(parentCategory ?? currentCategory)!.slug}`)
+              }}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${!parentCategory ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
             >
               All {(parentCategory ?? currentCategory)!.name}
@@ -284,7 +307,11 @@ export function Shop({
               <Link
                 key={sc.id}
                 href={`/shop/${sc.slug}`}
-                onClick={() => setMobileFiltersOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setMobileFiltersOpen(false)
+                  goShop(`/shop/${sc.slug}`)
+                }}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
               >
                 <span>{sc.name}</span>
@@ -297,6 +324,10 @@ export function Shop({
     </>
   )
 
+  const gridPendingClass = filterPending
+    ? 'opacity-50 pointer-events-none transition-opacity duration-200'
+    : 'opacity-100 transition-opacity duration-200'
+
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-14">
       <nav className="text-[11px] tracking-[0.08em] text-ink-soft mb-8 flex items-center gap-2 flex-wrap">
@@ -306,7 +337,14 @@ export function Shop({
         {parentCategory && (
           <>
             <span>/</span>
-            <Link href={`/shop/${parentCategory.slug}`} className="hover:text-ink">
+            <Link
+              href={`/shop/${parentCategory.slug}`}
+              onClick={(e) => {
+                e.preventDefault()
+                goShop(`/shop/${parentCategory.slug}`)
+              }}
+              className="hover:text-ink"
+            >
               {parentCategory.name.toUpperCase()}
             </Link>
           </>
@@ -384,8 +422,8 @@ export function Shop({
           {filterPanelContent}
         </aside>
 
-        <div className="min-w-0">
-          {loading ? (
+        <div className={`min-w-0 ${gridPendingClass}`} aria-busy={filterPending || undefined}>
+          {initialLoading ? (
             <ProductGridSkeleton variant="shop" />
           ) : sortedProducts.length === 0 ? (
             <EmptyState
