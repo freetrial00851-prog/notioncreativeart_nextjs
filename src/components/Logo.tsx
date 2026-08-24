@@ -23,28 +23,54 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
   )
 }
 
+/** Square “N” tile used in the full logo — no link (safe inside overlays). */
+export function LogoIcon({
+  size = 40,
+  onAccent = false,
+  className = '',
+}: {
+  size?: number
+  /** Invert for dark/accent backgrounds (e.g. chat header). */
+  onAccent?: boolean
+  className?: string
+}) {
+  const tile = onAccent ? '#FCFBF8' : 'var(--color-accent)'
+  const letter = onAccent ? 'var(--color-accent)' : '#FCFBF8'
+  const dot = Math.max(5, Math.round(size * 0.175))
+  const inset = Math.max(3, Math.round(size * 0.1))
+  return (
+    <span
+      className={`relative shrink-0 flex items-center justify-center font-bold leading-none ${className}`}
+      style={{
+        width: size,
+        height: size,
+        background: tile,
+        color: letter,
+        borderRadius: '22%',
+        fontFamily: 'var(--font-logo)',
+        fontSize: Math.round(size * 0.45),
+      }}
+      aria-hidden
+    >
+      N
+      <span
+        className="absolute rounded-full"
+        style={{
+          background: 'var(--color-logo-accent)',
+          width: dot,
+          height: dot,
+          top: inset,
+          right: inset,
+        }}
+      />
+    </span>
+  )
+}
+
 function FullMark() {
   return (
     <span className="inline-flex items-center gap-2.5">
-      <span
-        className="relative shrink-0 w-10 h-10 flex items-center justify-center text-[#FCFBF8] text-[18px] font-bold leading-none"
-        style={{
-          background: 'var(--color-accent)',
-          borderRadius: '22%',
-          fontFamily: 'var(--font-logo)',
-        }}
-      >
-        N
-        <span
-          className="absolute w-[7px] h-[7px] rounded-full"
-          style={{
-            background: 'var(--color-logo-accent)',
-            top: '4px',
-            right: '4px',
-          }}
-          aria-hidden
-        />
-      </span>
+      <LogoIcon size={40} />
       <span
         className="text-[19px] desktop:text-[21px] font-bold tracking-tight leading-none"
         style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-logo)' }}

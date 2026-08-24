@@ -2,22 +2,24 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { MaterialIcon } from './MaterialIcon'
+import { LogoIcon } from './Logo'
 import { CloseCircleIcon } from './icons'
 
 type Role = 'user' | 'assistant'
 type ChatMsg = { id: string; role: Role; content: string }
 type DownloadLink = { title: string; signedUrl: string; filename: string }
 
-const WELCOME =
-  "Hi — I'm the NCA support assistant. Ask about downloads, accounts, or refunds. Need a fresh download link? Send your order number and the email used at checkout."
+const WELCOME = 'Hi! How can I help you today?'
 
 function uid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
 export function SupportChat() {
+  const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
@@ -25,6 +27,12 @@ export function SupportChat() {
     { id: 'welcome', role: 'assistant', content: WELCOME },
   ])
   const [downloadsByMsg, setDownloadsByMsg] = useState<Record<string, DownloadLink[]>>({})
+  const [showHumanBtnFor, setShowHumanBtnFor] = useState<Record<string, boolean>>({})
+  const [escalateOpen, setEscalateOpen] = useState(false)
+  const [escalateEmail, setEscalateEmail] = useState('')
+  const [escalateMessage, setEscalateMessage] = useState('')
+  const [escalateSending, setEscalateSending] = useState(false)
+  const [escalateError, setEscalateError] = useState<string | null>(null)
   const [lockPage, setLockPage] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -46,22 +54,36 @@ export function SupportChat() {
   useEffect(() => {
     if (!open) return
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
-  }, [open, messages, sending, downloadsByMsg])
+  }, [open, messages, sending, downloadsByMsg, escalateOpen, showHumanBtnFor])
 
   useEffect(() => {
     if (!open) return
-    inputRef.current?.focus()
+    if (!escalateOpen) inputRef.current?.focus()
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        if (escalateOpen) setEscalateOpen(false)
+        else setOpen(false)
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  }, [open, escalateOpen])
+
+  const openEscalate = (seedMessage?: string) => {
+    setEscalateError(null)
+    setEscalateEmail(user?.email ?? escalateEmail)
+    if (seedMessage) setEscalateMessage(seedMessage)
+    else if (!escalateMessage.trim()) {
+      const lastUser = [...messages].reverse().find((m) => m.role === 'user')
+      if (lastUser) setEscalateMessage(lastUser.content)
+    }
+    setEscalateOpen(true)
+  }
 
   const send = async (e?: FormEvent) => {
     e?.preventDefault()
     const text = input.trim()
-    if (!text || sending) return
+    if (!text || sending || escalateOpen) return
 
     const userMsg: ChatMsg = { id: uid(), role: 'user', content: text }
     const historyForApi = [...messages.filter((m) => m.id !== 'welcome'), userMsg].map((m) => ({
@@ -80,7 +102,7 @@ export function SupportChat() {
 
       let reply = typeof data?.reply === 'string' ? data.reply : null
       if (fnError || !reply) {
-        reply = "Couldn't reach support chat — please try again, or use the Contact page."
+        reply = "Couldn't reach support chat — please try again, or use Talk to a human below."
         try {
           const context = (fnError as { context?: Response })?.context
           if (context && typeof context.json === 'function') {
@@ -99,17 +121,79 @@ export function SupportChat() {
       if (Array.isArray(data?.downloads) && data.downloads.length > 0) {
         setDownloadsByMsg((prev) => ({ ...prev, [assistantId]: data.downloads as DownloadLink[] }))
       }
+      const offer =
+        data?.offerHuman === true ||
+        /\b(human|real person|agent|talk to (a )?(person|human)|customer service)\b/i.test(text)
+      if (offer || fnError) {
+        setShowHumanBtnFor((prev) => ({ ...prev, [assistantId]: true }))
+      }
     } catch {
+      const assistantId = uid()
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantId,
+          role: 'assistant',
+          content: "Couldn't reach support chat — please try again, or use Talk to a human below.",
+        },
+      ])
+      setShowHumanBtnFor((prev) => ({ ...prev, [assistantId]: true }))
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const submitEscalate = async (e: FormEvent) => {
+    e.preventDefault()
+    if (escalateSending) return
+    setEscalateError(null)
+    setEscalateSending(true)
+
+    try {
+      const history = messages
+        .filter((m) => m.id !== 'welcome')
+        .map((m) => ({ role: m.role, content: m.content }))
+
+      const { data, error: fnError } = await supabase.functions.invoke('chat-escalate', {
+        body: {
+          email: escalateEmail.trim(),
+          message: escalateMessage.trim(),
+          history,
+        },
+      })
+
+      if (fnError || !data?.ok) {
+        let msg = "Couldn't send your message — please try again."
+        try {
+          const context = (fnError as { context?: Response })?.context
+          if (context && typeof context.json === 'function') {
+            const body = await context.json()
+            if (body?.error) msg = body.error
+          } else if (data?.error) {
+            msg = data.error
+          }
+        } catch {
+          /* keep generic */
+        }
+        setEscalateError(msg)
+        return
+      }
+
+      const email = (data.email as string) || escalateEmail.trim()
+      setEscalateOpen(false)
+      setEscalateMessage('')
       setMessages((prev) => [
         ...prev,
         {
           id: uid(),
           role: 'assistant',
-          content: "Couldn't reach support chat — please try again, or use the Contact page.",
+          content: `Thanks — we've received your message and will get back to you at ${email}.`,
         },
       ])
+    } catch {
+      setEscalateError("Couldn't send your message — please try again.")
     } finally {
-      setSending(false)
+      setEscalateSending(false)
     }
   }
 
@@ -122,7 +206,6 @@ export function SupportChat() {
 
   return (
     <>
-      {/* Floating launcher */}
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -134,7 +217,6 @@ export function SupportChat() {
         <span className="text-[13px] font-semibold tracking-wide">Help</span>
       </button>
 
-      {/* Panel */}
       {open && (
         <div
           role="dialog"
@@ -148,9 +230,12 @@ export function SupportChat() {
             className="flex items-center justify-between px-4 py-3.5 shrink-0 text-white"
             style={{ background: 'var(--color-accent)' }}
           >
-            <div className="min-w-0">
-              <p className="font-heading font-semibold text-[17px] leading-tight">NCA Support</p>
-              <p className="text-[11px] text-white/80 mt-0.5">FAQ answers · order download help</p>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <LogoIcon size={36} onAccent />
+              <div className="min-w-0">
+                <p className="font-heading font-semibold text-[17px] leading-tight">NCA Support</p>
+                <p className="text-[11px] text-white/80 mt-0.5">We're here to help</p>
+              </div>
             </div>
             <button
               type="button"
@@ -187,6 +272,16 @@ export function SupportChat() {
                     Download {d.title}
                   </a>
                 ))}
+                {showHumanBtnFor[m.id] && !escalateOpen && (
+                  <button
+                    type="button"
+                    onClick={() => openEscalate()}
+                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-semibold border border-line bg-white text-ink hover:bg-surface transition-colors"
+                  >
+                    <MaterialIcon name="person" size={15} />
+                    Talk to a human
+                  </button>
+                )}
               </div>
             ))}
             {sending && (
@@ -198,34 +293,101 @@ export function SupportChat() {
                 Thinking…
               </div>
             )}
+
+            {escalateOpen && (
+              <form
+                onSubmit={submitEscalate}
+                className="rounded-2xl border border-line bg-white p-3.5 space-y-2.5 shadow-sm"
+              >
+                <p className="text-[13px] font-semibold text-ink">Talk to a human</p>
+                <p className="text-[11px] text-ink-soft leading-snug">
+                  Leave your email and a short note — we'll reply by email.
+                </p>
+                <label className="block">
+                  <span className="sr-only">Your email</span>
+                  <input
+                    type="email"
+                    required
+                    value={escalateEmail}
+                    onChange={(e) => setEscalateEmail(e.target.value)}
+                    placeholder="Your email"
+                    disabled={escalateSending}
+                    className="w-full px-3 py-2 text-[13px] border border-line rounded-xl bg-canvas focus:outline-none focus:border-ink disabled:opacity-60"
+                  />
+                </label>
+                <label className="block">
+                  <span className="sr-only">Your message</span>
+                  <textarea
+                    required
+                    rows={3}
+                    value={escalateMessage}
+                    onChange={(e) => setEscalateMessage(e.target.value)}
+                    placeholder="How can we help?"
+                    disabled={escalateSending}
+                    className="w-full resize-none px-3 py-2 text-[13px] border border-line rounded-xl bg-canvas focus:outline-none focus:border-ink disabled:opacity-60"
+                  />
+                </label>
+                {escalateError && (
+                  <p className="text-[12px] text-red-700 leading-snug">{escalateError}</p>
+                )}
+                <div className="flex items-center gap-2 pt-0.5">
+                  <button
+                    type="submit"
+                    disabled={escalateSending || !escalateEmail.trim() || escalateMessage.trim().length < 5}
+                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white disabled:opacity-40 hover:opacity-90"
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    {escalateSending ? 'Sending…' : 'Send message'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEscalateOpen(false)}
+                    disabled={escalateSending}
+                    className="px-3 py-2.5 rounded-xl text-[13px] font-medium text-ink-soft hover:bg-surface"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
 
-          <form onSubmit={send} className="shrink-0 border-t border-line bg-white p-3">
-            <div className="flex items-end gap-2">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={onKeyDown}
-                rows={1}
-                placeholder="Ask a question…"
-                disabled={sending}
-                className="flex-1 resize-none max-h-28 min-h-[42px] px-3.5 py-2.5 text-[13px] border border-line rounded-xl bg-canvas focus:outline-none focus:border-ink disabled:opacity-60"
-              />
+          {!escalateOpen ? (
+            <form onSubmit={send} className="shrink-0 border-t border-line bg-white p-3">
+              <div className="flex items-end gap-2">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  rows={1}
+                  placeholder="Ask a question…"
+                  disabled={sending}
+                  className="flex-1 resize-none max-h-28 min-h-[42px] px-3.5 py-2.5 text-[13px] border border-line rounded-xl bg-canvas focus:outline-none focus:border-ink disabled:opacity-60"
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !input.trim()}
+                  aria-label="Send message"
+                  className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl text-white disabled:opacity-40 hover:opacity-90 transition-opacity"
+                  style={{ background: 'var(--color-accent)' }}
+                >
+                  <MaterialIcon name="send" size={18} />
+                </button>
+              </div>
               <button
-                type="submit"
-                disabled={sending || !input.trim()}
-                aria-label="Send message"
-                className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl text-white disabled:opacity-40 hover:opacity-90 transition-opacity"
-                style={{ background: 'var(--color-accent)' }}
+                type="button"
+                onClick={() => openEscalate()}
+                className="mt-2 text-[11px] text-ink-soft hover:text-ink underline-offset-2 hover:underline"
               >
-                <MaterialIcon name="send" size={18} />
+                Talk to a human
               </button>
+            </form>
+          ) : (
+            <div className="shrink-0 border-t border-line bg-white px-4 py-3">
+              <p className="text-[11px] text-ink-soft">Fill in the form above to reach support by email.</p>
             </div>
-            <p className="text-[10px] text-ink-soft mt-2 px-0.5 leading-snug">
-              For order downloads, include both your order number and checkout email.
-            </p>
-          </form>
+          )}
         </div>
       )}
     </>

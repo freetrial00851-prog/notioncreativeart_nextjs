@@ -57,4 +57,23 @@ Deploy separately when needed:
 npx supabase functions deploy lemon-webhook --project-ref anlsellghialszuuvipw
 npx supabase functions deploy create-cart-checkout --project-ref anlsellghialszuuvipw
 npx supabase functions deploy subscribe-newsletter --project-ref anlsellghialszuuvipw
+npx supabase functions deploy download-free-pattern --project-ref anlsellghialszuuvipw
+npx supabase functions deploy chat-support --project-ref anlsellghialszuuvipw
+npx supabase functions deploy chat-escalate --project-ref anlsellghialszuuvipw
 ```
+
+### `chat-support` secrets
+
+```bash
+npx supabase secrets set GROQ_API_KEY=your_groq_api_key --project-ref anlsellghialszuuvipw
+```
+
+Get a free key at https://console.groq.com (Phase 1 uses `llama-3.1-8b-instant`).
+
+### `chat-escalate` secrets
+
+```bash
+npx supabase secrets set RESEND_API_KEY=your_resend_api_key --project-ref anlsellghialszuuvipw
+```
+
+Get a free key at https://resend.com. Escalations email `freetrail00851@gmail.com` via Resend (`from: onboarding@resend.dev` until a custom domain is verified).
