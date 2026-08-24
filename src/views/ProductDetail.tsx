@@ -463,6 +463,12 @@ export function ProductDetail() {
 
   const shopLink = category ? `/shop/${category.slug}` : '/shop'
 
+  // Warm the category shop route so breadcrumb clicks feel as fast as in-shop filters.
+  useEffect(() => {
+    if (!shopLink || shopLink === '/shop') return
+    router.prefetch(shopLink)
+  }, [router, shopLink])
+
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 py-8 pb-24 md:pb-14">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-8 flex-wrap" aria-label="Breadcrumb">
@@ -470,7 +476,13 @@ export function ProductDetail() {
         {category && (
           <>
             <span>›</span>
-            <Link href={`/shop/${category.slug}`} className="hover:text-ink">{category.name}</Link>
+            <Link
+              href={`/shop/${category.slug}`}
+              prefetch
+              className="hover:text-ink"
+            >
+              {category.name}
+            </Link>
           </>
         )}
         <span>›</span>

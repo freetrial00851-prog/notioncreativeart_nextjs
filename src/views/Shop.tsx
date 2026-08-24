@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
@@ -64,8 +64,8 @@ export function Shop({
   const params = useParams()
   const router = useRouter()
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
-  const [searchParams, setSearchParams, searchPending] = useUpdateSearchParams()
-  const [navPending, startNavTransition] = useTransition()
+  const [searchParams, setSearchParams, , peekSearchParams] = useUpdateSearchParams()
+  const [, startNavTransition] = useTransition()
 
   const urlFilters = filtersFromUrl(categorySlug, searchParams)
   const urlKey = shopFiltersKey(urlFilters)
@@ -93,6 +93,8 @@ export function Shop({
   const [loadedKey, setLoadedKey] = useState<string | null>(() =>
     bootSeed ? shopFiltersKey(bootSeed.filters) : null,
   )
+  const fetchGen = useRef(0)
+  const pendingKeyRef = useRef<string | null>(null)
 
   const level = urlFilters.level
   const priceFilter = urlFilters.price
@@ -106,7 +108,8 @@ export function Shop({
   const categoryName =
     categorySlug === 'sale' ? 'Sale' : categorySlug === 'new' ? 'New Arrivals' : currentCategory?.name
 
-  const filterPending = searchPending || navPending || filterFetching
+  // Dim only while the fast client catalog fetch runs — not while RSC/SSR catches up.
+  const filterPending = filterFetching
 
   const setters = {
     setProducts,
@@ -118,11 +121,52 @@ export function Shop({
     setFilterFetching,
   }
 
-  /** Soft-navigate shop paths (category) without a hard reload; keep prior UI via transition. */
+  const loadFilters = (next: ShopFilters) => {
+    const key = shopFiltersKey(next)
+    if (loadedKey === key) {
+      setFilterFetching(false)
+      return
+    }
+    const cached = getShopCatalogCache(next)
+    if (cached) {
+      pendingKeyRef.current = null
+      applySnapshot(cached, setters)
+      return
+    }
+    if (pendingKeyRef.current === key) return
+    pendingKeyRef.current = key
+    const gen = ++fetchGen.current
+    if (loadedKey === null) setInitialLoading(true)
+    else setFilterFetching(true)
+    fetchShopCatalog(next).then((snap) => {
+      if (gen !== fetchGen.current) return
+      pendingKeyRef.current = null
+      applySnapshot(snap, setters)
+    })
+  }
+
+  /** Soft-navigate shop paths; kick off client catalog fetch immediately (don't wait for RSC). */
   const goShop = (href: string) => {
+    const path = href.split('?')[0]
+    const slugMatch = path.match(/^\/shop\/([^/]+)\/?$/)
+    const nextSlug = path === '/shop' || path === '/shop/' ? null : slugMatch ? slugMatch[1] : null
+    loadFilters({
+      categorySlug: nextSlug,
+      level: null,
+      price: null,
+      bundle: false,
+      sale: false,
+    })
     startNavTransition(() => {
       router.push(href, { scroll: false })
     })
+  }
+
+  /** Query-param filters: fetch immediately, update URL in the background. */
+  const applyQueryMutate = (mutate: (params: URLSearchParams) => URLSearchParams | void) => {
+    const nextParams = peekSearchParams(mutate)
+    loadFilters(filtersFromUrl(categorySlug, nextParams))
+    setSearchParams(mutate)
   }
 
   // Warm cache + apply fresh SSR props after soft navigations.
@@ -131,42 +175,20 @@ export function Shop({
     const key = shopFiltersKey(initialCatalog.filters)
     if (key === urlKey) {
       setShopCatalogCache(initialCatalog)
+      pendingKeyRef.current = null
       applySnapshot(initialCatalog, setters)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCatalog, urlKey])
 
-  // Client refetch when URL diverges from loaded data — keep prior grid visible.
+  // Fallback client refetch when URL changes without an optimistic loadFilters call.
   useEffect(() => {
     if (loadedKey === urlKey) {
       setFilterFetching(false)
       return
     }
-
-    const cached = getShopCatalogCache(urlFilters)
-    if (cached) {
-      applySnapshot(cached, setters)
-      return
-    }
-
-    if (initialCatalog && shopFiltersKey(initialCatalog.filters) === urlKey) {
-      setShopCatalogCache(initialCatalog)
-      applySnapshot(initialCatalog, setters)
-      return
-    }
-
-    let cancelled = false
-    const hasPriorResults = loadedKey !== null
-    if (hasPriorResults) setFilterFetching(true)
-    else setInitialLoading(true)
-
-    fetchShopCatalog(urlFilters).then((snap) => {
-      if (cancelled) return
-      applySnapshot(snap, setters)
-    })
-    return () => {
-      cancelled = true
-    }
+    if (pendingKeyRef.current === urlKey) return
+    loadFilters(urlFilters)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey, loadedKey])
 
@@ -214,7 +236,7 @@ export function Shop({
   }
 
   const toggleParam = (key: string, value: string) => {
-    setSearchParams((p) => {
+    applyQueryMutate((p) => {
       if (p.get(key) === value) p.delete(key)
       else p.set(key, value)
       return p
@@ -231,7 +253,7 @@ export function Shop({
         <div className="space-y-0.5">
           <button
             onClick={() =>
-              setSearchParams((p) => {
+              applyQueryMutate((p) => {
                 p.delete('level')
                 return p
               })
@@ -312,6 +334,7 @@ export function Shop({
                   setMobileFiltersOpen(false)
                   goShop(`/shop/${sc.slug}`)
                 }}
+                onMouseEnter={() => router.prefetch(`/shop/${sc.slug}`)}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
               >
                 <span>{sc.name}</span>
@@ -405,7 +428,7 @@ export function Shop({
           {activeFilterCount > 0 && (
             <button
               onClick={() =>
-                setSearchParams((p) => {
+                applyQueryMutate((p) => {
                   p.delete('level')
                   p.delete('price')
                   p.delete('sale')
@@ -505,7 +528,7 @@ export function Shop({
                 {activeFilterCount > 0 && (
                   <button
                     onClick={() =>
-                      setSearchParams((p) => {
+                      applyQueryMutate((p) => {
                         p.delete('level')
                         p.delete('price')
                         p.delete('sale')
