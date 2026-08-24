@@ -12,12 +12,35 @@ import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
 import { downloadFreePattern } from '../lib/downloads'
+import { useIsMobile } from '../lib/useIsMobile'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { FavoriteIcon, ShareIcon } from '../components/icons'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductDetailSkeleton } from '../components/Skeleton'
 import type { Product } from '../lib/types'
+
+/** Stage candidates: mobile stops at large (1000w); desktop may use full (1600w). */
+function gallerySrcSet(cardUrl: string, includeFull: boolean) {
+  const large = deriveVariantUrl(cardUrl, 'large')
+  if (!includeFull) return `${cardUrl} 640w, ${large} 1000w`
+  return `${cardUrl} 640w, ${large} 1000w, ${deriveVariantUrl(cardUrl, 'full')} 1600w`
+}
+
+function gallerySizes(includeFull: boolean) {
+  return includeFull
+    ? '(max-width: 1024px) 62vw, 52vw'
+    : '100vw'
+}
+
+/** Warm the browser cache for a gallery stage URL (and its srcset). */
+function preloadGalleryStage(cardUrl: string, includeFull: boolean) {
+  const img = new Image()
+  img.decoding = 'async'
+  img.sizes = gallerySizes(includeFull)
+  img.srcset = gallerySrcSet(cardUrl, includeFull)
+  img.src = deriveVariantUrl(cardUrl, includeFull ? 'full' : 'large')
+}
 
 type DescriptionBlock = { type: 'heading' | 'check' | 'warning' | 'paragraph'; content: string }
 
@@ -95,6 +118,7 @@ export function ProductDetail() {
   const [shareHint, setShareHint] = useState<string | null>(null)
   const [purchaseCount, setPurchaseCount] = useState(0)
   const [alsoBought, setAlsoBought] = useState<Product[]>([])
+  const isMobileGallery = useIsMobile(769)
 
   useEffect(() => {
     if (!slug) return
@@ -206,6 +230,21 @@ export function ProductDetail() {
     document.head.appendChild(script)
     return () => { document.head.removeChild(script) }
   }, [product, slug])
+
+  // Preload adjacent gallery stages so swipe/arrow doesn't wait on network.
+  useEffect(() => {
+    const imgs = product?.images ?? []
+    if (imgs.length < 2) return
+    const includeFull = !isMobileGallery
+    const neighbors = [
+      (activeImage + 1) % imgs.length,
+      (activeImage - 1 + imgs.length) % imgs.length,
+    ]
+    for (const i of new Set(neighbors)) {
+      const url = imgs[i]
+      if (url) preloadGalleryStage(url, includeFull)
+    }
+  }, [product?.images, activeImage, isMobileGallery])
 
   if (loading) return <ProductDetailSkeleton />
   if (!product) return (
@@ -486,9 +525,9 @@ export function ProductDetail() {
               >
                 {images[activeImage] ? (
                   <img
-                    src={deriveVariantUrl(images[activeImage], 'full')}
-                    srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w, ${deriveVariantUrl(images[activeImage], 'full')} 1600w`}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw"
+                    src={deriveVariantUrl(images[activeImage], isMobileGallery ? 'large' : 'full')}
+                    srcSet={gallerySrcSet(images[activeImage], !isMobileGallery)}
+                    sizes={isMobileGallery ? '100vw' : '(max-width: 1024px) 62vw, 52vw'}
                     alt={product.title}
                     loading="eager"
                     fetchPriority="high"

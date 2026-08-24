@@ -1,17 +1,68 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '../lib/supabase'
-import { getCategoriesWithProducts, type CategoryWithCount } from '../lib/categories'
-import { DEFAULT_LAYOUT, mergeLayout } from '../lib/defaultLayout'
+import type { CategoryWithCount } from '../lib/categories'
+import { DEFAULT_LAYOUT } from '../lib/defaultLayout'
+import {
+  fetchHomeCatalog,
+  getHomeCatalogCache,
+  type HomeCatalogSnapshot,
+} from '../lib/homeCatalogCache'
 import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialContent } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { HomeSectionSkeleton } from '../components/Skeleton'
 import { SectionBand } from '../components/SectionBand'
+
+function readCachedCatalog(): HomeCatalogSnapshot | null {
+  if (typeof window === 'undefined') return null
+  return getHomeCatalogCache()
+}
+
+function applyCatalogSnapshot(
+  snap: HomeCatalogSnapshot,
+  setters: {
+    setTrending: (v: Product[]) => void
+    setNewArrivals: (v: Product[]) => void
+    setBundles: (v: Product[]) => void
+    setFreeProduct: (v: Product | null) => void
+    setCategories: (v: CategoryWithCount[]) => void
+    setChapters: (v: ChapterContent[]) => void
+    setTestimonials: (v: TestimonialContent[]) => void
+    setHero: Dispatch<SetStateAction<HeroContent | null>>
+    setLayout: Dispatch<SetStateAction<LayoutSection[]>>
+    setSkillCounts: (v: Record<'beginner' | 'intermediate' | 'advanced', number>) => void
+  },
+) {
+  setters.setTrending(snap.trending)
+  setters.setNewArrivals(snap.newArrivals)
+  setters.setBundles(snap.bundles)
+  setters.setFreeProduct(snap.freeProduct)
+  setters.setCategories(snap.categories)
+  setters.setChapters(snap.chapters)
+  setters.setTestimonials(snap.testimonials)
+  setters.setSkillCounts(snap.skillCounts)
+  if (snap.hero) {
+    setters.setHero((prev) => {
+      const prevUrls = (prev?.images ?? []).join('|')
+      const nextUrls = (snap.hero?.images ?? []).join('|')
+      return prevUrls === nextUrls ? prev : snap.hero
+    })
+  }
+  if (snap.layout) {
+    const next = snap.layout
+    setters.setLayout((prev) => {
+      const same =
+        prev.length === next.length &&
+        prev.every((s, i) => s.id === next[i].id && s.visible === next[i].visible)
+      return same ? prev : next
+    })
+  }
+}
 
 function HeroImage({
   src,
@@ -31,6 +82,7 @@ function HeroImage({
       fill
       sizes={sizes}
       priority={priority}
+      quality={85}
       className={className}
     />
   )
@@ -81,23 +133,31 @@ export function Home({
   /** Server-prefetched layout — avoids flashing off sections as "visible" before client fetch. */
   initialLayout?: LayoutSection[]
 }) {
-  const [trending, setTrending] = useState<Product[]>([])
-  const [newArrivals, setNewArrivals] = useState<Product[]>([])
-  const [bundles, setBundles] = useState<Product[]>([])
-  const [freeProduct, setFreeProduct] = useState<Product | null>(null)
-  const [hero, setHero] = useState<HeroContent | null>(initialHero)
-  const [heroReady, setHeroReady] = useState(Boolean(initialHero?.images?.length))
-  const [heroSlide, setHeroSlide] = useState(0)
-  const [chapters, setChapters] = useState<ChapterContent[]>([])
-  const [testimonials, setTestimonials] = useState<TestimonialContent[]>([])
-  const [categories, setCategories] = useState<CategoryWithCount[]>([])
-  const [layout, setLayout] = useState<LayoutSection[]>(() =>
-    initialLayout?.length ? initialLayout : DEFAULT_LAYOUT
+  const seed = readCachedCatalog()
+  const [trending, setTrending] = useState<Product[]>(() => seed?.trending ?? [])
+  const [newArrivals, setNewArrivals] = useState<Product[]>(() => seed?.newArrivals ?? [])
+  const [bundles, setBundles] = useState<Product[]>(() => seed?.bundles ?? [])
+  const [freeProduct, setFreeProduct] = useState<Product | null>(() => seed?.freeProduct ?? null)
+  const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
+  const [heroReady, setHeroReady] = useState(() =>
+    Boolean((seed?.hero ?? initialHero)?.images?.length) || Boolean(seed),
   )
-  /** False until product/category/chapter fetches finish — prevents empty
-   *  mid-page sections from collapsing so Newsletter doesn't jump up. */
-  const [catalogReady, setCatalogReady] = useState(false)
-  const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>({ beginner: 0, intermediate: 0, advanced: 0 })
+  const [heroSlide, setHeroSlide] = useState(0)
+  const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
+  const [testimonials, setTestimonials] = useState<TestimonialContent[]>(() => seed?.testimonials ?? [])
+  const [categories, setCategories] = useState<CategoryWithCount[]>(() => seed?.categories ?? [])
+  const [layout, setLayout] = useState<LayoutSection[]>(() =>
+    seed?.layout?.length
+      ? seed.layout
+      : initialLayout?.length
+        ? initialLayout
+        : DEFAULT_LAYOUT,
+  )
+  /** False until product/category/chapter data is ready (cache hit or network). */
+  const [catalogReady, setCatalogReady] = useState(() => Boolean(seed))
+  const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>(
+    () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
+  )
   const [activeSkill, setActiveSkill] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
   const [skillProducts, setSkillProducts] = useState<Product[]>([])
   const [skillLoading, setSkillLoading] = useState(true)
@@ -120,55 +180,32 @@ export function Home({
 
   useEffect(() => {
     let cancelled = false
+    const setters = {
+      setTrending,
+      setNewArrivals,
+      setBundles,
+      setFreeProduct,
+      setCategories,
+      setChapters,
+      setTestimonials,
+      setHero,
+      setLayout,
+      setSkillCounts,
+    }
 
-    const featuredP = supabase.from('products').select('*').eq('active', true).eq('featured', true).order('created_at', { ascending: false }).limit(6)
-    const newP = supabase.from('products').select('*').eq('active', true).order('created_at', { ascending: false }).limit(6)
-    const bundlesP = supabase.from('products').select('*').eq('active', true).eq('is_bundle', true).order('created_at', { ascending: false }).limit(4)
-    const freeP = supabase.from('products').select('*').eq('active', true).eq('price', 0).order('featured', { ascending: false }).order('created_at', { ascending: false }).limit(1)
-    const settingsP = supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials'])
-    const categoriesP = getCategoriesWithProducts()
-    const skillCountPs = (['beginner', 'intermediate', 'advanced'] as const).map((level) =>
-      supabase.from('products').select('id', { count: 'exact', head: true }).eq('active', true).eq('skill_level', level)
-        .then(({ count }) => ({ level, count: count ?? 0 }))
-    )
+    // Fresh module cache → paint instantly, skip network for this visit.
+    const cached = getHomeCatalogCache()
+    if (cached) {
+      applyCatalogSnapshot(cached, setters)
+      setHeroReady(true)
+      setCatalogReady(true)
+      return () => { cancelled = true }
+    }
 
-    Promise.all([featuredP, newP, bundlesP, freeP, settingsP, categoriesP, ...skillCountPs])
-      .then(([featuredRes, newRes, bundlesRes, freeRes, settingsRes, cats, ...skillRows]) => {
+    fetchHomeCatalog()
+      .then((snap) => {
         if (cancelled) return
-
-        setTrending((featuredRes.data as Product[]) ?? [])
-        setNewArrivals((newRes.data as Product[]) ?? [])
-        setBundles((bundlesRes.data as Product[]) ?? [])
-        setFreeProduct((freeRes.data as Product[])?.[0] ?? null)
-        setCategories(cats)
-
-        for (const row of settingsRes.data ?? []) {
-          if (row.key === 'hero') {
-            const next = row.value as HeroContent
-            setHero((prev) => {
-              const prevUrls = (prev?.images ?? []).join('|')
-              const nextUrls = (next?.images ?? []).join('|')
-              return prevUrls === nextUrls ? prev : next
-            })
-          }
-          if (row.key === 'chapters') setChapters(row.value as ChapterContent[])
-          if (row.key === 'homepage_layout') {
-            const next = mergeLayout(row.value as LayoutSection[])
-            setLayout((prev) => {
-              const same =
-                prev.length === next.length &&
-                prev.every((s, i) => s.id === next[i].id && s.visible === next[i].visible)
-              return same ? prev : next
-            })
-          }
-          if (row.key === 'testimonials') setTestimonials((row.value as TestimonialContent[]).filter((t) => t.quote && t.name))
-        }
-
-        const nextCounts = { beginner: 0, intermediate: 0, advanced: 0 }
-        for (const row of skillRows as { level: 'beginner' | 'intermediate' | 'advanced'; count: number }[]) {
-          nextCounts[row.level] = row.count
-        }
-        setSkillCounts(nextCounts)
+        applyCatalogSnapshot(snap, setters)
       })
       .finally(() => {
         if (!cancelled) {
