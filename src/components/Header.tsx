@@ -157,7 +157,7 @@ export function Header() {
       )}
 
       {/* ── Desktop ≥1025: logo + Categories | capped search | icons immediately after ── */}
-      <div className="hidden desktop:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-site">
+      <div className="hidden desktop:flex items-center gap-5 px-6 md:px-16 xl:px-24 2xl:px-32 py-3.5 max-w-site">
         <div className="flex items-center gap-3 shrink-0">
           <Logo variant="full" />
           <div ref={categoriesWrapRef} className="relative">

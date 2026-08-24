@@ -35,7 +35,7 @@ export function SectionBand({
       className={`w-full ${padY} ${className}`}
       style={sectionBandStyle(index)}
     >
-      <div className={`max-w-site px-6 md:px-16 ${innerClassName}`}>
+      <div className={`max-w-site px-6 md:px-16 xl:px-24 2xl:px-32 ${innerClassName}`}>
         {children}
       </div>
     </section>

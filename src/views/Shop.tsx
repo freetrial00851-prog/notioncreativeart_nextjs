@@ -212,7 +212,7 @@ useEffect(() => {
   )
 
   return (
-    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-14">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-14">
       <nav className="text-[11px] tracking-[0.08em] text-ink-soft mb-8 flex items-center gap-2 flex-wrap">
         <Link href="/" className="hover:text-ink">HOME</Link>
         {parentCategory && (
