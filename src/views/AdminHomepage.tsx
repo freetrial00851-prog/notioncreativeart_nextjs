@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { compressImage } from '../lib/imageCompress'
 import { IMAGE_MAX } from '../lib/imageVariants'
 import type { HeroContent, ChapterContent, CategoryContent, AnnouncementsContent, SocialContent, LayoutSection, TestimonialContent } from '../lib/types'
+import { DEFAULT_ANNOUNCEMENT_COLORS, normalizeAnnouncements } from '../lib/types'
 import { mergeLayout } from '../lib/defaultLayout'
 import { DropzoneUpload } from '../components/DropzoneUpload'
 
@@ -23,14 +24,21 @@ export function HomepageAdmin() {
 
   const load = () => {
     supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'categories', 'announcements', 'social', 'homepage_layout', 'testimonials']).then(({ data }) => {
+      let foundAnnouncements = false
       for (const row of data ?? []) {
         if (row.key === 'hero') setHero(row.value as HeroContent)
         if (row.key === 'chapters') setChapters(row.value as ChapterContent[])
         if (row.key === 'categories') setCategories(row.value as CategoryContent[])
-        if (row.key === 'announcements') setAnnouncements(row.value as AnnouncementsContent)
+        if (row.key === 'announcements') {
+          setAnnouncements(normalizeAnnouncements(row.value))
+          foundAnnouncements = true
+        }
         if (row.key === 'social') setSocial(row.value as SocialContent)
         if (row.key === 'homepage_layout') setLayout(mergeLayout(row.value as LayoutSection[]))
         if (row.key === 'testimonials') setTestimonials(row.value as TestimonialContent[])
+      }
+      if (!foundAnnouncements) {
+        setAnnouncements(normalizeAnnouncements({ enabled: false, messages: [''] }))
       }
       setLoading(false)
     })
@@ -191,20 +199,88 @@ export function HomepageAdmin() {
       {/* ANNOUNCEMENT BAR */}
       {announcements && (
         <div>
-          <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-4">ANNOUNCEMENT BAR (ROTATES EVERY 4 SECONDS)</p>
-          <div className="border border-line rounded-2xl p-6 space-y-3 bg-white">
+          <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-4">ANNOUNCEMENT BAR</p>
+          <div className="border border-line rounded-2xl p-6 space-y-4 bg-white">
+            <label className="flex items-center justify-between gap-4 cursor-pointer">
+              <span className="text-[13px] font-medium text-ink">Show announcement bar on site</span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={announcements.enabled}
+                onClick={() => setAnnouncements({ ...announcements, enabled: !announcements.enabled })}
+                className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${announcements.enabled ? 'bg-ink' : 'bg-[#d4d0c8]'}`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${announcements.enabled ? 'translate-x-5' : 'translate-x-0'}`}
+                />
+              </button>
+            </label>
+            <p className="text-[11px] text-ink-soft -mt-2">
+              Off = bar is completely hidden. On with empty text lines also hides the bar (nothing renders).
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="block text-[12px] text-ink-soft">
+                Background color
+                <div className="mt-1.5 flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={announcements.bg_color}
+                    onChange={(e) => setAnnouncements({ ...announcements, bg_color: e.target.value })}
+                    className="w-10 h-10 rounded border border-line cursor-pointer bg-transparent p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={announcements.bg_color}
+                    onChange={(e) => setAnnouncements({ ...announcements, bg_color: e.target.value })}
+                    className="flex-1 border border-line px-3 py-2 text-[13px] bg-canvas focus:outline-none focus:border-ink font-mono"
+                    placeholder={DEFAULT_ANNOUNCEMENT_COLORS.bg_color}
+                  />
+                </div>
+              </label>
+              <label className="block text-[12px] text-ink-soft">
+                Text color
+                <div className="mt-1.5 flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={announcements.text_color}
+                    onChange={(e) => setAnnouncements({ ...announcements, text_color: e.target.value })}
+                    className="w-10 h-10 rounded border border-line cursor-pointer bg-transparent p-0.5"
+                  />
+                  <input
+                    type="text"
+                    value={announcements.text_color}
+                    onChange={(e) => setAnnouncements({ ...announcements, text_color: e.target.value })}
+                    className="flex-1 border border-line px-3 py-2 text-[13px] bg-canvas focus:outline-none focus:border-ink font-mono"
+                    placeholder={DEFAULT_ANNOUNCEMENT_COLORS.text_color}
+                  />
+                </div>
+              </label>
+            </div>
+
+            <div
+              className="rounded-lg px-4 py-2.5 text-center text-[12px] tracking-[0.04em]"
+              style={{ background: announcements.bg_color, color: announcements.text_color }}
+            >
+              {announcements.messages.map((m) => m.trim()).filter(Boolean).join(' · ') || 'Preview — add a message below'}
+            </div>
+
+            <p className="text-[11px] text-ink-soft">Messages (rotates every 4 seconds when more than one)</p>
             {announcements.messages.map((msg, i) => (
               <div key={i} className="flex gap-2">
                 <input
                   value={msg}
                   onChange={(e) => {
-                    const next = [...announcements.messages]; next[i] = e.target.value
-                    setAnnouncements({ messages: next })
+                    const next = [...announcements.messages]
+                    next[i] = e.target.value
+                    setAnnouncements({ ...announcements, messages: next })
                   }}
                   className="flex-1 border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink"
+                  placeholder="Announcement text"
                 />
                 <button
-                  onClick={() => setAnnouncements({ messages: announcements.messages.filter((_, idx) => idx !== i) })}
+                  type="button"
+                  onClick={() => setAnnouncements({ ...announcements, messages: announcements.messages.filter((_, idx) => idx !== i) })}
                   className="px-3 text-[11px] text-ink-soft hover:text-madder"
                 >
                   ✕
@@ -212,12 +288,15 @@ export function HomepageAdmin() {
               </div>
             ))}
             <button
-              onClick={() => setAnnouncements({ messages: [...announcements.messages, ''] })}
+              type="button"
+              onClick={() => setAnnouncements({ ...announcements, messages: [...announcements.messages, ''] })}
               className="text-[11px] tracking-[0.1em] border-b border-ink pb-0.5"
             >
               + ADD LINE
             </button>
-            <div><SaveButton onClick={() => save('announcements', announcements)} saving={savingKey === 'announcements'} /></div>
+            <div>
+              <SaveButton onClick={() => save('announcements', announcements)} saving={savingKey === 'announcements'} />
+            </div>
           </div>
         </div>
       )}

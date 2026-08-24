@@ -11,6 +11,11 @@ import { getCategoriesWithProducts, getSubcategoriesWithCounts, type CategoryWit
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { AnnouncementsContent, Product } from '../lib/types'
+import {
+  activeAnnouncementMessages,
+  normalizeAnnouncements,
+  shouldShowAnnouncementBar,
+} from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
 import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, CartIcon, UI_ICON_SIZE } from './icons'
@@ -34,7 +39,8 @@ export function Header() {
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [mobileExpandedCategory, setMobileExpandedCategory] = useState<string | null>(null)
   const [mobileSubcategoriesCache, setMobileSubcategoriesCache] = useState<Record<string, SubcategoryWithCount[]>>({})
-  const [messages, setMessages] = useState<string[]>(['FREE PATTERN WITH EVERY FIRST ORDER — CODE FIRSTSTITCH'])
+  /** null until site_settings loads — avoids flashing a hardcoded fallback. */
+  const [announcement, setAnnouncement] = useState<AnnouncementsContent | null>(null)
   const [messageIndex, setMessageIndex] = useState(0)
 
   const [query, setQuery] = useState('')
@@ -47,19 +53,25 @@ export function Header() {
   const tabletSearchInputRef = useRef<HTMLInputElement>(null)
   const mobileSearchInputRef = useRef<HTMLInputElement>(null)
 
+  const announcementMessages = announcement ? activeAnnouncementMessages(announcement) : []
+  const showAnnouncement = shouldShowAnnouncementBar(announcement)
+
   useEffect(() => {
     supabase.from('site_settings').select('value').eq('key', 'announcements').maybeSingle().then(({ data }) => {
-      const content = data?.value as AnnouncementsContent | undefined
-      if (content?.messages?.length) setMessages(content.messages)
+      setAnnouncement(normalizeAnnouncements(data?.value))
     })
     getCategoriesWithProducts().then(setCategories)
   }, [])
 
   useEffect(() => {
-    if (messages.length <= 1) return
-    const timer = setInterval(() => setMessageIndex((i) => (i + 1) % messages.length), 4000)
+    if (announcementMessages.length <= 1) return
+    const timer = setInterval(() => setMessageIndex((i) => (i + 1) % announcementMessages.length), 4000)
     return () => clearInterval(timer)
-  }, [messages])
+  }, [announcementMessages.length])
+
+  useEffect(() => {
+    setMessageIndex(0)
+  }, [announcementMessages.join('|')])
 
   useEffect(() => {
     if (!query.trim()) return setSuggestions([])
@@ -133,16 +145,20 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-canvas border-b border-line">
-      {/* Announcement bar — one shared strip above all header breakpoints */}
-      <div
-        className="w-full text-white text-[11px] sm:text-[12px] tracking-[0.04em] text-center py-2.5 px-4"
-        style={{ background: 'var(--color-primary)' }}
-        role="status"
-      >
-        <p key={messageIndex} className="max-w-site mx-auto leading-snug animate-[fadeIn_0.4s_ease-out]">
-          {messages[messageIndex]}
-        </p>
-      </div>
+      {showAnnouncement && (
+        <div
+          className="w-full text-[11px] sm:text-[12px] tracking-[0.04em] text-center py-2.5 px-4"
+          style={{
+            background: announcement!.bg_color,
+            color: announcement!.text_color,
+          }}
+          role="status"
+        >
+          <p key={messageIndex} className="max-w-site mx-auto leading-snug animate-[fadeIn_0.4s_ease-out]">
+            {announcementMessages[messageIndex]}
+          </p>
+        </div>
+      )}
 
       {/* ── Desktop ≥1024 (lg): Logo | capped Search (centered) | Account | Wishlist | Cart ── */}
       <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-site w-full mx-auto">

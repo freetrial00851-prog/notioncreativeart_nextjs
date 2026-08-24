@@ -38,7 +38,41 @@ export type Product = {
 }
 
 export type AnnouncementsContent = {
+  /** When false, the bar is not rendered at all. */
+  enabled: boolean
   messages: string[]
+  /** CSS color for the bar background (default #111111). */
+  bg_color: string
+  /** CSS color for the bar text (default #ffffff). */
+  text_color: string
+}
+
+export const DEFAULT_ANNOUNCEMENT_COLORS = {
+  bg_color: '#111111',
+  text_color: '#ffffff',
+} as const
+
+/** Normalize legacy `{ messages }` rows and apply color/enabled defaults. */
+export function normalizeAnnouncements(raw: unknown): AnnouncementsContent {
+  const value = (raw && typeof raw === 'object' ? raw : {}) as Partial<AnnouncementsContent>
+  const messages = Array.isArray(value.messages) ? value.messages.map(String) : []
+  const hasText = messages.some((m) => m.trim().length > 0)
+  return {
+    enabled: typeof value.enabled === 'boolean' ? value.enabled : hasText,
+    messages,
+    bg_color: value.bg_color?.trim() || DEFAULT_ANNOUNCEMENT_COLORS.bg_color,
+    text_color: value.text_color?.trim() || DEFAULT_ANNOUNCEMENT_COLORS.text_color,
+  }
+}
+
+export function activeAnnouncementMessages(content: AnnouncementsContent): string[] {
+  return content.messages.map((m) => m.trim()).filter(Boolean)
+}
+
+/** Bar renders only when enabled AND at least one non-empty message (on+empty ≡ hidden). */
+export function shouldShowAnnouncementBar(content: AnnouncementsContent | null | undefined): boolean {
+  if (!content?.enabled) return false
+  return activeAnnouncementMessages(content).length > 0
 }
 
 export type LayoutSection = {
