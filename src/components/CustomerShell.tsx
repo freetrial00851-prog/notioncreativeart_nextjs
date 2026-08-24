@@ -7,6 +7,7 @@ import { CompleteAccountBanner } from '@/components/CompleteAccountBanner'
 import { AdminAreaGuard } from '@/components/AdminAreaGuard'
 import { CartDrawer } from '@/components/CartDrawer'
 import { CheckoutOverlay } from '@/components/CheckoutOverlay'
+import { SupportChat } from '@/components/SupportChat'
 import { AuthSheet } from '@/components/AuthSheet'
 import { NewsletterPromptModal } from '@/components/NewsletterPromptModal'
 import { useUI } from '@/context/UIContext'
@@ -33,6 +34,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
       <AdminAreaGuard />
       <CartDrawer />
       <CheckoutOverlay />
+      <SupportChat />
       <AuthSheet />
       <NewsletterPromptHost />
       <div className="min-h-screen flex flex-col">
