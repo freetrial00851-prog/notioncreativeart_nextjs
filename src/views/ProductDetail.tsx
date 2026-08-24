@@ -95,7 +95,7 @@ export function ProductDetail() {
   const params = useParams()
   const slug = typeof params?.slug === 'string' ? params.slug : undefined
   const { user, profile } = useAuth()
-  const { requireAuth, maybeOpenNewsletterPrompt } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const router = useRouter()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
@@ -263,16 +263,21 @@ export function ProductDetail() {
 
   const handleBuy = async () => {
     if (product.price === 0) {
-      maybeOpenNewsletterPrompt()
+      if (downloadingFree) return
       setDownloadingFree(true)
+      showBusyOverlay('download')
       const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+      hideBusyOverlay()
       setDownloadingFree(false)
       showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
+      // Newsletter after overlay clears so they don't stack on screen.
+      if (result.ok) maybeOpenNewsletterPrompt()
       return
     }
     if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
+    showBusyOverlay('checkout')
     startCheckout({
       variantId: product.lemon_variant_id,
       userId: user!.id,
@@ -284,7 +289,11 @@ export function ProductDetail() {
       billingZip: profile?.billing_zip,
       checkoutMode: product.checkout_mode,
     })
-    setTimeout(() => setBuying(false), 1500)
+    // Lemon opens sync; keep overlay briefly so the blur paints, then clear.
+    setTimeout(() => {
+      hideBusyOverlay()
+      setBuying(false)
+    }, 400)
   }
 
   const toggleWishlist = async () => {
@@ -742,8 +751,8 @@ export function ProductDetail() {
                 style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
               >
                 {product.price === 0
-                  ? (downloadingFree ? 'PREPARING…' : 'DOWNLOAD FREE')
-                  : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW')}
+                  ? 'DOWNLOAD FREE'
+                  : 'BUY NOW'}
               </button>
               <button
                 onClick={toggleWishlist}
@@ -881,7 +890,7 @@ export function ProductDetail() {
             className="flex-1 py-3 text-canvas text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
             style={{ background: 'var(--color-sale-green)' }}
           >
-            {product.price === 0 ? (downloadingFree ? 'PREPARING…' : 'DOWNLOAD FREE') : (buying ? 'OPENING…' : 'BUY NOW')}
+            {product.price === 0 ? 'DOWNLOAD FREE' : 'BUY NOW'}
           </button>
         </div>
       )}

@@ -15,7 +15,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 
 export function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const { user, profile } = useAuth()
-  const { requireAuth, maybeOpenNewsletterPrompt } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
   const router = useRouter()
@@ -54,18 +54,25 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
 
   const handleBuy = async () => {
     if (product.price === 0) {
-      maybeOpenNewsletterPrompt()
+      if (downloadingFree) return
       setDownloadingFree(true)
+      showBusyOverlay('download')
       const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+      hideBusyOverlay()
       setDownloadingFree(false)
       showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
+      if (result.ok) maybeOpenNewsletterPrompt()
       return
     }
     if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
+    showBusyOverlay('checkout')
     startCheckout({ variantId: product.lemon_variant_id, userId: user!.id, productId: product.id, email: user!.email, name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined, billingCountry: profile?.billing_country, billingState: profile?.billing_state, billingZip: profile?.billing_zip, checkoutMode: product.checkout_mode })
-    setTimeout(() => setBuying(false), 1500)
+    setTimeout(() => {
+      hideBusyOverlay()
+      setBuying(false)
+    }, 400)
   }
 
   const toggleWishlist = async () => {
@@ -173,7 +180,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
                 className="w-full py-3.5 bg-ink text-canvas text-[12px] tracking-[0.15em] hover:opacity-85 transition-opacity rounded-lg disabled:opacity-60"
               >
-                {product.price === 0 ? (downloadingFree ? 'PREPARING…' : 'DOWNLOAD FREE') : (buying ? 'OPENING CHECKOUT…' : 'BUY NOW — INSTANT DOWNLOAD')}
+                {product.price === 0 ? 'DOWNLOAD FREE' : 'BUY NOW — INSTANT DOWNLOAD'}
               </button>
             )}
             <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-3'}>

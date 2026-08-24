@@ -6,6 +6,7 @@ import { hasBeenNewsletterPrompted } from '../lib/newsletterPrompt'
 
 type RequireAuthAction = { type: 'buy' | 'wishlist' | 'cart'; productId: string }
 type AuthSheetView = 'login' | 'signup'
+export type BusyOverlayKind = 'checkout' | 'download'
 
 type UIContextValue = {
   requireAuth: (action?: RequireAuthAction) => boolean // returns true if already authed
@@ -20,6 +21,10 @@ type UIContextValue = {
   newsletterPromptOpen: boolean
   maybeOpenNewsletterPrompt: () => void
   closeNewsletterPrompt: () => void
+  /** Full-screen blur spinner for Buy Now / Download Free (cart uses CartContext.checkingOut). */
+  busyOverlay: BusyOverlayKind | null
+  showBusyOverlay: (kind: BusyOverlayKind) => void
+  hideBusyOverlay: () => void
 }
 
 const UIContext = createContext<UIContextValue | null>(null)
@@ -29,6 +34,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [authSheetOpen, setAuthSheetOpen] = useState(false)
   const [authSheetView, setAuthSheetView] = useState<AuthSheetView>('login')
   const [newsletterPromptOpen, setNewsletterPromptOpen] = useState(false)
+  const [busyOverlay, setBusyOverlay] = useState<BusyOverlayKind | null>(null)
 
   const openAuthSheet = (view: AuthSheetView = 'login') => {
     setAuthSheetView(view)
@@ -53,6 +59,9 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
   const closeNewsletterPrompt = useCallback(() => setNewsletterPromptOpen(false), [])
 
+  const showBusyOverlay = useCallback((kind: BusyOverlayKind) => setBusyOverlay(kind), [])
+  const hideBusyOverlay = useCallback(() => setBusyOverlay(null), [])
+
   return (
     <UIContext.Provider
       value={{
@@ -66,6 +75,9 @@ export function UIProvider({ children }: { children: ReactNode }) {
         newsletterPromptOpen,
         maybeOpenNewsletterPrompt,
         closeNewsletterPrompt,
+        busyOverlay,
+        showBusyOverlay,
+        hideBusyOverlay,
       }}
     >
       {children}

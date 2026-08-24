@@ -17,7 +17,7 @@ import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
-  const { requireAuth, maybeOpenNewsletterPrompt } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { user } = useAuth()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
@@ -61,11 +61,14 @@ export function ProductCard({ product, priority = false }: { product: Product; p
 
   const downloadFree = async (e: React.MouseEvent) => {
     e.preventDefault()
-    maybeOpenNewsletterPrompt()
+    if (downloadingFree) return
     setDownloadingFree(true)
+    showBusyOverlay('download')
     const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+    hideBusyOverlay()
     setDownloadingFree(false)
     showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
+    if (result.ok) maybeOpenNewsletterPrompt()
   }
 
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
