@@ -89,7 +89,7 @@ function DescriptionBlocks({ text }: { text: string }) {
   )
 }
 
-type Tab = 'included' | 'materials' | 'skill' | 'details'
+type Tab = 'description' | 'included' | 'materials' | 'skill' | 'details'
 
 export function ProductDetail() {
   const params = useParams()
@@ -106,8 +106,8 @@ export function ProductDetail() {
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
-  const [activeTab, setActiveTab] = useState<Tab>('included')
-  const [openAccordion, setOpenAccordion] = useState<Tab | null>(null)
+  const [activeTab, setActiveTab] = useState<Tab>('description')
+  const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
   const buyButtonRef = useRef<HTMLDivElement>(null)
   const [owned, setOwned] = useState(false)
   const [inWishlist, setInWishlist] = useState(false)
@@ -140,8 +140,7 @@ export function ProductDetail() {
         setUnavailable(!!everExisted)
       }
       setLoading(false)
-      setActiveTab('included')
-      setOpenAccordion(null)
+      setActiveTab('description')
       setActiveImage(0)
     })
   }, [slug])
@@ -330,19 +329,16 @@ export function ProductDetail() {
   }
 
   const images = product.images ?? []
+  const shortBlurb = product.description?.split('\n').find((l) => l.trim())?.trim() ?? ''
   const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
   const badge = product.card_badge
   const skillLabel = product.skill_level
     ? product.skill_level.charAt(0).toUpperCase() + product.skill_level.slice(1)
     : null
 
-  /** Category / skill pills — sit above the title on every breakpoint */
-  const badges: string[] = []
-  if (category) badges.push(category.name)
-  if (skillLabel) badges.push(skillLabel === 'Beginner' ? 'Beginner Friendly' : skillLabel)
-
-  /** Status / promo pills — sit below specs */
   const tags: string[] = []
+  if (category) tags.push(category.name)
+  if (skillLabel) tags.push(skillLabel === 'Beginner' ? 'Beginner Friendly' : skillLabel)
   if (product.price === 0) tags.push('Free')
   if (product.is_bundle) tags.push('Bundle')
   if (badge === 'new') tags.push('New')
@@ -358,8 +354,8 @@ export function ProductDetail() {
     ...(product.pdf_pages ? [{ icon: 'auto_stories', label: 'Pages', value: `${product.pdf_pages} pages` }] : []),
   ]
 
-  /** Description + specs live only in the hero content stack — not repeated in tabs. */
   const TABS: { key: Tab; label: string }[] = [
+    { key: 'description', label: 'Description' },
     { key: 'included', label: "What's Included" },
     { key: 'materials', label: 'Materials' },
     { key: 'skill', label: 'Skill Level' },
@@ -387,6 +383,18 @@ export function ProductDetail() {
   )
 
   const renderTabContent = (tab: Tab) => {
+    if (tab === 'description') {
+      return wrapTabWithImage(
+        product.description ? (
+          <div>
+            <h3 className="font-subheading font-semibold text-xl mb-4">Pattern Description</h3>
+            <DescriptionBlocks text={product.description} />
+          </div>
+        ) : (
+          <p className="text-[13px] text-ink-soft">No description yet.</p>
+        )
+      )
+    }
     if (tab === 'included') {
       return wrapTabWithImage(
         <ul className="text-[14px] text-ink-soft space-y-3 max-w-xl">
@@ -437,11 +445,18 @@ export function ProductDetail() {
     return wrapTabWithImage(
       <div className="rounded-xl px-5 py-4 space-y-2.5 text-[14px] max-w-md" style={{ background: 'var(--color-surface)' }}>
         <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1">PATTERN DETAILS</p>
+        {skillLabel && (
+          <div className="flex justify-between gap-4"><span className="text-ink-soft">Skill Level</span><span className="capitalize">{product.skill_level}</span></div>
+        )}
+        <div className="flex justify-between gap-4"><span className="text-ink-soft">Language</span><span>English (US terms)</span></div>
+        <div className="flex justify-between gap-4"><span className="text-ink-soft">Format</span><span>PDF (Printable)</span></div>
         {product.pdf_filename && (
           <div className="flex justify-between gap-4"><span className="text-ink-soft">File</span><span className="text-right truncate max-w-[200px]">{product.pdf_filename}</span></div>
         )}
+        {product.pdf_pages && (
+          <div className="flex justify-between gap-4"><span className="text-ink-soft">Pages</span><span>{product.pdf_pages}</span></div>
+        )}
         <div className="flex justify-between gap-4"><span className="text-ink-soft">Delivery</span><span>Instant download</span></div>
-        <div className="flex justify-between gap-4"><span className="text-ink-soft">Returns</span><span>Non-refundable</span></div>
       </div>
     )
   }
@@ -462,12 +477,12 @@ export function ProductDetail() {
         <span className="text-ink truncate max-w-[260px]">{product.title}</span>
       </nav>
 
-      {/* Hero layout — same content order at every breakpoint
-          < lg: single column (gallery → content stack)
-          ≥ lg: 2 columns (gallery | content stack) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] gap-6 lg:gap-10 items-start overflow-visible">
-        {/* Gallery */}
-        <div className="min-w-0 relative z-20">
+      {/* Hero layout
+          < lg (mobile + tablet): single column — gallery → title/badges → buy → details
+          ≥ lg: 3-col gallery | details | buy */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,0.55fr)_minmax(240px,0.45fr)] gap-6 lg:gap-8 items-start overflow-visible">
+        {/* Panel 1 — Gallery */}
+        <div className="min-w-0 relative order-1 lg:col-start-1 lg:row-start-1 z-20">
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
             {/* Vertical thumbnails — tablet + desktop (≥768) */}
             {images.length > 1 && (
@@ -517,7 +532,7 @@ export function ProductDetail() {
                   <img
                     src={deriveVariantUrl(images[activeImage], isMobileGallery ? 'large' : 'full')}
                     srcSet={gallerySrcSet(images[activeImage], !isMobileGallery)}
-                    sizes={isMobileGallery ? '100vw' : '(max-width: 1024px) 100vw, 55vw'}
+                    sizes={isMobileGallery ? '100vw' : '(max-width: 1024px) 62vw, 52vw'}
                     alt={product.title}
                     loading="eager"
                     fetchPriority="high"
@@ -597,7 +612,7 @@ export function ProductDetail() {
                 </div>
               )}
 
-              {/* Horizontal thumbnails — mobile only (<768) */}
+              {/* Horizontal thumbnails — mobile only (<768), no side arrows */}
               {images.length > 1 && (
                 <div className="md:hidden mt-3 flex gap-2 overflow-x-auto py-0.5" style={{ scrollbarWidth: 'none' }}>
                   {images.map((img, i) => (
@@ -613,141 +628,62 @@ export function ProductDetail() {
                   ))}
                 </div>
               )}
+
+              {/* Title + badges — mobile & tablet (< lg); stacks above buy box */}
+              <div className="lg:hidden mt-4">
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
+                        style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <h1 className="font-display font-semibold text-[24px] leading-tight break-words">
+                  {product.title}
+                </h1>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Unified content — badges → title → buy → description → specs → tags */}
-        <div className="min-w-0 flex flex-col gap-5 lg:pt-1">
-          <div>
-            {badges.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2.5">
-                {badges.map((b) => (
+        {/* Panel 2 — Product details (desktop middle; below buy on mobile/tablet) */}
+        <div className="min-w-0 lg:pt-1 order-3 lg:col-start-2 lg:row-start-1">
+          <div className="hidden lg:block">
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {tags.map((tag) => (
                   <span
-                    key={b}
+                    key={tag}
                     className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
                     style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
                   >
-                    {b}
+                    {tag}
                   </span>
                 ))}
               </div>
             )}
-            <h1 className="font-display font-semibold text-[24px] sm:text-[26px] lg:text-[1.85rem] xl:text-[2rem] leading-tight break-words">
+            <h1 className="font-display font-semibold text-[26px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
               {product.title}
             </h1>
           </div>
 
-          <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2">
-            <div className="space-y-0.5">
-              {product.price > 0 && onSale ? (
-                <div className="flex items-baseline gap-3 flex-wrap">
-                  <span className="text-2xl sm:text-[1.75rem] font-semibold text-ink">${product.price.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
-                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price!.toFixed(2)}</span>
-                </div>
-              ) : (
-                <p className="text-2xl sm:text-[1.75rem] font-semibold text-ink">
-                  {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
-                  {product.price > 0 && <span className="text-sm font-normal text-ink-soft ml-1">USD</span>}
-                </p>
-              )}
-              {product.price > 0 && (
-                <p className="text-[12px] text-ink-soft leading-tight">One-time purchase</p>
-              )}
-            </div>
-
-            {product.sold_out ? (
-              <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
-            ) : (
-              <div className="space-y-1.5">
-                {product.price > 0 && (
-                  isInCart(product.id) ? (
-                    <Link
-                      href="/cart"
-                      className="block text-center w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      ✓ IN CART — GO TO CART
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={toggleCart}
-                      className="w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      <MaterialIcon name="shopping_bag" size={15} /> ADD TO CART
-                    </button>
-                  )
-                )}
-                <button
-                  onClick={handleBuy}
-                  disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-                  className={product.price === 0
-                    ? 'w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
-                    : 'w-full py-3 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
-                  style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
-                >
-                  {product.price === 0
-                    ? 'DOWNLOAD FREE'
-                    : 'BUY NOW'}
-                </button>
-                <button
-                  onClick={toggleWishlist}
-                  className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
-                >
-                  <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
-                  {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
-                </button>
-                <button
-                  onClick={shareListing}
-                  className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
-                >
-                  <ShareIcon size={15} />
-                  {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
-                </button>
-              </div>
-            )}
-
-            {owned && (
-              <p className="text-[11px] text-ink-soft text-center">
-                You already own this — <Link href="/account/orders" className="underline underline-offset-2 hover:text-ink">go to your downloads</Link>
-              </p>
-            )}
-
-            {!product.sold_out && (
-              <div className="rounded-xl px-3.5 py-2.5 space-y-2" style={{ background: 'var(--color-surface)' }}>
-                <div className="flex gap-2.5 items-start">
-                  <MaterialIcon name="download" size={16} color="var(--color-sale-green)" />
-                  <div>
-                    <p className="text-[12px] font-medium text-ink">Instant Download</p>
-                    <p className="text-[11px] text-ink-soft leading-snug">Your PDF is ready right after purchase.</p>
-                  </div>
-                </div>
-                <div className="flex gap-2.5 items-start">
-                  <MaterialIcon name="lock" size={16} color="var(--color-sale-green)" />
-                  <div>
-                    <p className="text-[12px] font-medium text-ink">Secure Checkout</p>
-                    <p className="text-[11px] text-ink-soft leading-snug">Payments protected by Lemon Squeezy.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {(purchaseCount >= 3 || product.description) && (
-            <div>
-              {purchaseCount >= 3 && (
-                <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5">
-                  <MaterialIcon name="download_done" size={14} /> {purchaseCount}+ makers have downloaded this pattern
-                </p>
-              )}
-              {product.description ? (
-                <DescriptionBlocks text={product.description} />
-              ) : null}
-            </div>
+          {purchaseCount >= 3 && (
+            <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5 mt-1 lg:mt-0">
+              <MaterialIcon name="download_done" size={14} /> {purchaseCount}+ makers have downloaded this pattern
+            </p>
           )}
 
-          <ul className="space-y-2.5">
+          {shortBlurb && (
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-5">{shortBlurb}</p>
+          )}
+
+          <ul className="space-y-2.5 mb-5">
             {specs.map((s) => (
               <li key={s.label} className="flex items-center gap-3 text-[13px]">
                 <MaterialIcon name={s.icon} size={18} color="var(--color-ink-soft)" />
@@ -757,31 +693,111 @@ export function ProductDetail() {
             ))}
           </ul>
 
-          {(tags.length > 0 || product.wishlist_count > 0) && (
-            <div className="space-y-3">
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
-                      style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
+          {product.wishlist_count > 0 && (
+            <p className="text-[11px] text-ink-soft mt-5">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
+          )}
+        </div>
+
+        {/* Panel 3 — Purchase card (after title on mobile/tablet; right column on desktop) */}
+        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2 order-2 lg:col-start-3 lg:row-start-1 lg:sticky lg:top-24">
+          <div className="space-y-0.5">
+            {product.price > 0 && onSale ? (
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span className="text-2xl sm:text-[1.75rem] font-semibold text-ink">${product.price.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
+                <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price!.toFixed(2)}</span>
+              </div>
+            ) : (
+              <p className="text-2xl sm:text-[1.75rem] font-semibold text-ink">
+                {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
+                {product.price > 0 && <span className="text-sm font-normal text-ink-soft ml-1">USD</span>}
+              </p>
+            )}
+            {product.price > 0 && (
+              <p className="text-[12px] text-ink-soft leading-tight">One-time purchase</p>
+            )}
+          </div>
+
+          {product.sold_out ? (
+            <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
+          ) : (
+            <div className="space-y-1.5">
+              {product.price > 0 && (
+                isInCart(product.id) ? (
+                  <Link
+                    href="/cart"
+                    className="block text-center w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    ✓ IN CART — GO TO CART
+                  </Link>
+                ) : (
+                  <button
+                    onClick={toggleCart}
+                    className="w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    <MaterialIcon name="shopping_bag" size={15} /> ADD TO CART
+                  </button>
+                )
+              )}
+              <button
+                onClick={handleBuy}
+                disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
+                className={product.price === 0
+                  ? 'w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
+                  : 'w-full py-3 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
+                style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
+              >
+                {product.price === 0
+                  ? 'DOWNLOAD FREE'
+                  : 'BUY NOW'}
+              </button>
+              <button
+                onClick={toggleWishlist}
+                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+              >
+                <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
+                {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
+              </button>
+              <button
+                onClick={shareListing}
+                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+              >
+                <ShareIcon size={15} />
+                {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
+              </button>
+            </div>
+          )}
+
+          {owned && (
+            <p className="text-[11px] text-ink-soft text-center">
+              You already own this — <Link href="/account/orders" className="underline underline-offset-2 hover:text-ink">go to your downloads</Link>
+            </p>
+          )}
+
+          {!product.sold_out && (
+            <div className="rounded-xl px-3.5 py-2.5 space-y-2" style={{ background: 'var(--color-surface)' }}>
+              <div className="flex gap-2.5 items-start">
+                <MaterialIcon name="download" size={16} color="var(--color-sale-green)" />
+                <div>
+                  <p className="text-[12px] font-medium text-ink">Instant Download</p>
+                  <p className="text-[11px] text-ink-soft leading-snug">Your PDF is ready right after purchase.</p>
                 </div>
-              )}
-              {product.wishlist_count > 0 && (
-                <p className="text-[11px] text-ink-soft">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
-              )}
+              </div>
+              <div className="flex gap-2.5 items-start">
+                <MaterialIcon name="lock" size={16} color="var(--color-sale-green)" />
+                <div>
+                  <p className="text-[12px] font-medium text-ink">Secure Checkout</p>
+                  <p className="text-[11px] text-ink-soft leading-snug">Payments protected by Lemon Squeezy.</p>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
 
       {/* Full-width tabs */}
-      <div className="mt-14 md:mt-16 pt-2">
+      <div className="mt-14 md:mt-16 pt-2 order-4">
         <div className="hidden md:flex gap-7 border-b border-line overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {TABS.map((t) => (
             <button
