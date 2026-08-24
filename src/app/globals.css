@@ -61,9 +61,11 @@
 
 html { background: var(--color-canvas); overflow-x: hidden; }
 
-/* Ensure max-w-site tracks the responsive --max-width-site token */
+/* Shared content column — always centered; pages use `max-w-site` (+ optional padding). */
 @utility max-w-site {
+  width: 100%;
   max-width: var(--max-width-site);
+  margin-inline: auto;
 }
 
 /* Widen the shared content column on large / ultra-wide monitors */

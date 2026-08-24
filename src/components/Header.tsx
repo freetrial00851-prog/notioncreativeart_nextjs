@@ -161,13 +161,13 @@ export function Header() {
       )}
 
       {/* ── Desktop ≥1024 (lg): Logo | Search (≤600) | Sign in → Wishlist → Cart ── */}
-      <div className="hidden lg:flex items-center gap-5 px-6 xl:px-8 py-3.5 max-w-site w-full mx-auto">
+      <div className="hidden lg:flex items-center justify-between gap-5 px-6 xl:px-8 py-3.5 max-w-site">
         <div className="shrink-0">
           <Logo variant="full" />
         </div>
 
-        {/* Search + icon cluster: ~32px (gap-8) between search and icons */}
-        <div className="flex-1 min-w-0 flex items-center gap-8">
+        {/* Search + icons pack to the trailing edge; ~32px between search and icon group */}
+        <div className="flex items-center gap-8 min-w-0 flex-1 justify-end">
           <div className="flex items-center gap-3 w-full max-w-[600px] min-w-0">
             <div ref={searchWrapRef} className="relative flex-1 min-w-0">
               <div ref={categoriesWrapRef} className="relative">
@@ -265,7 +265,7 @@ export function Header() {
 
       {/* ── Tablet 768–1023 (md–lg): two rows ── */}
       <div className="hidden md:block lg:hidden">
-        <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-site w-full mx-auto">
+        <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-site">
           <Logo variant="full" />
           <div className="flex items-center gap-5 shrink-0 text-[#111111]">
             <HeaderAccountControl
@@ -291,7 +291,7 @@ export function Header() {
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-3 px-5 pb-3 max-w-site w-full mx-auto">
+        <div className="flex items-center gap-3 px-5 pb-3 max-w-site">
           <button
             type="button"
             aria-label="Browse categories"
