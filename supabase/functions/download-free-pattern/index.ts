@@ -16,7 +16,7 @@ const MAX_PER_WINDOW = 20
 const WINDOW_MINUTES = 60
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: jsonHeaders(req)For(req) })
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeadersFor(req) })
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: jsonHeaders(req) })
   }
