@@ -138,3 +138,7 @@ create policy "admin manage categories" on public.categories for all
   using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
 create policy "admin read all orders" on public.orders for select
   using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
+create policy "admin read all purchases" on public.purchases for select
+  using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
+create policy "admin delete purchases" on public.purchases for delete
+  using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
