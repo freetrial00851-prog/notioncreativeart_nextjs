@@ -1,3 +1,4 @@
+import Papa from 'papaparse'
 import type { Category } from './types'
 
 /** Exact CSV headers expected by the bulk uploader. */
@@ -107,57 +108,22 @@ function parseOptionalPrice(value: string): number | null {
   return parsePrice(trimmed)
 }
 
-/** Minimal RFC 4180-style CSV parser (quoted fields, comma-separated). */
+/** RFC 4180 CSV parse via Papa Parse (quoted commas, newlines, escaped quotes). */
 export function parseCsv(text: string): { headers: string[]; rows: BulkCsvRow[]; error: string | null } {
-  const lines: string[] = []
-  let cur = ''
-  let inQuotes = false
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i]
-    if (ch === '"') {
-      if (inQuotes && text[i + 1] === '"') {
-        cur += '"'
-        i++
-      } else {
-        inQuotes = !inQuotes
-      }
-    } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
-      if (ch === '\r' && text[i + 1] === '\n') i++
-      if (cur.trim()) lines.push(cur)
-      cur = ''
-    } else {
-      cur += ch
-    }
-  }
-  if (cur.trim()) lines.push(cur)
+  const parsed = Papa.parse<string[]>(text, {
+    header: false,
+    skipEmptyLines: 'greedy',
+  })
 
-  if (lines.length === 0) return { headers: [], rows: [], error: 'CSV file is empty.' }
-
-  const parseLine = (line: string) => {
-    const cells: string[] = []
-    let cell = ''
-    let quoted = false
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i]
-      if (ch === '"') {
-        if (quoted && line[i + 1] === '"') {
-          cell += '"'
-          i++
-        } else {
-          quoted = !quoted
-        }
-      } else if (ch === ',' && !quoted) {
-        cells.push(cell.trim())
-        cell = ''
-      } else {
-        cell += ch
-      }
-    }
-    cells.push(cell.trim())
-    return cells
+  if (parsed.errors.length > 0) {
+    const msg = parsed.errors.map((e) => e.message).join('; ')
+    return { headers: [], rows: [], error: `CSV parse error: ${msg}` }
   }
 
-  const headers = parseLine(lines[0]).map((h) => h.toLowerCase())
+  const rawRows = parsed.data.filter((row) => row.some((cell) => String(cell ?? '').trim()))
+  if (rawRows.length === 0) return { headers: [], rows: [], error: 'CSV file is empty.' }
+
+  const headers = rawRows[0].map((h) => String(h ?? '').trim().toLowerCase())
   const missing = BULK_CSV_HEADERS.filter((h) => !headers.includes(h))
   if (missing.length) {
     return {
@@ -168,13 +134,13 @@ export function parseCsv(text: string): { headers: string[]; rows: BulkCsvRow[];
   }
 
   const rows: BulkCsvRow[] = []
-  for (let i = 1; i < lines.length; i++) {
-    const cells = parseLine(lines[i])
-    if (cells.every((c) => !c)) continue
+  for (let i = 1; i < rawRows.length; i++) {
+    const cells = rawRows[i]
+    if (cells.every((c) => !String(c ?? '').trim())) continue
     const row = {} as BulkCsvRow
     for (const h of BULK_CSV_HEADERS) {
       const idx = headers.indexOf(h)
-      row[h] = idx >= 0 ? (cells[idx] ?? '') : ''
+      row[h] = idx >= 0 ? String(cells[idx] ?? '') : ''
     }
     rows.push(row)
   }
