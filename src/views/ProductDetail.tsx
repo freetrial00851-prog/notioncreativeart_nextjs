@@ -336,7 +336,6 @@ export function ProductDetail() {
   }
 
   const images = product.images ?? []
-  const shortBlurb = product.description?.split('\n').find((l) => l.trim())?.trim() ?? ''
   const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
   const badge = product.card_badge
   const skillLabel = product.skill_level
@@ -686,9 +685,12 @@ export function ProductDetail() {
             </p>
           )}
 
-          {shortBlurb && (
-            <p className="text-[14px] text-ink-soft leading-relaxed mb-5">{shortBlurb}</p>
-          )}
+          {/* Fixed slot so specs/tabs don’t jump when subtitle is empty, short, or long. */}
+          <div className="min-h-[2.875rem] mb-5" aria-hidden={!product.subtitle?.trim()}>
+            {product.subtitle?.trim() ? (
+              <p className="text-[14px] text-ink-soft leading-relaxed line-clamp-2">{product.subtitle.trim()}</p>
+            ) : null}
+          </div>
 
           <ul className="space-y-2.5 mb-5">
             {specs.map((s) => (

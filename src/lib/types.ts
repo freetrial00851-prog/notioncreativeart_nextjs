@@ -11,6 +11,8 @@ export type Product = {
   id: string
   title: string
   slug: string
+  /** Short blurb under the product title (~100–150 chars); distinct from description. */
+  subtitle: string | null
   description: string | null
   skill_level: 'beginner' | 'intermediate' | 'advanced' | null
   price: number

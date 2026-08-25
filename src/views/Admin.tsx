@@ -247,6 +247,7 @@ const emptyForm = {
   id: '',
   title: '',
   slug: '',
+  subtitle: '',
   description: '',
   skill_level: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
   itemType: 'paid' as 'free' | 'paid',
@@ -480,6 +481,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
         id: p.id,
         title: p.title,
         slug: p.slug,
+        subtitle: p.subtitle ?? '',
         description: p.description ?? '',
         skill_level: p.skill_level ?? 'beginner',
         itemType: p.price === 0 ? 'free' : 'paid',
@@ -538,6 +540,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       id: '',
       title: `${p.title} (Copy)`,
       slug: newSlug,
+      subtitle: p.subtitle ?? '',
       description: p.description ?? '',
       skill_level: p.skill_level ?? 'beginner',
       itemType: p.price === 0 ? 'free' : 'paid',
@@ -586,6 +589,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     const payload = {
       title: form.title,
       slug,
+      subtitle: form.subtitle.trim() || null,
       description: form.description || null,
       skill_level: form.skill_level,
       price: form.itemType === 'free' ? 0 : parseFloat(form.price) || 0,
@@ -721,6 +725,16 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                   <p className="text-[12px] text-ink-soft -mt-2">Duplicated from another product — images and details copied, but you&apos;ll need a new Lemon Squeezy checkout ID and PDF before publishing.</p>
                 )}
                 <Field label="Slug (URL)"><input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="input" placeholder="granny-stripe-top" /></Field>
+                <Field label={`Subtitle (${form.subtitle.length}/150)`}>
+                  <input
+                    value={form.subtitle}
+                    onChange={(e) => setForm({ ...form, subtitle: e.target.value.slice(0, 150) })}
+                    className="input"
+                    maxLength={150}
+                    placeholder="Short line under the title on the product page"
+                  />
+                  <p className="text-[12px] text-ink-soft mt-1.5">Aim for 100–150 characters, unique from your description, include a keyword.</p>
+                </Field>
                 <Field label="Description"><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input" rows={5} /></Field>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Skill level">
