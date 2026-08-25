@@ -1,3 +1,4 @@
+import { headers } from 'next/headers'
 import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
 import { Home } from '@/views/Home'
 import { getHomeCatalogServer } from '@/lib/data/home'
@@ -19,8 +20,18 @@ export const metadata = buildMetadata({
   ],
 })
 
-/** Homepage — full public catalog SSR; client keeps auth/cart/wishlist interactive. */
+/**
+ * Homepage — full public catalog SSR on hard/document loads.
+ * Soft navigations skip the catalog flight; Home seeds from homeCatalogCache
+ * (or client-fetches) so logo→home feels instant when the cache is warm.
+ */
 export default async function HomePage() {
+  const softNav = (await headers()).get('x-nca-soft-nav') === '1'
+
+  if (softNav) {
+    return <Home />
+  }
+
   const { snapshot, featuredError } = await getHomeCatalogServer()
   return (
     <Home

@@ -246,6 +246,13 @@ export function ProductDetail() {
     }
   }, [product?.images, activeImage, isMobileGallery])
 
+  // Warm the category shop route so breadcrumb clicks feel instant.
+  // Must stay above any conditional returns (Rules of Hooks).
+  useEffect(() => {
+    if (!category?.slug) return
+    router.prefetch(`/shop/${category.slug}`)
+  }, [router, category?.slug])
+
   if (loading) return <ProductDetailSkeleton />
   if (!product) return (
     <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
@@ -470,7 +477,7 @@ export function ProductDetail() {
         {category && (
           <>
             <span>›</span>
-            <Link href={`/shop/${category.slug}`} className="hover:text-ink">{category.name}</Link>
+            <Link href={shopLink} prefetch className="hover:text-ink">{category.name}</Link>
           </>
         )}
         <span>›</span>

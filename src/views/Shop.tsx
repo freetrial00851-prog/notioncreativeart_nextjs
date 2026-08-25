@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
 import { supabase } from '../lib/supabase'
 import { getSubcategoriesWithCounts, type SubcategoryWithCount } from '../lib/categories'
@@ -17,8 +17,10 @@ const LEVELS = ['beginner', 'intermediate', 'advanced'] as const
 
 export function Shop() {
   const params = useParams()
+  const router = useRouter()
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
-  const [searchParams, setSearchParams] = useUpdateSearchParams()
+  const [searchParams, setSearchParams, searchPending] = useUpdateSearchParams()
+  const [navPending, startNavTransition] = useTransition()
   const level = searchParams?.get('level') ?? null
   const priceFilter = searchParams?.get('price') ?? null
   const bundleFilter = searchParams?.get('bundle') === '1'
@@ -27,12 +29,27 @@ export function Shop() {
   const [categories, setCategories] = useState<Category[]>([])
   const [sidebarCategories, setSidebarCategories] = useState<SubcategoryWithCount[]>([])
   const [suggestions, setSuggestions] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  /** True only on cold first paint — never for subsequent filter/category changes. */
+  const [initialLoading, setInitialLoading] = useState(true)
+  /** Refetch in flight while previous results stay on screen (dimmed). */
+  const [filterFetching, setFilterFetching] = useState(false)
+  const hasLoadedOnce = useRef(false)
+  const fetchGen = useRef(0)
 
   const currentCategory = categories.find((c) => c.slug === categorySlug)
   const parentCategory = currentCategory?.parent_id ? categories.find((c) => c.id === currentCategory.parent_id) : null
   const categoryName = categorySlug === 'sale' ? 'Sale' : categorySlug === 'new' ? 'New Arrivals' : currentCategory?.name
-useEffect(() => {
+
+  const filterPending = searchPending || navPending || filterFetching
+
+  /** Soft-navigate shop paths without clearing the grid to a skeleton. */
+  const goShop = (href: string) => {
+    startNavTransition(() => {
+      router.push(href, { scroll: false })
+    })
+  }
+
+  useEffect(() => {
     supabase.from('categories').select('*').order('sort_order').then(({ data }) => setCategories((data as Category[]) ?? []))
   }, [])
 
@@ -46,7 +63,17 @@ useEffect(() => {
   }, [currentCategory?.id])
 
   useEffect(() => {
-    setLoading(true)
+    // Wait for categories when filtering by a real category slug — otherwise the
+    // first query would fetch the unfiltered catalog and flash wrong products.
+    if (categorySlug && categorySlug !== 'sale' && categorySlug !== 'new' && categorySlug !== 'bestsellers' && categories.length === 0) {
+      return
+    }
+
+    const gen = ++fetchGen.current
+    const hasPrior = hasLoadedOnce.current
+    if (hasPrior) setFilterFetching(true)
+    else setInitialLoading(true)
+
     let query = supabase.from('products').select('*').eq('active', true)
     if (level) query = query.eq('skill_level', level)
     if (priceFilter === 'free') query = query.eq('price', 0)
@@ -71,6 +98,7 @@ useEffect(() => {
       }
     }
     query.order('created_at', { ascending: false }).then(({ data }) => {
+      if (gen !== fetchGen.current) return
       let rows = (data as Product[]) ?? []
       // "On sale" isn't a single-column filter (needs compare_at_price > price,
       // not just "is set") — Supabase can't compare two columns directly, so
@@ -78,15 +106,17 @@ useEffect(() => {
       // matching the exact same isOnSale logic ProductCard uses for the badge.
       if (saleFilter) rows = rows.filter((p) => p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price)
       setProducts(rows)
-      setLoading(false)
+      hasLoadedOnce.current = true
+      setInitialLoading(false)
+      setFilterFetching(false)
     })
   }, [level, priceFilter, bundleFilter, saleFilter, categorySlug, categories])
 
   useEffect(() => {
-    if (loading || products.length > 0) return
+    if (initialLoading || filterFetching || products.length > 0) return
     supabase.from('products').select('*').eq('active', true).order('wishlist_count', { ascending: false }).limit(4)
       .then(({ data }) => setSuggestions((data as Product[]) ?? []))
-  }, [loading, products.length])
+  }, [initialLoading, filterFetching, products.length])
 
   const title = categorySlug === 'new'
     ? 'New Arrivals'
@@ -189,7 +219,11 @@ useEffect(() => {
           <div className="space-y-0.5">
             <Link
               href={`/shop/${(parentCategory ?? currentCategory)!.slug}`}
-              onClick={() => setMobileFiltersOpen(false)}
+              onClick={(e) => {
+                e.preventDefault()
+                setMobileFiltersOpen(false)
+                goShop(`/shop/${(parentCategory ?? currentCategory)!.slug}`)
+              }}
               className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${!parentCategory ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
             >
               All {(parentCategory ?? currentCategory)!.name}
@@ -198,7 +232,11 @@ useEffect(() => {
               <Link
                 key={sc.id}
                 href={`/shop/${sc.slug}`}
-                onClick={() => setMobileFiltersOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setMobileFiltersOpen(false)
+                  goShop(`/shop/${sc.slug}`)
+                }}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
               >
                 <span>{sc.name}</span>
@@ -211,6 +249,10 @@ useEffect(() => {
     </>
   )
 
+  const gridPendingClass = filterPending
+    ? 'opacity-50 pointer-events-none transition-opacity duration-200'
+    : 'opacity-100 transition-opacity duration-200'
+
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-14">
       <nav className="text-[11px] tracking-[0.08em] text-ink-soft mb-8 flex items-center gap-2 flex-wrap">
@@ -218,7 +260,16 @@ useEffect(() => {
         {parentCategory && (
           <>
             <span>/</span>
-            <Link href={`/shop/${parentCategory.slug}`} className="hover:text-ink">{parentCategory.name.toUpperCase()}</Link>
+            <Link
+              href={`/shop/${parentCategory.slug}`}
+              onClick={(e) => {
+                e.preventDefault()
+                goShop(`/shop/${parentCategory.slug}`)
+              }}
+              className="hover:text-ink"
+            >
+              {parentCategory.name.toUpperCase()}
+            </Link>
           </>
         )}
         <span>/</span>
@@ -282,8 +333,8 @@ useEffect(() => {
           {filterPanelContent}
         </aside>
 
-        <div className="min-w-0">
-          {loading ? (
+        <div className={`min-w-0 ${gridPendingClass}`} aria-busy={filterPending || undefined}>
+          {initialLoading ? (
             <ProductGridSkeleton variant="shop" />
           ) : sortedProducts.length === 0 ? (
             <EmptyState
