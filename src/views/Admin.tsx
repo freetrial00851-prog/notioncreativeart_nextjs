@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext'
 import type { Product, Category } from '../lib/types'
 import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
+import { AdminBulkUpload } from './AdminBulkUpload'
 import { DropzoneUpload } from '../components/DropzoneUpload'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { triggerPdfDownload } from '../lib/downloads'
@@ -26,6 +27,7 @@ type NavItem =
 const ADMIN_NAV: NavItem[] = [
   { kind: 'link', to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true },
   { kind: 'link', to: '/admin/listings', label: 'Listings', icon: 'sell' },
+  { kind: 'link', to: '/admin/bulk-upload', label: 'Bulk Upload', icon: 'upload_file' },
   { kind: 'link', to: '/admin/orders', label: 'Orders', icon: 'receipt_long' },
   { kind: 'link', to: '/admin/categories', label: 'Categories', icon: 'category' },
   {
@@ -197,6 +199,8 @@ function AdminContent() {
       return <CategoriesAdmin />
     case '/admin/listings':
       return <ProductsAdmin mode="listings" />
+    case '/admin/bulk-upload':
+      return <AdminBulkUpload />
     case '/admin/free-patterns':
       return <ProductsAdmin mode="free" />
     case '/admin/bundles':
