@@ -1,14 +1,15 @@
 -- Generic rate-limit event log — Edge Functions insert a row per attempt and
 -- check how many rows exist for a given key within a time window before
--- allowing an action. No RLS policies needed here: only Edge Functions
--- (using the service-role key) ever touch this table, never the browser
--- directly.
+-- allowing an action. RLS enabled with no public policies: only Edge Functions
+-- (service-role key) touch this table; browser/anon/authenticated are blocked.
 
 create table if not exists public.rate_limit_events (
   id bigserial primary key,
   key text not null,
   created_at timestamptz not null default now()
 );
+
+alter table public.rate_limit_events enable row level security;
 
 create index if not exists rate_limit_events_key_created_at_idx
   on public.rate_limit_events (key, created_at);

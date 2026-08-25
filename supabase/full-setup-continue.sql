@@ -285,13 +285,15 @@ end $$;
 -- check how many rows exist for a given key within a time window before
 -- allowing an action. No RLS policies needed here: only Edge Functions
 -- (using the service-role key) ever touch this table, never the browser
--- directly.
+-- directly. RLS enabled with no public policies — service-role only.
 
 create table if not exists public.rate_limit_events (
   id bigserial primary key,
   key text not null,
   created_at timestamptz not null default now()
 );
+
+alter table public.rate_limit_events enable row level security;
 
 create index if not exists rate_limit_events_key_created_at_idx
   on public.rate_limit_events (key, created_at);
@@ -377,6 +379,11 @@ alter table public.products
 
 -- Backfill any nulls if the column was ever nullable mid-migration
 update public.products set lemon_variant_id = '' where lemon_variant_id is null;
+
+
+-- ═══ products-pdf-filename.sql ═══
+-- Original uploaded PDF filename (storage object remains {product_id}.pdf).
+alter table public.products add column if not exists pdf_filename text;
 
 
 -- ═══ grants-api-access.sql ═══
