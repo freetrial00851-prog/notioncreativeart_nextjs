@@ -7,11 +7,7 @@
 // No DB / admin inbox — email delivery only.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { corsHeadersFor, isOriginAllowed, jsonHeaders } from '../_shared/cors.ts'
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
@@ -37,16 +33,19 @@ async function rateLimitOk(ip: string): Promise<boolean> {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeadersFor(req) })
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: corsHeaders })
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: jsonHeaders(req) })
+  }
+  if (!isOriginAllowed(req)) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), { status: 403, headers: jsonHeaders(req) })
   }
 
   try {
     if (!RESEND_API_KEY) {
       return new Response(
         JSON.stringify({ error: "Human support email isn't configured yet — please use the Contact page." }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        { status: 503, headers: jsonHeaders(req) },
       )
     }
 
@@ -54,7 +53,7 @@ Deno.serve(async (req) => {
     if (!(await rateLimitOk(ip))) {
       return new Response(JSON.stringify({ error: 'Too many messages — please wait a bit and try again.' }), {
         status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: jsonHeaders(req),
       })
     }
 
@@ -72,13 +71,13 @@ Deno.serve(async (req) => {
     if (!EMAIL_RE.test(email)) {
       return new Response(JSON.stringify({ error: 'Please enter a valid email address.' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: jsonHeaders(req),
       })
     }
     if (message.length < 5) {
       return new Response(JSON.stringify({ error: 'Please include a short message for support.' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: jsonHeaders(req),
       })
     }
 
@@ -115,19 +114,19 @@ Deno.serve(async (req) => {
       console.error('Resend error:', res.status, errText)
       return new Response(JSON.stringify({ error: "Couldn't send your message — please try again or use the Contact page." }), {
         status: 502,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: jsonHeaders(req),
       })
     }
 
     return new Response(JSON.stringify({ ok: true, email }), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: jsonHeaders(req),
     })
   } catch (err) {
     console.error('chat-escalate error:', err)
     return new Response(JSON.stringify({ error: 'Internal error' }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: jsonHeaders(req),
     })
   }
 })

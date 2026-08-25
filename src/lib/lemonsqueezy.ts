@@ -14,7 +14,8 @@ import { supabase } from './supabase'
 const FALLBACK_CHECKOUT_ERROR = "Couldn't start checkout — please try again in a moment."
 
 export type ApiCheckoutCustomer = {
-  userId: string
+  /** Deprecated — server derives user id from the session JWT. */
+  userId?: string
   email?: string | null
   name?: string
   billingCountry?: string | null
@@ -65,7 +66,6 @@ export async function startApiCheckout(
   const { data, error: fnError } = await supabase.functions.invoke('create-cart-checkout', {
     body: {
       productIds,
-      userId: customer.userId,
       email: customer.email,
       name: customer.name,
       billingCountry: customer.billingCountry,

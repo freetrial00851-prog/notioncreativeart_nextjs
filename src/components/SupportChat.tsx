@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -36,6 +37,7 @@ export function SupportChat() {
     { id: 'welcome', role: 'assistant', content: WELCOME },
   ])
   const [downloadsByMsg, setDownloadsByMsg] = useState<Record<string, DownloadLink[]>>({})
+  const [authRequiredByMsg, setAuthRequiredByMsg] = useState<Record<string, boolean>>({})
   const [showHumanBtnFor, setShowHumanBtnFor] = useState<Record<string, boolean>>({})
   const [followUpsFor, setFollowUpsFor] = useState<string | null>(null)
   const [escalateOpen, setEscalateOpen] = useState(false)
@@ -133,6 +135,9 @@ export function SupportChat() {
       setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', content: reply! }])
       if (Array.isArray(data?.downloads) && data.downloads.length > 0) {
         setDownloadsByMsg((prev) => ({ ...prev, [assistantId]: data.downloads as DownloadLink[] }))
+      }
+      if (data?.authRequired) {
+        setAuthRequiredByMsg((prev) => ({ ...prev, [assistantId]: true }))
       }
 
       const offer =
@@ -320,6 +325,15 @@ export function SupportChat() {
                       Anything else?
                     </button>
                   </div>
+                )}
+                {authRequiredByMsg[m.id] && !user && (
+                  <Link
+                    href="/login"
+                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-semibold text-white hover:opacity-90"
+                    style={{ background: 'var(--color-accent)' }}
+                  >
+                    Sign in for download links
+                  </Link>
                 )}
                 {showHumanBtnFor[m.id] && !escalateOpen && (
                   <button

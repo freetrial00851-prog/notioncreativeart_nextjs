@@ -1,7 +1,8 @@
 // Supabase Edge Function: lemon-webhook
 // Deploy target: Supabase Dashboard → Edge Functions → New function → paste this file
 // Required secrets (set in Dashboard → Edge Functions → lemon-webhook → Secrets):
-//   LEMON_WEBHOOK_SECRET   — from Lemon Squeezy → Settings → Webhooks
+//   LEMON_WEBHOOK_SECRET      — Lemon Squeezy test-mode webhook signing secret
+//   LEMON_WEBHOOK_SECRET_LIVE — Lemon Squeezy live-mode webhook signing secret
 //   SUPABASE_URL           — auto-provided by Supabase
 //   SUPABASE_SERVICE_ROLE_KEY — auto-provided by Supabase (bypasses RLS — never expose to frontend)
 
@@ -28,18 +29,35 @@ async function verifySignature(rawBody: string, signature: string | null, secret
     digestHex.split('').every((c, i) => c === signature[i])
 }
 
+/** Accept either test or live Lemon webhook secret — modes use different signing keys. */
+async function verifyAgainstConfiguredSecrets(rawBody: string, signature: string | null) {
+  const secrets = [
+    Deno.env.get('LEMON_WEBHOOK_SECRET'),
+    Deno.env.get('LEMON_WEBHOOK_SECRET_LIVE'),
+  ].filter((s): s is string => Boolean(s))
+
+  if (secrets.length === 0) {
+    console.error('lemon-webhook: neither LEMON_WEBHOOK_SECRET nor LEMON_WEBHOOK_SECRET_LIVE is set')
+    return { configured: false, valid: false }
+  }
+
+  for (const secret of secrets) {
+    if (await verifySignature(rawBody, signature, secret)) {
+      return { configured: true, valid: true }
+    }
+  }
+  return { configured: true, valid: false }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
 
   const rawBody = await req.text()
   const signature = req.headers.get('x-signature')
-  const secret = Deno.env.get('LEMON_WEBHOOK_SECRET')
-  if (!secret) {
-    console.error('lemon-webhook: LEMON_WEBHOOK_SECRET is not set')
+  const { configured, valid } = await verifyAgainstConfiguredSecrets(rawBody, signature)
+  if (!configured) {
     return new Response('Webhook not configured', { status: 500 })
   }
-
-  const valid = await verifySignature(rawBody, signature, secret)
   if (!valid) {
     console.error('lemon-webhook: invalid signature')
     return new Response('Invalid signature', { status: 401 })

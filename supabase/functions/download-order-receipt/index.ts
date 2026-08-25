@@ -4,11 +4,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from 'https://esm.sh/pdf-lib@1.17.1'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { corsHeadersFor, isOriginAllowed, jsonHeaders } from '../_shared/cors.ts'
 
 const NAVY = rgb(31 / 255, 36 / 255, 156 / 255)
 const INK = rgb(31 / 255, 41 / 255, 51 / 255)
@@ -191,9 +187,12 @@ async function buildPdf(opts: {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeadersFor(req) })
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: corsHeaders })
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: jsonHeaders(req) })
+  }
+  if (!isOriginAllowed(req)) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), { status: 403, headers: jsonHeaders(req) })
   }
 
   try {
@@ -201,7 +200,7 @@ Deno.serve(async (req) => {
     if (!token) {
       return new Response(JSON.stringify({ error: 'Sign in to download your receipt.' }), {
         status: 401,
-        headers: corsHeaders,
+        headers: jsonHeaders(req),
       })
     }
 
@@ -210,13 +209,13 @@ Deno.serve(async (req) => {
     if (authErr || !user) {
       return new Response(JSON.stringify({ error: 'Sign in to download your receipt.' }), {
         status: 401,
-        headers: corsHeaders,
+        headers: jsonHeaders(req),
       })
     }
 
     const { orderId } = await req.json()
     if (!orderId || typeof orderId !== 'string') {
-      return new Response(JSON.stringify({ error: 'Missing order id.' }), { status: 400, headers: corsHeaders })
+      return new Response(JSON.stringify({ error: 'Missing order id.' }), { status: 400, headers: jsonHeaders(req) })
     }
 
     const { data: order, error: orderErr } = await supabase
@@ -227,7 +226,7 @@ Deno.serve(async (req) => {
       .maybeSingle()
 
     if (orderErr || !order) {
-      return new Response(JSON.stringify({ error: 'Order not found.' }), { status: 404, headers: corsHeaders })
+      return new Response(JSON.stringify({ error: 'Order not found.' }), { status: 404, headers: jsonHeaders(req) })
     }
 
     const productIds = (order.product_ids ?? []) as string[]
@@ -276,13 +275,13 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ filename, pdfBase64: btoa(binary) }), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: jsonHeaders(req),
     })
   } catch (err) {
     console.error('download-order-receipt error:', err)
     return new Response(JSON.stringify({ error: 'Could not generate receipt.' }), {
       status: 500,
-      headers: corsHeaders,
+      headers: jsonHeaders(req),
     })
   }
 })
