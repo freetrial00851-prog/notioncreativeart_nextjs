@@ -54,6 +54,7 @@ create table public.products (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   slug text not null unique,
+  subtitle text,
   description text,
   skill_level text check (skill_level in ('beginner','intermediate','advanced')),
   price numeric(10,2) not null,
@@ -422,6 +423,10 @@ alter table public.products add column if not exists materials text;
 
 alter table public.products add column if not exists meta_title text;
 alter table public.products add column if not exists meta_description text;
+
+
+-- === products-subtitle.sql ===
+alter table public.products add column if not exists subtitle text;
 
 
 -- ═══ products-soft-delete-migration.sql ═══
