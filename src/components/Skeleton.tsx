@@ -1,6 +1,6 @@
 /** Shared pulse skeleton building blocks — each variant mirrors its real content layout. */
 
-import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
+import { HOME_PRODUCT_ROW_CLASS, HOME_PRODUCT_ROW_ITEM_CLASS } from '../lib/homeProductGrid'
 
 function Bone({ className = '' }: { className?: string }) {
   return <div className={`bg-skeleton rounded animate-pulse ${className}`} />
@@ -25,14 +25,16 @@ function ProductCardSkeleton() {
 
 export type ProductGridVariant = 'featured' | 'newArrivals' | 'shop' | 'search' | 'wishlist'
 
-const PRODUCT_GRID: Record<ProductGridVariant, { className: string; defaultCount: number }> = {
-  // Home Featured Items + New Arrivals (same auto-fill card width)
+const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassName?: string; defaultCount: number }> = {
+  // Home Featured Items + New Arrivals — single auto-sizing row
   featured: {
-    className: HOME_PRODUCT_GRID_CLASS,
+    className: HOME_PRODUCT_ROW_CLASS,
+    itemClassName: HOME_PRODUCT_ROW_ITEM_CLASS,
     defaultCount: 6,
   },
   newArrivals: {
-    className: HOME_PRODUCT_GRID_CLASS,
+    className: HOME_PRODUCT_ROW_CLASS,
+    itemClassName: HOME_PRODUCT_ROW_ITEM_CLASS,
     defaultCount: 6,
   },
   // Shop / category listing (PAGE_SIZE 15)
@@ -59,13 +61,19 @@ export function ProductGridSkeleton({
   count?: number
   variant?: ProductGridVariant
 }) {
-  const { className, defaultCount } = PRODUCT_GRID[variant]
+  const { className, itemClassName, defaultCount } = PRODUCT_GRID[variant]
   const n = count ?? defaultCount
   return (
     <div className={className} aria-hidden>
-      {Array.from({ length: n }).map((_, i) => (
-        <ProductCardSkeleton key={i} />
-      ))}
+      {Array.from({ length: n }).map((_, i) =>
+        itemClassName ? (
+          <div key={i} className={itemClassName}>
+            <ProductCardSkeleton />
+          </div>
+        ) : (
+          <ProductCardSkeleton key={i} />
+        ),
+      )}
     </div>
   )
 }
