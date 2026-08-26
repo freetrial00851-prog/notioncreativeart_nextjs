@@ -43,6 +43,7 @@ export function SupportChat() {
   const [escalateOpen, setEscalateOpen] = useState(false)
   const [escalateEmail, setEscalateEmail] = useState('')
   const [escalateMessage, setEscalateMessage] = useState('')
+  const [escalateCompany, setEscalateCompany] = useState('')
   const [escalateSending, setEscalateSending] = useState(false)
   const [escalateError, setEscalateError] = useState<string | null>(null)
   const [lockPage, setLockPage] = useState(false)
@@ -187,6 +188,7 @@ export function SupportChat() {
         body: {
           email: escalateEmail.trim(),
           message: escalateMessage.trim(),
+          company: escalateCompany,
           history,
         },
       })
@@ -378,6 +380,23 @@ export function SupportChat() {
                     className="w-full px-3 py-2 text-[13px] border border-line rounded-xl bg-canvas focus:outline-none focus:border-ink disabled:opacity-60"
                   />
                 </label>
+                {/* Honeypot — hidden from real users; bots that fill it are rejected server-side */}
+                <div
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '-10000px', top: 'auto', width: 1, height: 1, overflow: 'hidden' }}
+                >
+                  <label>
+                    Company
+                    <input
+                      type="text"
+                      name="company"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={escalateCompany}
+                      onChange={(e) => setEscalateCompany(e.target.value)}
+                    />
+                  </label>
+                </div>
                 <label className="block">
                   <span className="sr-only">Your message</span>
                   <textarea

@@ -117,9 +117,15 @@ alter table public.wishlist enable row level security;
 create policy "public read categories" on public.categories for select using (true);
 create policy "public read active products" on public.products for select using (active = true);
 
--- Profiles: user can read/update only their own row
+-- Profiles: user can read/update only their own row.
+-- WITH CHECK blocks self-promotion of is_admin (must stay equal to the existing row value).
 create policy "read own profile" on public.profiles for select using (auth.uid() = id);
-create policy "update own profile" on public.profiles for update using (auth.uid() = id);
+create policy "update own profile" on public.profiles for update
+  using (auth.uid() = id)
+  with check (
+    auth.uid() = id
+    and is_admin = (select p.is_admin from public.profiles p where p.id = auth.uid())
+  );
 
 -- Orders: user can read only their own orders (writes happen via Edge Function using service_role, bypassing RLS)
 create policy "read own orders" on public.orders for select using (auth.uid() = user_id);

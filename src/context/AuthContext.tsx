@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { authCallbackUrl } from '../lib/authCallbackUrl'
+import { checkAuthRateLimit } from '../lib/authRateLimit'
 import type { Profile } from '../lib/types'
 
 type PendingAction = { type: 'buy' | 'wishlist' | 'cart'; productId: string } | null
@@ -88,6 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signInWithEmail = async (email: string, password: string) => {
+    const limited = await checkAuthRateLimit('login', email)
+    if (limited) return { error: limited }
     sessionStorage.setItem('nca_signin_intent', '1')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) sessionStorage.removeItem('nca_signin_intent')
@@ -95,6 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signUpWithEmail = async ({ firstName, lastName, email, password }: { firstName: string; lastName: string; email: string; password: string }) => {
+    const limited = await checkAuthRateLimit('signup', email)
+    if (limited) return { error: limited }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,

@@ -55,16 +55,22 @@ create policy "admin delete patterns"
     and exists (select 1 from public.profiles where id = auth.uid() and is_admin = true)
   );
 
-create policy "owner read purchased pattern"
-  on storage.objects for select
-  using (
-    bucket_id = 'patterns'
-    and (
-      exists (select 1 from public.profiles where id = auth.uid() and is_admin = true)
-      or exists (
-        select 1 from public.purchases
-        where purchases.user_id = auth.uid()
-          and purchases.product_id::text = split_part(storage.objects.name, '.', 1)
-      )
+-- Ownership-gated read (matches patterns-bucket-read-policy-v2-secure.sql / live DB).
+create policy "read own purchased patterns or admin"
+on storage.objects for select
+to authenticated
+using (
+  bucket_id = 'patterns'
+  and (
+    exists (
+      select 1 from public.purchases
+      where purchases.user_id = auth.uid()
+      and purchases.product_id = (regexp_replace(storage.objects.name, '\.pdf$', ''))::uuid
     )
-  );
+    or exists (
+      select 1 from public.profiles
+      where profiles.id = auth.uid()
+      and profiles.is_admin = true
+    )
+  )
+);

@@ -125,7 +125,13 @@ create policy "public read active products" on public.products for select using 
 
 -- Profiles: user can read/update only their own row
 create policy "read own profile" on public.profiles for select using (auth.uid() = id);
-create policy "update own profile" on public.profiles for update using (auth.uid() = id);
+-- WITH CHECK blocks self-promotion of is_admin (must stay equal to the existing row value).
+create policy "update own profile" on public.profiles for update
+  using (auth.uid() = id)
+  with check (
+    auth.uid() = id
+    and is_admin = (select p.is_admin from public.profiles p where p.id = auth.uid())
+  );
 
 -- Orders: user can read only their own orders (writes happen via Edge Function using service_role, bypassing RLS)
 create policy "read own orders" on public.orders for select using (auth.uid() = user_id);
@@ -208,19 +214,25 @@ create policy "admin delete patterns"
     and exists (select 1 from public.profiles where id = auth.uid() and is_admin = true)
   );
 
-create policy "owner read purchased pattern"
-  on storage.objects for select
-  using (
-    bucket_id = 'patterns'
-    and (
-      exists (select 1 from public.profiles where id = auth.uid() and is_admin = true)
-      or exists (
-        select 1 from public.purchases
-        where purchases.user_id = auth.uid()
-          and purchases.product_id::text = split_part(storage.objects.name, '.', 1)
-      )
+-- Ownership-gated read (matches patterns-bucket-read-policy-v2-secure.sql / live DB).
+create policy "read own purchased patterns or admin"
+on storage.objects for select
+to authenticated
+using (
+  bucket_id = 'patterns'
+  and (
+    exists (
+      select 1 from public.purchases
+      where purchases.user_id = auth.uid()
+      and purchases.product_id = (regexp_replace(storage.objects.name, '\.pdf$', ''))::uuid
     )
-  );
+    or exists (
+      select 1 from public.profiles
+      where profiles.id = auth.uid()
+      and profiles.is_admin = true
+    )
+  )
+);
 
 
 -- ═══ site-settings.sql ═══
@@ -320,10 +332,8 @@ create table public.newsletter_subscribers (
 
 alter table public.newsletter_subscribers enable row level security;
 
--- Anyone (even signed-out visitors) can subscribe
-create policy "public can subscribe" on public.newsletter_subscribers for insert
-  with check (true);
-
+-- No public INSERT policy — signups go through the subscribe-newsletter Edge
+-- Function (service role), which enforces server-side rate limiting.
 -- Only admins can view the list
 create policy "admin read subscribers" on public.newsletter_subscribers for select
   using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));

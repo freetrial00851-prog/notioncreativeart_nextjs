@@ -124,9 +124,21 @@ Deno.serve(async (req) => {
     }
 
     if (eventName === 'order_refunded') {
-      await supabase.from('orders').update({ status: 'refunded' }).eq('lemon_order_id', lemonOrderId)
-      // Purchases intentionally left in place — pattern access on refund is a business decision;
-      // revoke manually from Admin → Orders if needed.
+      // Mark refunded, then revoke download access ONLY for this order's purchases
+      // (same order_id). Other purchases by the same customer are left untouched.
+      const { data: order, error: refundOrderErr } = await supabase
+        .from('orders')
+        .update({ status: 'refunded' })
+        .eq('lemon_order_id', lemonOrderId)
+        .select('id')
+        .maybeSingle()
+
+      if (refundOrderErr) throw refundOrderErr
+
+      if (order?.id) {
+        const { error: revokeErr } = await supabase.from('purchases').delete().eq('order_id', order.id)
+        if (revokeErr) throw revokeErr
+      }
     }
 
     return new Response('ok', { status: 200 })

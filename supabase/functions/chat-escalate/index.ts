@@ -49,6 +49,17 @@ Deno.serve(async (req) => {
       )
     }
 
+    const body = await req.json()
+    // Honeypot: real users never see/fill this field. Bots that auto-fill
+    // hidden inputs get a fake success so we don't tip them off — no email sent.
+    const honeypot = typeof body?.company === 'string' ? body.company.trim() : ''
+    if (honeypot.length > 0) {
+      return new Response(JSON.stringify({ ok: true, email: 'ok' }), {
+        status: 200,
+        headers: jsonHeaders(req),
+      })
+    }
+
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
     if (!(await rateLimitOk(ip))) {
       return new Response(JSON.stringify({ error: 'Too many messages — please wait a bit and try again.' }), {
@@ -57,7 +68,6 @@ Deno.serve(async (req) => {
       })
     }
 
-    const body = await req.json()
     const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
     const message = typeof body?.message === 'string' ? body.message.trim().slice(0, 4000) : ''
     const history = Array.isArray(body?.history)

@@ -50,7 +50,29 @@ export async function updateSession(request: NextRequest) {
   })
 
   // Triggers session refresh — do not remove
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Server-side admin gate: never serve /admin shell to logged-out or non-admin users.
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
+
+    if (!user) {
+      return NextResponse.redirect(loginUrl)
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (!profile?.is_admin) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
 
   return supabaseResponse
 }

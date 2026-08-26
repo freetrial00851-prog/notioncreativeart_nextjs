@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { checkAuthRateLimit } from './authRateLimit'
 import { supabase } from './supabase'
 
 /**
@@ -45,6 +46,12 @@ export function useLoginForm({ redirectTo, onSignedIn }: { redirectTo: string; o
   const handleResetRequest = async (e: React.FormEvent) => {
     e.preventDefault()
     setResetSubmitting(true)
+    const limited = await checkAuthRateLimit('reset', resetEmail)
+    if (limited) {
+      setResetSubmitting(false)
+      showToast(limited, 'error')
+      return
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: `${window.location.origin}/reset-password` })
     setResetSubmitting(false)
     if (error) { showToast("Couldn't send the reset email — please try again.", 'error'); return }

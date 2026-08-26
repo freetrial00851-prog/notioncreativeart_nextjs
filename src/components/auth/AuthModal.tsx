@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useBodyScrollLock } from '../../lib/useBodyScrollLock'
+import { checkAuthRateLimit } from '../../lib/authRateLimit'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../context/ToastContext'
 import { MaterialIcon } from '../MaterialIcon'
@@ -64,6 +65,12 @@ export function AuthModal({ open, onClose }: Props) {
   const handleResetRequest = async (e: React.FormEvent) => {
     e.preventDefault()
     setResetSubmitting(true)
+    const limited = await checkAuthRateLimit('reset', resetEmail)
+    if (limited) {
+      setResetSubmitting(false)
+      showToast(limited, 'error')
+      return
+    }
     const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: `${window.location.origin}/reset-password` })
     setResetSubmitting(false)
     if (err) { showToast("Couldn't send the reset email — please try again.", 'error'); return }

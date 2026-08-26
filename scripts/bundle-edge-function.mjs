@@ -10,7 +10,8 @@ if (!name) {
 
 const root = path.join(process.cwd(), 'supabase', 'functions')
 const index = fs.readFileSync(path.join(root, name, 'index.ts'), 'utf8')
-const shared = fs.readFileSync(path.join(root, '_shared', 'cors.ts'), 'utf8')
+const sharedPath = path.join(root, '_shared', 'cors.ts')
+const shared = fs.existsSync(sharedPath) ? fs.readFileSync(sharedPath, 'utf8') : ''
 
 const verifyJwtByName = {
   'create-cart-checkout': true,
@@ -20,6 +21,14 @@ const verifyJwtByName = {
   'subscribe-newsletter': false,
   'download-free-pattern': false,
   'chat-escalate': false,
+  'auth-rate-limit': false,
+  'lemon-webhook': false,
+}
+
+const needsCors = name !== 'lemon-webhook'
+const files = [{ name: 'index.ts', content: index }]
+if (needsCors) {
+  files.push({ name: '../_shared/cors.ts', content: shared })
 }
 
 console.log(
@@ -28,9 +37,6 @@ console.log(
     name,
     entrypoint_path: 'index.ts',
     verify_jwt: verifyJwtByName[name] ?? false,
-    files: [
-      { name: 'index.ts', content: index },
-      { name: '../_shared/cors.ts', content: shared },
-    ],
+    files,
   }),
 )
