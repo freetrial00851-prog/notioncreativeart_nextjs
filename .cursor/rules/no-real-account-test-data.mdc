@@ -1,0 +1,25 @@
+---
+description: Never write test/verification data to real user accounts
+alwaysApply: true
+---
+
+# No real-account test data
+
+Never write test data (orders, purchases, login/signup/reset rate-limit attempts, profiles, carts, or anything else) to any **real, existing** user account — including the project owner's admin accounts — for verification or debugging.
+
+## Required approach
+
+- If a database-level or auth-level test is genuinely needed, **create a clearly fake throwaway user first** (e.g. a new signup with a disposable/fake email created only for that test).
+- Use **only** that throwaway user for inserts/updates/auth bursts.
+- **Delete** the throwaway user and all related rows in the **same** step after the test.
+- Never query `auth.users` for a real email and reuse that `user_id` for test inserts.
+- Never use `SELECT id FROM auth.users LIMIT 1` (or similar) for test data — that can pick a real account.
+
+## Rate-limit / auth testing
+
+- Do not burn rate-limit keys against IPs that real users (including the owner) share for login.
+- Prefer isolated keys / throwaway emails; if an IP-based limit must be tested, clear those `rate_limit_events` rows immediately after, and avoid exhausting limits on the owner's network IP when possible.
+
+## Ask first
+
+If a test seems to require touching a real account, **stop and ask the user** before doing anything. Do not assume consent.

@@ -19,6 +19,7 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductGridSkeleton, CategoryRowSkeleton, ChaptersSkeleton, SkillBrowseSkeleton, TestimonialsSkeleton } from '../components/Skeleton'
 import { SectionBand } from '../components/SectionBand'
+import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
@@ -473,7 +474,7 @@ export function Home({
     ) : trending.length > 0 ? (
       <div>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12">
+        <div className={HOME_PRODUCT_GRID_CLASS}>
           {trending.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 4} />)}
         </div>
         <div className="text-center mt-10">
@@ -499,7 +500,7 @@ export function Home({
     ) : newArrivals.length > 0 ? (
       <div>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 lg:gap-x-6 gap-y-10 lg:gap-y-12">
+        <div className={HOME_PRODUCT_GRID_CLASS}>
           {newArrivals.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
         <div className="text-center mt-10">
