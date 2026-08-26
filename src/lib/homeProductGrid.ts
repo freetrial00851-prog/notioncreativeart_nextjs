@@ -1,12 +1,9 @@
-/**
- * Shared homepage product row for Featured Items + New Arrivals.
- * Always exactly one row — card count is not chosen by breakpoints.
- * Cards share the row (grow from ~220px); if they cannot all fit, the
- * row scrolls horizontally instead of wrapping to a second line.
- */
-export const HOME_PRODUCT_ROW_CLASS =
-  'flex flex-nowrap gap-x-6 lg:gap-x-8 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+/** Min card width for Featured Items / New Arrivals (matches Featured visual size). */
+export const HOME_PRODUCT_GRID_MIN_PX = 220
 
-/** Flex child: grow with the screen, never wrap below the Featured card size. */
-export const HOME_PRODUCT_ROW_ITEM_CLASS =
-  'min-w-[min(100%,220px)] flex-[1_0_min(100%,220px)]'
+/**
+ * Skeleton / SSR-friendly fallback: auto-fill grid with the same min card width.
+ * Live sections use HomeProductRow (one row, no scroll, width-driven columns).
+ */
+export const HOME_PRODUCT_GRID_CLASS =
+  `grid grid-cols-[repeat(auto-fill,minmax(min(100%,${HOME_PRODUCT_GRID_MIN_PX}px),1fr))] gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12`

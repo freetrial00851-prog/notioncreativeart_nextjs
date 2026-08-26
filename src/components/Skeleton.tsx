@@ -1,6 +1,6 @@
 /** Shared pulse skeleton building blocks — each variant mirrors its real content layout. */
 
-import { HOME_PRODUCT_ROW_CLASS, HOME_PRODUCT_ROW_ITEM_CLASS } from '../lib/homeProductGrid'
+import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
 
 function Bone({ className = '' }: { className?: string }) {
   return <div className={`bg-skeleton rounded animate-pulse ${className}`} />
@@ -26,15 +26,13 @@ function ProductCardSkeleton() {
 export type ProductGridVariant = 'featured' | 'newArrivals' | 'shop' | 'search' | 'wishlist'
 
 const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassName?: string; defaultCount: number }> = {
-  // Home Featured Items + New Arrivals — single auto-sizing row
+  // Home Featured Items + New Arrivals — shared auto-fill card width
   featured: {
-    className: HOME_PRODUCT_ROW_CLASS,
-    itemClassName: HOME_PRODUCT_ROW_ITEM_CLASS,
+    className: HOME_PRODUCT_GRID_CLASS,
     defaultCount: 6,
   },
   newArrivals: {
-    className: HOME_PRODUCT_ROW_CLASS,
-    itemClassName: HOME_PRODUCT_ROW_ITEM_CLASS,
+    className: HOME_PRODUCT_GRID_CLASS,
     defaultCount: 6,
   },
   // Shop / category listing (PAGE_SIZE 15)
