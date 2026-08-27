@@ -185,8 +185,9 @@ export function AuthPage() {
 
               <form onSubmit={signup.handleSignUp} noValidate className="space-y-4">
                 <div>
-                  <label className="block text-[13px] font-semibold mb-1.5">Name <span className="font-normal text-ink-soft">(optional)</span></label>
-                  <input placeholder="Your name" value={signup.name} onChange={(e) => signup.setName(e.target.value)} className={signup.inputClass(false)} autoComplete="name" />
+                  <label className="block text-[13px] font-semibold mb-1.5">Name <span style={{ color: 'var(--color-madder)' }}>*</span></label>
+                  <input placeholder="Your name" value={signup.name} onChange={(e) => signup.setName(e.target.value)} className={signup.inputClass(signup.attempted && !!signup.fieldErrors.name)} autoComplete="name" />
+                  {signup.attempted && signup.fieldErrors.name && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.name}</p>}
                 </div>
                 <div>
                   <label className="block text-[13px] font-semibold mb-1.5">Email Address <span style={{ color: 'var(--color-madder)' }}>*</span></label>
@@ -209,16 +210,15 @@ export function AuthPage() {
                   <PasswordStrength password={signup.password} />
                   {signup.attempted && signup.fieldErrors.password && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.password}</p>}
                 </div>
-                <div>
-                  <label className="flex items-start gap-2 text-[12px] text-ink-soft">
-                    <input type="checkbox" checked={signup.agreed} onChange={(e) => signup.setAgreed(e.target.checked)} className="accent-ink mt-0.5" />
-                    I agree to the <Link href="/terms" className="underline underline-offset-2 hover:text-ink">Terms of Use</Link> and <Link href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</Link>
-                  </label>
-                  {signup.attempted && signup.fieldErrors.agreed && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.agreed}</p>}
-                </div>
                 <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
                   {signup.submitting ? 'Creating Account…' : 'Create Account'}
                 </button>
+                <p className="text-[11px] text-ink-soft leading-relaxed text-center">
+                  By clicking Create Account or continuing with Google, you agree to the{' '}
+                  <Link href="/terms" className="underline underline-offset-2 hover:text-ink">Terms of Use</Link>
+                  {' '}and{' '}
+                  <Link href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</Link>.
+                </p>
               </form>
 
               <p className="text-center text-[13px] text-ink-soft mt-8">

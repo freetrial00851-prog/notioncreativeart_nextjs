@@ -24,7 +24,6 @@ export function useSignUpForm(options: Options = {}) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [agreed, setAgreed] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -35,9 +34,9 @@ export function useSignUpForm(options: Options = {}) {
   const passwordValid = isPasswordValid(password)
 
   const fieldErrors = {
+    name: name.trim() === '' ? 'Name is required.' : null,
     email: email.trim() === '' ? 'Email address is required.' : (!emailFormatValid ? 'Enter a valid email address.' : null),
     password: !passwordValid ? 'Password doesn\u2019t meet the requirements above.' : null,
-    agreed: !agreed ? 'You must agree to the Terms of Use and Privacy Policy.' : null,
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -47,7 +46,7 @@ export function useSignUpForm(options: Options = {}) {
     if (Object.values(fieldErrors).some(Boolean)) return
     setSubmitting(true)
     const { error, duplicateEmail, session } = await signUpWithEmail({
-      name: name.trim() || undefined,
+      name: name.trim(),
       email,
       password,
     })
@@ -73,7 +72,6 @@ export function useSignUpForm(options: Options = {}) {
     name, setName,
     email, setEmail,
     password, setPassword,
-    agreed, setAgreed,
     showPassword, setShowPassword,
     error, submitting,
     attempted, emailTaken, setEmailTaken,

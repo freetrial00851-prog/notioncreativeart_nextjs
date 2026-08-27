@@ -18,7 +18,7 @@ type AuthContextValue = {
   setPendingAction: (a: PendingAction) => void
   signInWithGoogle: (redirectPath?: string) => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>
-  signUpWithEmail: (params: { name?: string; email: string; password: string }) => Promise<{ error: string | null; duplicateEmail?: boolean; session?: Session | null }>
+  signUpWithEmail: (params: { name: string; email: string; password: string }) => Promise<{ error: string | null; duplicateEmail?: boolean; session?: Session | null }>
   resendVerification: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
@@ -97,15 +97,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }
 
-  const signUpWithEmail = async ({ name, email, password }: { name?: string; email: string; password: string }) => {
+  const signUpWithEmail = async ({ name, email, password }: { name: string; email: string; password: string }) => {
     const limited = await checkAuthRateLimit('signup', email)
     if (limited) return { error: limited }
-    const trimmed = name?.trim()
+    const trimmed = name.trim()
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: trimmed ? { name: trimmed } : {},
+        data: { name: trimmed },
         emailRedirectTo: window.location.origin,
       },
     })
