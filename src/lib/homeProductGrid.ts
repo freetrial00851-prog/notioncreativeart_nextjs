@@ -1,9 +1,11 @@
-/** Min card width for Featured Items / New Arrivals (matches Featured visual size). */
-export const HOME_PRODUCT_GRID_MIN_PX = 220
+/** Max products fetched/rendered per homepage product section. */
+export const HOME_PRODUCT_SECTION_LIMIT = 6
 
 /**
- * Skeleton / SSR-friendly fallback: auto-fill grid with the same min card width.
- * Live sections use HomeProductRow (one row, no scroll, width-driven columns).
+ * Featured Items, New Arrivals, Free Patterns — fixed 3-tier breakpoints:
+ *   <640px  → 2 columns
+ *   640–1023px → 3 columns
+ *   ≥1024px → 6 columns (one full row at the fetch limit)
  */
 export const HOME_PRODUCT_GRID_CLASS =
-  `grid grid-cols-[repeat(auto-fill,minmax(min(100%,${HOME_PRODUCT_GRID_MIN_PX}px),1fr))] gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12`
+  'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12'

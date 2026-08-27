@@ -19,7 +19,7 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductGridSkeleton, CategoryRowSkeleton, ChaptersSkeleton, SkillBrowseSkeleton, TestimonialsSkeleton } from '../components/Skeleton'
 import { SectionBand } from '../components/SectionBand'
-import { HomeProductRow } from '../components/HomeProductRow'
+import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
@@ -474,11 +474,11 @@ export function Home({
     ) : trending.length > 0 ? (
       <div>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <HomeProductRow>
+        <div className={HOME_PRODUCT_GRID_CLASS}>
           {trending.map((p, i) => (
             <ProductCard key={p.id} product={p} priority={i < 4} />
           ))}
-        </HomeProductRow>
+        </div>
         <div className="text-center mt-10">
           <Link
             href="/shop/bestsellers"
@@ -502,11 +502,11 @@ export function Home({
     ) : newArrivals.length > 0 ? (
       <div>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
-        <HomeProductRow>
+        <div className={HOME_PRODUCT_GRID_CLASS}>
           {newArrivals.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
-        </HomeProductRow>
+        </div>
         <div className="text-center mt-10">
           <Link
             href="/shop/new"

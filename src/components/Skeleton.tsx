@@ -23,15 +23,19 @@ function ProductCardSkeleton() {
   )
 }
 
-export type ProductGridVariant = 'featured' | 'newArrivals' | 'shop' | 'search' | 'wishlist'
+export type ProductGridVariant = 'featured' | 'newArrivals' | 'freePatterns' | 'shop' | 'search' | 'wishlist'
 
 const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassName?: string; defaultCount: number }> = {
-  // Home Featured Items + New Arrivals — shared auto-fill card width
+  // Home Featured Items, New Arrivals, Free Patterns — 2 / 3 / 6 column tiers
   featured: {
     className: HOME_PRODUCT_GRID_CLASS,
     defaultCount: 6,
   },
   newArrivals: {
+    className: HOME_PRODUCT_GRID_CLASS,
+    defaultCount: 6,
+  },
+  freePatterns: {
     className: HOME_PRODUCT_GRID_CLASS,
     defaultCount: 6,
   },

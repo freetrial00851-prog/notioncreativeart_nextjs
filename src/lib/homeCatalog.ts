@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getCategoriesWithProducts, type CategoryWithCount } from './categories'
 import { mergeLayout } from './defaultLayout'
+import { HOME_PRODUCT_SECTION_LIMIT } from './homeProductGrid'
 import type {
   Product,
   HeroContent,
@@ -14,6 +15,9 @@ export type HomeCatalogSnapshot = {
   trending: Product[]
   newArrivals: Product[]
   bundles: Product[]
+  /** Up to {@link HOME_PRODUCT_SECTION_LIMIT} free patterns for the homepage grid (when built). */
+  freeProducts: Product[]
+  /** First free product — used by the current Free Patterns banner. */
   freeProduct: Product | null
   categories: CategoryWithCount[]
   chapters: ChapterContent[]
@@ -46,13 +50,13 @@ export async function loadHomeCatalog(
     .eq('active', true)
     .eq('featured', true)
     .order('created_at', { ascending: false })
-    .limit(6)
+    .limit(HOME_PRODUCT_SECTION_LIMIT)
   const newP = supabase
     .from('products')
     .select('*')
     .eq('active', true)
     .order('created_at', { ascending: false })
-    .limit(6)
+    .limit(HOME_PRODUCT_SECTION_LIMIT)
   const bundlesP = supabase
     .from('products')
     .select('*')
@@ -67,7 +71,7 @@ export async function loadHomeCatalog(
     .eq('price', 0)
     .order('featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(1)
+    .limit(HOME_PRODUCT_SECTION_LIMIT)
   const settingsP = supabase
     .from('site_settings')
     .select('key, value')
@@ -129,6 +133,7 @@ export async function loadHomeCatalog(
     trending: featuredError ? [] : ((featuredRes.data as Product[]) ?? []),
     newArrivals: (newRes.data as Product[]) ?? [],
     bundles: (bundlesRes.data as Product[]) ?? [],
+    freeProducts: (freeRes.data as Product[]) ?? [],
     freeProduct: (freeRes.data as Product[])?.[0] ?? null,
     categories: cats,
     chapters,
