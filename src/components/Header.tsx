@@ -17,6 +17,7 @@ import {
   normalizeAnnouncements,
   shouldShowAnnouncementBar,
 } from '../lib/types'
+import { profileDisplayName, profileInitial } from '../lib/profileName'
 import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
 import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, CartIcon, UI_ICON_SIZE } from './icons'
@@ -516,10 +517,10 @@ export function Header() {
                 <div className="h-1" style={{ background: 'var(--color-accent)' }} />
                 <div className="px-6 py-5 border-b border-line flex items-center gap-3" style={{ background: 'var(--color-surface)' }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-semibold" style={{ background: 'var(--color-accent)' }}>
-                    {(profile?.first_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
+                    {profileInitial(profile, user.email)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[14px] font-medium truncate">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}</p>
+                    <p className="text-[14px] font-medium truncate">{profileDisplayName(profile, 'My Account')}</p>
                     <p className="text-[12px] text-ink-soft truncate">{user.email}</p>
                   </div>
                 </div>
@@ -586,7 +587,7 @@ function HeaderActions({
   onCart: () => void
   onWishlist: () => void
   user: { email?: string } | null
-  profile: { first_name?: string | null; last_name?: string | null } | null
+  profile: { name?: string | null } | null
   requireAuth: () => boolean
   signOut: () => void
   accountOpen: boolean
@@ -779,7 +780,7 @@ function HeaderAccountControl({
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   user: { email?: string } | null
-  profile: { first_name?: string | null; last_name?: string | null } | null
+  profile: { name?: string | null } | null
   requireAuth: () => boolean
   signOut: () => void
 }) {
@@ -825,7 +826,7 @@ function AccountDropdown({
   onClose,
   onSignOut,
 }: {
-  profile: { first_name?: string | null; last_name?: string | null } | null
+  profile: { name?: string | null } | null
   email?: string
   onClose: () => void
   onSignOut: () => void
@@ -839,11 +840,11 @@ function AccountDropdown({
             className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-[14px] font-semibold"
             style={{ background: 'var(--color-accent)' }}
           >
-            {(profile?.first_name?.[0] ?? email?.[0] ?? '?').toUpperCase()}
+            {profileInitial(profile, email)}
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-ink truncate">
-              {[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'My Account'}
+              {profileDisplayName(profile, 'My Account')}
             </p>
             <p className="text-[11px] text-ink-soft truncate">{email}</p>
           </div>

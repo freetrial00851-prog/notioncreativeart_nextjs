@@ -9,6 +9,7 @@ import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVaria
 import { compressImage } from '../lib/imageCompress'
 import { useAuth } from '../context/AuthContext'
 import type { Product, Category } from '../lib/types'
+import { profileDisplayName } from '../lib/profileName'
 import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminBulkUpload } from './AdminBulkUpload'
@@ -50,7 +51,7 @@ export function Admin() {
   const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ settings: true })
-  const shopLabel = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Notion Creative Art'
+  const shopLabel = profileDisplayName(profile, 'Notion Creative Art')
 
   if (loading) return null
   if (!user || !profile?.is_admin) {

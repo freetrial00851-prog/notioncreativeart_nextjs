@@ -142,8 +142,7 @@ export type CategoryContent = {
 
 export type Profile = {
   id: string
-  first_name: string | null
-  last_name: string | null
+  name: string | null
   avatar_url: string | null
   is_admin: boolean
   billing_country: string | null

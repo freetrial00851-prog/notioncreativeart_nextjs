@@ -18,6 +18,7 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { FavoriteIcon, ShareIcon } from '../components/icons'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductDetailSkeleton } from '../components/Skeleton'
+import { profileDisplayName } from '../lib/profileName'
 import type { Product } from '../lib/types'
 
 /** Stage candidates: mobile stops at large (1000w); desktop may use full (1600w). */
@@ -302,7 +303,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
     const result = await startApiCheckout([product.id], {
       userId: user!.id,
       email: user!.email,
-      name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined,
+      name: profileDisplayName(profile) || undefined,
       billingCountry: profile?.billing_country,
       billingState: profile?.billing_state,
       billingZip: profile?.billing_zip,

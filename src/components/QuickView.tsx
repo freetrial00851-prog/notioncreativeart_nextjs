@@ -11,6 +11,7 @@ import { supabase } from '../lib/supabase'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { downloadFreePattern } from '../lib/downloads'
 import { useToast } from '../context/ToastContext'
+import { profileDisplayName } from '../lib/profileName'
 import { deriveVariantUrl } from '../lib/imageVariants'
 
 export function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
@@ -71,7 +72,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
     const result = await startApiCheckout([product.id], {
       userId: user!.id,
       email: user!.email,
-      name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined,
+      name: profileDisplayName(profile) || undefined,
       billingCountry: profile?.billing_country,
       billingState: profile?.billing_state,
       billingZip: profile?.billing_zip,

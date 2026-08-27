@@ -22,8 +22,7 @@ export function AuthModal({ open, onClose }: Props) {
   useBodyScrollLock(open)
   const [tab, setTab] = useState<Tab>('signin')
   const [screen, setScreen] = useState<Screen>('form')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -53,8 +52,7 @@ export function AuthModal({ open, onClose }: Props) {
     setEmail('')
     setPassword('')
     setConfirmPassword('')
-    setFirstName('')
-    setLastName('')
+    setName('')
     setAgreed(false)
     setShowPassword(false)
     setShowConfirmPassword(false)
@@ -94,7 +92,7 @@ export function AuthModal({ open, onClose }: Props) {
     if (password !== confirmPassword) return setError('Passwords do not match.')
     if (!agreed) return setError('Please agree to the Terms & Privacy Policy.')
     setSubmitting(true)
-    const { error } = await signUpWithEmail({ firstName, lastName, email, password })
+    const { error } = await signUpWithEmail({ name: name.trim() || undefined, email, password })
     setSubmitting(false)
     if (error) return setError(error)
     setScreen('verify-sent')
@@ -207,9 +205,8 @@ export function AuthModal({ open, onClose }: Props) {
                 </form>
               ) : (
                 <form onSubmit={handleSignUp} className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <input required placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="px-4 py-3 border border-line bg-canvas text-sm focus:outline-none focus:border-ink" />
-                    <input required placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)} className="px-4 py-3 border border-line bg-canvas text-sm focus:outline-none focus:border-ink" />
+                  <div className="grid grid-cols-1 gap-3">
+                    <input placeholder="Name (optional)" value={name} onChange={(e) => setName(e.target.value)} className="px-4 py-3 border border-line bg-canvas text-sm focus:outline-none focus:border-ink" />
                   </div>
                   <input required type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 border border-line bg-canvas text-sm focus:outline-none focus:border-ink" />
                   <div>

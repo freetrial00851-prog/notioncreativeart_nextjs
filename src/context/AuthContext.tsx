@@ -18,7 +18,7 @@ type AuthContextValue = {
   setPendingAction: (a: PendingAction) => void
   signInWithGoogle: (redirectPath?: string) => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>
-  signUpWithEmail: (params: { firstName: string; lastName: string; email: string; password: string }) => Promise<{ error: string | null; duplicateEmail?: boolean }>
+  signUpWithEmail: (params: { name?: string; email: string; password: string }) => Promise<{ error: string | null; duplicateEmail?: boolean; session?: Session | null }>
   resendVerification: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
@@ -97,14 +97,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }
 
-  const signUpWithEmail = async ({ firstName, lastName, email, password }: { firstName: string; lastName: string; email: string; password: string }) => {
+  const signUpWithEmail = async ({ name, email, password }: { name?: string; email: string; password: string }) => {
     const limited = await checkAuthRateLimit('signup', email)
     if (limited) return { error: limited }
+    const trimmed = name?.trim()
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { first_name: firstName, last_name: lastName },
+        data: trimmed ? { name: trimmed } : {},
         emailRedirectTo: window.location.origin,
       },
     })
@@ -112,11 +113,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Supabase deliberately doesn't return an error for an email that's already
     // registered and confirmed — it responds as if signup succeeded but with an
     // empty identities array, to stop attackers from probing which emails exist.
-    // An empty array here is how we detect that case client-side.
     if (data.user && data.user.identities && data.user.identities.length === 0) {
-      return { error: null, duplicateEmail: true }
+      return { error: null, duplicateEmail: true, session: null }
     }
-    return { error: null }
+
+    // Confirm-email ON: signUp returns no session, but still queues the verify email.
+    // Edge function confirms the user and returns session tokens — setSession, no password retry race.
+    if (data.user && !data.session) {
+      const { data: activateData, error: activateErr } = await supabase.functions.invoke('activate-email-signup', {
+        body: { userId: data.user.id, email, password },
+      })
+      if (activateErr || activateData?.error || !activateData?.access_token || !activateData?.refresh_token) {
+        return {
+          error: 'Account created — check your email to verify, then sign in.',
+          session: null,
+        }
+      }
+      sessionStorage.setItem('nca_signin_intent', '1')
+      try {
+        sessionStorage.setItem('nca_verify_hint_email', email.trim().toLowerCase())
+      } catch {
+        // ignore
+      }
+      const { data: setData, error: setErr } = await supabase.auth.setSession({
+        access_token: activateData.access_token as string,
+        refresh_token: activateData.refresh_token as string,
+      })
+      if (setErr || !setData.session) {
+        sessionStorage.removeItem('nca_signin_intent')
+        return {
+          error: 'Account created — check your email to verify, then sign in.',
+          session: null,
+        }
+      }
+      return { error: null, session: setData.session }
+    }
+
+    if (data.session) {
+      try {
+        sessionStorage.setItem('nca_verify_hint_email', email.trim().toLowerCase())
+      } catch {
+        // ignore
+      }
+    }
+
+    return { error: null, session: data.session }
   }
 
   const resendVerification = async (email: string) => {

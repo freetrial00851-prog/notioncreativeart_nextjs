@@ -18,6 +18,8 @@ import { StatusBadge, type OrderRow } from '../components/StatusBadge'
 import { Wishlist } from './Wishlist'
 import { OrderDetail } from './OrderDetail'
 import { subscribeToNewsletter } from '../lib/newsletter'
+import { profileDisplayName, profileInitial } from '../lib/profileName'
+import { EmailVerifyBanner } from '../components/EmailVerifyBanner'
 import type { Purchase, Product } from '../lib/types'
 
 export type { OrderRow } from '../components/StatusBadge'
@@ -81,6 +83,8 @@ export function Account() {
           </>
         )}
       </nav>
+
+      <EmailVerifyBanner />
 
       {showPageTitle && (
         <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
@@ -331,8 +335,7 @@ function ProfileTab() {
     const href = key === 'profile' ? '/account/profile' : `/account/profile?tab=${key}`
     router.replace(href, { scroll: false })
   }
-  const [firstName, setFirstName] = useState(profile?.first_name ?? '')
-  const [lastName, setLastName] = useState(profile?.last_name ?? '')
+  const [name, setName] = useState(profile?.name ?? '')
   const [editingName, setEditingName] = useState(false)
   const [nameSaving, setNameSaving] = useState(false)
 
@@ -343,9 +346,8 @@ function ProfileTab() {
   const [pwMessage, setPwMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    setFirstName(profile?.first_name ?? '')
-    setLastName(profile?.last_name ?? '')
-  }, [profile?.first_name, profile?.last_name])
+    setName(profile?.name ?? '')
+  }, [profile?.name])
 
   const NAME_COOLDOWN_DAYS = 7
   const daysSinceNameChange = profile?.name_changed_at ? (Date.now() - new Date(profile.name_changed_at).getTime()) / 86400000 : Infinity
@@ -362,8 +364,7 @@ function ProfileTab() {
   }
 
   const cancelEditingName = () => {
-    setFirstName(profile?.first_name ?? '')
-    setLastName(profile?.last_name ?? '')
+    setName(profile?.name ?? '')
     setEditingName(false)
   }
 
@@ -371,8 +372,7 @@ function ProfileTab() {
     if (!user) return
     setNameSaving(true)
     const { error } = await supabase.from('profiles').update({
-      first_name: firstName || null,
-      last_name: lastName || null,
+      name: name.trim() || null,
       name_changed_at: new Date().toISOString(),
     }).eq('id', user.id)
     await refreshProfile()
@@ -431,16 +431,16 @@ function ProfileTab() {
         <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-xl space-y-5 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center gap-4 mb-2">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-[20px] font-semibold shrink-0" style={{ background: BRAND_SOFT, color: BRAND }}>
-              {(profile?.first_name?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()}
+              {profileInitial(profile, user?.email)}
             </div>
             <div>
-              <p className="font-medium text-[15px]">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Your Account'}</p>
+              <p className="font-medium text-[15px]">{profileDisplayName(profile, 'Your Account')}</p>
               <p className="text-[12px] text-ink-soft">{user?.email}</p>
             </div>
           </div>
-          <div>
+          <label className="block">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="block text-ink-soft text-[11px] tracking-[0.1em]">FIRST NAME</span>
+              <span className="block text-ink-soft text-[11px] tracking-[0.1em]">NAME</span>
               {!editingName && (
                 <button onClick={startEditingName} className="text-[11px] tracking-[0.08em] underline underline-offset-2 hover:opacity-70" style={{ color: BRAND }}>
                   EDIT YOUR NAME
@@ -448,18 +448,10 @@ function ProfileTab() {
               )}
             </div>
             <input
-              value={firstName}
+              value={name}
               disabled={!editingName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg disabled:bg-surface disabled:text-ink-soft"
-            />
-          </div>
-          <label className="block">
-            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">LAST NAME</span>
-            <input
-              value={lastName}
-              disabled={!editingName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Optional"
               className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg disabled:bg-surface disabled:text-ink-soft"
             />
           </label>
@@ -591,7 +583,7 @@ function AddressesPage() {
       {hasAddress && !editing ? (
         <div className="bg-white border border-line rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-start justify-between gap-3 mb-3">
-            <p className="text-[14px] font-semibold">{[profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Billing'}</p>
+            <p className="text-[14px] font-semibold">{profileDisplayName(profile, 'Billing')}</p>
             <span className="text-[10px] tracking-wide px-2.5 py-1 rounded-full font-medium" style={{ background: BRAND_SOFT, color: BRAND }}>Default</span>
           </div>
           <div className="text-[13px] text-ink-soft leading-relaxed space-y-0.5">

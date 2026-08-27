@@ -6,6 +6,7 @@ import { useUI } from '../context/UIContext'
 import { supabase } from '../lib/supabase'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { downloadFreePattern } from '../lib/downloads'
+import { profileDisplayName } from '../lib/profileName'
 import type { Product } from '../lib/types'
 
 export function PendingActionRunner() {
@@ -57,7 +58,7 @@ export function PendingActionRunner() {
             await startApiCheckout([product.id], {
               userId: user.id,
               email: user.email,
-              name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || undefined,
+              name: profileDisplayName(profile) || undefined,
               billingCountry: profile?.billing_country,
               billingState: profile?.billing_state,
               billingZip: profile?.billing_zip,

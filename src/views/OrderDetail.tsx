@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useAuth } from '../context/AuthContext'
+import { profileDisplayName } from '../lib/profileName'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { ContentSkeleton } from '../components/Skeleton'
 import { StatusBadge, type OrderRow } from '../components/StatusBadge'
@@ -91,7 +92,7 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
           <p className="text-[11px] tracking-[0.12em] text-ink-soft mb-3 font-medium">BILLING</p>
           {profile?.billing_country ? (
             <div className="text-ink-soft leading-relaxed space-y-0.5">
-              <p className="text-ink font-medium">{[profile.first_name, profile.last_name].filter(Boolean).join(' ') || user?.email}</p>
+              <p className="text-ink font-medium">{profileDisplayName(profile, user?.email ?? '')}</p>
               {profile.billing_country === 'US' ? (
                 <>
                   {profile.billing_address_line1 && <p>{profile.billing_address_line1}</p>}

@@ -31,7 +31,7 @@ export function AuthSheet() {
       : pathname || '/'
 
   const login = useLoginForm({ redirectTo: returnTo, onSignedIn: closeAuthSheet })
-  const signup = useSignUpForm()
+  const signup = useSignUpForm({ onSignedIn: closeAuthSheet, redirectTo: returnTo })
 
   useEffect(() => {
     if (!authSheetOpen) return
@@ -159,23 +159,30 @@ export function AuthSheet() {
         </div>
       ) : (
         <>
+          <button
+            type="button"
+            onClick={() => signup.signInWithGoogle(returnTo)}
+            className="w-full py-3 border border-line rounded-lg flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-line" />
+            <span className="text-[12px] text-ink-soft">Or continue with email</span>
+            <div className="flex-1 h-px bg-line" />
+          </div>
+
           {signup.error && <p style={{ color: 'var(--color-madder)' }} className="text-[13px] mb-4">{signup.error}</p>}
           <form onSubmit={signup.handleSignUp} noValidate className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[13px] font-semibold mb-1.5">First Name <span style={{ color: 'var(--color-madder)' }}>*</span></label>
-                <input placeholder="First name" value={signup.firstName} onChange={(e) => signup.setFirstName(e.target.value)} className={signup.inputClass(signup.attempted && !!signup.fieldErrors.firstName)} />
-                {signup.attempted && signup.fieldErrors.firstName && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.firstName}</p>}
-              </div>
-              <div>
-                <label className="block text-[13px] font-semibold mb-1.5">Last Name <span style={{ color: 'var(--color-madder)' }}>*</span></label>
-                <input placeholder="Last name" value={signup.lastName} onChange={(e) => signup.setLastName(e.target.value)} className={signup.inputClass(signup.attempted && !!signup.fieldErrors.lastName)} />
-                {signup.attempted && signup.fieldErrors.lastName && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.lastName}</p>}
-              </div>
+            <div>
+              <label className="block text-[13px] font-semibold mb-1.5">Name <span className="font-normal text-ink-soft">(optional)</span></label>
+              <input placeholder="Your name" value={signup.name} onChange={(e) => signup.setName(e.target.value)} className={signup.inputClass(false)} autoComplete="name" />
             </div>
             <div>
               <label className="block text-[13px] font-semibold mb-1.5">Email Address <span style={{ color: 'var(--color-madder)' }}>*</span></label>
-              <input type="email" placeholder="Enter Email" value={signup.email} onChange={(e) => { signup.setEmail(e.target.value); signup.setEmailTaken(false) }} className={signup.inputClass((signup.attempted && !!signup.fieldErrors.email) || signup.emailTaken)} />
+              <input type="email" placeholder="Enter Email" value={signup.email} onChange={(e) => { signup.setEmail(e.target.value); signup.setEmailTaken(false) }} className={signup.inputClass((signup.attempted && !!signup.fieldErrors.email) || signup.emailTaken)} autoComplete="email" />
               {signup.emailTaken ? (
                 <p className="text-[11px] text-madder mt-1.5">
                   An account with this email already exists — use another, or{' '}
@@ -186,27 +193,13 @@ export function AuthSheet() {
             <div>
               <label className="block text-[13px] font-semibold mb-1.5">Password <span style={{ color: 'var(--color-madder)' }}>*</span></label>
               <div className="relative">
-                <input type={signup.showPassword ? 'text' : 'password'} placeholder="Password" value={signup.password} onChange={(e) => signup.setPassword(e.target.value)} className={`${signup.inputClass(signup.attempted && !!signup.fieldErrors.password)} pr-11`} />
+                <input type={signup.showPassword ? 'text' : 'password'} placeholder="Password" value={signup.password} onChange={(e) => signup.setPassword(e.target.value)} className={`${signup.inputClass(signup.attempted && !!signup.fieldErrors.password)} pr-11`} autoComplete="new-password" />
                 <button type="button" onClick={() => signup.setShowPassword((s) => !s)} aria-label={signup.showPassword ? 'Hide password' : 'Show password'} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink">
                   <MaterialIcon name={signup.showPassword ? 'visibility_off' : 'visibility'} size={18} />
                 </button>
               </div>
               <PasswordStrength password={signup.password} />
               {signup.attempted && signup.fieldErrors.password && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.password}</p>}
-            </div>
-            <div>
-              <label className="block text-[13px] font-semibold mb-1.5">Confirm Password <span style={{ color: 'var(--color-madder)' }}>*</span></label>
-              <div className="relative">
-                <input type={signup.showConfirmPassword ? 'text' : 'password'} placeholder="Confirm password" value={signup.confirmPassword} onChange={(e) => signup.setConfirmPassword(e.target.value)} className={`${signup.inputClass(signup.attempted && !!signup.fieldErrors.confirmPassword)} pr-11`} />
-                <button type="button" onClick={() => signup.setShowConfirmPassword((s) => !s)} aria-label={signup.showConfirmPassword ? 'Hide password' : 'Show password'} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink">
-                  <MaterialIcon name={signup.showConfirmPassword ? 'visibility_off' : 'visibility'} size={18} />
-                </button>
-              </div>
-              {signup.attempted && signup.fieldErrors.confirmPassword ? (
-                <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.confirmPassword}</p>
-              ) : (signup.passwordsTyped && signup.passwordsMatch && (
-                <p className="text-[11px] mt-1.5 text-sale-green">✓ Passwords match</p>
-              ))}
             </div>
             <div>
               <label className="flex items-start gap-2 text-[12px] text-ink-soft">
@@ -219,21 +212,6 @@ export function AuthSheet() {
               {signup.submitting ? 'Creating Account…' : 'Create Account'}
             </button>
           </form>
-
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-line" />
-            <span className="text-[12px] text-ink-soft">Or continue with</span>
-            <div className="flex-1 h-px bg-line" />
-          </div>
-
-          <button
-            type="button"
-            onClick={() => signup.signInWithGoogle(returnTo)}
-            className="w-full py-3 border border-line rounded-lg flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
 
           <p className="text-center text-[13px] text-ink-soft mt-8">
             Already have an account?{' '}

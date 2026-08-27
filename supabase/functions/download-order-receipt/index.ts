@@ -238,11 +238,11 @@ Deno.serve(async (req) => {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('first_name, last_name')
+      .select('name')
       .eq('id', user.id)
       .maybeSingle()
 
-    const customerName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ')
+    const customerName = profile?.name?.trim() ?? ''
     const orderNumber = String(order.lemon_order_id || order.id.slice(0, 8))
     const items = productIds.map((id) => {
       const p = products.find((row) => row.id === id)

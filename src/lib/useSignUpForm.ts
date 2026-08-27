@@ -1,41 +1,42 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
 import { isPasswordValid } from '../components/PasswordStrength'
 
+type Options = {
+  /** Called when signup creates an immediate session (autoconfirm on). */
+  onSignedIn?: () => void
+  redirectTo?: string
+}
+
 /**
- * All the state and handlers behind the create-account form. Extracted so
- * the desktop full-page SignUp and the mobile bottom-sheet version share one
- * implementation of validation, duplicate-email detection, and submission.
+ * State and handlers for create-account. Shared by /signup and AuthSheet.
  */
-export function useSignUpForm() {
+export function useSignUpForm(options: Options = {}) {
   const { signInWithGoogle, signUpWithEmail, resendVerification } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = options.redirectTo || searchParams?.get('redirect') || '/account'
+
   const [screen, setScreen] = useState<'form' | 'verify-sent'>('form')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [agreed, setAgreed] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [attempted, setAttempted] = useState(false)
   const [emailTaken, setEmailTaken] = useState(false)
 
   const emailFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const passwordsTyped = password.length > 0 && confirmPassword.length > 0
-  const passwordsMatch = password === confirmPassword
   const passwordValid = isPasswordValid(password)
 
   const fieldErrors = {
-    firstName: firstName.trim() === '' ? 'First name is required.' : null,
-    lastName: lastName.trim() === '' ? 'Last name is required.' : null,
     email: email.trim() === '' ? 'Email address is required.' : (!emailFormatValid ? 'Enter a valid email address.' : null),
     password: !passwordValid ? 'Password doesn\u2019t meet the requirements above.' : null,
-    confirmPassword: confirmPassword === '' ? 'Please confirm your password.' : (!passwordsMatch ? 'Passwords don\u2019t match.' : null),
     agreed: !agreed ? 'You must agree to the Terms of Use and Privacy Policy.' : null,
   }
 
@@ -45,10 +46,20 @@ export function useSignUpForm() {
     setError(null)
     if (Object.values(fieldErrors).some(Boolean)) return
     setSubmitting(true)
-    const { error, duplicateEmail } = await signUpWithEmail({ firstName, lastName, email, password })
+    const { error, duplicateEmail, session } = await signUpWithEmail({
+      name: name.trim() || undefined,
+      email,
+      password,
+    })
     setSubmitting(false)
     if (duplicateEmail) { setEmailTaken(true); return }
     if (error) return setError(error)
+    if (session) {
+      options.onSignedIn?.()
+      if (!options.onSignedIn) router.push(redirectTo)
+      return
+    }
+    // Confirm-email still required on this project — fall back to verify screen.
     setScreen('verify-sent')
   }
 
@@ -59,17 +70,13 @@ export function useSignUpForm() {
     signInWithGoogle,
     resendVerification,
     screen,
-    firstName, setFirstName,
-    lastName, setLastName,
+    name, setName,
     email, setEmail,
     password, setPassword,
-    confirmPassword, setConfirmPassword,
     agreed, setAgreed,
     showPassword, setShowPassword,
-    showConfirmPassword, setShowConfirmPassword,
     error, submitting,
     attempted, emailTaken, setEmailTaken,
-    passwordsTyped, passwordsMatch,
     fieldErrors,
     handleSignUp,
     inputClass,

@@ -6,8 +6,7 @@
 -- ============================================================
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  first_name text,
-  last_name text,
+  name text,
   avatar_url text,
   is_admin boolean not null default false,
   created_at timestamptz not null default now()
@@ -17,11 +16,10 @@ create table public.profiles (
 create function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, first_name, last_name, avatar_url)
+  insert into public.profiles (id, name, avatar_url)
   values (
     new.id,
-    new.raw_user_meta_data->>'first_name',
-    new.raw_user_meta_data->>'last_name',
+    new.raw_user_meta_data->>'name',
     new.raw_user_meta_data->>'avatar_url'
   );
   return new;

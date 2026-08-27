@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { profileDisplayName } from '../lib/profileName'
 import { useAuth } from '../context/AuthContext'
 
 type DashStats = {
@@ -42,7 +43,7 @@ function timeAgo(iso: string) {
 
 export function AdminDashboard() {
   const { profile, user } = useAuth()
-  const shopName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Notion Creative Art'
+  const shopName = profileDisplayName(profile, 'Notion Creative Art')
   const [tab, setTab] = useState<'home' | 'activity'>('home')
   const [activityFilter, setActivityFilter] = useState<'all' | 'purchases' | 'favourites'>('all')
   const [stats, setStats] = useState<DashStats | null>(null)
