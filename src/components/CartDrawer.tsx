@@ -2,16 +2,30 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
+import { setPendingCheckout } from '../lib/guestStorage'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { MaterialIcon } from './MaterialIcon'
 import { CloseCircleIcon } from './icons'
 
 export function CartDrawer() {
+  const { user } = useAuth()
+  const { requireAuth } = useUI()
   const { items, count, drawerOpen, closeDrawer, justAdded, removeFromCart, checkingOut, checkoutError, checkout } = useCart()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   useBodyScrollLock(drawerOpen)
+
+  const handleCheckout = () => {
+    if (!user) {
+      setPendingCheckout(true)
+      requireAuth()
+      return
+    }
+    void checkout()
+  }
 
   // ESC to close + move focus to the drawer's close button when it opens (basic focus management)
   useEffect(() => {
@@ -124,7 +138,7 @@ export function CartDrawer() {
 
               <div className="space-y-2.5">
                 <button
-                  onClick={checkout}
+                  onClick={handleCheckout}
                   disabled={checkingOut}
                   aria-busy={checkingOut}
                   className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"

@@ -126,17 +126,15 @@ export function Header() {
   }
 
   const goWishlist = () => {
-    if (requireAuth()) window.location.href = '/account/wishlist'
+    router.push('/account/wishlist')
   }
 
   const openCart = () => {
-    if (user) openDrawer()
-    else requireAuth()
+    openDrawer()
   }
 
   const openMobileCart = () => {
-    if (user) router.push('/cart')
-    else requireAuth()
+    router.push('/cart')
   }
 
   return (

@@ -3,8 +3,10 @@
 import { AuthProvider } from '@/context/AuthContext'
 import { UIProvider } from '@/context/UIContext'
 import { CartProvider } from '@/context/CartContext'
+import { WishlistProvider } from '@/context/WishlistContext'
 import { ToastProvider } from '@/context/ToastContext'
 import { PendingActionRunner } from '@/components/PendingActionRunner'
+import { GuestMergeRunner } from '@/components/GuestMergeRunner'
 import { AdminRedirect } from '@/components/AdminRedirect'
 import { Analytics } from '@/components/Analytics'
 import { CookieConsent } from '@/components/CookieConsent'
@@ -22,14 +24,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <ToastProvider>
           <UIProvider>
-            <CartProvider>
-              <PendingActionRunner />
-              <AdminRedirect />
-              <Analytics />
-              <TabRestoreIndicator />
-              {children}
-              <CookieConsent />
-            </CartProvider>
+            <WishlistProvider>
+              <CartProvider>
+                <GuestMergeRunner />
+                <PendingActionRunner />
+                <AdminRedirect />
+                <Analytics />
+                <TabRestoreIndicator />
+                {children}
+                <CookieConsent />
+              </CartProvider>
+            </WishlistProvider>
           </UIProvider>
         </ToastProvider>
       </AuthProvider>

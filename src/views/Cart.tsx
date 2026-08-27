@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
+import { setPendingCheckout } from '../lib/guestStorage'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { CartIcon } from '../components/icons'
@@ -11,23 +12,21 @@ import { ContentSkeleton } from '../components/Skeleton'
 
 export function Cart() {
   const { user, loading: authLoading } = useAuth()
-  const { openAuthModal } = useUI()
+  const { requireAuth } = useUI()
   const { items, loading, removeFromCart, clearCart, checkingOut, checkoutError, checkout } = useCart()
 
   if (authLoading || loading) return <ContentSkeleton />
 
-  if (!user) {
-    return (
-      <div className="max-w-site w-full mx-auto px-6 py-32 text-center">
-        <p className="font-subheading text-2xl mb-4">Sign in to see your cart.</p>
-        <button type="button" onClick={() => openAuthModal()} className="text-[12px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-70">
-          SIGN IN →
-        </button>
-      </div>
-    )
-  }
-
   const total = items.reduce((sum, i) => sum + (i.product?.price ?? 0), 0)
+
+  const handleCheckout = () => {
+    if (!user) {
+      setPendingCheckout(true)
+      requireAuth()
+      return
+    }
+    void checkout()
+  }
 
   if (items.length === 0) {
     return (
@@ -40,7 +39,6 @@ export function Cart() {
 
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 py-10">
-      {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
         <span>/</span>
@@ -128,7 +126,7 @@ export function Cart() {
           {checkoutError && <p className="text-madder text-[12px] mb-3">{checkoutError}</p>}
 
           <button
-            onClick={checkout}
+            onClick={handleCheckout}
             disabled={checkingOut}
             aria-busy={checkingOut}
             className="w-full py-4 flex items-center justify-center gap-2 text-white text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
@@ -136,6 +134,12 @@ export function Cart() {
           >
             <CartIcon size={14} /> CHECKOUT — ${total.toFixed(2)}
           </button>
+
+          {!user && (
+            <p className="text-[11px] text-ink-soft text-center mt-3">
+              Sign in to complete checkout — your cart will be saved to your account.
+            </p>
+          )}
 
           <div className="flex items-center gap-3 rounded-xl px-4 py-3.5 mt-4" style={{ background: 'var(--color-surface)' }}>
             <DigitalIcon />

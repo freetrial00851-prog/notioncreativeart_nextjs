@@ -10,6 +10,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { downloadFreePattern } from '../lib/downloads'
 import { useIsMobile } from '../lib/useIsMobile'
@@ -99,6 +100,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const router = useRouter()
   const { addToCart, removeFromCart, isInCart } = useCart()
+  const { isWishlisted, toggleWishlist: toggleWishlistItem } = useWishlist()
   const { showToast } = useToast()
   const seeded =
     initialProduct && slug && initialProduct.slug === slug ? initialProduct : null
@@ -113,7 +115,6 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
   const buyButtonRef = useRef<HTMLDivElement>(null)
   const [owned, setOwned] = useState(false)
-  const [inWishlist, setInWishlist] = useState(false)
   const [loading, setLoading] = useState(() => !seeded)
   const [downloadingFree, setDownloadingFree] = useState(false)
   const [buying, setBuying] = useState(false)
@@ -208,14 +209,9 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
       .eq('product_id', product.id)
       .limit(1)
       .then(({ data }) => setOwned(!!data && data.length > 0))
-    supabase
-      .from('wishlist')
-      .select('product_id')
-      .eq('user_id', user.id)
-      .eq('product_id', product.id)
-      .maybeSingle()
-      .then(({ data }) => setInWishlist(!!data))
   }, [user, product])
+
+  const inWishlist = product ? isWishlisted(product.id) : false
 
   useEffect(() => {
     if (!buyButtonRef.current) return
@@ -314,21 +310,17 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   }
 
   const toggleWishlist = async () => {
-    if (!requireAuth({ type: 'wishlist', productId: product.id })) return
-    if (inWishlist) {
-      await supabase.from('wishlist').delete().eq('user_id', user!.id).eq('product_id', product.id)
-      setInWishlist(false)
-      showToast('Removed from wishlist', 'info')
-    } else {
-      await supabase.from('wishlist').upsert({ user_id: user!.id, product_id: product.id })
-      setInWishlist(true)
+    if (!product) return
+    const { added } = await toggleWishlistItem(product.id)
+    if (added) {
       showToast('♡ Saved to wishlist', 'success', { label: 'View Wishlist', onClick: () => router.push('/account/wishlist') })
+    } else {
+      showToast('Removed from wishlist', 'info')
     }
   }
 
   const toggleCart = async () => {
-    if (product.price === 0) return
-    if (!requireAuth({ type: 'cart', productId: product.id })) return
+    if (!product || product.price === 0) return
     if (isInCart(product.id)) await removeFromCart(product.id)
     else await addToCart(product.id)
   }

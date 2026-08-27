@@ -44,6 +44,12 @@ export function Account() {
   const pathname = usePathname()
 
   if (loading) return <ContentSkeleton />
+
+  // Guests can browse a local wishlist; other account tabs still require sign-in.
+  if (!user && pathname === '/account/wishlist') {
+    return <Wishlist />
+  }
+
   if (!user) {
     return (
       <div className="max-w-site w-full mx-auto px-8 py-32 text-center">

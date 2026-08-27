@@ -7,7 +7,7 @@ import type { Product } from '../lib/types'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
-import { supabase } from '../lib/supabase'
+import { useWishlist } from '../context/WishlistContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { downloadFreePattern } from '../lib/downloads'
 import { useToast } from '../context/ToastContext'
@@ -18,27 +18,17 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
   const { user, profile } = useAuth()
   const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { addToCart, removeFromCart, isInCart } = useCart()
+  const { isWishlisted, toggleWishlist: toggleWishlistItem } = useWishlist()
   const { showToast } = useToast()
   const router = useRouter()
   const [activeImage, setActiveImage] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const [inWishlist, setInWishlist] = useState(false)
   const [downloadingFree, setDownloadingFree] = useState(false)
   const [buying, setBuying] = useState(false)
   const images = product.images ?? []
   const hasMultiple = images.length > 1
   const inCart = isInCart(product.id)
-
-  useEffect(() => {
-    if (!user) return setInWishlist(false)
-    supabase
-      .from('wishlist')
-      .select('product_id')
-      .eq('user_id', user.id)
-      .eq('product_id', product.id)
-      .maybeSingle()
-      .then(({ data }) => setInWishlist(!!data))
-  }, [user, product.id])
+  const inWishlist = isWishlisted(product.id)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -83,21 +73,16 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
   }
 
   const toggleWishlist = async () => {
-    if (!requireAuth({ type: 'wishlist', productId: product.id })) return
-    if (inWishlist) {
-      await supabase.from('wishlist').delete().eq('user_id', user!.id).eq('product_id', product.id)
-      setInWishlist(false)
-      showToast('Removed from wishlist', 'info')
-    } else {
-      await supabase.from('wishlist').upsert({ user_id: user!.id, product_id: product.id })
-      setInWishlist(true)
+    const { added } = await toggleWishlistItem(product.id)
+    if (added) {
       showToast('♡ Saved to wishlist', 'success', { label: 'View Wishlist', onClick: () => { onClose(); router.push('/account/wishlist') } })
+    } else {
+      showToast('Removed from wishlist', 'info')
     }
   }
 
   const toggleCart = async () => {
     if (product.price === 0) return
-    if (!requireAuth({ type: 'cart', productId: product.id })) return
     if (inCart) await removeFromCart(product.id)
     else await addToCart(product.id)
   }

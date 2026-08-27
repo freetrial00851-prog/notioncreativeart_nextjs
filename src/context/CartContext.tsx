@@ -1,11 +1,20 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './AuthContext'
 import { useToast } from './ToastContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { profileDisplayName } from '../lib/profileName'
+import {
+  GUEST_MERGE_DONE_EVENT,
+  RUN_PENDING_CHECKOUT_EVENT,
+  addGuestCartItem,
+  clearGuestCart,
+  readGuestCart,
+  removeGuestCartItem,
+  writeGuestCart,
+} from '../lib/guestStorage'
 import type { Product } from '../lib/types'
 
 type CartItem = {
@@ -28,6 +37,7 @@ type CartContextValue = {
   clearCart: () => Promise<void>
   checkingOut: boolean
   checkoutError: string | null
+  /** Requires an authenticated user. Guests should call requireAuth + setPendingCheckout first. */
   checkout: () => Promise<void>
 }
 
@@ -42,13 +52,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [justAdded, setJustAdded] = useState(false)
   const [checkingOut, setCheckingOut] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const itemsRef = useRef(items)
+  itemsRef.current = items
 
-  const load = async () => {
-    if (!user) {
+  const loadGuest = useCallback(async () => {
+    setLoading(true)
+    const guest = readGuestCart()
+    if (guest.length === 0) {
       setItems([])
       setLoading(false)
       return
     }
+    const ids = guest.map((g) => g.productId)
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .in('id', ids)
+      .eq('active', true)
+    const byId = new Map((data as Product[] | null)?.map((p) => [p.id, p]) ?? [])
+    const paid: CartItem[] = []
+    const dropGuest: string[] = []
+    for (const g of guest) {
+      const product = byId.get(g.productId)
+      if (!product || Number(product.price) === 0) {
+        dropGuest.push(g.productId)
+        continue
+      }
+      paid.push({
+        product_id: g.productId,
+        added_at: new Date().toISOString(),
+        product,
+      })
+    }
+    if (dropGuest.length > 0) {
+      writeGuestCart(guest.filter((g) => !dropGuest.includes(g.productId)))
+      if (dropGuest.some((id) => Number(byId.get(id)?.price) === 0)) {
+        showToast('Free patterns download directly — they can’t be added to cart.', 'info')
+      }
+    }
+    setItems(paid)
+    setLoading(false)
+  }, [showToast])
+
+  const loadAccount = useCallback(async () => {
+    if (!user) return
     setLoading(true)
     const { data } = await supabase
       .from('cart_items')
@@ -57,15 +104,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       .order('added_at', { ascending: false })
     const rows = (data as unknown as CartItem[]) ?? []
 
-    // A product that's since been deactivated or deleted comes back as
-    // product: null here (RLS only exposes active products) — rather than
-    // let a stale row linger and crash the cart UI on missing product data,
-    // quietly drop it from both local state and the cart_items table.
     const withProduct = rows.filter((r) => r.product)
     const staleIds = rows.filter((r) => !r.product).map((r) => r.product_id)
 
-    // Free ($0) patterns download directly — they must never sit in the cart
-    // (legacy rows from before this rule are stripped on every load).
     const freeIds = withProduct
       .filter((r) => Number(r.product?.price) === 0)
       .map((r) => r.product_id)
@@ -86,40 +127,46 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems(paid)
     setLoading(false)
-  }
+  }, [user, showToast])
+
+  const load = useCallback(async () => {
+    if (!user) await loadGuest()
+    else await loadAccount()
+  }, [user, loadGuest, loadAccount])
 
   useEffect(() => {
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id])
+    void load()
+  }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    // Lemon Squeezy's overlay fires this event when a checkout completes successfully —
-    // the webhook clears the DB cart in the background, but nothing else tells our UI
-    // to refetch, so without this the cart page/badge would keep showing stale items
-    // until the next full page load.
+    const onMerge = () => {
+      void load()
+    }
+    window.addEventListener(GUEST_MERGE_DONE_EVENT, onMerge)
+    return () => window.removeEventListener(GUEST_MERGE_DONE_EVENT, onMerge)
+  }, [load])
+
+  useEffect(() => {
     window.createLemonSqueezy?.()
     window.LemonSqueezy?.Setup?.({
       eventHandler: (event: { event: string }) => {
         if (event.event === 'Checkout.Success') {
           setDrawerOpen(false)
-          setTimeout(load, 1500) // small delay so the webhook has time to clear cart_items first
+          setTimeout(() => void load(), 1500)
         }
       },
     })
-    // Fallback: also refresh whenever the tab regains focus (covers the hosted/new-tab
-    // checkout case, where there's no in-page event to listen for at all).
-    const onFocus = () => load()
+    const onFocus = () => {
+      if (user) void load()
+    }
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id])
+  }, [user?.id, user, load])
 
   const openDrawer = () => setDrawerOpen(true)
   const closeDrawer = () => setDrawerOpen(false)
 
   const addToCart = async (productId: string) => {
-    if (!user) return
     const { data: product } = await supabase
       .from('products')
       .select('price')
@@ -129,40 +176,57 @@ export function CartProvider({ children }: { children: ReactNode }) {
       showToast('Free patterns download directly — they can’t be added to cart.', 'info')
       return
     }
+
+    if (!user) {
+      addGuestCartItem(productId)
+      await loadGuest()
+      setJustAdded(true)
+      setDrawerOpen(true)
+      setTimeout(() => setJustAdded(false), 2500)
+      return
+    }
+
     await supabase.from('cart_items').upsert({ user_id: user.id, product_id: productId })
-    await load()
+    await loadAccount()
     setJustAdded(true)
     setDrawerOpen(true)
     setTimeout(() => setJustAdded(false), 2500)
   }
 
   const removeFromCart = async (productId: string) => {
-    if (!user) return
+    if (!user) {
+      removeGuestCartItem(productId)
+      await loadGuest()
+      return
+    }
     await supabase.from('cart_items').delete().eq('user_id', user.id).eq('product_id', productId)
-    load()
+    await loadAccount()
   }
 
   const clearCart = async () => {
-    if (!user) return
+    if (!user) {
+      clearGuestCart()
+      setItems([])
+      return
+    }
     await supabase.from('cart_items').delete().eq('user_id', user.id)
     setItems([])
   }
 
   const isInCart = (productId: string) => items.some((i) => i.product_id === productId)
 
-  // Shared by both the /cart page and the drawer — combines every cart item into
-  // one Lemon Squeezy checkout (see create-cart-checkout Edge Function).
   const checkout = async () => {
-    if (!user || items.length === 0) return
+    if (!user || itemsRef.current.length === 0) return
     setCheckoutError(null)
-    const freeInCart = items.filter((i) => Number(i.product?.price) === 0)
+    const current = itemsRef.current
+    const freeInCart = current.filter((i) => Number(i.product?.price) === 0)
     if (freeInCart.length > 0) {
       setCheckoutError('Free patterns can’t be checked out — remove them and use Download Free on the product page.')
       return
     }
     setCheckingOut(true)
     const result = await startApiCheckout(
-      items.map((i) => i.product_id),
+      current.map((i) => i.product_id),
       {
         userId: user.id,
         email: user.email,
@@ -175,6 +239,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!result.ok) setCheckoutError(result.error)
     setCheckingOut(false)
   }
+
+  useEffect(() => {
+    const onPendingCheckout = () => {
+      // Allow cart reload from merge to settle, then checkout.
+      setTimeout(() => {
+        void checkout()
+      }, 400)
+    }
+    window.addEventListener(RUN_PENDING_CHECKOUT_EVENT, onPendingCheckout)
+    return () => window.removeEventListener(RUN_PENDING_CHECKOUT_EVENT, onPendingCheckout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, profile])
 
   return (
     <CartContext.Provider
