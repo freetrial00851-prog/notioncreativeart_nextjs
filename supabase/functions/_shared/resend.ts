@@ -1,6 +1,6 @@
 /** Shared Resend helpers for Edge Functions. */
 
-export const RESEND_FROM = 'Notion Creative Art <onboarding@resend.dev>'
+export const RESEND_FROM = 'Notion Creative Art <orders@notioncreativeart.com>'
 
 export async function sendResendEmail(opts: {
   to: string

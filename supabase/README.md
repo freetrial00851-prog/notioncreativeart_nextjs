@@ -93,4 +93,4 @@ Get a free key at https://console.groq.com (uses `openai/gpt-oss-20b`; `llama-3.
 npx supabase secrets set RESEND_API_KEY=your_resend_api_key --project-ref anlsellghialszuuvipw
 ```
 
-Get a free key at https://resend.com. Escalations email `freetrial00851@gmail.com` via Resend (`from: onboarding@resend.dev` until a custom domain is verified).
+Get a free key at https://resend.com. Order confirmation emails send from `orders@notioncreativeart.com` (verified domain). Escalations still use `chat-escalate` (`from` there may differ until updated).
