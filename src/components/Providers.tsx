@@ -9,6 +9,7 @@ import { AdminRedirect } from '@/components/AdminRedirect'
 import { Analytics } from '@/components/Analytics'
 import { CookieConsent } from '@/components/CookieConsent'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { TabRestoreIndicator } from '@/components/TabRestoreIndicator'
 
 /**
  * Client-side provider tree — wraps the entire app.
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               <PendingActionRunner />
               <AdminRedirect />
               <Analytics />
+              <TabRestoreIndicator />
               {children}
               <CookieConsent />
             </CartProvider>

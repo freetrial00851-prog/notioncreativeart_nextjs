@@ -67,7 +67,7 @@ export default async function PatternPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <ProductDetail />
+      <ProductDetail initialProduct={product} />
     </>
   )
 }

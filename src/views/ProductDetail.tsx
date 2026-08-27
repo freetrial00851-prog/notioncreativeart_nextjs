@@ -91,7 +91,7 @@ function DescriptionBlocks({ text }: { text: string }) {
 
 type Tab = 'description' | 'included' | 'materials' | 'skill' | 'details'
 
-export function ProductDetail() {
+export function ProductDetail({ initialProduct = null }: { initialProduct?: Product | null }) {
   const params = useParams()
   const slug = typeof params?.slug === 'string' ? params.slug : undefined
   const { user, profile } = useAuth()
@@ -99,7 +99,9 @@ export function ProductDetail() {
   const router = useRouter()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { showToast } = useToast()
-  const [product, setProduct] = useState<Product | null>(null)
+  const seeded =
+    initialProduct && slug && initialProduct.slug === slug ? initialProduct : null
+  const [product, setProduct] = useState<Product | null>(() => seeded)
   const [category, setCategory] = useState<{ name: string; slug: string } | null>(null)
   const [related, setRelated] = useState<Product[]>([])
   const [activeImage, setActiveImage] = useState(0)
@@ -111,7 +113,7 @@ export function ProductDetail() {
   const buyButtonRef = useRef<HTMLDivElement>(null)
   const [owned, setOwned] = useState(false)
   const [inWishlist, setInWishlist] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !seeded)
   const [downloadingFree, setDownloadingFree] = useState(false)
   const [buying, setBuying] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
@@ -122,6 +124,18 @@ export function ProductDetail() {
 
   useEffect(() => {
     if (!slug) return
+
+    // Server ISR payload already has this product — skip the duplicate base fetch.
+    // Soft-nav to another slug still fetches (or uses hover prefetch when available).
+    if (initialProduct && initialProduct.slug === slug) {
+      setProduct(initialProduct)
+      setUnavailable(false)
+      setLoading(false)
+      setActiveTab('description')
+      setActiveImage(0)
+      return
+    }
+
     setLoading(true)
     setUnavailable(false)
     const prefetched = getPrefetchedProduct(slug)
@@ -143,7 +157,7 @@ export function ProductDetail() {
       setActiveTab('description')
       setActiveImage(0)
     })
-  }, [slug])
+  }, [slug, initialProduct])
 
   useEffect(() => {
     if (!product?.category_id) { setCategory(null); return }
