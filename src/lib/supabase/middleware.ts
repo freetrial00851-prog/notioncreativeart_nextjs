@@ -19,8 +19,10 @@ function isSoftNavigation(request: NextRequest): boolean {
  * Refreshes the Supabase auth session on every matched request.
  * Without this, server components would see stale/expired sessions.
  *
- * Also stamps `x-nca-soft-nav` so Server Components can skip heavy SSR work
- * on client-side navigations (Flight headers are stripped before `headers()`).
+ * Also stamps `x-nca-soft-nav` for any future Server Components that need it.
+ * Homepage deliberately does NOT read this header (calling headers() would
+ * force the route dynamic and defeat ISR) — soft-nav speed comes from
+ * client homeCatalogCache instead.
  */
 export async function updateSession(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)

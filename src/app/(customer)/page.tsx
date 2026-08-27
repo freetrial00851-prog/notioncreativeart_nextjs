@@ -1,10 +1,14 @@
-import { headers } from 'next/headers'
 import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
 import { Home } from '@/views/Home'
 import { getHomeCatalogServer } from '@/lib/data/home'
 import { mergeLayout } from '@/lib/defaultLayout'
 
-/** Keep homepage SSR fresh enough that admin section toggles don't flash after save. */
+/**
+ * ISR homepage — catalog is server-fetched and CDN-cached for 60s.
+ * Soft navigations stay fast via the client homeCatalogCache module
+ * (checked first in Home.tsx); do not call headers() here or the route
+ * becomes fully dynamic and defeats revalidate.
+ */
 export const revalidate = 60
 
 export const metadata = buildMetadata({
@@ -20,18 +24,7 @@ export const metadata = buildMetadata({
   ],
 })
 
-/**
- * Homepage — full public catalog SSR on hard/document loads.
- * Soft navigations skip the catalog flight; Home seeds from homeCatalogCache
- * (or client-fetches) so logo→home feels instant when the cache is warm.
- */
 export default async function HomePage() {
-  const softNav = (await headers()).get('x-nca-soft-nav') === '1'
-
-  if (softNav) {
-    return <Home />
-  }
-
   const { snapshot, featuredError } = await getHomeCatalogServer()
   return (
     <Home

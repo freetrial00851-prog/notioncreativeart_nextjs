@@ -15,6 +15,8 @@ import { AdminBulkUpload } from './AdminBulkUpload'
 import { DropzoneUpload } from '../components/DropzoneUpload'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { triggerPdfDownload } from '../lib/downloads'
+import { revalidateStorefront } from '../lib/actions/revalidateStorefront'
+import { clearHomeCatalogCache } from '../lib/homeCatalogCache'
 
 const SHELL_BG = '#f9f8f6'
 const SIDEBAR_BG = '#f3f1ec'
@@ -461,11 +463,21 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     setSelected((s) => (s.size === products.length ? new Set() : new Set(products.map((p) => p.id))))
   }
 
+  const bustStorefrontCache = async (slug?: string | null) => {
+    clearHomeCatalogCache()
+    try {
+      await revalidateStorefront(slug)
+    } catch (err) {
+      console.warn('Storefront revalidation failed:', err)
+    }
+  }
+
   const bulkSetActive = async (active: boolean) => {
     setBulkWorking(true)
     await supabase.from('products').update({ active }).in('id', [...selected])
     setBulkWorking(false)
     setSelected(new Set())
+    await bustStorefrontCache()
     load()
   }
 
@@ -475,6 +487,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     await supabase.from('products').update({ deleted_at: new Date().toISOString(), active: false }).in('id', [...selected])
     setBulkWorking(false)
     setSelected(new Set())
+    await bustStorefrontCache()
     load()
   }
 
@@ -636,23 +649,28 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       }
     }
     setSaving(false)
+    await bustStorefrontCache(slug)
     load()
     return savedId || null
   }
 
   const setActive = async (p: Product, active: boolean) => {
     await supabase.from('products').update({ active }).eq('id', p.id)
+    await bustStorefrontCache(p.slug)
     load()
   }
 
   const setFeatured = async (p: Product) => {
     await supabase.from('products').update({ featured: !p.featured }).eq('id', p.id)
+    await bustStorefrontCache(p.slug)
     load()
   }
 
   const trash = async (id: string) => {
     if (!confirm('Move this product to Trash? It will disappear from the site, and you can restore it later.')) return
+    const target = products.find((p) => p.id === id)
     await supabase.from('products').update({ deleted_at: new Date().toISOString(), active: false }).eq('id', id)
+    await bustStorefrontCache(target?.slug)
     load()
   }
 
@@ -1564,12 +1582,24 @@ function TrashAdmin() {
 
   const restore = async (p: Product) => {
     await supabase.from('products').update({ deleted_at: null }).eq('id', p.id)
+    clearHomeCatalogCache()
+    try {
+      await revalidateStorefront(p.slug)
+    } catch (err) {
+      console.warn('Storefront revalidation failed:', err)
+    }
     load()
   }
 
   const deleteForever = async (p: Product) => {
     if (!confirm(`Permanently delete "${p.title}"? This can't be undone.`)) return
     await supabase.from('products').delete().eq('id', p.id)
+    clearHomeCatalogCache()
+    try {
+      await revalidateStorefront(p.slug)
+    } catch (err) {
+      console.warn('Storefront revalidation failed:', err)
+    }
     load()
   }
 

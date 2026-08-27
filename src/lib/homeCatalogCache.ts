@@ -7,8 +7,12 @@ import {
 
 export type { HomeCatalogFetchResult, HomeCatalogSnapshot }
 
-/** Warm TTL — back-nav within this window skips network and paints instantly. */
-const TTL_MS = 2.5 * 60 * 1000
+/**
+ * Warm TTL — soft-nav within this window skips network and paints instantly.
+ * Freshness after admin edits is handled by on-demand revalidatePath, so this
+ * can stay longer than the old 2.5-minute window.
+ */
+const TTL_MS = 10 * 60 * 1000
 
 type CacheEntry = { data: HomeCatalogSnapshot; at: number }
 
