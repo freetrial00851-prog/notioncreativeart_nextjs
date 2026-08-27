@@ -372,14 +372,14 @@ export function Home({
     ),
     categories: !catalogReady ? (
       <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-3xl mb-10">Shop by Category</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Shop by Category</h2>
         <CategoryRowSkeleton count={6} />
       </div>
     ) : categories.length > 0 ? (
       <div>
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <div className="relative mb-10">
-          <h2 className="font-heading text-center font-semibold text-3xl">Shop by Category</h2>
+          <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl">Shop by Category</h2>
           <Link href="/shop" className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 text-[11px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-60">
             VIEW ALL CATEGORIES →
           </Link>
@@ -425,13 +425,13 @@ export function Home({
     ) : null,
     chapters: !catalogReady ? (
       <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-3xl mb-10">Skill Level Chapters</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
         <ChaptersSkeleton count={3} />
       </div>
     ) : chapters.length > 0 ? (
       <div>
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <h2 className="font-heading text-center font-semibold text-3xl mb-10">Skill Level Chapters</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {chapters.map((c) => {
             const badgeColor = 'var(--color-primary)'
@@ -461,7 +461,7 @@ export function Home({
       </div>
     ) : featuredError ? (
       <div className="text-center py-4">
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-4">Featured Items</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <p className="text-[14px] text-ink-soft mb-5">Couldn&apos;t load featured items. Please try again.</p>
         <button
           type="button"
@@ -490,7 +490,7 @@ export function Home({
       </div>
     ) : (
       <div className="text-center py-6">
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-4">Featured Items</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <p className="text-[14px] text-ink-soft">No featured items yet.</p>
       </div>
     ),
@@ -614,7 +614,7 @@ export function Home({
         <div className="bg-white border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FREE PATTERNS</p>
-            <h2 className="font-heading font-semibold text-2xl mb-2">Start With Free</h2>
+            <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2">Start With Free</h2>
             <p className="text-[13px] text-ink-soft mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
             <Link
               href="/shop?price=free"
@@ -634,7 +634,7 @@ export function Home({
     why_us: (
       <div>
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <h2 className="font-heading text-center font-semibold text-3xl mb-10">Why Makers Love NCA</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Why Makers Love NCA</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
           {[
             { icon: 'checklist', title: 'Easy to Follow', copy: 'Clear instructions for every step' },
@@ -659,13 +659,13 @@ export function Home({
     ),
     testimonials: !catalogReady ? (
       <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-3xl mb-10">What Our Makers Say</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">What Our Makers Say</h2>
         <TestimonialsSkeleton count={3} />
       </div>
     ) : testimonials.length > 0 ? (
       <div>
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <h2 className="font-heading text-center font-semibold text-3xl mb-10">What Our Makers Say</h2>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">What Our Makers Say</h2>
         {(() => {
           const perPage = 3
           const pageCount = Math.ceil(testimonials.length / perPage)

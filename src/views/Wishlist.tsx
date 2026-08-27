@@ -71,7 +71,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
   if (embedded) {
     return (
       <div>
-        <h2 className="font-display font-semibold text-2xl md:text-3xl mb-6">Wishlist</h2>
+        <h2 className="font-display font-semibold text-3xl md:text-4xl mb-6">Wishlist</h2>
         {body}
       </div>
     )
@@ -81,7 +81,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
     <div className="max-w-site w-full mx-auto px-8 md:px-16 py-14">
       <div className="border-b border-line pb-8 mb-10">
         <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">MY ACCOUNT</p>
-        <h1 className="font-display font-semibold text-4xl">Wishlist</h1>
+        <h1 className="font-display font-semibold text-3xl md:text-4xl">Wishlist</h1>
       </div>
       {body}
     </div>

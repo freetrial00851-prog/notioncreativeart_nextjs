@@ -280,7 +280,7 @@ export function Shop() {
         <div className="flex items-end justify-between flex-wrap gap-4 mb-5 md:mb-0">
           <div>
             <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">SHOP</p>
-            <h1 className="font-display font-semibold text-[28px] sm:text-3xl md:text-4xl leading-tight break-words">{title}</h1>
+            <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words">{title}</h1>
           </div>
           <select
             value={sort}

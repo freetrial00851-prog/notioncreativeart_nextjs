@@ -53,7 +53,7 @@ export function Cart() {
       <div className="flex items-start justify-between mb-10 flex-wrap gap-3">
         <div>
           <p className="text-[11px] tracking-[0.15em] font-medium mb-2" style={{ color: 'var(--color-sale-green)' }}>YOUR SHOPPING CART</p>
-          <h1 className="font-display font-semibold text-4xl mb-2">Cart ({items.length})</h1>
+          <h1 className="font-display font-semibold text-3xl md:text-4xl mb-2">Cart ({items.length})</h1>
           <p className="text-[13px] text-ink-soft">Your selected crochet patterns, ready for checkout.</p>
           {!user && (
             <p className="text-[12px] text-ink-soft mt-3 leading-relaxed">

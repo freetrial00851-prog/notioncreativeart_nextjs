@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { searchProducts } from '../lib/productSearch'
 import type { Product } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
-import { MaterialIcon } from '../components/MaterialIcon'
+import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
 
 const PAGE_SIZE = 15
@@ -70,16 +69,23 @@ export function Search() {
       </div>
 
       {!loading && q && results.length === 0 && (
-        <div className="text-center py-10 mb-14">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'var(--color-surface)' }}>
-            <MaterialIcon name="search_off" size={36} color="var(--color-ink-soft)" />
-          </div>
-          <h2 className="font-display font-semibold text-2xl mb-2">No patterns found for "{q}"</h2>
-          <p className="text-ink-soft text-[14px] mb-8">Try different keywords or browse our categories.</p>
-          <div className="flex gap-4 justify-center text-[12px] tracking-[0.12em]">
-            <Link href="/shop" className="px-7 py-3.5 bg-ink text-canvas hover:opacity-85 rounded-lg">BROWSE CATEGORIES</Link>
-            <button onClick={() => router.push('/search')} className="px-7 py-3.5 border border-ink hover:bg-surface rounded-lg">CLEAR SEARCH</button>
-          </div>
+        <div className="mb-14">
+          <EmptyState
+            icon="search_off"
+            title={`No patterns found for "${q}"`}
+            subtitle="Try different keywords or browse our categories."
+            actionLabel="BROWSE CATEGORIES"
+            actionTo="/shop"
+            afterAction={(
+              <button
+                type="button"
+                onClick={() => router.push('/search')}
+                className="px-6 py-3 rounded-lg border border-line text-[13px] font-semibold hover:bg-surface transition-colors"
+              >
+                CLEAR SEARCH
+              </button>
+            )}
+          />
         </div>
       )}
 

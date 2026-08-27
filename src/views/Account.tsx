@@ -88,7 +88,7 @@ export function Account() {
       </nav>
 
       {showPageTitle && (
-        <h1 className="font-display font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
+        <h1 className="font-display font-semibold text-3xl md:text-4xl text-ink mb-6">{crumbLabel}</h1>
       )}
       <AccountContent />
     </div>
