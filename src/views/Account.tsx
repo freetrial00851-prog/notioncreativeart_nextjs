@@ -19,7 +19,6 @@ import { Wishlist } from './Wishlist'
 import { OrderDetail } from './OrderDetail'
 import { subscribeToNewsletter } from '../lib/newsletter'
 import { profileDisplayName, profileInitial } from '../lib/profileName'
-import { EmailVerifyBanner } from '../components/EmailVerifyBanner'
 import type { Purchase, Product } from '../lib/types'
 
 export type { OrderRow } from '../components/StatusBadge'
@@ -64,7 +63,7 @@ export function Account() {
   const isOrderDetail = /^\/account\/orders\/[^/]+$/.test(pathname ?? '')
   const crumbLabel = isOrderDetail
     ? 'Order Details'
-    : (PAGE_TITLES[pathname ?? ''] ?? 'My Account')
+    : (PAGE_TITLES[pathname ?? ''] ?? 'Account')
   const isAccountHome = pathname === '/account' || pathname === '/account/'
   const showPageTitle = !isOrderDetail && pathname !== '/account/wishlist' && !isAccountHome && pathname !== '/account/logout'
 
@@ -72,8 +71,6 @@ export function Account() {
     <div className="max-w-[1100px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 py-8 md:py-10 pb-16">
       <nav className="flex items-center gap-2 text-[12px] text-ink-soft mb-6 flex-wrap" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">Home</Link>
-        <span>›</span>
-        <span className="text-ink-soft">My Account</span>
         {!isAccountHome && (
           <>
             <span>›</span>
@@ -89,8 +86,6 @@ export function Account() {
           </>
         )}
       </nav>
-
-      <EmailVerifyBanner />
 
       {showPageTitle && (
         <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>

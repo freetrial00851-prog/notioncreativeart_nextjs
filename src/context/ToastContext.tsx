@@ -7,7 +7,7 @@ type ToastType = 'success' | 'error' | 'info'
 type Toast = { id: number; message: string; type: ToastType; action?: { label: string; onClick: () => void } }
 
 interface ToastContextValue {
-  showToast: (message: string, type?: ToastType, action?: Toast['action']) => void
+  showToast: (message: string, type?: ToastType, action?: Toast['action'], durationMs?: number) => void
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined)
@@ -25,12 +25,23 @@ function InfoCircleIcon() {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
   const idRef = useRef(0)
+  const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map())
 
-  const showToast = useCallback((message: string, type: ToastType = 'success', action?: Toast['action']) => {
+  const dismissToast = useCallback((id: number) => {
+    const timer = timersRef.current.get(id)
+    if (timer) {
+      clearTimeout(timer)
+      timersRef.current.delete(id)
+    }
+    setToasts((prev) => prev.filter((t) => t.id !== id))
+  }, [])
+
+  const showToast = useCallback((message: string, type: ToastType = 'success', action?: Toast['action'], durationMs = 5000) => {
     const id = ++idRef.current
     setToasts((prev) => [...prev, { id, message, type, action }])
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000)
-  }, [])
+    const timer = setTimeout(() => dismissToast(id), durationMs)
+    timersRef.current.set(id, timer)
+  }, [dismissToast])
 
   return (
     <ToastContext.Provider value={{ showToast }}>
@@ -47,13 +58,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <span className="flex-1">{t.message}</span>
             {t.action && (
               <button
-                onClick={() => { t.action!.onClick(); setToasts((prev) => prev.filter((x) => x.id !== t.id)) }}
+                onClick={() => { t.action!.onClick(); dismissToast(t.id) }}
                 className="text-[12px] font-semibold underline underline-offset-2 shrink-0"
                 style={{ color: 'var(--color-sale-green)' }}
               >
                 {t.action.label}
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => dismissToast(t.id)}
+              aria-label="Dismiss notification"
+              className="text-ink-soft hover:text-ink p-0.5 shrink-0"
+            >
+              <MaterialIcon name="close" size={16} />
+            </button>
           </div>
         ))}
       </div>

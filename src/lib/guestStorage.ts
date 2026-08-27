@@ -165,6 +165,21 @@ export function emitGuestMergeDone() {
   window.dispatchEvent(new Event(GUEST_MERGE_DONE_EVENT))
 }
 
+/** Resolves when guest merge finishes (or after timeout). */
+export function waitForGuestMerge(timeoutMs = 10000): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve()
+  return new Promise((resolve) => {
+    const finish = () => {
+      window.removeEventListener(GUEST_MERGE_DONE_EVENT, onDone)
+      clearTimeout(timer)
+      resolve()
+    }
+    const onDone = () => finish()
+    const timer = setTimeout(finish, timeoutMs)
+    window.addEventListener(GUEST_MERGE_DONE_EVENT, onDone, { once: true })
+  })
+}
+
 export function emitRunPendingCheckout() {
   if (typeof window === 'undefined') return
   window.dispatchEvent(new Event(RUN_PENDING_CHECKOUT_EVENT))

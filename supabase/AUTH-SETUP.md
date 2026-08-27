@@ -70,3 +70,12 @@ The app uses `/auth/callback` after Google sign-in; wildcards above cover it.
 
 Same **Site URL** and **Redirect URLs** apply to verification and reset emails.
 No extra code changes needed.
+
+### Branded "Confirm signup" email template
+
+1. Open [Authentication → Email Templates → Confirm signup](https://supabase.com/dashboard/project/anlsellghialszuuvipw/auth/templates)
+2. **Subject:** `Confirm your Notion Creative Art account`
+3. **Body:** paste the HTML from [`email-templates/confirm-signup.html`](./email-templates/confirm-signup.html) (uses `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .SiteURL }}`)
+4. Save
+
+Matches order-confirmation branding: navy `#243B5A`, sage `#6F8760`, Playfair Display + Manrope, with a proper **Confirm Email Address** button.

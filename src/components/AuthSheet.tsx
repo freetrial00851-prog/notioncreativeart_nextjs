@@ -11,6 +11,7 @@ import { MaterialIcon } from './MaterialIcon'
 import { CloseCircleIcon } from './icons'
 import { GoogleIcon } from './GoogleIcon'
 import { PasswordStrength } from './PasswordStrength'
+import { SignupLoadingOverlay } from './SignupLoadingOverlay'
 
 /**
  * Auth overlay: mobile (<768) bottom sheet, tablet/desktop (≥768) centered modal.
@@ -234,7 +235,7 @@ function AuthSheetInner() {
               {signup.attempted && signup.fieldErrors.password && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.password}</p>}
             </div>
             <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
-              {signup.submitting ? 'Creating Account…' : 'Create Account'}
+              Create Account
             </button>
             <p className="text-[11px] text-ink-soft leading-relaxed text-center">
               By clicking Create Account or continuing with Google, you agree to the{' '}
@@ -255,6 +256,7 @@ function AuthSheetInner() {
 
   return (
     <>
+      <SignupLoadingOverlay active={signup.submitting} />
       {/* ── Mobile <768: bottom sheet ── */}
       <div className="md:hidden">
         <div

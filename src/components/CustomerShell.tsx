@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { CompleteAccountBanner } from '@/components/CompleteAccountBanner'
+import { GlobalAccountBanners } from '@/components/GlobalAccountBanners'
 import { AdminAreaGuard } from '@/components/AdminAreaGuard'
 import { CartDrawer } from '@/components/CartDrawer'
 import { CheckoutOverlay } from '@/components/CheckoutOverlay'
@@ -39,7 +39,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
       <NewsletterPromptHost />
       <div className="min-h-screen flex flex-col">
         <Header />
-        <CompleteAccountBanner />
+        <GlobalAccountBanners />
         <main className="flex-1">{children}</main>
         <Footer />
       </div>

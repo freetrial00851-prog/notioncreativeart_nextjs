@@ -1,0 +1,84 @@
+<!--
+  Supabase Auth → Email Templates → Confirm signup
+
+  Paste the HTML below into the "Confirm signup" template body in the Supabase Dashboard.
+  Subject line suggestion: Confirm your Notion Creative Art account
+
+  Template variables (Go syntax):
+  - {{ .ConfirmationURL }} — full confirmation link (use in button href)
+  - {{ .Email }} — recipient email
+  - {{ .SiteURL }} — site URL from Auth settings
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirm your email — Notion Creative Art</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body style="margin:0;padding:0;background:#F7F5F1;color:#1A1A1A;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F7F5F1;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #E4E1DB;border-radius:16px;overflow:hidden;">
+          <tr>
+            <td style="background:#243B5A;padding:28px 32px;text-align:center;">
+              <p style="margin:0;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;letter-spacing:0.02em;color:#ffffff;">
+                Notion Creative Art
+              </p>
+              <p style="margin:8px 0 0;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.75);">
+                Confirm your email
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px;">
+              <h1 style="margin:0 0 12px;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;font-weight:700;color:#243B5A;">
+                Welcome — one more step
+              </h1>
+              <p style="margin:0 0 8px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#5C5C5C;">
+                Hi there,
+              </p>
+              <p style="margin:0 0 24px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#5C5C5C;">
+                Thanks for creating your Notion Creative Art account. Please confirm your email address so we know we can reach you about orders and downloads.
+              </p>
+
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
+                <tr>
+                  <td align="center" style="border-radius:10px;background:#6F8760;">
+                    <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 28px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:0.04em;text-decoration:none;color:#ffffff;">
+                      Confirm Email Address
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 8px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#5C5C5C;">
+                If the button doesn&apos;t work, copy and paste this link into your browser:
+              </p>
+              <p style="margin:0 0 24px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.55;color:#243B5A;word-break:break-all;">
+                {{ .ConfirmationURL }}
+              </p>
+
+              <p style="margin:0;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#5C5C5C;">
+                Happy making,<br />
+                <span style="color:#243B5A;font-weight:600;">Notion Creative Art</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:18px 32px 24px;border-top:1px solid #E4E1DB;text-align:center;">
+              <p style="margin:0;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:11px;line-height:1.5;color:#5C5C5C;">
+                You received this email because someone signed up at {{ .SiteURL }} with {{ .Email }}.
+                If this wasn&apos;t you, you can safely ignore this message.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

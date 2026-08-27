@@ -10,6 +10,7 @@ import { GoogleIcon } from '../components/GoogleIcon'
 import { AuthBrandPanel } from '../components/AuthBrandPanel'
 import { AuthCloseButton } from '../components/AuthCloseButton'
 import { PasswordStrength } from '../components/PasswordStrength'
+import { SignupLoadingOverlay } from '../components/SignupLoadingOverlay'
 
 /**
  * Single page serving both /login and /signup. Which form shows first
@@ -108,6 +109,7 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen flex relative">
+      <SignupLoadingOverlay active={view === 'signup' && signup.submitting} />
       <AuthCloseButton fallbackTo={closeFallback} />
       <AuthBrandPanel />
       <div className="flex-1 flex items-center justify-center px-6 py-16">
@@ -211,7 +213,7 @@ export function AuthPage() {
                   {signup.attempted && signup.fieldErrors.password && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.password}</p>}
                 </div>
                 <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
-                  {signup.submitting ? 'Creating Account…' : 'Create Account'}
+                  Create Account
                 </button>
                 <p className="text-[11px] text-ink-soft leading-relaxed text-center">
                   By clicking Create Account or continuing with Google, you agree to the{' '}

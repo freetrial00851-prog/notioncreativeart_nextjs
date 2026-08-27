@@ -7,12 +7,18 @@ import { MaterialIcon } from '@/components/MaterialIcon'
 const DISMISS_KEY = 'nca_email_verify_banner_dismissed'
 const HINT_KEY = 'nca_verify_hint_email'
 
+const NAVY = '#243B5A'
+
+type EmailVerifyBannerProps = {
+  /** `global` = full-width top bar in CustomerShell; omit for legacy inline (unused). */
+  variant?: 'global'
+}
+
 /**
- * Soft, dismissible nudge on the account area. Never blocks checkout or other actions.
- * Shows when email is still unconfirmed, or right after signup (hint) while a
- * confirmation email may still be in the inbox.
+ * Soft, dismissible nudge when email is still unconfirmed (or right after signup).
+ * Rendered sitewide via CustomerShell — never blocks checkout or other actions.
  */
-export function EmailVerifyBanner() {
+export function EmailVerifyBanner({ variant = 'global' }: EmailVerifyBannerProps) {
   const { user, resendVerification } = useAuth()
   const [visible, setVisible] = useState(false)
   const [sending, setSending] = useState(false)
@@ -56,17 +62,52 @@ export function EmailVerifyBanner() {
     setSent(true)
   }
 
+  const message = sent
+    ? `Verification email sent to ${user.email}.`
+    : `Verify your email (${user.email}) — optional, and never required for shopping.`
+
+  if (variant === 'global') {
+    return (
+      <div
+        className="border-b border-line text-[12px] tracking-[0.02em] text-white"
+        style={{ background: NAVY }}
+        role="status"
+      >
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 max-w-site w-full mx-auto">
+          <MaterialIcon name="mark_email_unread" size={16} color="rgba(255,255,255,0.85)" className="shrink-0" />
+          <p className="flex-1 min-w-[12rem] text-white/90">{message}</p>
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            {!sent && (
+              <button
+                type="button"
+                onClick={resend}
+                disabled={sending}
+                className="text-[12px] font-semibold underline underline-offset-2 text-white disabled:opacity-50"
+              >
+                {sending ? 'Sending…' : 'Resend'}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={dismiss}
+              aria-label="Dismiss"
+              className="text-white/70 hover:text-white p-1"
+            >
+              <MaterialIcon name="close" size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-[13px]"
       role="status"
     >
       <MaterialIcon name="mark_email_unread" size={18} className="text-ink-soft shrink-0" />
-      <p className="flex-1 min-w-[12rem] text-ink-soft">
-        {sent
-          ? `Verification email sent to ${user.email}.`
-          : `Verify your email (${user.email}) — optional, and never required for shopping.`}
-      </p>
+      <p className="flex-1 min-w-[12rem] text-ink-soft">{message}</p>
       <div className="flex items-center gap-2 shrink-0">
         {!sent && (
           <button

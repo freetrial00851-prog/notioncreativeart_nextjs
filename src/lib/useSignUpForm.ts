@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import { isPasswordValid } from '../components/PasswordStrength'
+import { waitForGuestMerge } from './guestStorage'
 
 type Options = {
   /** Called when signup creates an immediate session (autoconfirm on). */
@@ -16,6 +18,7 @@ type Options = {
  */
 export function useSignUpForm(options: Options = {}) {
   const { signInWithGoogle, signUpWithEmail, resendVerification } = useAuth()
+  const { showToast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = options.redirectTo || searchParams?.get('redirect') || '/account'
@@ -45,21 +48,26 @@ export function useSignUpForm(options: Options = {}) {
     setError(null)
     if (Object.values(fieldErrors).some(Boolean)) return
     setSubmitting(true)
-    const { error, duplicateEmail, session } = await signUpWithEmail({
-      name: name.trim(),
-      email,
-      password,
-    })
-    setSubmitting(false)
-    if (duplicateEmail) { setEmailTaken(true); return }
-    if (error) return setError(error)
-    if (session) {
-      options.onSignedIn?.()
-      if (!options.onSignedIn) router.push(redirectTo)
-      return
+    try {
+      const { error, duplicateEmail, session } = await signUpWithEmail({
+        name: name.trim(),
+        email,
+        password,
+      })
+      if (duplicateEmail) { setEmailTaken(true); return }
+      if (error) { setError(error); return }
+      if (session) {
+        await waitForGuestMerge()
+        showToast('Account created! Check your email to verify your address.', 'success', undefined, 8000)
+        options.onSignedIn?.()
+        if (!options.onSignedIn) router.push(redirectTo)
+        return
+      }
+      // Confirm-email still required on this project — fall back to verify screen.
+      setScreen('verify-sent')
+    } finally {
+      setSubmitting(false)
     }
-    // Confirm-email still required on this project — fall back to verify screen.
-    setScreen('verify-sent')
   }
 
   const inputClass = (hasError: boolean) =>
