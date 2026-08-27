@@ -607,7 +607,7 @@ function HeaderActions({
       <button
         type="button"
         aria-label="Wishlist"
-        title="Wishlist"
+        title={user ? 'Wishlist' : 'Wishlist — items saved for 7 days while signed out'}
         onClick={onWishlist}
         className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
       >
@@ -617,7 +617,7 @@ function HeaderActions({
         type="button"
         onClick={onCart}
         aria-label="Cart"
-        title="Cart"
+        title={user ? 'Cart' : 'Cart — items saved for 7 days while signed out'}
         className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
       >
         <CartIcon size={iconSize} color={HEADER_ICON} />

@@ -32,6 +32,11 @@ export function Cart() {
     return (
       <div className="max-w-site w-full mx-auto px-6 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Your cart is empty.</p>
+        {!user && (
+          <p className="text-[12px] text-ink-soft mb-6 max-w-sm mx-auto leading-relaxed">
+            Cart items are saved for 7 days. Sign in to save them permanently.
+          </p>
+        )}
         <Link href="/shop" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">SHOP ALL PATTERNS →</Link>
       </div>
     )
@@ -50,6 +55,11 @@ export function Cart() {
           <p className="text-[11px] tracking-[0.15em] font-medium mb-2" style={{ color: 'var(--color-sale-green)' }}>YOUR SHOPPING CART</p>
           <h1 className="font-display font-semibold text-4xl mb-2">Cart ({items.length})</h1>
           <p className="text-[13px] text-ink-soft">Your selected crochet patterns, ready for checkout.</p>
+          {!user && (
+            <p className="text-[12px] text-ink-soft mt-3 leading-relaxed">
+              Cart items are saved for 7 days. Sign in to save them permanently.
+            </p>
+          )}
         </div>
         <Link href="/shop" className="flex items-center gap-1.5 text-[13px] font-medium hover:opacity-80" style={{ color: 'var(--color-sale-green)' }}>
           <ArrowLeftIcon /> Continue Shopping

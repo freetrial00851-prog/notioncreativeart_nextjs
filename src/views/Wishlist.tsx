@@ -11,7 +11,7 @@ const PAGE_SIZE = 15
 
 /** Wishlist grid — use `embedded` inside the account shell so sidebar nav stays visible. */
 export function Wishlist({ embedded = false }: { embedded?: boolean }) {
-  const { loading: authLoading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const { products, productsLoading, ready } = useWishlist()
   const [page, setPage] = useState(1)
 
@@ -24,8 +24,15 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const guestHint = !user ? (
+    <p className="text-[12px] text-ink-soft mb-6 leading-relaxed">
+      Wishlist items are saved for 7 days. Sign in to save them permanently.
+    </p>
+  ) : null
+
   const body = (
     <>
+      {guestHint}
       {products.length === 0 ? (
         <EmptyState
           icon="favorite"

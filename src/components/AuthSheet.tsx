@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef, type RefObject } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useUI } from '../context/UIContext'
@@ -68,6 +68,26 @@ function AuthSheetInner() {
   const title = authSheetView === 'login'
     ? (login.forgotMode ? 'Reset Password' : 'Sign In')
     : (signup.screen === 'verify-sent' ? 'Verify Your Email' : 'Create Account')
+
+  const showHeaderRegister = authSheetView === 'login' && !login.forgotMode
+
+  const headerActions = (closeRef: RefObject<HTMLButtonElement | null>, closeClassName: string) => (
+    <div className="flex items-center gap-1 shrink-0">
+      {showHeaderRegister && (
+        <button
+          type="button"
+          onClick={() => setAuthSheetView('signup')}
+          className="text-[13px] font-semibold px-2.5 py-1.5 rounded-lg hover:bg-surface transition-colors"
+          style={{ color: 'var(--color-accent)' }}
+        >
+          Register
+        </button>
+      )}
+      <button ref={closeRef} type="button" onClick={closeAuthSheet} aria-label="Close" className={closeClassName}>
+        <CloseCircleIcon size={28} />
+      </button>
+    </div>
+  )
 
   const formBody = (
     <>
@@ -253,11 +273,9 @@ function AuthSheetInner() {
           <div className="flex items-center justify-center pt-2.5 pb-1 shrink-0">
             <div className="w-9 h-1 rounded-full bg-line" />
           </div>
-          <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0">
-            <h2 className="font-display font-semibold text-lg">{title}</h2>
-            <button ref={closeButtonRef} type="button" onClick={closeAuthSheet} aria-label="Close" className="w-8 h-8 flex items-center justify-center hover:opacity-80">
-              <CloseCircleIcon size={28} />
-            </button>
+          <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0 gap-3">
+            <h2 className="font-display font-semibold text-lg min-w-0">{title}</h2>
+            {headerActions(closeButtonRef, 'w-8 h-8 flex items-center justify-center hover:opacity-80')}
           </div>
           <div className="overflow-y-auto px-5 pt-5 pb-8">{formBody}</div>
         </div>
@@ -282,11 +300,9 @@ function AuthSheetInner() {
             onClick={(e) => e.stopPropagation()}
             className={`pointer-events-auto w-full max-w-md bg-canvas border border-line rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.18)] flex flex-col max-h-[min(90vh,720px)] transition-opacity duration-200 motion-reduce:transition-none ${authSheetOpen ? 'opacity-100 animate-[fadeIn_0.15s_ease-out]' : 'opacity-0'}`}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-line shrink-0">
-              <h2 className="font-display font-semibold text-xl">{title}</h2>
-              <button ref={desktopCloseRef} type="button" onClick={closeAuthSheet} aria-label="Close" className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition-colors">
-                <CloseCircleIcon size={28} />
-              </button>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-line shrink-0 gap-3">
+              <h2 className="font-display font-semibold text-xl min-w-0">{title}</h2>
+              {headerActions(desktopCloseRef, 'w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition-colors')}
             </div>
             <div className="overflow-y-auto px-6 py-5">{formBody}</div>
           </div>

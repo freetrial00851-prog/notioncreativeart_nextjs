@@ -67,6 +67,11 @@ export function CartDrawer() {
           <div>
             <h2 className="font-subheading font-semibold text-lg">Your Cart</h2>
             <p className="text-[11px] text-ink-soft mt-0.5">{count} {count === 1 ? 'item' : 'items'}</p>
+            {!user && (
+              <p className="text-[11px] text-ink-soft mt-1.5 leading-relaxed max-w-[240px]">
+                Cart items are saved for 7 days. Sign in to save them permanently.
+              </p>
+            )}
           </div>
           <button ref={closeButtonRef} onClick={closeDrawer} aria-label="Close cart" className="w-8 h-8 flex items-center justify-center hover:opacity-80">
             <CloseCircleIcon size={28} />
