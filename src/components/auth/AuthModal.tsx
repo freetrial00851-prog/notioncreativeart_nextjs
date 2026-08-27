@@ -92,7 +92,7 @@ export function AuthModal({ open, onClose }: Props) {
     if (password !== confirmPassword) return setError('Passwords do not match.')
     if (!agreed) return setError('Please agree to the Terms & Privacy Policy.')
     setSubmitting(true)
-    const { error } = await signUpWithEmail({ name: name.trim() || undefined, email, password })
+    const { error } = await signUpWithEmail({ name: name.trim(), email, password })
     setSubmitting(false)
     if (error) return setError(error)
     setScreen('verify-sent')
