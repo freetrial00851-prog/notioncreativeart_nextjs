@@ -72,9 +72,12 @@ Subscribe to `order_created` and `order_refunded`. JWT verification is off becau
 
 ```bash
 npx supabase secrets set LEMON_WEBHOOK_SECRET=your_test_mode_signing_secret --project-ref anlsellghialszuuvipw
+npx supabase secrets set LEMON_WEBHOOK_SECRET_LIVE=your_live_mode_signing_secret --project-ref anlsellghialszuuvipw
 ```
 
-Copy the signing secret from the **test-mode** webhook in Lemon Squeezy (test and live secrets are different).
+Create separate webhooks in Lemon Squeezy for **test mode** and **live mode** (same callback URL). The function accepts either signing secret. Test and live secrets are different — do not overwrite one with the other.
+
+Paid `order_created` events also send a branded order-confirmation email via **Resend** (same project `RESEND_API_KEY` as `chat-escalate`). Email failures are logged only — they never fail the webhook or block purchase creation.
 
 ### `chat-support` secrets
 

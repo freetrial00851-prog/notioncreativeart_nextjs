@@ -3,10 +3,13 @@
 // Required secrets (set in Dashboard → Edge Functions → lemon-webhook → Secrets):
 //   LEMON_WEBHOOK_SECRET      — Lemon Squeezy test-mode webhook signing secret
 //   LEMON_WEBHOOK_SECRET_LIVE — Lemon Squeezy live-mode webhook signing secret
+//   RESEND_API_KEY            — project secret (same as chat-escalate) for order emails
 //   SUPABASE_URL           — auto-provided by Supabase
 //   SUPABASE_SERVICE_ROLE_KEY — auto-provided by Supabase (bypasses RLS — never expose to frontend)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { buildOrderConfirmationEmail, siteBaseUrl } from '../_shared/orderConfirmationEmail.ts'
+import { sendResendEmail } from '../_shared/resend.ts'
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -47,6 +50,65 @@ async function verifyAgainstConfiguredSecrets(rawBody: string, signature: string
     }
   }
   return { configured: true, valid: false }
+}
+
+/**
+ * Side effect only — never throws into the webhook response path.
+ * Failures are logged; purchase/order writes must already have succeeded.
+ */
+async function sendOrderConfirmationEmail(opts: {
+  email: string
+  orderNumber: string
+  amount: number
+  currency: string
+  productIds: string[]
+}) {
+  const to = opts.email.trim().toLowerCase()
+  if (!to || !opts.orderNumber) return
+
+  let products: { title: string; price?: number | null }[] = []
+  if (opts.productIds.length > 0) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, title, price')
+      .in('id', opts.productIds)
+    if (error) {
+      console.error('lemon-webhook: product lookup for email failed', error.message)
+    } else {
+      const byId = new Map((data ?? []).map((p) => [p.id as string, p]))
+      products = opts.productIds.map((id) => {
+        const row = byId.get(id)
+        return { title: (row?.title as string) || 'Crochet pattern', price: row?.price as number | null }
+      })
+    }
+  }
+  if (products.length === 0) {
+    products = [{ title: 'Your crochet pattern(s)' }]
+  }
+
+  const downloadsUrl = `${siteBaseUrl()}/account/downloads`
+  const built = buildOrderConfirmationEmail({
+    customerEmail: to,
+    orderNumber: opts.orderNumber,
+    amount: opts.amount,
+    currency: opts.currency,
+    products,
+    downloadsUrl,
+  })
+
+  const result = await sendResendEmail({
+    to,
+    subject: built.subject,
+    html: built.html,
+    text: built.text,
+    idempotencyKey: `order-confirm-${opts.orderNumber}`,
+  })
+
+  if (!result.ok) {
+    console.error('lemon-webhook: order confirmation email failed', result.error)
+  } else {
+    console.log('lemon-webhook: order confirmation email sent to', to)
+  }
 }
 
 Deno.serve(async (req) => {
@@ -120,6 +182,21 @@ Deno.serve(async (req) => {
 
         // Clear these items out of the cart now that they've been bought
         await supabase.from('cart_items').delete().eq('user_id', userId).in('product_id', productIds)
+      }
+
+      // Email is a side effect — never block or fail the webhook if Resend errors.
+      if (status === 'paid' && email) {
+        try {
+          await sendOrderConfirmationEmail({
+            email,
+            orderNumber: lemonOrderId,
+            amount,
+            currency,
+            productIds,
+          })
+        } catch (emailErr) {
+          console.error('lemon-webhook: order confirmation email threw', emailErr)
+        }
       }
     }
 
