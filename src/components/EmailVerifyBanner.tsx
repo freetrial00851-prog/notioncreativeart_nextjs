@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { MaterialIcon } from '@/components/MaterialIcon'
 
@@ -24,24 +24,35 @@ export function EmailVerifyBanner({ variant = 'global' }: EmailVerifyBannerProps
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
 
-  useEffect(() => {
-    if (!user?.email) {
+  const evaluateVisibility = useCallback((currentUser: typeof user) => {
+    if (!currentUser?.email) {
       setVisible(false)
       return
     }
-    const email = user.email.toLowerCase()
-    const hasEmailIdentity = (user.identities ?? []).some((i) => i.provider === 'email')
-    const unconfirmed = !user.email_confirmed_at
+    const email = currentUser.email.toLowerCase()
+    const hasEmailIdentity = (currentUser.identities ?? []).some((i) => i.provider === 'email')
+    const unconfirmed = !currentUser.email_confirmed_at
+    if (currentUser.email_confirmed_at) {
+      try {
+        sessionStorage.removeItem(HINT_KEY)
+      } catch {
+        // ignore
+      }
+    }
     let dismissed = false
     let hintMatch = false
     try {
-      dismissed = localStorage.getItem(DISMISS_KEY) === user.id
+      dismissed = localStorage.getItem(DISMISS_KEY) === currentUser.id
       hintMatch = sessionStorage.getItem(HINT_KEY) === email
     } catch {
       // ignore
     }
     setVisible(Boolean(hasEmailIdentity && !dismissed && (unconfirmed || hintMatch)))
-  }, [user])
+  }, [])
+
+  useEffect(() => {
+    evaluateVisibility(user)
+  }, [user, evaluateVisibility])
 
   if (!visible || !user?.email) return null
 

@@ -60,6 +60,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe()
   }, [])
 
+  // Re-fetch session when tab regains focus (e.g. email confirmed in another tab).
+  useEffect(() => {
+    const refreshSession = () => {
+      if (document.visibilityState !== 'visible') return
+      void supabase.auth.refreshSession().then(({ data }) => {
+        if (data.session) setSession(data.session)
+      })
+    }
+    document.addEventListener('visibilitychange', refreshSession)
+    window.addEventListener('focus', refreshSession)
+    return () => {
+      document.removeEventListener('visibilitychange', refreshSession)
+      window.removeEventListener('focus', refreshSession)
+    }
+  }, [])
+
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
     setProfile(data as Profile)

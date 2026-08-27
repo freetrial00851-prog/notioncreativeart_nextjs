@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { ENABLE_SUPPORT_CHAT } from '../lib/featureFlags'
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -234,6 +235,8 @@ export function SupportChat() {
       void send()
     }
   }
+
+  if (!ENABLE_SUPPORT_CHAT) return null
 
   return (
     <>

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
@@ -54,6 +55,18 @@ export function Header() {
   const desktopSearchInputRef = useRef<HTMLInputElement>(null)
   const tabletSearchInputRef = useRef<HTMLInputElement>(null)
   const mobileSearchInputRef = useRef<HTMLInputElement>(null)
+  const headerRef = useRef<HTMLElement>(null)
+  const [browsePanelTop, setBrowsePanelTop] = useState(0)
+
+  const closeMobileBrowse = () => {
+    setMobileOpen(false)
+    setMobileExpandedCategory(null)
+  }
+
+  const updateBrowsePanelTop = () => {
+    if (!headerRef.current) return
+    setBrowsePanelTop(headerRef.current.getBoundingClientRect().bottom)
+  }
 
   const announcementMessages = announcement ? activeAnnouncementMessages(announcement) : []
   const showAnnouncement = shouldShowAnnouncementBar(announcement)
@@ -109,6 +122,13 @@ export function Header() {
     setQuery(activeQuery)
   }, [pathname, typeof window !== 'undefined' ? window.location.search : ''])
 
+  useLayoutEffect(() => {
+    if (!mobileOpen) return
+    updateBrowsePanelTop()
+    window.addEventListener('resize', updateBrowsePanelTop)
+    return () => window.removeEventListener('resize', updateBrowsePanelTop)
+  }, [mobileOpen, showAnnouncement, announcementMessages.length])
+
   const submitSearch = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!query.trim()) return
@@ -138,7 +158,8 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-canvas border-b border-line">
+    <>
+    <header ref={headerRef} className="sticky top-0 z-40 bg-canvas border-b border-line">
       <div className="relative z-[3] bg-canvas">
       {showAnnouncement && (
         <div
@@ -237,6 +258,7 @@ export function Header() {
             <button
               type="button"
               aria-label="Browse categories"
+              aria-expanded={mobileOpen}
               onClick={() => { setCategoriesOpen(false); setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
               className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
             >
@@ -292,8 +314,9 @@ export function Header() {
               <>
                 <button
                   type="button"
-                  onClick={() => { setMobileExpandedCategory(null); setMobileOpen(true) }}
+                  onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
                   aria-label="Browse categories"
+                  aria-expanded={mobileOpen}
                   className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
                 >
                   <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
@@ -400,106 +423,6 @@ export function Header() {
       </div>
       </div>
 
-      {/* Browse panel — mobile + tablet (hidden on desktop, which uses the Categories dropdown) */}
-      {mobileOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[1] bg-black/25 desktop:hidden"
-            onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
-          />
-          <div className="absolute left-0 right-0 top-full z-[2] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] max-h-[min(78vh,640px)] overflow-y-auto desktop:hidden">
-              <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
-                <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
-                  Browse Categories
-                </h2>
-                <button
-                  type="button"
-                  aria-label="Close categories"
-                  onClick={() => { setMobileOpen(false); setMobileExpandedCategory(null) }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
-                >
-                  <MaterialIcon name="close" size={22} />
-                </button>
-              </div>
-              <nav className="pb-3">
-                <Link
-                  href="/shop/new"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
-                >
-                  New Arrivals
-                </Link>
-                {categories.map((c) => {
-                  const expanded = mobileExpandedCategory === c.id
-                  const subs = mobileSubcategoriesCache[c.id]
-                  const hasSubsCached = subs !== undefined
-                  return (
-                    <div key={c.link} className="border-b border-[#ebe8e2]">
-                      <div className="flex items-stretch">
-                        <Link
-                          href={c.link}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex-1 px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
-                        >
-                          {c.name}
-                        </Link>
-                        <button
-                          type="button"
-                          aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
-                          aria-expanded={expanded}
-                          onClick={() => {
-                            const opening = !expanded
-                            setMobileExpandedCategory(opening ? c.id : null)
-                            if (opening && !hasSubsCached) {
-                              getSubcategoriesWithCounts(supabase, c.id).then((list) =>
-                                setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
-                              )
-                            }
-                          }}
-                          className="px-4 text-black"
-                        >
-                          <MaterialIcon
-                            name="chevron_right"
-                            size={22}
-                            style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
-                          />
-                        </button>
-                      </div>
-                      {expanded && (
-                        <div className="bg-[#f0eee8] pb-1">
-                          {(subs?.length ?? 0) === 0 && hasSubsCached ? (
-                            <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
-                          ) : (
-                            (subs ?? []).map((sub) => (
-                              <Link
-                                key={sub.id}
-                                href={`/shop/${sub.slug}`}
-                                onClick={() => setMobileOpen(false)}
-                                className="block px-8 py-2.5 text-[15px] font-bold text-black tracking-[-0.015em]"
-                              >
-                                {sub.name}
-                              </Link>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-                <Link href="/shop" onClick={() => setMobileOpen(false)} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
-                  All Patterns
-                </Link>
-                <Link href="/shop?price=free" onClick={() => setMobileOpen(false)} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
-                  Free Patterns
-                </Link>
-                <Link href="/shop/sale" onClick={() => setMobileOpen(false)} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug">
-                  Sale
-                </Link>
-              </nav>
-            </div>
-          </>
-        )}
-
       {mobileAccountOpen && (
         <div className="fixed inset-0 z-50 tablet:hidden">
           <div className="absolute inset-0 bg-canvas flex flex-col">
@@ -562,6 +485,112 @@ export function Header() {
         </div>
       )}
     </header>
+
+    {/* Browse panel — mobile + tablet; portaled so overlay covers full viewport (not clipped by sticky header). */}
+    {mobileOpen && typeof document !== 'undefined' && createPortal(
+      <>
+        <div
+          className="fixed inset-0 z-[45] bg-black/25 desktop:hidden"
+          onClick={closeMobileBrowse}
+          aria-hidden="true"
+        />
+        <div
+          className="fixed left-0 right-0 z-[46] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] overflow-y-auto desktop:hidden"
+          style={{ top: browsePanelTop, maxHeight: `min(78vh, calc(100vh - ${browsePanelTop}px))` }}
+        >
+          <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
+            <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
+              Browse Categories
+            </h2>
+            <button
+              type="button"
+              aria-label="Close categories"
+              onClick={closeMobileBrowse}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
+            >
+              <MaterialIcon name="close" size={22} />
+            </button>
+          </div>
+          <nav className="pb-3">
+            <Link
+              href="/shop/new"
+              onClick={closeMobileBrowse}
+              className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+            >
+              New Arrivals
+            </Link>
+            {categories.map((c) => {
+              const expanded = mobileExpandedCategory === c.id
+              const subs = mobileSubcategoriesCache[c.id]
+              const hasSubsCached = subs !== undefined
+              return (
+                <div key={c.link} className="border-b border-[#ebe8e2]">
+                  <div className="flex items-stretch">
+                    <Link
+                      href={c.link}
+                      onClick={closeMobileBrowse}
+                      className="flex-1 px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
+                    >
+                      {c.name}
+                    </Link>
+                    <button
+                      type="button"
+                      aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
+                      aria-expanded={expanded}
+                      onClick={() => {
+                        const opening = !expanded
+                        setMobileExpandedCategory(opening ? c.id : null)
+                        if (opening && !hasSubsCached) {
+                          getSubcategoriesWithCounts(supabase, c.id).then((list) =>
+                            setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
+                          )
+                        }
+                      }}
+                      className="px-4 text-black"
+                    >
+                      <MaterialIcon
+                        name="chevron_right"
+                        size={22}
+                        style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
+                      />
+                    </button>
+                  </div>
+                  {expanded && (
+                    <div className="bg-[#f0eee8] pb-1">
+                      {(subs?.length ?? 0) === 0 && hasSubsCached ? (
+                        <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
+                      ) : (
+                        (subs ?? []).map((sub) => (
+                          <Link
+                            key={sub.id}
+                            href={`/shop/${sub.slug}`}
+                            onClick={closeMobileBrowse}
+                            className="block px-8 py-2.5 text-[15px] font-bold text-black tracking-[-0.015em]"
+                          >
+                            {sub.name}
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            <Link href="/shop" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+              All Patterns
+            </Link>
+            <Link href="/shop?price=free" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+              Free Patterns
+            </Link>
+            <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug">
+              Sale
+            </Link>
+          </nav>
+        </div>
+      </>,
+      document.body,
+    )}
+    </>
   )
 }
 
