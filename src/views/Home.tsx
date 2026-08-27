@@ -444,7 +444,7 @@ export function Home({
                   </span>
                 </div>
                 <div className="p-6">
-                  <h3 className="font-heading font-semibold text-xl mb-2">{c.title}</h3>
+                  <h3 className="font-display font-semibold text-xl mb-2">{c.title}</h3>
                   <p className="text-[13px] text-ink-soft leading-relaxed mb-4">{c.copy}</p>
                   <span className="text-[12px] font-semibold" style={{ color: badgeColor }}>Explore →</span>
                 </div>
@@ -521,7 +521,7 @@ export function Home({
       <div>
         <div className="bg-white border border-line rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row gap-6">
           <div className="lg:w-[200px] shrink-0">
-            <p className="font-heading font-semibold text-lg mb-4">Browse by Skill Level</p>
+            <p className="font-display font-semibold text-lg mb-4">Browse by Skill Level</p>
             <div className="grid grid-cols-3 lg:flex lg:flex-col gap-2">
               {([
                 { level: 'beginner' as const, icon: 'eco' },
@@ -568,7 +568,7 @@ export function Home({
 
           {layout.find((s) => s.id === 'bundles')?.visible && bundles.length > 0 && (
             <div className="lg:w-[300px] shrink-0 rounded-xl p-6" style={{ background: 'var(--color-accent-soft)' }}>
-              <p className="font-heading font-semibold text-lg mb-1.5">Pattern Bundles</p>
+              <p className="font-display font-semibold text-lg mb-1.5">Pattern Bundles</p>
               <p className="text-[12px] text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
               <Link
                 href="/shop?bundle=1"

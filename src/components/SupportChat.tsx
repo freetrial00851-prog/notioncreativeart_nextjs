@@ -267,7 +267,7 @@ export function SupportChat() {
             <div className="flex items-center gap-2.5 min-w-0">
               <LogoIcon size={36} onAccent />
               <div className="min-w-0">
-                <p className="font-heading font-semibold text-[17px] leading-tight">NCA Support</p>
+                <p className="font-display font-semibold text-[17px] leading-tight">NCA Support</p>
                 <p className="text-[11px] text-white/80 mt-0.5">We're here to help</p>
               </div>
             </div>

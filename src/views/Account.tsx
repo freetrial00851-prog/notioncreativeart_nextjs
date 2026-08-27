@@ -88,7 +88,7 @@ export function Account() {
       </nav>
 
       {showPageTitle && (
-        <h1 className="font-heading font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
+        <h1 className="font-display font-semibold text-2xl md:text-3xl text-ink mb-6">{crumbLabel}</h1>
       )}
       <AccountContent />
     </div>
@@ -714,7 +714,7 @@ function LogoutConfirm() {
       <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: BRAND_SOFT }}>
         <MaterialIcon name="logout" size={28} color={BRAND} />
       </div>
-      <h2 className="font-heading font-semibold text-2xl mb-2">Log Out</h2>
+      <h2 className="font-display font-semibold text-2xl mb-2">Log Out</h2>
       <p className="text-[14px] text-ink-soft mb-8">Are you sure you want to sign out of your Notion Creative Art account?</p>
       <button
         onClick={signOut}

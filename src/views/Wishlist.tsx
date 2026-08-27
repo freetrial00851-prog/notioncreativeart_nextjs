@@ -71,7 +71,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
   if (embedded) {
     return (
       <div>
-        <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-6">Wishlist</h2>
+        <h2 className="font-display font-semibold text-2xl md:text-3xl mb-6">Wishlist</h2>
         {body}
       </div>
     )
