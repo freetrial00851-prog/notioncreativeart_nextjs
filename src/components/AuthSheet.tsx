@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useUI } from '../context/UIContext'
@@ -16,8 +16,19 @@ import { PasswordStrength } from './PasswordStrength'
  * Auth overlay: mobile (<768) bottom sheet, tablet/desktop (≥768) centered modal.
  * Shares validation/submission via useLoginForm / useSignUpForm with /login.
  * Closing returns the user to the page they were already on (no redirect).
+ *
+ * Suspense is required because useSignUpForm reads useSearchParams(); without a
+ * boundary here, every CustomerShell page fails static prerender.
  */
 export function AuthSheet() {
+  return (
+    <Suspense fallback={null}>
+      <AuthSheetInner />
+    </Suspense>
+  )
+}
+
+function AuthSheetInner() {
   const { authSheetOpen, authSheetView, setAuthSheetView, closeAuthSheet } = useUI()
   const pathname = usePathname()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
