@@ -8,6 +8,9 @@ import { isPasswordValid } from '../components/PasswordStrength'
 import { waitForGuestMerge } from './guestStorage'
 import type { SignupSetupPhase } from '../components/SignupLoadingOverlay'
 
+/** Let the bar reach 100% and all step checks render before dismissing. */
+const FINISH_HOLD_MS = 550
+
 type Options = {
   /** Called when signup creates an immediate session (autoconfirm on). */
   onSignedIn?: () => void
@@ -22,7 +25,7 @@ export function useSignUpForm(options: Options = {}) {
   const { showToast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = options.redirectTo || searchParams?.get('redirect') || '/account'
+  const redirectTo = options.redirectTo || searchParams?.get('redirect') || '/'
 
   const [screen, setScreen] = useState<'form' | 'verify-sent'>('form')
   const [name, setName] = useState('')
@@ -63,6 +66,8 @@ export function useSignUpForm(options: Options = {}) {
         setSetupPhase('syncing')
         await waitForGuestMerge()
         setSetupPhase('finishing')
+        await new Promise((resolve) => setTimeout(resolve, FINISH_HOLD_MS))
+        setSetupPhase('idle')
         showToast('Account created! Check your email to verify your address.', 'success', undefined, 8000)
         options.onSignedIn?.()
         if (!options.onSignedIn) router.push(redirectTo)
@@ -72,7 +77,7 @@ export function useSignUpForm(options: Options = {}) {
       setScreen('verify-sent')
     } finally {
       setSubmitting(false)
-      setSetupPhase((prev) => (prev === 'finishing' ? 'finishing' : 'idle'))
+      setSetupPhase('idle')
     }
   }
 

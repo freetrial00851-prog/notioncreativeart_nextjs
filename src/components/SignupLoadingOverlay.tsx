@@ -39,6 +39,7 @@ type StepStatus = 'done' | 'active' | 'pending'
 function stepStatus(stepIdx: number, phase: SignupSetupPhase): StepStatus {
   const current = phaseIndex(phase)
   if (current < 0) return 'pending'
+  if (phase === 'finishing') return 'done'
   if (stepIdx < current) return 'done'
   if (stepIdx === current) return 'active'
   return 'pending'
@@ -190,15 +191,6 @@ export function SignupLoadingOverlay({ phase }: { phase: SignupSetupPhase }) {
                 className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out"
                 style={{ width: `${percent}%`, background: BRAND }}
               />
-              <div
-                className="absolute top-1/2 -translate-y-1/2 h-5 w-5 rounded-full border-2 border-white shadow-sm transition-[left] duration-500 ease-out flex items-center justify-center"
-                style={{
-                  left: `calc(${percent}% - 10px)`,
-                  background: BRAND,
-                }}
-              >
-                <span className="h-2.5 w-2.5 rounded-full border border-white/40 border-t-white animate-spin motion-reduce:animate-none" />
-              </div>
             </div>
             <span className="text-[13px] sm:text-[14px] font-semibold tabular-nums shrink-0 min-w-[2.5rem] text-right" style={{ color: BRAND }}>
               {percent}%
