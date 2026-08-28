@@ -3,28 +3,28 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
 import { hasBeenNewsletterPrompted } from '../lib/newsletterPrompt'
+import type { CheckoutPhase, DownloadPhase, LoadingOverlayState } from '../lib/checkoutLoading'
 
 type RequireAuthAction = { type: 'buy' | 'wishlist' | 'cart'; productId: string }
 type AuthSheetView = 'login' | 'signup'
-export type BusyOverlayKind = 'checkout' | 'download'
 
 type UIContextValue = {
-  requireAuth: (action?: RequireAuthAction) => boolean // returns true if already authed
+  requireAuth: (action?: RequireAuthAction) => boolean
   openAuthModal: () => void
-  // Auth overlay (mobile sheet / desktop-tablet modal)
   authSheetOpen: boolean
   authSheetView: AuthSheetView
   openAuthSheet: (view?: AuthSheetView) => void
   closeAuthSheet: () => void
   setAuthSheetView: (view: AuthSheetView) => void
-  // Newsletter prompt after free download
   newsletterPromptOpen: boolean
   maybeOpenNewsletterPrompt: () => void
   closeNewsletterPrompt: () => void
-  /** Full-screen blur spinner for Buy Now / Download Free (cart uses CartContext.checkingOut). */
-  busyOverlay: BusyOverlayKind | null
-  showBusyOverlay: (kind: BusyOverlayKind) => void
-  hideBusyOverlay: () => void
+  loadingOverlay: LoadingOverlayState
+  beginCheckoutLoading: (opts: { source: 'cart' | 'buy'; phase?: CheckoutPhase }) => void
+  setCheckoutPhase: (phase: CheckoutPhase) => void
+  beginDownloadLoading: () => void
+  setDownloadPhase: (phase: DownloadPhase) => void
+  endLoadingOverlay: () => void
 }
 
 const UIContext = createContext<UIContextValue | null>(null)
@@ -34,15 +34,13 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [authSheetOpen, setAuthSheetOpen] = useState(false)
   const [authSheetView, setAuthSheetView] = useState<AuthSheetView>('login')
   const [newsletterPromptOpen, setNewsletterPromptOpen] = useState(false)
-  const [busyOverlay, setBusyOverlay] = useState<BusyOverlayKind | null>(null)
+  const [loadingOverlay, setLoadingOverlay] = useState<LoadingOverlayState>(null)
 
   const openAuthSheet = (view: AuthSheetView = 'login') => {
     setAuthSheetView(view)
     setAuthSheetOpen(true)
   }
   const closeAuthSheet = () => setAuthSheetOpen(false)
-
-  /** Opens auth overlay on the current page — sheet on mobile, modal on ≥768. */
   const goToLogin = () => openAuthSheet('login')
 
   const requireAuth = (action?: RequireAuthAction) => {
@@ -59,8 +57,27 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
   const closeNewsletterPrompt = useCallback(() => setNewsletterPromptOpen(false), [])
 
-  const showBusyOverlay = useCallback((kind: BusyOverlayKind) => setBusyOverlay(kind), [])
-  const hideBusyOverlay = useCallback(() => setBusyOverlay(null), [])
+  const beginCheckoutLoading = useCallback((opts: { source: 'cart' | 'buy'; phase?: CheckoutPhase }) => {
+    setLoadingOverlay({
+      kind: 'checkout',
+      source: opts.source,
+      phase: opts.phase ?? (opts.source === 'cart' ? 'validating' : 'preparing'),
+    })
+  }, [])
+
+  const setCheckoutPhase = useCallback((phase: CheckoutPhase) => {
+    setLoadingOverlay((prev) => (prev?.kind === 'checkout' ? { ...prev, phase } : prev))
+  }, [])
+
+  const beginDownloadLoading = useCallback(() => {
+    setLoadingOverlay({ kind: 'download', phase: 'preparing' })
+  }, [])
+
+  const setDownloadPhase = useCallback((phase: DownloadPhase) => {
+    setLoadingOverlay((prev) => (prev?.kind === 'download' ? { ...prev, phase } : prev))
+  }, [])
+
+  const endLoadingOverlay = useCallback(() => setLoadingOverlay(null), [])
 
   return (
     <UIContext.Provider
@@ -75,9 +92,12 @@ export function UIProvider({ children }: { children: ReactNode }) {
         newsletterPromptOpen,
         maybeOpenNewsletterPrompt,
         closeNewsletterPrompt,
-        busyOverlay,
-        showBusyOverlay,
-        hideBusyOverlay,
+        loadingOverlay,
+        beginCheckoutLoading,
+        setCheckoutPhase,
+        beginDownloadLoading,
+        setDownloadPhase,
+        endLoadingOverlay,
       }}
     >
       {children}
