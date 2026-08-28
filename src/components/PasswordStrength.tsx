@@ -1,20 +1,28 @@
 import { MaterialIcon } from './MaterialIcon'
 
-export const PASSWORD_RULES = [
+/** Must pass before signup / password reset can submit. */
+export const PASSWORD_REQUIRED_RULES = [
   { key: 'length', label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
+  { key: 'number', label: '1 number', test: (p: string) => /\d/.test(p) },
+] as const
+
+/** Shown in the strength meter only — not required to submit. */
+export const PASSWORD_BONUS_RULES = [
   { key: 'upper', label: '1 uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
   { key: 'lower', label: '1 lowercase letter', test: (p: string) => /[a-z]/.test(p) },
   { key: 'special', label: '1 special character', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
 ] as const
 
+export const PASSWORD_RULES = [...PASSWORD_REQUIRED_RULES, ...PASSWORD_BONUS_RULES]
+
 export function isPasswordValid(password: string) {
-  return PASSWORD_RULES.every((rule) => rule.test(password))
+  return PASSWORD_REQUIRED_RULES.every((rule) => rule.test(password))
 }
 
 function getStrength(password: string) {
   const metCount = PASSWORD_RULES.filter((rule) => rule.test(password)).length
-  if (metCount <= 1) return { level: 'weak', label: 'Weak', color: 'var(--color-madder)', width: '33%' } as const
-  if (metCount <= 3) return { level: 'medium', label: 'Medium', color: '#D97706', width: '66%' } as const
+  if (metCount <= 2) return { level: 'weak', label: 'Weak', color: 'var(--color-madder)', width: '33%' } as const
+  if (metCount <= 4) return { level: 'medium', label: 'Medium', color: '#D97706', width: '66%' } as const
   return { level: 'strong', label: 'Strong', color: 'var(--color-sale-green)', width: '100%' } as const
 }
 
@@ -33,8 +41,20 @@ export function PasswordStrength({ password }: { password: string }) {
         </div>
         <span className="text-[11px] font-semibold shrink-0" style={{ color: strength.color }}>{strength.label}</span>
       </div>
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-1 mb-1.5">
+        {PASSWORD_REQUIRED_RULES.map((rule) => {
+          const met = rule.test(password)
+          return (
+            <li key={rule.key} className="flex items-center gap-1.5 text-[11px]" style={{ color: met ? 'var(--color-sale-green)' : 'var(--color-ink-soft)' }}>
+              <MaterialIcon name={met ? 'check_circle' : 'radio_button_unchecked'} size={13} />
+              {rule.label}
+            </li>
+          )
+        })}
+      </ul>
+      <p className="text-[10px] text-ink-soft/80 mb-1">Optional (improves strength)</p>
       <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
-        {PASSWORD_RULES.map((rule) => {
+        {PASSWORD_BONUS_RULES.map((rule) => {
           const met = rule.test(password)
           return (
             <li key={rule.key} className="flex items-center gap-1.5 text-[11px]" style={{ color: met ? 'var(--color-sale-green)' : 'var(--color-ink-soft)' }}>

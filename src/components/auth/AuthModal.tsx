@@ -7,6 +7,7 @@ import { checkAuthRateLimit } from '../../lib/authRateLimit'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../context/ToastContext'
 import { MaterialIcon } from '../MaterialIcon'
+import { isPasswordValid } from '../PasswordStrength'
 
 type Props = {
   open: boolean
@@ -90,6 +91,7 @@ export function AuthModal({ open, onClose }: Props) {
     e.preventDefault()
     setError(null)
     if (password !== confirmPassword) return setError('Passwords do not match.')
+    if (!isPasswordValid(password)) return setError('Password must be at least 8 characters and include at least one number.')
     if (!agreed) return setError('Please agree to the Terms & Privacy Policy.')
     setSubmitting(true)
     const { error } = await signUpWithEmail({ name: name.trim(), email, password })

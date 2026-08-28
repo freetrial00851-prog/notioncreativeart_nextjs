@@ -33,7 +33,7 @@ const router = useRouter()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    if (!passwordValid) { setError('Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a special character.'); return }
+    if (!passwordValid) { setError('Password must be at least 8 characters and include at least one number.'); return }
     if (password !== confirmPassword) { setError("Passwords don't match."); return }
     setSubmitting(true)
     const { error: err } = await supabase.auth.updateUser({ password })

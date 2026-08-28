@@ -44,7 +44,7 @@ export function useSignUpForm(options: Options = {}) {
   const fieldErrors = {
     name: name.trim() === '' ? 'Name is required.' : null,
     email: email.trim() === '' ? 'Email address is required.' : (!emailFormatValid ? 'Enter a valid email address.' : null),
-    password: !passwordValid ? 'Password doesn\u2019t meet the requirements above.' : null,
+    password: !passwordValid ? 'Password must be at least 8 characters and include at least one number.' : null,
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
