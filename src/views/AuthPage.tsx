@@ -109,7 +109,7 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen flex relative">
-      <SignupLoadingOverlay active={view === 'signup' && signup.submitting} />
+      <SignupLoadingOverlay phase={signup.setupPhase} />
       <AuthCloseButton fallbackTo={closeFallback} />
       <AuthBrandPanel />
       <div className="flex-1 flex items-center justify-center px-6 py-16">

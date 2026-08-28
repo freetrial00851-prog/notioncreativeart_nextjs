@@ -256,7 +256,7 @@ function AuthSheetInner() {
 
   return (
     <>
-      <SignupLoadingOverlay active={signup.submitting} />
+      <SignupLoadingOverlay phase={signup.setupPhase} />
       {/* ── Mobile <768: bottom sheet ── */}
       <div className="md:hidden">
         <div

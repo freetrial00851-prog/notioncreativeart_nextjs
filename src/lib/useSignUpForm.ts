@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { isPasswordValid } from '../components/PasswordStrength'
 import { waitForGuestMerge } from './guestStorage'
+import type { SignupSetupPhase } from '../components/SignupLoadingOverlay'
 
 type Options = {
   /** Called when signup creates an immediate session (autoconfirm on). */
@@ -30,6 +31,7 @@ export function useSignUpForm(options: Options = {}) {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [setupPhase, setSetupPhase] = useState<SignupSetupPhase>('idle')
   const [attempted, setAttempted] = useState(false)
   const [emailTaken, setEmailTaken] = useState(false)
 
@@ -48,6 +50,7 @@ export function useSignUpForm(options: Options = {}) {
     setError(null)
     if (Object.values(fieldErrors).some(Boolean)) return
     setSubmitting(true)
+    setSetupPhase('creating')
     try {
       const { error, duplicateEmail, session } = await signUpWithEmail({
         name: name.trim(),
@@ -57,7 +60,9 @@ export function useSignUpForm(options: Options = {}) {
       if (duplicateEmail) { setEmailTaken(true); return }
       if (error) { setError(error); return }
       if (session) {
+        setSetupPhase('syncing')
         await waitForGuestMerge()
+        setSetupPhase('finishing')
         showToast('Account created! Check your email to verify your address.', 'success', undefined, 8000)
         options.onSignedIn?.()
         if (!options.onSignedIn) router.push(redirectTo)
@@ -67,6 +72,7 @@ export function useSignUpForm(options: Options = {}) {
       setScreen('verify-sent')
     } finally {
       setSubmitting(false)
+      setSetupPhase((prev) => (prev === 'finishing' ? 'finishing' : 'idle'))
     }
   }
 
@@ -81,7 +87,7 @@ export function useSignUpForm(options: Options = {}) {
     email, setEmail,
     password, setPassword,
     showPassword, setShowPassword,
-    error, submitting,
+    error, submitting, setupPhase,
     attempted, emailTaken, setEmailTaken,
     fieldErrors,
     handleSignUp,
