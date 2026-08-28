@@ -44,6 +44,8 @@ const ORDER = [
   'newsletter-close-direct-insert.sql',
   'catchup-migration.sql',
   'products-bundle-fields.sql',
+  'products-pdf-filename.sql',
+  'abandoned-cart-reminder.sql',
   'grants-api-access.sql',
   'seed-initial-data.sql',
 ]

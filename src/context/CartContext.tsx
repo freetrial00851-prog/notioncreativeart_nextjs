@@ -186,7 +186,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    await supabase.from('cart_items').upsert({ user_id: user.id, product_id: productId })
+    await supabase.from('cart_items').upsert(
+      { user_id: user.id, product_id: productId, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,product_id' },
+    )
     await loadAccount()
     setJustAdded(true)
     setDrawerOpen(true)

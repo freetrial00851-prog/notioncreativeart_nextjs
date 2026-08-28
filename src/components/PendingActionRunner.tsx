@@ -36,7 +36,10 @@ export function PendingActionRunner() {
           hideBusyOverlay()
           if (result.ok) maybeOpenNewsletterPrompt()
         } else if (product) {
-          await supabase.from('cart_items').upsert({ user_id: user.id, product_id: pendingAction.productId })
+          await supabase.from('cart_items').upsert(
+            { user_id: user.id, product_id: pendingAction.productId, updated_at: new Date().toISOString() },
+            { onConflict: 'user_id,product_id' },
+          )
         }
       }
 

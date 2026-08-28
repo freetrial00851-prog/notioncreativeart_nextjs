@@ -60,6 +60,7 @@ npx supabase functions deploy subscribe-newsletter --project-ref anlsellghialszu
 npx supabase functions deploy download-order-receipt --project-ref anlsellghialszuuvipw
 npx supabase functions deploy chat-support --project-ref anlsellghialszuuvipw
 npx supabase functions deploy chat-escalate --project-ref anlsellghialszuuvipw
+npx supabase functions deploy abandoned-cart-reminder --project-ref anlsellghialszuuvipw --no-verify-jwt
 ```
 
 Callback URL for Lemon Squeezy → Settings → Webhooks (Test mode):
@@ -94,3 +95,46 @@ npx supabase secrets set RESEND_API_KEY=your_resend_api_key --project-ref anlsel
 ```
 
 Get a free key at https://resend.com. Order confirmation emails send from `orders@notioncreativeart.com` (verified domain). Escalations still use `chat-escalate` (`from` there may differ until updated).
+
+### `abandoned-cart-reminder` (scheduled)
+
+Sends a branded abandoned-cart email to **logged-in users** with paid items left in `cart_items` for 24+ hours. At most one reminder per user per 7 days. Guest/localStorage carts are excluded.
+
+**1. Run SQL migration** (required — not applied automatically):
+
+```bash
+# Paste supabase/abandoned-cart-reminder.sql in SQL Editor → Run
+# https://supabase.com/dashboard/project/anlsellghialszuuvipw/sql/new
+```
+
+**2. Deploy the function:**
+
+```bash
+npx supabase functions deploy abandoned-cart-reminder --project-ref anlsellghialszuuvipw --no-verify-jwt
+npx supabase secrets set CRON_SECRET=your_long_random_secret --project-ref anlsellghialszuuvipw
+```
+
+`RESEND_API_KEY` is already required for `lemon-webhook` — no new email secret needed.
+
+**3. Schedule (pick one):**
+
+- **pg_cron** (recommended on Supabase Pro): see commented block at the bottom of `abandoned-cart-reminder.sql` — enable `pg_cron` + `pg_net`, then schedule an hourly `net.http_post` to the function URL with `Authorization: Bearer YOUR_CRON_SECRET`.
+- **External cron** (e.g. cron-job.org, GitHub Actions): `POST` the function URL hourly with the same bearer token.
+
+**Manual / dry-run test** (no emails sent):
+
+```bash
+curl -X POST "https://anlsellghialszuuvipw.supabase.co/functions/v1/abandoned-cart-reminder?dryRun=1" \
+  -H "Authorization: Bearer YOUR_CRON_SECRET"
+```
+
+**SQL test** (simulate 25h abandonment for a test user):
+
+```sql
+update public.cart_items
+set updated_at = now() - interval '25 hours'
+where user_id = 'YOUR_USER_UUID';
+
+select * from public.get_abandoned_cart_candidates();
+-- Should return the test user. Reset with: update cart_items set updated_at = now() where user_id = '...';
+```

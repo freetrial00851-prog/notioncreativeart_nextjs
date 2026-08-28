@@ -74,8 +74,11 @@ export function GuestMergeRunner() {
             const rows = paidIds.map((product_id) => ({
               user_id: user.id,
               product_id,
+              updated_at: new Date().toISOString(),
             }))
-            const { error } = await supabase.from('cart_items').upsert(rows)
+            const { error } = await supabase.from('cart_items').upsert(rows, {
+              onConflict: 'user_id,product_id',
+            })
             if (error) throw new Error(`cart merge: ${error.message}`)
           }
           if (cancelled) return
