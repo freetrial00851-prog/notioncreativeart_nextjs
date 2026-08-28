@@ -294,7 +294,7 @@ export function Home({
       <>
           <div>
             <p className="text-[11px] font-semibold tracking-[0.2em] mb-4" style={{ color: 'var(--color-accent)' }}>{hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}</p>
-            <h1 className="font-heading font-semibold text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5">
+            <h1 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5">
               <span className="block text-ink">Beautiful Patterns.</span>
               <span className="block" style={{ color: 'var(--color-accent)' }}>Made for You.</span>
             </h1>
