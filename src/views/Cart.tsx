@@ -33,7 +33,7 @@ export function Cart() {
       <div className="max-w-site w-full mx-auto px-6 py-32 text-center">
         <p className="font-subheading text-2xl mb-4">Your cart is empty.</p>
         {!user && (
-          <p className="text-[12px] text-ink-soft mb-6 max-w-sm mx-auto leading-relaxed">
+          <p className="text-[13px] text-ink-soft mb-6 max-w-sm mx-auto leading-relaxed">
             Cart items are saved for 7 days. Sign in to save them permanently.
           </p>
         )}
@@ -56,7 +56,7 @@ export function Cart() {
           <h1 className="font-display font-semibold text-3xl md:text-4xl mb-2">Cart ({items.length})</h1>
           <p className="text-[13px] text-ink-soft">Your selected crochet patterns, ready for checkout.</p>
           {!user && (
-            <p className="text-[12px] text-ink-soft mt-3 leading-relaxed">
+            <p className="text-[13px] text-ink-soft mt-3 leading-relaxed">
               Cart items are saved for 7 days. Sign in to save them permanently.
             </p>
           )}
@@ -139,10 +139,10 @@ export function Cart() {
             onClick={handleCheckout}
             disabled={checkingOut}
             aria-busy={checkingOut}
-            className="w-full py-4 flex items-center justify-center gap-2 text-white text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
+            className="w-full py-4 flex items-center justify-center gap-2 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
             style={{ background: 'var(--color-sale-green)' }}
           >
-            <CartIcon size={14} /> CHECKOUT — ${total.toFixed(2)}
+            <CartIcon size={14} /> Checkout — ${total.toFixed(2)}
           </button>
 
           {!user && (

@@ -499,7 +499,7 @@ export function Header() {
           style={{ top: browsePanelTop, maxHeight: `min(78vh, calc(100vh - ${browsePanelTop}px))` }}
         >
           <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
-            <h2 className="text-[17px] font-extrabold text-black tracking-[-0.02em] leading-none">
+            <h2 className="text-[17px] font-semibold text-black tracking-[-0.02em] leading-none">
               Browse Categories
             </h2>
             <button
@@ -515,7 +515,7 @@ export function Header() {
             <Link
               href="/shop/new"
               onClick={closeMobileBrowse}
-              className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+              className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
             >
               New Arrivals
             </Link>
@@ -529,7 +529,7 @@ export function Header() {
                     <Link
                       href={c.link}
                       onClick={closeMobileBrowse}
-                      className="flex-1 px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug"
+                      className="flex-1 px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug"
                     >
                       {c.name}
                     </Link>
@@ -565,7 +565,7 @@ export function Header() {
                             key={sub.id}
                             href={`/shop/${sub.slug}`}
                             onClick={closeMobileBrowse}
-                            className="block px-8 py-2.5 text-[15px] font-bold text-black tracking-[-0.015em]"
+                            className="block px-8 py-2.5 text-[15px] font-semibold text-black tracking-[-0.015em]"
                           >
                             {sub.name}
                           </Link>
@@ -576,13 +576,13 @@ export function Header() {
                 </div>
               )
             })}
-            <Link href="/shop" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+            <Link href="/shop" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
               All Patterns
             </Link>
-            <Link href="/shop?price=free" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+            <Link href="/shop?price=free" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
               Free Patterns
             </Link>
-            <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-extrabold text-black tracking-[-0.02em] leading-snug">
+            <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug">
               Sale
             </Link>
           </nav>

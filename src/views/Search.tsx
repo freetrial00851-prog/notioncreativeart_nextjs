@@ -74,7 +74,7 @@ export function Search() {
             icon="search_off"
             title={`No patterns found for "${q}"`}
             subtitle="Try different keywords or browse our categories."
-            actionLabel="BROWSE CATEGORIES"
+            actionLabel="Browse categories"
             actionTo="/shop"
             afterAction={(
               <button
@@ -82,7 +82,7 @@ export function Search() {
                 onClick={() => router.push('/search')}
                 className="px-6 py-3 rounded-lg border border-line text-[13px] font-semibold hover:bg-surface transition-colors"
               >
-                CLEAR SEARCH
+                Clear search
               </button>
             )}
           />
@@ -90,7 +90,7 @@ export function Search() {
       )}
 
       {!q && (
-        <p className="text-ink-soft text-sm">Type above to find patterns by name or description.</p>
+        <p className="text-ink-soft text-[13px]">Type above to find patterns by name or description.</p>
       )}
 
       {loading && q ? (

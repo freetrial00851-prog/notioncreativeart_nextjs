@@ -83,7 +83,7 @@ function DescriptionBlocks({ text }: { text: string }) {
           return <p key={i} className="flex items-start gap-2 text-[14px] text-ink-soft leading-relaxed"><span className="mt-0.5"><CheckIcon /></span><span>{b.content}</span></p>
         }
         if (b.type === 'warning') {
-          return <p key={i} className="text-[12px] text-ink-soft italic mt-5 pt-4 border-t border-line">⚠ {b.content}</p>
+          return <p key={i} className="text-[14px] text-ink-soft italic leading-relaxed mt-5 pt-4 border-t border-line">⚠ {b.content}</p>
         }
         return <p key={i} className="text-[14px] text-ink-soft leading-relaxed mb-3">{b.content}</p>
       })}
@@ -270,7 +270,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
       {unavailable ? (
         <>
           <p className="font-subheading text-2xl mb-3">This pattern is no longer available.</p>
-          <p className="text-ink-soft text-[13px] mb-6 max-w-sm mx-auto">The maker has taken this listing down. If you already own it, it's still in your account under Downloads.</p>
+          <p className="text-ink-soft text-[14px] leading-relaxed mb-6 max-w-sm mx-auto">The maker has taken this listing down. If you already own it, it's still in your account under Downloads.</p>
         </>
       ) : (
         <p className="font-subheading text-2xl mb-4">Pattern not found.</p>
@@ -404,7 +404,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
             <DescriptionBlocks text={product.description} />
           </div>
         ) : (
-          <p className="text-[13px] text-ink-soft">No description yet.</p>
+          <p className="text-[14px] text-ink-soft leading-relaxed">No description yet.</p>
         )
       )
     }
@@ -432,7 +432,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
             {product.materials.split('\n').filter(Boolean).map((line, i) => <li key={i}>{line}</li>)}
           </ul>
         ) : (
-          <p className="text-[13px] text-ink-soft">No materials list added for this pattern yet.</p>
+          <p className="text-[14px] text-ink-soft leading-relaxed">No materials list added for this pattern yet.</p>
         )
       )
     }
@@ -446,7 +446,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 {product.skill_level === 'beginner' ? ' — clear steps and photos so you can follow along with confidence.' : '.'}
               </p>
               {purchaseCount >= 3 && (
-                <p className="text-[13px]">{purchaseCount}+ makers have already downloaded this pattern.</p>
+                <p className="text-[14px] leading-relaxed">{purchaseCount}+ makers have already downloaded this pattern.</p>
               )}
             </>
           ) : (
@@ -741,18 +741,18 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 isInCart(product.id) ? (
                   <Link
                     href="/cart"
-                    className="block text-center w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity"
+                    className="block text-center w-full py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity"
                     style={{ background: 'var(--color-accent)' }}
                   >
-                    ✓ IN CART — GO TO CART
+                    ✓ In cart — go to cart
                   </Link>
                 ) : (
                   <button
                     onClick={toggleCart}
-                    className="w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    className="w-full py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                     style={{ background: 'var(--color-accent)' }}
                   >
-                    <MaterialIcon name="shopping_bag" size={15} /> ADD TO CART
+                    <MaterialIcon name="shopping_bag" size={15} /> Add to Cart
                   </button>
                 )
               )}
@@ -760,13 +760,13 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 onClick={handleBuy}
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
                 className={product.price === 0
-                  ? 'w-full py-3 text-canvas text-[12px] tracking-[0.15em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
-                  : 'w-full py-3 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
+                  ? 'w-full py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
+                  : 'w-full py-3 border border-ink text-[13px] font-semibold hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
                 style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
               >
                 {product.price === 0
-                  ? 'DOWNLOAD FREE'
-                  : 'BUY NOW'}
+                  ? 'Download free'
+                  : 'Buy now'}
               </button>
               <button
                 onClick={toggleWishlist}
@@ -901,10 +901,10 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           <button
             onClick={handleBuy}
             disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-            className="flex-1 py-3 text-canvas text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+            className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
             style={{ background: 'var(--color-sale-green)' }}
           >
-            {product.price === 0 ? 'DOWNLOAD FREE' : 'BUY NOW'}
+            {product.price === 0 ? 'Download free' : 'Buy now'}
           </button>
         </div>
       )}

@@ -98,10 +98,10 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full px-6 py-3 rounded-lg text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity disabled:opacity-60"
+                className="w-full px-6 py-3 rounded-lg text-[13px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
                 style={{ background: 'var(--color-accent)', color: 'white' }}
               >
-                {submitting ? 'SUBSCRIBING…' : 'SUBSCRIBE'}
+                {submitting ? 'Subscribing…' : 'Subscribe'}
               </button>
               {error && <p className="text-[11px] text-red-600">{error}</p>}
             </form>

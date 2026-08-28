@@ -410,7 +410,7 @@ function ProfileTab() {
 
   return (
     <div>
-      <div className="flex gap-6 border-b border-line mb-8 text-[12px] tracking-[0.08em] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex gap-6 border-b border-line mb-8 text-[13px] tracking-[0.08em] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {([
           { key: 'profile' as const, label: 'Profile Information' },
           { key: 'password' as const, label: 'Password' },
@@ -436,12 +436,12 @@ function ProfileTab() {
             </div>
             <div>
               <p className="font-medium text-[15px]">{profileDisplayName(profile, 'Your Account')}</p>
-              <p className="text-[12px] text-ink-soft">{user?.email}</p>
+              <p className="text-[13px] text-ink-soft">{user?.email}</p>
             </div>
           </div>
           <label className="block">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="block text-ink-soft text-[11px] tracking-[0.1em]">NAME</span>
+              <span className="block text-ink-soft text-[13px]">NAME</span>
               {!editingName && (
                 <button onClick={startEditingName} className="text-[11px] tracking-[0.08em] underline underline-offset-2 hover:opacity-70" style={{ color: BRAND }}>
                   EDIT YOUR NAME
@@ -461,19 +461,19 @@ function ProfileTab() {
               <button
                 onClick={saveName}
                 disabled={nameSaving}
-                className="px-5 py-2 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="px-5 py-2 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 style={{ background: BRAND }}
               >
-                {nameSaving ? 'SAVING…' : 'SAVE NAME'}
+                {nameSaving ? 'Saving…' : 'Save name'}
               </button>
-              <button onClick={cancelEditingName} className="text-[11px] tracking-[0.1em] text-ink-soft hover:text-ink">CANCEL</button>
+              <button onClick={cancelEditingName} className="text-[13px] text-ink-soft hover:text-ink">Cancel</button>
             </div>
           )}
           {!editingName && nameEditLocked && (
             <p className="text-[11px] text-ink-soft">You can change your name again in {nameCooldownDaysLeft} day{nameCooldownDaysLeft === 1 ? '' : 's'}.</p>
           )}
           <div>
-            <p className="text-ink-soft text-[11px] tracking-[0.1em] mb-1">EMAIL</p>
+            <p className="text-ink-soft text-[13px] mb-1">EMAIL</p>
             <p>{user?.email}</p>
             <p className="text-ink-soft text-[11px] mt-1">Contact support to change your email address.</p>
           </div>
@@ -483,7 +483,7 @@ function ProfileTab() {
       {settingsTab === 'password' && (
         <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 max-w-sm space-y-5 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <label className="block">
-            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CURRENT PASSWORD</span>
+            <span className="block text-ink-soft text-[13px] mb-1.5">CURRENT PASSWORD</span>
             <input
               type="password"
               value={oldPassword}
@@ -492,7 +492,7 @@ function ProfileTab() {
             />
           </label>
           <label className="block">
-            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">NEW PASSWORD</span>
+            <span className="block text-ink-soft text-[13px] mb-1.5">NEW PASSWORD</span>
             <input
               type="password"
               value={newPassword}
@@ -501,7 +501,7 @@ function ProfileTab() {
             />
           </label>
           <label className="block">
-            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CONFIRM NEW PASSWORD</span>
+            <span className="block text-ink-soft text-[13px] mb-1.5">CONFIRM NEW PASSWORD</span>
             <input
               type="password"
               value={confirmPassword}
@@ -512,12 +512,12 @@ function ProfileTab() {
           <button
             onClick={changePassword}
             disabled={pwSaving}
-            className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: BRAND }}
           >
-            {pwSaving ? 'UPDATING…' : 'UPDATE PASSWORD'}
+            {pwSaving ? 'Updating…' : 'Update password'}
           </button>
-          {pwMessage && <p className="text-[12px] text-ink-soft">{pwMessage}</p>}
+          {pwMessage && <p className="text-[13px] text-ink-soft">{pwMessage}</p>}
           <p className="text-[11px] text-ink-soft">If you signed up with Google, password changes aren&apos;t available here.</p>
         </div>
       )}
@@ -608,7 +608,7 @@ function AddressesPage() {
         <div className="bg-white border border-line rounded-2xl p-5 sm:p-6 space-y-4 text-[13px] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <p className="text-[13px] text-ink-soft">Saved here fills in automatically at checkout.</p>
           <label className="block">
-            <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">COUNTRY</span>
+            <span className="block text-ink-soft text-[13px] mb-1.5">COUNTRY</span>
             <select
               value={billingCountry}
               onChange={(e) => { setBillingCountry(e.target.value); setSaved(false); setTouched(false) }}
@@ -621,11 +621,11 @@ function AddressesPage() {
           {isUS ? (
             <>
               <label className="block">
-                <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">ADDRESS LINE 1</span>
+                <span className="block text-ink-soft text-[13px] mb-1.5">ADDRESS LINE 1</span>
                 <input value={billingAddressLine1} onChange={(e) => { setBillingAddressLine1(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
               </label>
               <label className="block">
-                <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">STATE</span>
+                <span className="block text-ink-soft text-[13px] mb-1.5">STATE</span>
                 <select value={billingState} onChange={(e) => { setBillingState(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg">
                   <option value="">Select a state…</option>
                   {US_STATES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
@@ -633,28 +633,28 @@ function AddressesPage() {
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">CITY</span>
+                  <span className="block text-ink-soft text-[13px] mb-1.5">CITY</span>
                   <input value={billingCity} onChange={(e) => { setBillingCity(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
                 </label>
                 <label className="block">
-                  <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">ZIP</span>
+                  <span className="block text-ink-soft text-[13px] mb-1.5">ZIP</span>
                   <input value={billingZip} onChange={(e) => { setBillingZip(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
                 </label>
               </div>
             </>
           ) : billingCountry ? (
             <label className="block">
-              <span className="block text-ink-soft text-[11px] tracking-[0.1em] mb-1.5">POSTAL CODE</span>
+              <span className="block text-ink-soft text-[13px] mb-1.5">POSTAL CODE</span>
               <input value={billingZip} onChange={(e) => { setBillingZip(e.target.value); setSaved(false) }} className="w-full border border-line px-3 py-2.5 text-[13px] bg-canvas focus:outline-none focus:border-ink rounded-lg" />
               {touched && !zipValid && <span className="text-[11px] text-madder mt-1 block">Enter a valid postal code.</span>}
             </label>
           ) : null}
           <div className="flex items-center gap-3 pt-2">
-            <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
-              {saving ? 'SAVING…' : 'SAVE ADDRESS'}
+            <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
+              {saving ? 'Saving…' : 'Save address'}
             </button>
-            {hasAddress && <button onClick={() => setEditing(false)} className="text-[11px] text-ink-soft hover:text-ink">CANCEL</button>}
-            {saved && <span className="text-[12px] text-ink-soft">Saved.</span>}
+            {hasAddress && <button onClick={() => setEditing(false)} className="text-[13px] text-ink-soft hover:text-ink">Cancel</button>}
+            {saved && <span className="text-[13px] text-ink-soft">Saved.</span>}
           </div>
         </div>
       )}
@@ -698,10 +698,10 @@ function NewsletterPrefs() {
       <button
         onClick={save}
         disabled={saving || !subscribed}
-        className="px-6 py-2.5 text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-90 disabled:opacity-50"
+        className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
         style={{ background: BRAND }}
       >
-        {saving ? 'SAVING…' : 'SAVE PREFERENCES'}
+        {saving ? 'Saving…' : 'Save preferences'}
       </button>
     </div>
   )
@@ -718,10 +718,10 @@ function LogoutConfirm() {
       <p className="text-[14px] text-ink-soft mb-8">Are you sure you want to sign out of your Notion Creative Art account?</p>
       <button
         onClick={signOut}
-        className="w-full py-3.5 text-canvas text-[12px] tracking-[0.12em] font-semibold rounded-lg hover:opacity-90 mb-3"
+        className="w-full py-3.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 mb-3"
         style={{ background: BRAND }}
       >
-        LOG OUT
+        Log out
       </button>
       <Link href="/account/orders" className="text-[12px] text-ink-soft hover:text-ink underline underline-offset-2">
         Cancel - stay signed in

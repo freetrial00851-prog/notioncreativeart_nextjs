@@ -298,7 +298,7 @@ export function Home({
               <span className="block text-ink">Beautiful Patterns.</span>
               <span className="block" style={{ color: 'var(--color-accent)' }}>Made for You.</span>
             </h1>
-            <p className="text-[15px] text-ink-soft leading-relaxed mb-7 max-w-md">
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-7 max-w-md">
               Instantly download easy-to-follow crochet patterns designed with love for makers around the world.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
@@ -445,7 +445,7 @@ export function Home({
                 </div>
                 <div className="p-6">
                   <h3 className="font-display font-semibold text-xl mb-2">{c.title}</h3>
-                  <p className="text-[13px] text-ink-soft leading-relaxed mb-4">{c.copy}</p>
+                  <p className="text-[14px] text-ink-soft leading-relaxed mb-4">{c.copy}</p>
                   <span className="text-[12px] font-semibold" style={{ color: badgeColor }}>Explore →</span>
                 </div>
               </Link>
@@ -466,7 +466,7 @@ export function Home({
         <button
           type="button"
           onClick={retryFeaturedCatalog}
-          className="inline-block px-7 py-3 rounded-lg border text-[12px] font-semibold tracking-[0.06em] transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+          className="inline-block px-7 py-3 rounded-lg border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
         >
           Try again
         </button>
@@ -482,9 +482,9 @@ export function Home({
         <div className="text-center mt-10">
           <Link
             href="/shop/bestsellers"
-            className="inline-block px-7 py-3 rounded-lg border text-[12px] font-semibold tracking-[0.06em] transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+            className="inline-block px-7 py-3 rounded-lg border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
           >
-            VIEW ALL
+            View all
           </Link>
         </div>
       </div>
@@ -510,9 +510,9 @@ export function Home({
         <div className="text-center mt-10">
           <Link
             href="/shop/new"
-            className="inline-block px-7 py-3 rounded-lg border text-[12px] font-semibold tracking-[0.06em] transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+            className="inline-block px-7 py-3 rounded-lg border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
           >
-            VIEW ALL
+            View all
           </Link>
         </div>
       </div>
@@ -569,10 +569,10 @@ export function Home({
           {layout.find((s) => s.id === 'bundles')?.visible && bundles.length > 0 && (
             <div className="lg:w-[300px] shrink-0 rounded-xl p-6" style={{ background: 'var(--color-accent-soft)' }}>
               <p className="font-display font-semibold text-lg mb-1.5">Pattern Bundles</p>
-              <p className="text-[12px] text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
+              <p className="text-[14px] text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
               <Link
                 href="/shop?bundle=1"
-                className="inline-block px-4 py-2 rounded-lg text-white text-[11px] font-semibold hover:opacity-90 transition-opacity mb-4"
+                className="inline-block px-4 py-2 rounded-lg text-white text-[13px] font-semibold hover:opacity-90 transition-opacity mb-4"
                 style={{ background: 'var(--color-accent)' }}
               >
                 Shop Bundles →
@@ -615,13 +615,13 @@ export function Home({
           <div>
             <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FREE PATTERNS</p>
             <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2">Start With Free</h2>
-            <p className="text-[13px] text-ink-soft mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
             <Link
               href="/shop?price=free"
-              className="inline-block px-6 py-3 rounded-lg text-white text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity"
+              className="inline-block px-6 py-3 rounded-lg text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
               style={{ background: 'var(--color-accent)' }}
             >
-              EXPLORE FREE PATTERNS
+              Explore free patterns
             </Link>
           </div>
           {freeProduct.images?.[0] && (
@@ -650,7 +650,7 @@ export function Home({
               </div>
               <div>
                 <p className="text-[14px] font-semibold">{b.title}</p>
-                <p className="text-[12px] text-ink-soft">{b.copy}</p>
+                <p className="text-[14px] text-ink-soft leading-relaxed">{b.copy}</p>
               </div>
             </div>
           ))}
@@ -688,7 +688,7 @@ export function Home({
                     <div className="flex gap-0.5 mb-3" style={{ color: 'var(--color-gold)' }}>
                       {Array.from({ length: 5 }).map((_, si) => <MaterialIcon key={si} name="star" size={15} />)}
                     </div>
-                    <p className="text-[13px] leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
+                    <p className="text-[14px] leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
                     <div className="flex items-center gap-3">
                       {t.photo ? (
                         <img src={t.photo} alt={t.name} className="w-9 h-9 rounded-full object-cover shrink-0" />

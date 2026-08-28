@@ -69,12 +69,12 @@ const { user, loading: authLoading } = useAuth()
         A confirmation email has been sent to {order?.customer_email ?? user?.email}.
       </p>
       <div className="space-y-3">
-        <Link href="/account/downloads" className="block w-full py-3.5 text-canvas text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity" style={{ background: 'var(--color-sale-green)' }}>
-          DOWNLOAD YOUR PATTERNS
+        <Link href="/account/downloads" className="block w-full py-3.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity" style={{ background: 'var(--color-sale-green)' }}>
+          Download your patterns
         </Link>
         {order && <DownloadReceiptButton orderId={order.id} />}
-        <Link href="/account/orders" className="block w-full py-3.5 border border-line rounded-lg text-[12px] tracking-[0.12em] text-ink hover:bg-surface transition-colors">
-          VIEW MY ORDERS
+        <Link href="/account/orders" className="block w-full py-3.5 border border-line rounded-lg text-[13px] font-semibold text-ink hover:bg-surface transition-colors">
+          View my orders
         </Link>
       </div>
       <Link href="/shop" className="block mt-8 text-[13px] text-ink-soft hover:text-ink underline underline-offset-2">Continue Shopping</Link>

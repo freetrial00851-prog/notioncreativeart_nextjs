@@ -161,7 +161,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
             )}
           </div>
           {product.description && (
-            <p className="text-[13px] text-ink-soft leading-relaxed mb-6 line-clamp-4 whitespace-pre-line">{product.description}</p>
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-6 line-clamp-4 whitespace-pre-line">{product.description}</p>
           )}
           <div className="space-y-3">
             {product.sold_out ? (
@@ -170,9 +170,9 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
               <button
                 onClick={handleBuy}
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-                className="w-full py-3.5 bg-ink text-canvas text-[12px] tracking-[0.15em] hover:opacity-85 transition-opacity rounded-lg disabled:opacity-60"
+                className="w-full py-3.5 bg-ink text-canvas text-[13px] font-semibold hover:opacity-85 transition-opacity rounded-lg disabled:opacity-60"
               >
-                {product.price === 0 ? 'DOWNLOAD FREE' : 'BUY NOW — INSTANT DOWNLOAD'}
+                {product.price === 0 ? 'Download free' : 'Buy now — instant download'}
               </button>
             )}
             <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-3'}>

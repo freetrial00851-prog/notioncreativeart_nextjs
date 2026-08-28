@@ -148,7 +148,7 @@ export function AuthPage() {
 
               <div className="flex items-center gap-3 my-6">
                 <div className="flex-1 h-px bg-line" />
-                <span className="text-[12px] text-ink-soft">Or continue with</span>
+                <span className="text-[13px] text-ink-soft">Or continue with</span>
                 <div className="flex-1 h-px bg-line" />
               </div>
 
@@ -179,7 +179,7 @@ export function AuthPage() {
 
               <div className="flex items-center gap-3 my-6">
                 <div className="flex-1 h-px bg-line" />
-                <span className="text-[12px] text-ink-soft">Or continue with email</span>
+                <span className="text-[13px] text-ink-soft">Or continue with email</span>
                 <div className="flex-1 h-px bg-line" />
               </div>
 

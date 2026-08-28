@@ -29,12 +29,12 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-[60vh] flex items-center justify-center px-6 text-center">
           <div>
             <p className="font-semibold text-lg mb-2">Something went wrong.</p>
-            <p className="text-sm text-ink-soft mb-5">Please reload the page. If this keeps happening, let us know what you were doing.</p>
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-5">Please reload the page. If this keeps happening, let us know what you were doing.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-ink text-canvas text-[12px] tracking-[0.12em] rounded-lg hover:opacity-90 transition-opacity"
+              className="px-6 py-3 bg-ink text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity"
             >
-              RELOAD
+              Reload
             </button>
           </div>
         </div>
