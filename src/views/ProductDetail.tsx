@@ -491,11 +491,11 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
       </nav>
 
       {/* Hero layout
-          < lg (mobile + tablet): single column — gallery → title/badges → buy → details
-          ≥ lg: 3-col gallery | details | buy */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,0.55fr)_minmax(240px,0.45fr)] gap-6 lg:gap-8 items-start overflow-visible">
-        {/* Panel 1 — Gallery */}
-        <div className="min-w-0 relative order-1 lg:col-start-1 lg:row-start-1 z-20">
+          < lg: single column — gallery → title/badges/buy/specs
+          ≥ lg: 2-col gallery | info + buy (Etsy-style) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)] gap-6 lg:gap-8 items-start overflow-visible">
+        {/* Left — Gallery */}
+        <div className="min-w-0 relative z-20">
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
             {/* Vertical thumbnails — tablet + desktop (≥768) */}
             {images.length > 1 && (
@@ -641,81 +641,36 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                   ))}
                 </div>
               )}
-
-              {/* Title + badges — mobile & tablet (< lg); stacks above buy box */}
-              <div className="lg:hidden mt-4">
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
-                        style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <h1 className="font-display font-semibold text-[24px] leading-tight break-words">
-                  {product.title}
-                </h1>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Panel 2 — Product details (desktop middle; below buy on mobile/tablet) */}
-        <div className="min-w-0 lg:pt-1 order-3 lg:col-start-2 lg:row-start-1">
-          <div className="hidden lg:block">
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
-                    style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-            <h1 className="font-display font-semibold text-[26px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
-              {product.title}
-            </h1>
-          </div>
+        {/* Right — badges, title, buy box, then specs */}
+        <div className="min-w-0 lg:pt-1 lg:sticky lg:top-24 lg:self-start">
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2 lg:mb-3">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
+                  style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          <h1 className="font-display font-semibold text-[24px] sm:text-[1.85rem] xl:text-[2rem] leading-tight mb-3 break-words">
+            {product.title}
+          </h1>
 
           {purchaseCount >= 3 && (
-            <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5 mt-1 lg:mt-0">
+            <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5">
               <MaterialIcon name="download_done" size={14} /> {purchaseCount}+ makers have downloaded this pattern
             </p>
           )}
 
-          {/* Fixed slot so specs/tabs don’t jump when subtitle is empty, short, or long. */}
-          <div className="min-h-[2.875rem] mb-5" aria-hidden={!product.subtitle?.trim()}>
-            {product.subtitle?.trim() ? (
-              <p className="text-[14px] text-ink-soft leading-relaxed line-clamp-2">{product.subtitle.trim()}</p>
-            ) : null}
-          </div>
-
-          <ul className="space-y-2.5 mb-5">
-            {specs.map((s) => (
-              <li key={s.label} className="flex items-center gap-3 text-[13px]">
-                <MaterialIcon name={s.icon} size={18} color="var(--color-ink-soft)" />
-                <span className="text-ink-soft">{s.label}:</span>
-                <span className="font-medium text-ink truncate">{s.value}</span>
-              </li>
-            ))}
-          </ul>
-
-          {product.wishlist_count > 0 && (
-            <p className="text-[11px] text-ink-soft mt-5">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
-          )}
-        </div>
-
-        {/* Panel 3 — Purchase card (after title on mobile/tablet; right column on desktop) */}
-        <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2 order-2 lg:col-start-3 lg:row-start-1 lg:sticky lg:top-24">
+          <div ref={buyButtonRef} className="rounded-2xl border border-line p-4 sm:p-5 space-y-2">
           <div className="space-y-0.5">
             {product.price > 0 && onSale ? (
               <div className="flex items-baseline gap-3 flex-wrap">
@@ -809,11 +764,33 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
               </div>
             </div>
           )}
+          </div>
+
+          {/* Fixed slot so specs/tabs don’t jump when subtitle is empty, short, or long. */}
+          <div className="min-h-[2.875rem] mb-5 mt-6" aria-hidden={!product.subtitle?.trim()}>
+            {product.subtitle?.trim() ? (
+              <p className="text-[14px] text-ink-soft leading-relaxed line-clamp-2">{product.subtitle.trim()}</p>
+            ) : null}
+          </div>
+
+          <ul className="space-y-2.5 mb-5">
+            {specs.map((s) => (
+              <li key={s.label} className="flex items-center gap-3 text-[13px]">
+                <MaterialIcon name={s.icon} size={18} color="var(--color-ink-soft)" />
+                <span className="text-ink-soft">{s.label}:</span>
+                <span className="font-medium text-ink truncate">{s.value}</span>
+              </li>
+            ))}
+          </ul>
+
+          {product.wishlist_count > 0 && (
+            <p className="text-[11px] text-ink-soft mt-5">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
+          )}
         </div>
       </div>
 
       {/* Full-width tabs */}
-      <div className="mt-14 md:mt-16 pt-2 order-4">
+      <div className="mt-14 md:mt-16 pt-2">
         <div className="hidden md:flex gap-7 border-b border-line overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {TABS.map((t) => (
             <button
