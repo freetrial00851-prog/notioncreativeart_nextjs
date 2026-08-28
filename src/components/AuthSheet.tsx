@@ -78,7 +78,7 @@ function AuthSheetInner() {
         <button
           type="button"
           onClick={() => setAuthSheetView('signup')}
-          className="text-[13px] font-semibold px-2.5 py-1.5 rounded-lg hover:bg-surface transition-colors"
+          className="text-[13px] font-semibold px-2.5 py-1.5 rounded-full hover:bg-surface transition-colors"
           style={{ color: 'var(--color-accent)' }}
         >
           Register
@@ -111,7 +111,7 @@ function AuthSheetInner() {
                   <label className="block text-[13px] font-semibold mb-1.5">Email <span style={{ color: 'var(--color-madder)' }}>*</span></label>
                   <input required type="email" value={login.resetEmail} onChange={(e) => login.setResetEmail(e.target.value)} className="w-full px-4 py-3 border border-line rounded-lg bg-canvas text-[13px] focus:outline-none focus:border-ink" />
                 </div>
-                <button disabled={login.resetSubmitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
+                <button disabled={login.resetSubmitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
                   {login.resetSubmitting ? 'Sending…' : 'Send Reset Link'}
                 </button>
               </form>
@@ -144,7 +144,7 @@ function AuthSheetInner() {
                 </label>
                 <button type="button" onClick={() => login.setForgotMode(true)} className="text-[13px] underline underline-offset-2" style={{ color: 'var(--color-accent)' }}>Forgot?</button>
               </div>
-              <button disabled={login.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
+              <button disabled={login.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
                 {login.submitting ? 'Signing In…' : 'Login'}
               </button>
             </form>
@@ -158,7 +158,7 @@ function AuthSheetInner() {
             <button
               type="button"
               onClick={() => login.signInWithGoogle(returnTo)}
-              className="w-full py-3 border border-line rounded-lg flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
+              className="w-full py-3 border border-line rounded-full flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
             >
               <GoogleIcon />
               Continue with Google
@@ -178,10 +178,10 @@ function AuthSheetInner() {
           <p className="text-ink-soft text-[14px] mb-1">We&apos;ve sent a verification link to</p>
           <p className="text-[14px] font-medium mb-6">{signup.email}</p>
           <p className="text-ink-soft text-[13px] mb-8">Please check your inbox and click the link to verify your account.</p>
-          <a href="mailto:" className="block w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity mb-3" style={{ background: 'var(--color-accent)' }}>
+          <a href="mailto:" className="block w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity mb-3" style={{ background: 'var(--color-accent)' }}>
             Open Email App
           </a>
-          <button type="button" onClick={() => signup.resendVerification(signup.email)} className="w-full py-3.5 border border-line rounded-lg text-[13px] font-semibold text-ink-soft hover:bg-surface transition-colors mb-3">
+          <button type="button" onClick={() => signup.resendVerification(signup.email)} className="w-full py-3.5 border border-line rounded-full text-[13px] font-semibold text-ink-soft hover:bg-surface transition-colors mb-3">
             Resend Email
           </button>
           <p className="text-[13px] text-ink-soft">
@@ -194,7 +194,7 @@ function AuthSheetInner() {
           <button
             type="button"
             onClick={() => signup.signInWithGoogle(returnTo)}
-            className="w-full py-3 border border-line rounded-lg flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
+            className="w-full py-3 border border-line rounded-full flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
           >
             <GoogleIcon />
             Continue with Google
@@ -234,7 +234,7 @@ function AuthSheetInner() {
               <PasswordStrength password={signup.password} />
               {signup.attempted && signup.fieldErrors.password && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.password}</p>}
             </div>
-            <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
+            <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
               Create Account
             </button>
             <p className="text-[11px] text-ink-soft leading-relaxed text-center">

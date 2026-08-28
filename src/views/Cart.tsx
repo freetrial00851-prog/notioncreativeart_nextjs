@@ -139,7 +139,7 @@ export function Cart() {
             onClick={handleCheckout}
             disabled={checkingOut}
             aria-busy={checkingOut}
-            className="w-full py-4 flex items-center justify-center gap-2 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
+            className="w-full py-4 flex items-center justify-center gap-2 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
             style={{ background: 'var(--color-sale-green)' }}
           >
             <CartIcon size={14} /> Checkout — ${total.toFixed(2)}

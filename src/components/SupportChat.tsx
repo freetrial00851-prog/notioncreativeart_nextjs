@@ -313,7 +313,7 @@ export function SupportChat() {
                     key={d.signedUrl}
                     href={d.signedUrl}
                     download={d.filename}
-                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-semibold text-white hover:opacity-90"
+                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-semibold text-white hover:opacity-90"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     <MaterialIcon name="download" size={15} />
@@ -334,7 +334,7 @@ export function SupportChat() {
                 {authRequiredByMsg[m.id] && !user && (
                   <Link
                     href="/login"
-                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-semibold text-white hover:opacity-90"
+                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-semibold text-white hover:opacity-90"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     Sign in for download links
@@ -344,7 +344,7 @@ export function SupportChat() {
                   <button
                     type="button"
                     onClick={() => openEscalate()}
-                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-semibold border border-line bg-white text-ink hover:bg-surface transition-colors"
+                    className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-semibold border border-line bg-white text-ink hover:bg-surface transition-colors"
                   >
                     <MaterialIcon name="person" size={15} />
                     Talk to a human
@@ -419,7 +419,7 @@ export function SupportChat() {
                   <button
                     type="submit"
                     disabled={escalateSending || !escalateEmail.trim() || escalateMessage.trim().length < 5}
-                    className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white disabled:opacity-40 hover:opacity-90"
+                    className="flex-1 py-2.5 rounded-full text-[13px] font-semibold text-white disabled:opacity-40 hover:opacity-90"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     {escalateSending ? (
@@ -438,7 +438,7 @@ export function SupportChat() {
                     type="button"
                     onClick={() => setEscalateOpen(false)}
                     disabled={escalateSending}
-                    className="px-3 py-2.5 rounded-xl text-[13px] font-medium text-ink-soft hover:bg-surface"
+                    className="px-3 py-2.5 rounded-full text-[13px] font-medium text-ink-soft hover:bg-surface"
                   >
                     Cancel
                   </button>
@@ -464,7 +464,7 @@ export function SupportChat() {
                   type="submit"
                   disabled={sending || !input.trim()}
                   aria-label="Send message"
-                  className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl text-white disabled:opacity-40 hover:opacity-90 transition-opacity"
+                  className="w-11 h-11 shrink-0 flex items-center justify-center rounded-full text-white disabled:opacity-40 hover:opacity-90 transition-opacity"
                   style={{ background: 'var(--color-accent)' }}
                 >
                   <MaterialIcon name="send" size={18} />

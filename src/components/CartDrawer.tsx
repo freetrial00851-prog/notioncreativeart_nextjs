@@ -93,7 +93,7 @@ export function CartDrawer() {
             <Link
               href="/shop"
               onClick={closeDrawer}
-              className="px-6 py-3 rounded-lg text-white text-[13px] font-semibold"
+              className="px-6 py-3 rounded-full text-white text-[13px] font-semibold"
               style={{ background: 'var(--color-cart-blue)' }}
             >
               Browse Patterns
@@ -146,7 +146,7 @@ export function CartDrawer() {
                   onClick={handleCheckout}
                   disabled={checkingOut}
                   aria-busy={checkingOut}
-                  className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
+                  className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
                   style={{ background: 'var(--color-cart-blue)' }}
                 >
                   Checkout — ${total.toFixed(2)}
@@ -154,7 +154,7 @@ export function CartDrawer() {
                 <Link
                   href="/cart"
                   onClick={closeDrawer}
-                  className="block text-center w-full py-3.5 border rounded-lg hover:bg-surface transition-colors text-[13px] font-semibold"
+                  className="block text-center w-full py-3.5 border rounded-full hover:bg-surface transition-colors text-[13px] font-semibold"
                   style={{ borderColor: 'var(--color-cart-blue)', color: 'var(--color-cart-blue)' }}
                 >
                   View Cart

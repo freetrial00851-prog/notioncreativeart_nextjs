@@ -115,7 +115,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           )}
           <button
             onClick={(e) => { e.preventDefault(); setQuickViewOpen(true) }}
-            className="hidden md:flex items-center justify-center gap-1.5 absolute bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] bg-white text-ink text-[11px] tracking-[0.1em] py-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-ink hover:text-white"
+            className="hidden md:flex items-center justify-center gap-1.5 absolute bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] bg-white text-ink text-[11px] tracking-[0.1em] py-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-ink hover:text-white"
           >
             <MaterialIcon name="visibility" size={14} />
             QUICK VIEW

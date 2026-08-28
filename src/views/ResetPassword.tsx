@@ -99,7 +99,7 @@ const router = useRouter()
                 </p>
               )}
             </div>
-            <button disabled={submitting || !passwordValid || !passwordsMatch} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
+            <button disabled={submitting || !passwordValid || !passwordsMatch} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
               {submitting ? 'Updating…' : 'Update Password'}
             </button>
           </form>

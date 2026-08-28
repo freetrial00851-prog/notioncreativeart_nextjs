@@ -75,7 +75,7 @@ export function Admin() {
                 end={item.end}
                 onClick={() => setMobileNavOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                  `flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
                     isActive ? 'bg-white text-ink font-medium shadow-sm' : 'text-[#444] hover:bg-white/70 hover:text-ink'
                   }`
                 }
@@ -92,7 +92,7 @@ export function Admin() {
               <button
                 type="button"
                 onClick={() => setOpenGroups((g) => ({ ...g, [item.id]: !g[item.id] }))}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
                   childActive ? 'text-ink font-medium' : 'text-[#444] hover:bg-white/70'
                 }`}
               >
@@ -108,7 +108,7 @@ export function Admin() {
                       href={c.to}
                       onClick={() => setMobileNavOpen(false)}
                       className={({ isActive }) =>
-                        `block px-3 py-1.5 rounded-md text-[12px] ${isActive ? 'text-ink font-medium bg-white' : 'text-[#666] hover:text-ink'}`
+                        `block px-3 py-1.5 rounded-full text-[12px] ${isActive ? 'text-ink font-medium bg-white' : 'text-[#666] hover:text-ink'}`
                       }
                     >
                       {c.label}
@@ -127,7 +127,7 @@ export function Admin() {
           href="/"
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-ink hover:bg-white/70"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-full text-[13px] text-ink hover:bg-white/70"
         >
           <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0" style={{ background: ACCENT }}>N</span>
           <span className="truncate">NCA Shop</span>
@@ -1090,10 +1090,10 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
           </button>
         </div>
         <div className="flex gap-1">
-          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md border ${viewMode === 'grid' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="Grid view">
+          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-full border ${viewMode === 'grid' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="Grid view">
             <MaterialIcon name="grid_view" size={18} />
           </button>
-          <button onClick={() => setViewMode('list')} className={`p-2 rounded-md border ${viewMode === 'list' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="List view">
+          <button onClick={() => setViewMode('list')} className={`p-2 rounded-full border ${viewMode === 'list' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="List view">
             <MaterialIcon name="view_list" size={18} />
           </button>
         </div>
@@ -1247,10 +1247,10 @@ function CategoriesAdmin() {
         onReorder={() => {}}
       />
       <div className="flex gap-3">
-        <button onClick={save} disabled={saving} className="px-6 py-3 rounded-lg text-white text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-primary)' }}>
+        <button onClick={save} disabled={saving} className="px-6 py-3 rounded-full text-white text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-primary)' }}>
           {saving ? 'SAVING…' : 'SAVE'}
         </button>
-        <button onClick={() => setEditingId(null)} className="px-6 py-3 border border-line text-[11px] tracking-[0.1em] rounded-lg hover:bg-surface bg-white">CANCEL</button>
+        <button onClick={() => setEditingId(null)} className="px-6 py-3 border border-line text-[11px] tracking-[0.1em] rounded-full hover:bg-surface bg-white">CANCEL</button>
       </div>
     </div>
   )
@@ -1259,7 +1259,7 @@ function CategoriesAdmin() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display font-semibold text-2xl">Categories</h1>
-        <button onClick={startNew} className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] hover:opacity-85 rounded-lg">+ ADD CATEGORY</button>
+        <button onClick={startNew} className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] hover:opacity-85 rounded-full">+ ADD CATEGORY</button>
       </div>
       {error && <p className="text-[13px] text-madder mb-4">{error}</p>}
 
@@ -1480,7 +1480,7 @@ function OrdersAdmin() {
       </div>
       {hasMore && (
         <div className="text-center mt-6">
-          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-lg hover:bg-surface bg-white disabled:opacity-50">
+          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-full hover:bg-surface bg-white disabled:opacity-50">
             {loadingMore ? 'LOADING…' : 'LOAD MORE'}
           </button>
         </div>
@@ -1530,7 +1530,7 @@ function SubscribersAdmin() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display font-semibold text-2xl">Newsletter</h1>
         {subscribers.length > 0 && (
-          <button onClick={exportCsv} disabled={exporting} className="px-5 py-2.5 border border-ink text-[11px] tracking-[0.1em] hover:bg-surface rounded-lg bg-white disabled:opacity-50">
+          <button onClick={exportCsv} disabled={exporting} className="px-5 py-2.5 border border-ink text-[11px] tracking-[0.1em] hover:bg-surface rounded-full bg-white disabled:opacity-50">
             {exporting ? 'PREPARING…' : 'EXPORT AS CSV'}
           </button>
         )}
@@ -1559,7 +1559,7 @@ function SubscribersAdmin() {
       </div>
       {hasMore && (
         <div className="text-center mt-6">
-          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-lg hover:bg-surface bg-white disabled:opacity-50">
+          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-full hover:bg-surface bg-white disabled:opacity-50">
             {loadingMore ? 'LOADING…' : 'LOAD MORE'}
           </button>
         </div>

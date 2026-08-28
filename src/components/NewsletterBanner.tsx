@@ -78,7 +78,7 @@ function NewsletterForm() {
         />
         <button
           type="submit"
-          className="px-6 py-3 rounded-lg text-[13px] font-semibold hover:opacity-90 transition-opacity shrink-0"
+          className="px-6 py-3 rounded-full text-[13px] font-semibold hover:opacity-90 transition-opacity shrink-0"
           style={{ background: 'var(--color-accent)', color: 'white' }}
         >
           Subscribe

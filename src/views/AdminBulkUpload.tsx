@@ -229,7 +229,7 @@ export function AdminBulkUpload() {
         </div>
         <Link
           href="/admin/listings"
-          className="text-[12px] tracking-[0.1em] border border-[#d9d5ce] px-4 py-2 rounded-lg hover:bg-white transition-colors"
+          className="text-[12px] tracking-[0.1em] border border-[#d9d5ce] px-4 py-2 rounded-full hover:bg-white transition-colors"
         >
           ← Back to Listings
         </Link>
@@ -248,7 +248,7 @@ export function AdminBulkUpload() {
             <button
               type="button"
               onClick={() => csvInputRef.current?.click()}
-              className="text-[12px] px-4 py-2 rounded-lg border border-[#d9d5ce] bg-[#faf9f7] hover:bg-white"
+              className="text-[12px] px-4 py-2 rounded-full border border-[#d9d5ce] bg-[#faf9f7] hover:bg-white"
             >
               Choose CSV
             </button>
@@ -282,7 +282,7 @@ export function AdminBulkUpload() {
             <button
               type="button"
               onClick={() => folderInputRef.current?.click()}
-              className="text-[12px] px-4 py-2 rounded-lg border border-[#d9d5ce] bg-[#faf9f7] hover:bg-white"
+              className="text-[12px] px-4 py-2 rounded-full border border-[#d9d5ce] bg-[#faf9f7] hover:bg-white"
             >
               Choose folder
             </button>
@@ -312,7 +312,7 @@ export function AdminBulkUpload() {
           type="button"
           onClick={handlePreview}
           disabled={uploading}
-          className="text-[12px] tracking-[0.08em] px-5 py-2.5 rounded-lg bg-[#1f249c] text-white font-medium hover:opacity-90 disabled:opacity-50"
+          className="text-[12px] tracking-[0.08em] px-5 py-2.5 rounded-full bg-[#1f249c] text-white font-medium hover:opacity-90 disabled:opacity-50"
         >
           Preview
         </button>
@@ -320,7 +320,7 @@ export function AdminBulkUpload() {
           type="button"
           onClick={handleConfirmUpload}
           disabled={!previewRows?.length || uploading}
-          className="text-[12px] tracking-[0.08em] px-5 py-2.5 rounded-lg border border-ink text-ink font-medium hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-[12px] tracking-[0.08em] px-5 py-2.5 rounded-full border border-ink text-ink font-medium hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Confirm Upload
         </button>

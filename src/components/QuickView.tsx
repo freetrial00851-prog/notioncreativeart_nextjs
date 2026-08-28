@@ -165,33 +165,33 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
           )}
           <div className="space-y-3">
             {product.sold_out ? (
-              <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.12em] text-ink-soft">SOLD OUT</div>
+              <div className="w-full py-3.5 border border-line rounded-full text-center text-[12px] tracking-[0.12em] text-ink-soft">SOLD OUT</div>
             ) : (
               <button
                 onClick={handleBuy}
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-                className="w-full py-3.5 bg-ink text-canvas text-[13px] font-semibold hover:opacity-85 transition-opacity rounded-lg disabled:opacity-60"
+                className="w-full py-3.5 bg-ink text-canvas text-[13px] font-semibold hover:opacity-85 transition-opacity rounded-full disabled:opacity-60"
               >
                 {product.price === 0 ? 'Download free' : 'Buy now — instant download'}
               </button>
             )}
             <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-3'}>
-              <button onClick={toggleWishlist} className="py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-lg w-full">
+              <button onClick={toggleWishlist} className="py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full w-full">
                 {inWishlist ? '♥ WISHLISTED' : '♡ WISHLIST'}
               </button>
               {!product.sold_out && product.price > 0 && (
                 inCart ? (
-                  <Link href="/cart" onClick={onClose} className="flex items-center justify-center py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-lg">
+                  <Link href="/cart" onClick={onClose} className="flex items-center justify-center py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
                     ✓ IN CART
                   </Link>
                 ) : (
-                  <button onClick={toggleCart} className="py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-lg">
+                  <button onClick={toggleCart} className="py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
                     + ADD TO CART
                   </button>
                 )
               )}
             </div>
-            <Link href={`/pattern/${product.slug}`} onClick={onClose} className="block text-center w-full py-3.5 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-lg">
+            <Link href={`/pattern/${product.slug}`} onClick={onClose} className="block text-center w-full py-3.5 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-full">
               VIEW FULL DETAILS
             </Link>
           </div>

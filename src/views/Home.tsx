@@ -304,14 +304,14 @@ export function Home({
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
               <Link
                 href={hero?.cta_link || '/shop/new'}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-lg text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
                 style={{ background: 'var(--color-accent)' }}
               >
                 {hero?.cta_text || 'Shop Patterns'}
               </Link>
               <Link
                 href={hero?.secondary_cta_link || '/shop?price=free'}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-lg text-[13px] font-semibold border bg-white hover:bg-surface transition-colors"
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-[13px] font-semibold border bg-white hover:bg-surface transition-colors"
                 style={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
               >
                 {hero?.secondary_cta_text || 'Explore Free Patterns'}
@@ -466,7 +466,7 @@ export function Home({
         <button
           type="button"
           onClick={retryFeaturedCatalog}
-          className="inline-block px-7 py-3 rounded-lg border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+          className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
         >
           Try again
         </button>
@@ -482,7 +482,7 @@ export function Home({
         <div className="text-center mt-10">
           <Link
             href="/shop/bestsellers"
-            className="inline-block px-7 py-3 rounded-lg border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+            className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
           >
             View all
           </Link>
@@ -510,7 +510,7 @@ export function Home({
         <div className="text-center mt-10">
           <Link
             href="/shop/new"
-            className="inline-block px-7 py-3 rounded-lg border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+            className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
           >
             View all
           </Link>
@@ -531,7 +531,7 @@ export function Home({
                 <button
                   key={s.level}
                   onClick={() => setActiveSkill(s.level)}
-                  className={`flex flex-col lg:flex-row items-center lg:items-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-3 rounded-lg text-center lg:text-left transition-colors ${activeSkill === s.level ? 'text-white' : 'bg-white hover:bg-canvas text-ink'}`}
+                  className={`flex flex-col lg:flex-row items-center lg:items-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-3 rounded-full text-center lg:text-left transition-colors ${activeSkill === s.level ? 'text-white' : 'bg-white hover:bg-canvas text-ink'}`}
                   style={activeSkill === s.level ? { background: 'var(--color-primary)' } : undefined}
                 >
                   <MaterialIcon name={s.icon} size={16} color={activeSkill === s.level ? '#fff' : 'var(--color-primary)'} />
@@ -572,7 +572,7 @@ export function Home({
               <p className="text-[14px] text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
               <Link
                 href="/shop?bundle=1"
-                className="inline-block px-4 py-2 rounded-lg text-white text-[13px] font-semibold hover:opacity-90 transition-opacity mb-4"
+                className="inline-block px-4 py-2 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity mb-4"
                 style={{ background: 'var(--color-accent)' }}
               >
                 Shop Bundles →
@@ -618,7 +618,7 @@ export function Home({
             <p className="text-[14px] text-ink-soft leading-relaxed mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
             <Link
               href="/shop?price=free"
-              className="inline-block px-6 py-3 rounded-lg text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+              className="inline-block px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
               style={{ background: 'var(--color-accent)' }}
             >
               Explore free patterns

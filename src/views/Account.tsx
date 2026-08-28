@@ -206,7 +206,7 @@ function MyOrders() {
                     <td className="px-5 py-4 text-right">
                       <Link
                         href={`/account/orders/${o.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] rounded-lg border border-line hover:bg-surface"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] rounded-full border border-line hover:bg-surface"
                       >
                         VIEW
                       </Link>
@@ -292,7 +292,7 @@ function Downloads() {
                   <button
                     onClick={() => download(p.product_id, p.product?.title)}
                     disabled={downloading === p.product_id}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-canvas text-[11px] font-semibold tracking-[0.06em] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-canvas text-[11px] font-semibold tracking-[0.06em] rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
                     style={{ background: BRAND }}
                   >
                     <MaterialIcon name="download" size={14} />
@@ -461,7 +461,7 @@ function ProfileTab() {
               <button
                 onClick={saveName}
                 disabled={nameSaving}
-                className="px-5 py-2 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="px-5 py-2 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
                 style={{ background: BRAND }}
               >
                 {nameSaving ? 'Saving…' : 'Save name'}
@@ -512,7 +512,7 @@ function ProfileTab() {
           <button
             onClick={changePassword}
             disabled={pwSaving}
-            className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ background: BRAND }}
           >
             {pwSaving ? 'Updating…' : 'Update password'}
@@ -650,7 +650,7 @@ function AddressesPage() {
             </label>
           ) : null}
           <div className="flex items-center gap-3 pt-2">
-            <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
+            <button onClick={save} disabled={saving} className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 disabled:opacity-50" style={{ background: BRAND }}>
               {saving ? 'Saving…' : 'Save address'}
             </button>
             {hasAddress && <button onClick={() => setEditing(false)} className="text-[13px] text-ink-soft hover:text-ink">Cancel</button>}
@@ -698,7 +698,7 @@ function NewsletterPrefs() {
       <button
         onClick={save}
         disabled={saving || !subscribed}
-        className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
+        className="px-6 py-2.5 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 disabled:opacity-50"
         style={{ background: BRAND }}
       >
         {saving ? 'Saving…' : 'Save preferences'}
@@ -718,7 +718,7 @@ function LogoutConfirm() {
       <p className="text-[14px] text-ink-soft mb-8">Are you sure you want to sign out of your Notion Creative Art account?</p>
       <button
         onClick={signOut}
-        className="w-full py-3.5 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 mb-3"
+        className="w-full py-3.5 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 mb-3"
         style={{ background: BRAND }}
       >
         Log out

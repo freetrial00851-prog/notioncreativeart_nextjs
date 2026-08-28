@@ -689,14 +689,14 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           </div>
 
           {product.sold_out ? (
-            <div className="w-full py-3.5 border border-line rounded-lg text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
+            <div className="w-full py-3.5 border border-line rounded-full text-center text-[12px] tracking-[0.15em] text-ink-soft">SOLD OUT</div>
           ) : (
             <div className="space-y-1.5">
               {product.price > 0 && (
                 isInCart(product.id) ? (
                   <Link
                     href="/cart"
-                    className="block text-center w-full py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                    className="block text-center w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     ✓ In cart — go to cart
@@ -704,7 +704,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 ) : (
                   <button
                     onClick={toggleCart}
-                    className="w-full py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    className="w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                     style={{ background: 'var(--color-accent)' }}
                   >
                     <MaterialIcon name="shopping_bag" size={15} /> Add to Cart
@@ -715,8 +715,8 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 onClick={handleBuy}
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
                 className={product.price === 0
-                  ? 'w-full py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60'
-                  : 'w-full py-3 border border-ink text-[13px] font-semibold hover:bg-surface transition-colors rounded-lg disabled:opacity-60'}
+                  ? 'w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60'
+                  : 'w-full py-3 border border-ink text-[13px] font-semibold hover:bg-surface transition-colors rounded-full disabled:opacity-60'}
                 style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
               >
                 {product.price === 0
@@ -725,14 +725,14 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
               </button>
               <button
                 onClick={toggleWishlist}
-                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors flex items-center justify-center gap-2"
               >
                 <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
                 {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
               </button>
               <button
                 onClick={shareListing}
-                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors flex items-center justify-center gap-2"
               >
                 <ShareIcon size={15} />
                 {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
@@ -878,7 +878,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           <button
             onClick={handleBuy}
             disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-            className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+            className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
             style={{ background: 'var(--color-sale-green)' }}
           >
             {product.price === 0 ? 'Download free' : 'Buy now'}

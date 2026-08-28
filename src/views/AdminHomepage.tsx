@@ -413,7 +413,7 @@ function TextField({ label, value, onChange, multiline }: { label: string; value
 
 function SaveButton({ onClick, saving }: { onClick: () => void; saving: boolean }) {
   return (
-    <button onClick={onClick} disabled={saving} className="px-6 py-3 bg-ink text-canvas text-[11px] tracking-[0.12em] hover:opacity-85 disabled:opacity-50 rounded-lg">
+    <button onClick={onClick} disabled={saving} className="px-6 py-3 bg-ink text-canvas text-[11px] tracking-[0.12em] hover:opacity-85 disabled:opacity-50 rounded-full">
       {saving ? 'SAVING…' : 'SAVE'}
     </button>
   )

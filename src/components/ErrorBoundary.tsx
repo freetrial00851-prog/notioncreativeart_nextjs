@@ -32,7 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-[14px] text-ink-soft leading-relaxed mb-5">Please reload the page. If this keeps happening, let us know what you were doing.</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-ink text-canvas text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="px-6 py-3 bg-ink text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity"
             >
               Reload
             </button>

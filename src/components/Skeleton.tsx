@@ -178,7 +178,7 @@ export function ListRowSkeleton({ rows = 4 }: { rows?: number }) {
             <Bone className="h-3.5 w-8 hidden sm:block" />
             <Bone className="h-3.5 w-14 hidden sm:block" />
             <Bone className="h-6 w-20 rounded-full" />
-            <Bone className="h-8 w-16 rounded-lg justify-self-end hidden sm:block" />
+            <Bone className="h-8 w-16 rounded-full justify-self-end hidden sm:block" />
           </div>
         ))}
       </div>
@@ -204,7 +204,7 @@ export function DownloadsTableSkeleton({ rows = 4 }: { rows?: number }) {
             </div>
             <Bone className="h-3.5 w-20 hidden sm:block" />
             <Bone className="h-3.5 w-16 hidden sm:block" />
-            <Bone className="h-8 w-24 rounded-lg justify-self-end shrink-0" />
+            <Bone className="h-8 w-24 rounded-full justify-self-end shrink-0" />
           </div>
         ))}
       </div>
@@ -231,9 +231,9 @@ export function ProductDetailSkeleton() {
           <Bone className="h-9 w-4/5" />
           <div className="rounded-2xl border border-line p-5 space-y-3">
             <Bone className="h-8 w-32" />
-            <Bone className="h-12 w-full rounded-lg" />
-            <Bone className="h-12 w-full rounded-lg" />
-            <Bone className="h-11 w-full rounded-lg" />
+            <Bone className="h-12 w-full rounded-full" />
+            <Bone className="h-12 w-full rounded-full" />
+            <Bone className="h-11 w-full rounded-full" />
             <Bone className="h-20 w-full rounded-xl" />
           </div>
           <div className="space-y-2.5 pt-2">
@@ -267,9 +267,9 @@ export function PageSkeleton() {
       <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-10">
         <div className="hidden lg:block space-y-6">
           <Bone className="h-4 w-24" />
-          <Bone className="h-10 w-full rounded-lg" />
+          <Bone className="h-10 w-full rounded-full" />
           <Bone className="h-4 w-20" />
-          <Bone className="h-24 w-full rounded-lg" />
+          <Bone className="h-24 w-full rounded-full" />
         </div>
         <ProductGridSkeleton variant="shop" />
       </div>
@@ -322,7 +322,7 @@ export function ContentSkeleton() {
             <Bone className="h-4 w-12" />
             <Bone className="h-4 w-16" />
           </div>
-          <Bone className="h-12 w-full rounded-lg" />
+          <Bone className="h-12 w-full rounded-full" />
         </div>
       </div>
     </div>

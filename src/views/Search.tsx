@@ -80,7 +80,7 @@ export function Search() {
               <button
                 type="button"
                 onClick={() => router.push('/search')}
-                className="px-6 py-3 rounded-lg border border-line text-[13px] font-semibold hover:bg-surface transition-colors"
+                className="px-6 py-3 rounded-full border border-line text-[13px] font-semibold hover:bg-surface transition-colors"
               >
                 Clear search
               </button>
@@ -102,19 +102,19 @@ export function Search() {
           </div>
           {pageCount > 1 && (
             <div className="flex items-center justify-center gap-2 mt-14">
-              <button onClick={() => goToPage(page - 1)} disabled={page === 1} aria-label="Previous page" className="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors">‹</button>
+              <button onClick={() => goToPage(page - 1)} disabled={page === 1} aria-label="Previous page" className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors">‹</button>
               {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
                   onClick={() => goToPage(p)}
                   aria-current={p === page ? 'page' : undefined}
-                  className={`w-9 h-9 flex items-center justify-center rounded-lg text-[13px] transition-colors ${p === page ? 'text-white' : 'border border-line hover:bg-surface'}`}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${p === page ? 'text-white' : 'border border-line hover:bg-surface'}`}
                   style={p === page ? { background: 'var(--color-accent)' } : undefined}
                 >
                   {p}
                 </button>
               ))}
-              <button onClick={() => goToPage(page + 1)} disabled={page === pageCount} aria-label="Next page" className="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors">›</button>
+              <button onClick={() => goToPage(page + 1)} disabled={page === pageCount} aria-label="Next page" className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors">›</button>
             </div>
           )}
         </>

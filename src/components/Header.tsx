@@ -474,7 +474,7 @@ export function Header() {
                 <button
                   type="button"
                   onClick={() => { setMobileAccountOpen(false); requireAuth() }}
-                  className="px-6 py-3 rounded-lg text-white text-[13px] font-semibold"
+                  className="px-6 py-3 rounded-full text-white text-[13px] font-semibold"
                   style={{ background: 'var(--color-accent)' }}
                 >
                   Sign In

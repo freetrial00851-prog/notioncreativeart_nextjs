@@ -141,7 +141,7 @@ export function AuthModal({ open, onClose }: Props) {
             <p className="text-ink-soft text-sm mb-6">Enter the email on your account and we'll send you a link to reset your password.</p>
             <form onSubmit={handleResetRequest} className="space-y-3">
               <input required type="email" placeholder="Email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} className="w-full px-4 py-3 border border-line bg-canvas text-sm focus:outline-none focus:border-ink" />
-              <button disabled={resetSubmitting} type="submit" className="w-full py-3 bg-ink text-canvas text-sm tracking-wide hover:opacity-85 transition-opacity disabled:opacity-50 rounded-lg">
+              <button disabled={resetSubmitting} type="submit" className="w-full py-3 bg-ink text-canvas text-sm tracking-wide hover:opacity-85 transition-opacity disabled:opacity-50 rounded-full">
                 {resetSubmitting ? 'Sending…' : 'Send reset link'}
               </button>
               <button type="button" onClick={() => setScreen('form')} className="w-full py-3 text-sm text-ink-soft hover:text-ink transition-colors">
@@ -199,7 +199,7 @@ export function AuthModal({ open, onClose }: Props) {
                     </label>
                     <button type="button" onClick={() => setScreen('forgot')} className="text-ink-soft hover:opacity-70">Forgot password?</button>
                   </div>
-                  <button disabled={submitting} type="submit" className="w-full py-3 bg-ink text-canvas text-sm tracking-wide hover:opacity-85 transition-opacity disabled:opacity-50 rounded-lg">
+                  <button disabled={submitting} type="submit" className="w-full py-3 bg-ink text-canvas text-sm tracking-wide hover:opacity-85 transition-opacity disabled:opacity-50 rounded-full">
                     {submitting ? 'Signing in…' : 'Sign In'}
                   </button>
                 </form>
@@ -235,7 +235,7 @@ export function AuthModal({ open, onClose }: Props) {
                     <input required type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="accent-ink mt-0.5" />
                     I agree to the Terms & Privacy Policy
                   </label>
-                  <button disabled={submitting} type="submit" className="w-full py-3 bg-ink text-canvas text-sm tracking-wide hover:opacity-85 transition-opacity disabled:opacity-50 rounded-lg">
+                  <button disabled={submitting} type="submit" className="w-full py-3 bg-ink text-canvas text-sm tracking-wide hover:opacity-85 transition-opacity disabled:opacity-50 rounded-full">
                     {submitting ? 'Creating account…' : 'Create Account'}
                   </button>
                 </form>

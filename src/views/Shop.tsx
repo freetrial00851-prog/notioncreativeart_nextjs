@@ -177,7 +177,7 @@ export function Shop() {
         <div className="space-y-0.5">
           <button
             onClick={() => setSearchParams((p) => { p.delete('level'); return p })}
-            className={`w-full text-left px-3 py-2 rounded-lg text-[13px] transition-colors ${!level ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+            className={`w-full text-left px-3 py-2 rounded-full text-[13px] transition-colors ${!level ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
           >
             All Levels
           </button>
@@ -185,7 +185,7 @@ export function Shop() {
             <button
               key={l}
               onClick={() => toggleParam('level', l)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-[13px] capitalize transition-colors ${level === l ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+              className={`w-full text-left px-3 py-2 rounded-full text-[13px] capitalize transition-colors ${level === l ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
             >
               {l}
             </button>
@@ -224,7 +224,7 @@ export function Shop() {
                 setMobileFiltersOpen(false)
                 goShop(`/shop/${(parentCategory ?? currentCategory)!.slug}`)
               }}
-              className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${!parentCategory ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+              className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${!parentCategory ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
             >
               All {(parentCategory ?? currentCategory)!.name}
             </Link>
@@ -237,7 +237,7 @@ export function Shop() {
                   setMobileFiltersOpen(false)
                   goShop(`/shop/${sc.slug}`)
                 }}
-                className={`flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+                className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
               >
                 <span>{sc.name}</span>
                 <span className="text-[11px] text-ink-soft/70">{sc.count}</span>
@@ -365,7 +365,7 @@ export function Shop() {
                     onClick={() => goToPage(page - 1)}
                     disabled={page === 1}
                     aria-label="Previous page"
-                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     ‹
                   </button>
@@ -375,7 +375,7 @@ export function Shop() {
                       onClick={() => goToPage(p)}
                       aria-label={`Page ${p}`}
                       aria-current={p === page ? 'page' : undefined}
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-[13px] transition-colors ${p === page ? 'text-white' : 'border border-line hover:bg-surface'}`}
+                      className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${p === page ? 'text-white' : 'border border-line hover:bg-surface'}`}
                       style={p === page ? { background: 'var(--color-accent)' } : undefined}
                     >
                       {p}
@@ -385,7 +385,7 @@ export function Shop() {
                     onClick={() => goToPage(page + 1)}
                     disabled={page === pageCount}
                     aria-label="Next page"
-                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     ›
                   </button>
@@ -422,7 +422,7 @@ export function Shop() {
             <div className="p-4 border-t border-line shrink-0">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3.5 rounded-lg text-white text-[13px] font-semibold"
+                className="w-full py-3.5 rounded-full text-white text-[13px] font-semibold"
                 style={{ background: 'var(--color-ink)' }}
               >
                 Show {sortedProducts.length} result{sortedProducts.length === 1 ? '' : 's'}

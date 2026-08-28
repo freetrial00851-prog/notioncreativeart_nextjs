@@ -31,13 +31,13 @@ export function CookieConsent() {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => choose('rejected')}
-            className="px-5 py-2.5 border border-ink text-[11px] tracking-[0.1em] rounded-lg hover:bg-surface transition-colors"
+            className="px-5 py-2.5 border border-ink text-[11px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors"
           >
             REJECT
           </button>
           <button
             onClick={() => choose('accepted')}
-            className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] rounded-lg hover:opacity-85 transition-opacity"
+            className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] rounded-full hover:opacity-85 transition-opacity"
           >
             ACCEPT
           </button>

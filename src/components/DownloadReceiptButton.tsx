@@ -31,7 +31,7 @@ export function DownloadReceiptButton({
         type="button"
         onClick={() => void onClick()}
         disabled={busy}
-        className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-[11px] tracking-[0.08em] font-semibold rounded-lg border border-line hover:bg-surface disabled:opacity-50"
+        className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-[11px] tracking-[0.08em] font-semibold rounded-full border border-line hover:bg-surface disabled:opacity-50"
       >
         <MaterialIcon name="download" size={14} />
         {busy ? 'PREPARING…' : 'DOWNLOAD RECEIPT'}
@@ -44,7 +44,7 @@ export function DownloadReceiptButton({
       type="button"
       onClick={() => void onClick()}
       disabled={busy}
-      className="flex w-full items-center justify-center gap-1.5 py-3.5 border border-line rounded-lg text-[12px] tracking-[0.12em] text-ink hover:bg-surface transition-colors disabled:opacity-50"
+      className="flex w-full items-center justify-center gap-1.5 py-3.5 border border-line rounded-full text-[12px] tracking-[0.12em] text-ink hover:bg-surface transition-colors disabled:opacity-50"
       style={{ color: BRAND }}
     >
       <MaterialIcon name="download" size={15} />

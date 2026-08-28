@@ -31,7 +31,7 @@ export function EmptyState({
       <p className="text-[13px] text-ink-soft mb-6 max-w-xs leading-relaxed">{subtitle}</p>
       <Link
         href={actionTo}
-        className="px-6 py-3 rounded-lg text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+        className="px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
         style={{ background: 'var(--color-sale-green)' }}
       >
         {actionLabel}

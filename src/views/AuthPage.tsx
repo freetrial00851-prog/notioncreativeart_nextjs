@@ -63,7 +63,7 @@ export function AuthPage() {
                     <label className="block text-[13px] font-semibold mb-1.5">Email <span style={{ color: 'var(--color-madder)' }}>*</span></label>
                     <input required type="email" value={login.resetEmail} onChange={(e) => login.setResetEmail(e.target.value)} className="w-full px-4 py-3 border border-line rounded-lg bg-canvas text-[13px] focus:outline-none focus:border-ink" />
                   </div>
-                  <button disabled={login.resetSubmitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
+                  <button disabled={login.resetSubmitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
                     {login.resetSubmitting ? 'Sending…' : 'Send Reset Link'}
                   </button>
                 </form>
@@ -92,10 +92,10 @@ export function AuthPage() {
             <p className="text-ink-soft text-[14px] mb-1">We've sent a verification link to</p>
             <p className="text-[14px] font-medium mb-6">{signup.email}</p>
             <p className="text-ink-soft text-[13px] mb-8">Please check your inbox and click the link to verify your account.</p>
-            <a href="mailto:" className="block w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity mb-3" style={{ background: 'var(--color-accent)' }}>
+            <a href="mailto:" className="block w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity mb-3" style={{ background: 'var(--color-accent)' }}>
               Open Email App
             </a>
-            <button onClick={() => signup.resendVerification(signup.email)} className="w-full py-3.5 border border-line rounded-lg text-[13px] font-semibold text-ink-soft hover:bg-surface transition-colors mb-3">
+            <button onClick={() => signup.resendVerification(signup.email)} className="w-full py-3.5 border border-line rounded-full text-[13px] font-semibold text-ink-soft hover:bg-surface transition-colors mb-3">
               Resend Email
             </button>
             <p className="text-[13px] text-ink-soft">
@@ -141,7 +141,7 @@ export function AuthPage() {
                   </label>
                   <button type="button" onClick={() => login.setForgotMode(true)} className="text-[13px] underline underline-offset-2" style={{ color: 'var(--color-accent)' }}>Forgot password? Reset Now</button>
                 </div>
-                <button disabled={login.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
+                <button disabled={login.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-accent)' }}>
                   {login.submitting ? 'Signing In…' : 'Login'}
                 </button>
               </form>
@@ -154,7 +154,7 @@ export function AuthPage() {
 
               <button
                 onClick={() => login.signInWithGoogle(redirectTo)}
-                className="w-full py-3 border border-line rounded-lg flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
+                className="w-full py-3 border border-line rounded-full flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
               >
                 <GoogleIcon />
                 Continue with Google
@@ -171,7 +171,7 @@ export function AuthPage() {
               <button
                 type="button"
                 onClick={() => signup.signInWithGoogle(redirectTo)}
-                className="w-full py-3 border border-line rounded-lg flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
+                className="w-full py-3 border border-line rounded-full flex items-center justify-center gap-3 text-[13px] font-medium hover:bg-surface transition-colors"
               >
                 <GoogleIcon />
                 Continue with Google
@@ -212,7 +212,7 @@ export function AuthPage() {
                   <PasswordStrength password={signup.password} />
                   {signup.attempted && signup.fieldErrors.password && <p className="text-[11px] text-madder mt-1.5">{signup.fieldErrors.password}</p>}
                 </div>
-                <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
+                <button disabled={signup.submitting} type="submit" className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
                   Create Account
                 </button>
                 <p className="text-[11px] text-ink-soft leading-relaxed text-center">
