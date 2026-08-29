@@ -18,7 +18,6 @@ import { StatusBadge, type OrderRow } from '../components/StatusBadge'
 import { Wishlist } from './Wishlist'
 import { OrderDetail } from './OrderDetail'
 import { subscribeToNewsletter } from '../lib/newsletter'
-import { DeleteAccountSection } from '../components/DeleteAccountSection'
 import { profileDisplayName, profileInitial } from '../lib/profileName'
 import type { Purchase, Product } from '../lib/types'
 
@@ -524,8 +523,6 @@ function ProfileTab() {
       )}
 
       {settingsTab === 'addresses' && <AddressesPage />}
-
-      <DeleteAccountSection />
     </div>
   )
 }

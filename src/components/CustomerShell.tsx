@@ -11,7 +11,6 @@ import { SupportChat } from '@/components/SupportChat'
 import { AuthSheet } from '@/components/AuthSheet'
 import { NewsletterPromptModal } from '@/components/NewsletterPromptModal'
 import { useUI } from '@/context/UIContext'
-import { AccountDeletedToast } from '@/components/DeleteAccountSection'
 import { ScrollToTop } from '@/components/ScrollToTop'
 
 /**
@@ -32,7 +31,6 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ScrollToTop />
-      <AccountDeletedToast />
       <AdminAreaGuard />
       <CartDrawer />
       <CheckoutOverlay />
