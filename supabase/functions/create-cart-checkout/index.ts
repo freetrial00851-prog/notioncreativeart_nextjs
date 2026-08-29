@@ -6,6 +6,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeadersFor, isOriginAllowed, jsonHeaders } from '../_shared/cors.ts'
+import { siteBaseUrl } from '../_shared/orderConfirmationEmail.ts'
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
 const LEMON_API_KEY = Deno.env.get('LEMON_API_KEY')!
@@ -116,8 +117,8 @@ Deno.serve(async (req) => {
               name,
               description,
               media,
-              redirect_url: 'https://notioncreativeartnextjs.vercel.app/order-success',
-              receipt_link_url: 'https://notioncreativeartnextjs.vercel.app/order-success',
+              redirect_url: `${siteBaseUrl()}/order-success`,
+              receipt_link_url: `${siteBaseUrl()}/order-success`,
               receipt_button_text: 'View your order',
             },
             checkout_options: { embed: !isHosted, desc: true },

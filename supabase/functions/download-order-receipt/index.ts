@@ -175,7 +175,7 @@ async function buildPdf(opts: {
     font: helv,
     color: MUTED,
   })
-  page.drawText('notioncreativeartnextjs.vercel.app', {
+  page.drawText('notioncreativeart.com', {
     x: left,
     y: 42,
     size: 8,

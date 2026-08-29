@@ -174,6 +174,6 @@ export function siteBaseUrl(): string {
   return (
     Deno.env.get('SITE_URL')?.replace(/\/$/, '') ||
     Deno.env.get('NEXT_PUBLIC_SITE_URL')?.replace(/\/$/, '') ||
-    'https://notioncreativeartnextjs.vercel.app'
+    'https://notioncreativeart.com'
   )
 }

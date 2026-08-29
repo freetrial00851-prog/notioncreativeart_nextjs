@@ -3,7 +3,9 @@
 import { useEffect } from 'react'
 
 const SITE_NAME = 'Notion Creative Art'
-const SITE_URL = 'https://notioncreativeart.com'
+import { CANONICAL_SITE_URL } from '@/lib/env'
+
+const SITE_URL = CANONICAL_SITE_URL
 const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon.svg`
 
 function setMetaTag(attr: 'name' | 'property', key: string, content: string) {

@@ -3,7 +3,7 @@ import { Baloo_2, Manrope, Playfair_Display } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
-import { buildMetadata, SEO_KEYWORDS, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
+import { buildMetadata, SEO_KEYWORDS, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
 
 /** Manrope — body, nav, UI. Self-hosted via next/font (no layout shift). */
 const manrope = Manrope({
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     path: '/',
     keywords: [...SEO_KEYWORDS],
   }),
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://notioncreativeart.com'),
+  metadataBase: new URL(SITE_URL),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -55,10 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${manrope.variable} ${playfair.variable} ${baloo2.variable}`}>
       <head>
-        {/* Brand favicon — app/icon.png + app/apple-icon.png are auto-wired by Next.js */}
+        {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
