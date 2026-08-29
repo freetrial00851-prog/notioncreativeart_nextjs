@@ -255,7 +255,7 @@ export function Shop() {
 
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-14">
-      <nav className="text-[11px] tracking-[0.08em] text-ink-soft mb-8 flex items-center gap-2 flex-wrap">
+      <nav className="text-[11px] tracking-[0.08em] text-ink-soft mb-3 flex items-center gap-2 flex-wrap">
         <Link href="/" className="hover:text-ink">HOME</Link>
         {parentCategory && (
           <>
@@ -276,10 +276,9 @@ export function Shop() {
         <span className="text-ink">{title.toUpperCase()}</span>
       </nav>
 
-      <div className="border-b border-line pb-6 md:pb-8 mb-6 md:mb-10">
-        <div className="flex items-end justify-between flex-wrap gap-4 mb-5 md:mb-0">
+      <div className="border-b border-line pb-4 md:pb-5 mb-4 md:mb-6">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-3 md:mb-0">
           <div>
-            <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">SHOP</p>
             <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words">{title}</h1>
           </div>
           <select
