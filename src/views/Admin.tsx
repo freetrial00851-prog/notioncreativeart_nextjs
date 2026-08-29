@@ -14,6 +14,7 @@ import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminBulkUpload } from './AdminBulkUpload'
 import { DropzoneUpload } from '../components/DropzoneUpload'
+import { ProductExportModal } from '../components/ProductExportModal'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { triggerPdfDownload } from '../lib/downloads'
 import { revalidateStorefront } from '../lib/actions/revalidateStorefront'
@@ -306,6 +307,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const [statusCounts, setStatusCounts] = useState({ active: 0, draft: 0, sold_out: 0, inactive: 0 })
   const [showStats, setShowStats] = useState(true)
+  const [showExportModal, setShowExportModal] = useState(false)
 
   const pageTitle = mode === 'free' ? 'Free Patterns' : mode === 'bundles' ? 'Bundles' : 'Listings'
   const emptyMessage = mode === 'free' ? 'No free patterns yet — set a product\'s price to $0 to list it here.' : mode === 'bundles' ? 'No bundles yet — check "This is a bundle" on a product to list it here.' : 'No listings yet.'
@@ -957,7 +959,18 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
           {selected.size > 0 && (
             <button onClick={() => setSelected(new Set())} className="text-[13px] text-ink-soft hover:text-ink ml-1">Clear ({selected.size})</button>
           )}
+          <button
+            type="button"
+            onClick={() => setShowExportModal(true)}
+            className="ml-auto px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] hover:bg-[#f9f8f6]"
+          >
+            Export CSV
+          </button>
         </div>
+
+        {showExportModal && (
+          <ProductExportModal categories={categories} onClose={() => setShowExportModal(false)} />
+        )}
 
         {products.length === 0 ? (
           <div className="bg-white border border-[#e4e1db] rounded-xl py-16 text-center text-[14px] text-ink-soft">
