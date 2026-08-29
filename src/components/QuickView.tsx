@@ -16,7 +16,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 
 export function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const { user, profile } = useAuth()
-  const { requireAuth, maybeOpenNewsletterPrompt, beginCheckoutLoading, setCheckoutPhase, beginDownloadLoading, setDownloadPhase, endLoadingOverlay } = useUI()
+  const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { isWishlisted, toggleWishlist: toggleWishlistItem } = useWishlist()
   const { showToast } = useToast()
@@ -47,11 +47,9 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
     if (product.price === 0) {
       if (downloadingFree) return
       setDownloadingFree(true)
-      beginDownloadLoading()
-      const result = await downloadFreePattern(product.id, product.title, user?.id ?? null, {
-        onStarting: () => setDownloadPhase('starting'),
-      })
-      endLoadingOverlay()
+      showBusyOverlay('download')
+      const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+      hideBusyOverlay()
       setDownloadingFree(false)
       showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
       if (result.ok) maybeOpenNewsletterPrompt()
@@ -60,7 +58,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
     if (!requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
-    beginCheckoutLoading({ source: 'buy', phase: 'preparing' })
+    showBusyOverlay('checkout')
     const result = await startApiCheckout([product.id], {
       userId: user!.id,
       email: user!.email,
@@ -68,8 +66,8 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
       billingCountry: profile?.billing_country,
       billingState: profile?.billing_state,
       billingZip: profile?.billing_zip,
-    }, { onRedirecting: () => setCheckoutPhase('redirecting') })
-    endLoadingOverlay()
+    })
+    hideBusyOverlay()
     setBuying(false)
     if (!result.ok) showToast(result.error, 'error')
   }

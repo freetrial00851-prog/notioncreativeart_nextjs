@@ -84,16 +84,11 @@ async function requestFreeDownloadUrl(productId: string): Promise<FreeDownloadRe
 
 /** Guest/anonymous free download — server verifies price === 0 and mints a
  *  signed URL via the download-free-pattern Edge Function. */
-async function downloadFreePatternViaServer(
-  productId: string,
-  title?: string,
-  options?: { onStarting?: () => void },
-): Promise<{ ok: boolean; error?: string }> {
+async function downloadFreePatternViaServer(productId: string, title?: string): Promise<{ ok: boolean; error?: string }> {
   const data = await requestFreeDownloadUrl(productId)
   if (data.error) return { ok: false, error: data.error }
   if (!data.signedUrl) return { ok: false, error: "This pattern's file isn't uploaded yet — please check back soon." }
   const filename = data.filename ?? `${(title ?? 'pattern').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`
-  options?.onStarting?.()
   triggerBrowserDownload(data.signedUrl, filename)
   return { ok: true }
 }
@@ -101,17 +96,11 @@ async function downloadFreePatternViaServer(
 /** Download a $0 pattern. Everyone gets the file via the Edge Function
  *  (reliable signed URL). Logged-in users also get a best-effort purchases
  *  row so the pattern shows up under Account → Downloads. */
-export async function downloadFreePattern(
-  productId: string,
-  title?: string,
-  userId?: string | null,
-  options?: { onStarting?: () => void },
-): Promise<{ ok: boolean; error?: string }> {
+export async function downloadFreePattern(productId: string, title?: string, userId?: string | null): Promise<{ ok: boolean; error?: string }> {
   if (userId) {
     void supabase.from('purchases').insert({ user_id: userId, product_id: productId, order_id: null }).then(({ error }) => {
       if (error && error.code !== '23505') console.error('Failed to record free-pattern purchase:', error)
     })
   }
-  const result = await downloadFreePatternViaServer(productId, title, options)
-  return result
+  return downloadFreePatternViaServer(productId, title)
 }

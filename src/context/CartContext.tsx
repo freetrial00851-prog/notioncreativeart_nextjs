@@ -15,7 +15,6 @@ import {
   removeGuestCartItem,
   writeGuestCart,
 } from '../lib/guestStorage'
-import { useUI } from './UIContext'
 import type { Product } from '../lib/types'
 
 type CartItem = {
@@ -47,12 +46,11 @@ const CartContext = createContext<CartContextValue | null>(null)
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user, profile } = useAuth()
   const { showToast } = useToast()
-  const { beginCheckoutLoading, setCheckoutPhase, endLoadingOverlay, loadingOverlay } = useUI()
   const [items, setItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [justAdded, setJustAdded] = useState(false)
-  const checkingOut = loadingOverlay?.kind === 'checkout' && loadingOverlay.source === 'cart'
+  const [checkingOut, setCheckingOut] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const itemsRef = useRef(items)
   itemsRef.current = items
@@ -225,13 +223,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCheckoutError(null)
     const current = itemsRef.current
     const freeInCart = current.filter((i) => Number(i.product?.price) === 0)
-    beginCheckoutLoading({ source: 'cart' })
     if (freeInCart.length > 0) {
-      endLoadingOverlay()
       setCheckoutError('Free patterns can’t be checked out — remove them and use Download Free on the product page.')
       return
     }
-    setCheckoutPhase('preparing')
+    setCheckingOut(true)
     const result = await startApiCheckout(
       current.map((i) => i.product_id),
       {
@@ -242,10 +238,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         billingState: profile?.billing_state,
         billingZip: profile?.billing_zip,
       },
-      { onRedirecting: () => setCheckoutPhase('redirecting') },
     )
     if (!result.ok) setCheckoutError(result.error)
-    endLoadingOverlay()
+    setCheckingOut(false)
   }
 
   useEffect(() => {

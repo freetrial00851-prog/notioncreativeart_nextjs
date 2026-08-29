@@ -11,14 +11,7 @@ import type { Product } from '../lib/types'
 
 export function PendingActionRunner() {
   const { user, profile, pendingAction, setPendingAction } = useAuth()
-  const {
-    beginCheckoutLoading,
-    setCheckoutPhase,
-    beginDownloadLoading,
-    setDownloadPhase,
-    endLoadingOverlay,
-    maybeOpenNewsletterPrompt,
-  } = useUI()
+  const { showBusyOverlay, hideBusyOverlay, maybeOpenNewsletterPrompt } = useUI()
 
   useEffect(() => {
     if (!user || !pendingAction) return
@@ -35,12 +28,12 @@ export function PendingActionRunner() {
           .eq('id', pendingAction.productId)
           .maybeSingle()
         const product = data as Pick<Product, 'id' | 'title' | 'price'> | null
+        // Free patterns never go in the cart — download instead if the user
+        // signed in after an accidental cart intent on a $0 listing.
         if (product && Number(product.price) === 0) {
-          beginDownloadLoading()
-          const result = await downloadFreePattern(product.id, product.title, user.id, {
-            onStarting: () => setDownloadPhase('starting'),
-          })
-          endLoadingOverlay()
+          showBusyOverlay('download')
+          const result = await downloadFreePattern(product.id, product.title, user.id)
+          hideBusyOverlay()
           if (result.ok) maybeOpenNewsletterPrompt()
         } else if (product) {
           await supabase.from('cart_items').upsert(
@@ -59,14 +52,12 @@ export function PendingActionRunner() {
         const product = data as Product | null
         if (product) {
           if (product.price === 0) {
-            beginDownloadLoading()
-            const result = await downloadFreePattern(product.id, product.title, user.id, {
-              onStarting: () => setDownloadPhase('starting'),
-            })
-            endLoadingOverlay()
+            showBusyOverlay('download')
+            const result = await downloadFreePattern(product.id, product.title, user.id)
+            hideBusyOverlay()
             if (result.ok) maybeOpenNewsletterPrompt()
           } else {
-            beginCheckoutLoading({ source: 'buy', phase: 'preparing' })
+            showBusyOverlay('checkout')
             await startApiCheckout([product.id], {
               userId: user.id,
               email: user.email,
@@ -74,8 +65,8 @@ export function PendingActionRunner() {
               billingCountry: profile?.billing_country,
               billingState: profile?.billing_state,
               billingZip: profile?.billing_zip,
-            }, { onRedirecting: () => setCheckoutPhase('redirecting') })
-            endLoadingOverlay()
+            })
+            hideBusyOverlay()
           }
         }
       }
@@ -84,18 +75,7 @@ export function PendingActionRunner() {
     }
 
     run()
-  }, [
-    user,
-    pendingAction,
-    setPendingAction,
-    profile,
-    beginCheckoutLoading,
-    setCheckoutPhase,
-    beginDownloadLoading,
-    setDownloadPhase,
-    endLoadingOverlay,
-    maybeOpenNewsletterPrompt,
-  ])
+  }, [user, pendingAction, setPendingAction, profile, showBusyOverlay, hideBusyOverlay, maybeOpenNewsletterPrompt])
 
   return null
 }

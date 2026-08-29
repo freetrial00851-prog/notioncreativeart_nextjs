@@ -17,7 +17,7 @@ import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
-  const { maybeOpenNewsletterPrompt, beginDownloadLoading, setDownloadPhase, endLoadingOverlay } = useUI()
+  const { maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { user } = useAuth()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const { isWishlisted, toggleWishlist: toggleWishlistItem } = useWishlist()
@@ -48,11 +48,9 @@ export function ProductCard({ product, priority = false }: { product: Product; p
     e.preventDefault()
     if (downloadingFree) return
     setDownloadingFree(true)
-    beginDownloadLoading()
-    const result = await downloadFreePattern(product.id, product.title, user?.id ?? null, {
-      onStarting: () => setDownloadPhase('starting'),
-    })
-    endLoadingOverlay()
+    showBusyOverlay('download')
+    const result = await downloadFreePattern(product.id, product.title, user?.id ?? null)
+    hideBusyOverlay()
     setDownloadingFree(false)
     showToast(result.ok ? 'Downloading your pattern…' : (result.error ?? "This pattern's file isn't uploaded yet — please check back soon."), result.ok ? 'success' : 'error')
     if (result.ok) maybeOpenNewsletterPrompt()

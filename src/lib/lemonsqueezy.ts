@@ -62,7 +62,6 @@ async function readFunctionError(
 export async function startApiCheckout(
   productIds: string[],
   customer: ApiCheckoutCustomer,
-  options?: { onRedirecting?: () => void },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const { data, error: fnError } = await supabase.functions.invoke('create-cart-checkout', {
     body: {
@@ -82,10 +81,8 @@ export async function startApiCheckout(
   }
 
   if (data.hosted) {
-    options?.onRedirecting?.()
     window.open(data.url, '_blank', 'noopener')
   } else {
-    options?.onRedirecting?.()
     openCheckout(data.url)
   }
   return { ok: true }
