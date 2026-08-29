@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { compressImage } from '../lib/imageCompress'
 import { IMAGE_MAX } from '../lib/imageVariants'
-import type { HeroContent, ChapterContent, CategoryContent, AnnouncementsContent, SocialContent, LayoutSection, TestimonialContent } from '../lib/types'
+import type { HeroContent, ChapterContent, CategoryContent, AnnouncementsContent, SocialContent, LayoutSection, TestimonialContent, SiteSeoContent } from '../lib/types'
 import { DEFAULT_ANNOUNCEMENT_COLORS, normalizeAnnouncements } from '../lib/types'
+import { DEFAULT_SITE_SEO } from '../lib/seoSettings'
 import { mergeLayout } from '../lib/defaultLayout'
 import { DropzoneUpload } from '../components/DropzoneUpload'
 
@@ -18,13 +19,15 @@ export function HomepageAdmin() {
   const [social, setSocial] = useState<SocialContent | null>(null)
   const [testimonials, setTestimonials] = useState<TestimonialContent[]>([])
   const [layout, setLayout] = useState<LayoutSection[] | null>(null)
+  const [seo, setSeo] = useState<SiteSeoContent | null>(null)
   const [loading, setLoading] = useState(true)
   const [savingKey, setSavingKey] = useState<string | null>(null)
   const [uploadingKey, setUploadingKey] = useState<string | null>(null)
 
   const load = () => {
-    supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'categories', 'announcements', 'social', 'homepage_layout', 'testimonials']).then(({ data }) => {
+    supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'categories', 'announcements', 'social', 'homepage_layout', 'testimonials', 'seo']).then(({ data }) => {
       let foundAnnouncements = false
+      let foundSeo = false
       for (const row of data ?? []) {
         if (row.key === 'hero') setHero(row.value as HeroContent)
         if (row.key === 'chapters') setChapters(row.value as ChapterContent[])
@@ -36,9 +39,16 @@ export function HomepageAdmin() {
         if (row.key === 'social') setSocial(row.value as SocialContent)
         if (row.key === 'homepage_layout') setLayout(mergeLayout(row.value as LayoutSection[]))
         if (row.key === 'testimonials') setTestimonials(row.value as TestimonialContent[])
+        if (row.key === 'seo') {
+          setSeo({ ...DEFAULT_SITE_SEO, ...(row.value as Partial<SiteSeoContent>) })
+          foundSeo = true
+        }
       }
       if (!foundAnnouncements) {
         setAnnouncements(normalizeAnnouncements({ enabled: false, messages: [''] }))
+      }
+      if (!foundSeo) {
+        setSeo({ ...DEFAULT_SITE_SEO })
       }
       setLoading(false)
     })
@@ -49,7 +59,7 @@ export function HomepageAdmin() {
     supabase.from('categories').select('id, name, slug').order('sort_order').then(({ data }) => setRealCategories(data ?? []))
   }, [])
 
-  const save = async (key: 'hero' | 'chapters' | 'categories' | 'announcements' | 'social' | 'homepage_layout' | 'testimonials', value: unknown) => {
+  const save = async (key: 'hero' | 'chapters' | 'categories' | 'announcements' | 'social' | 'homepage_layout' | 'testimonials' | 'seo', value: unknown) => {
     setSavingKey(key)
     await supabase.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() })
     setSavingKey(null)
@@ -59,6 +69,7 @@ export function HomepageAdmin() {
     setUploadingKey(tag)
     const maxDim =
       tag === 'hero' ? IMAGE_MAX.hero
+      : tag === 'seo-og' ? 1200
       : tag.startsWith('chapter') ? IMAGE_MAX.chapter
       : tag.startsWith('testimonial') ? 400
       : IMAGE_MAX.general
@@ -81,6 +92,43 @@ export function HomepageAdmin() {
   return (
     <div className="space-y-16 max-w-3xl">
       <h1 className="font-display font-semibold text-2xl">Homepage</h1>
+
+      {/* SEO & SOCIAL */}
+      {seo && (
+        <div>
+          <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-4">SEO &amp; SOCIAL SHARING</p>
+          <div className="space-y-4 border border-line rounded-2xl p-6 bg-white">
+            <TextField
+              label={`Homepage meta title (${seo.homepage_meta_title.length}/70)`}
+              value={seo.homepage_meta_title}
+              onChange={(v) => setSeo({ ...seo, homepage_meta_title: v })}
+            />
+            <TextField
+              label={`Homepage meta description (${seo.homepage_meta_description.length}/160)`}
+              value={seo.homepage_meta_description}
+              onChange={(v) => setSeo({ ...seo, homepage_meta_description: v })}
+              multiline
+            />
+            <DropzoneUpload
+              label="Social share image (OG image)"
+              sizeHint="1200×630px, landscape — used for Facebook, WhatsApp, Twitter, and other link previews site-wide"
+              urls={seo.og_image ? [seo.og_image] : []}
+              accept="image/jpeg,image/png"
+              acceptLabel="JPEG or PNG"
+              multiple={false}
+              uploading={uploadingKey === 'seo-og'}
+              onAdd={(files) => uploadImages(files, (urls) => setSeo({ ...seo, og_image: urls[0] ?? '' }), 'seo-og')}
+              onRemove={() => setSeo({ ...seo, og_image: '' })}
+              onReorder={() => {}}
+            />
+            <p className="text-[11px] text-ink-soft">
+              If no social image is set, the first hero banner image is used. Product pages use their own primary photo when available.
+            </p>
+            <SaveButton onClick={() => save('seo', seo)} saving={savingKey === 'seo'} />
+          </div>
+        </div>
+      )}
+
       {/* LAYOUT — reorder and show/hide sections */}
       {layout && (
         <div>

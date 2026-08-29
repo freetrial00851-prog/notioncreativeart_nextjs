@@ -117,6 +117,14 @@ export type HeroContent = {
   secondary_cta_link?: string
 }
 
+/** Homepage + site-wide social/SEO fields (site_settings key: `seo`). */
+export type SiteSeoContent = {
+  homepage_meta_title: string
+  homepage_meta_description: string
+  /** 1200×630 social share image URL; empty = fall back to hero image. */
+  og_image: string
+}
+
 export type ChapterContent = {
   level: 'beginner' | 'intermediate' | 'advanced'
   label: string

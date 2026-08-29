@@ -1,7 +1,9 @@
-import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
+import type { Metadata } from 'next'
+import { buildMetadata } from '@/lib/seo'
 import { Home } from '@/views/Home'
 import { getHomeCatalogServer } from '@/lib/data/home'
 import { mergeLayout } from '@/lib/defaultLayout'
+import { getSiteSeoContext } from '@/lib/seoSettings'
 
 /**
  * ISR homepage — catalog is server-fetched and CDN-cached for 60s.
@@ -11,18 +13,16 @@ import { mergeLayout } from '@/lib/defaultLayout'
  */
 export const revalidate = 60
 
-export const metadata = buildMetadata({
-  title: 'Notion Creative Art',
-  description:
-    'Considered crochet patterns, delivered as instant PDF downloads. Shop amigurumi, wearables, home decor, beginner-friendly designs, and free crochet patterns from a small studio that tests every design twice.',
-  path: '/',
-  keywords: [
-    ...SEO_KEYWORDS,
-    'crochet patterns online shop',
-    'buy crochet patterns online',
-    'crochet amigurumi patterns PDF',
-  ],
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo, siteOgImage } = await getSiteSeoContext()
+  return buildMetadata({
+    title: seo.homepage_meta_title,
+    description: seo.homepage_meta_description,
+    path: '/',
+    image: siteOgImage,
+    exactTitle: true,
+  })
+}
 
 export default async function HomePage() {
   const { snapshot, featuredError } = await getHomeCatalogServer()

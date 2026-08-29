@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
-import { buildMetadata, buildProductJsonLd, SEO_KEYWORDS } from '@/lib/seo'
+import { buildMetadata, buildProductJsonLd } from '@/lib/seo'
 import { getProductBySlug } from '@/lib/data/products'
+import { deriveVariantUrl } from '@/lib/imageVariants'
+import { getSiteSeoContext } from '@/lib/seoSettings'
 import { ProductDetail } from '@/views/ProductDetail'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -25,23 +27,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const description =
-    product.meta_description ??
-    (product.description
-      ? product.description.slice(0, 155)
-      : 'A crochet PDF pattern from Notion Creative Art — instant download.')
+    product.meta_description?.trim() ||
+    product.subtitle?.trim() ||
+    (product.description ? product.description.slice(0, 155) : '') ||
+    'A crochet PDF pattern from Notion Creative Art — instant download.'
+
+  const { siteOgImage } = await getSiteSeoContext()
+  const image = product.images?.[0]
+    ? deriveVariantUrl(product.images[0], 'large')
+    : siteOgImage
 
   return buildMetadata({
     title: product.meta_title || product.title,
     description,
     path: `/pattern/${slug}`,
-    image: product.images?.[0],
+    image,
     type: 'product',
-    keywords: [
-      ...SEO_KEYWORDS,
-      product.title,
-      `${product.title} crochet pattern`,
-      product.skill_level ? `${product.skill_level} crochet pattern` : 'crochet pattern PDF',
-    ],
   })
 }
 

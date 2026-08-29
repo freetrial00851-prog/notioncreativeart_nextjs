@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
+import { buildMetadata } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
 
 type Props = { params: Promise<{ categorySlug: string }> }
@@ -16,7 +16,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${label} — Shop`,
     description: `Browse ${label.toLowerCase()} crochet PDF patterns from Notion Creative Art. Instant download, beginner to advanced skill levels.`,
     path: `/shop/${categorySlug}`,
-    keywords: [...SEO_KEYWORDS, `${label.toLowerCase()} crochet patterns`, `crochet ${categorySlug} patterns PDF`],
   })
 }
 

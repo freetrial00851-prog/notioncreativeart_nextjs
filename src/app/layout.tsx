@@ -3,7 +3,8 @@ import { Baloo_2, Manrope, Playfair_Display } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
-import { buildMetadata, SEO_KEYWORDS, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
+import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
+import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
 /** Manrope — body, nav, UI. Self-hosted via next/font (no layout shift). */
 const manrope = Manrope({
@@ -36,16 +37,27 @@ export const viewport: Viewport = {
   themeColor: '#FCFBF8',
 }
 
-/** Root metadata — applies site-wide defaults; individual pages override via generateMetadata. */
-export const metadata: Metadata = {
-  ...buildMetadata({
-    title: 'Notion Creative Art',
-    description:
-      'Considered crochet patterns, delivered as instant PDF downloads. Shop amigurumi, wearables, home decor, and free crochet patterns from a small studio that tests every design.',
-    path: '/',
-    keywords: [...SEO_KEYWORDS],
-  }),
-  metadataBase: new URL(SITE_URL),
+/** Site-wide metadata defaults — child pages override title, description, canonical, and image. */
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo, siteOgImage } = await getSiteSeoContext()
+  const description = seo.homepage_meta_description.trim() || DEFAULT_HOMEPAGE_META_DESCRIPTION
+
+  const metadata: Metadata = {
+    metadataBase: new URL(SITE_URL),
+    description,
+  }
+
+  if (siteOgImage) {
+    metadata.openGraph = {
+      images: [{ url: siteOgImage, width: 1200, height: 630, alt: SITE_NAME }],
+    }
+    metadata.twitter = {
+      card: 'summary_large_image',
+      images: [siteOgImage],
+    }
+  }
+
+  return metadata
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

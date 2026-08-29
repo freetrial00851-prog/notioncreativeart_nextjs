@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { buildMetadata, SEO_KEYWORDS } from '@/lib/seo'
+import { buildMetadata } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
 
 export const metadata = buildMetadata({
@@ -7,7 +7,6 @@ export const metadata = buildMetadata({
   description:
     'Browse all crochet PDF patterns from Notion Creative Art — amigurumi, wearables, home decor, bundles, and free patterns. Instant digital download.',
   path: '/shop',
-  keywords: [...SEO_KEYWORDS, 'shop crochet patterns', 'crochet pattern catalog'],
 })
 
 function ShopLoading() {

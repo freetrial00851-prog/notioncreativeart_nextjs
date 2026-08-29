@@ -4,38 +4,17 @@ import { env } from '@/lib/env'
 /** Brand constants — single source of truth for SEO across the site. */
 export const SITE_NAME = 'Notion Creative Art'
 export const SITE_URL = env.siteUrl
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon.svg`
-
-/** Primary SEO keywords targeting organic crochet pattern searches. */
-export const SEO_KEYWORDS = [
-  'crochet patterns',
-  'crochet PDF patterns',
-  'instant download crochet patterns',
-  'amigurumi crochet patterns',
-  'beginner crochet patterns',
-  'intermediate crochet patterns',
-  'advanced crochet patterns',
-  'crochet pattern shop',
-  'digital crochet patterns',
-  'printable crochet patterns',
-  'Notion Creative Art',
-  'NCA crochet',
-  'crochet wearables patterns',
-  'crochet home decor patterns',
-  'free crochet patterns PDF',
-  'crochet pattern bundles',
-  'US crochet terms patterns',
-  'step by step crochet instructions',
-] as const
 
 export type PageMetaInput = {
   title: string
   description: string
   path: string
+  /** When omitted, no og:image / twitter:image tags are emitted (layout may supply a site default). */
   image?: string
   type?: 'website' | 'product'
-  keywords?: string[]
   noIndex?: boolean
+  /** Use title verbatim (no " — Site Name" suffix). For homepage meta title with embedded brand. */
+  exactTitle?: boolean
 }
 
 /**
@@ -43,33 +22,40 @@ export type PageMetaInput = {
  * Server-rendered metadata is indexable immediately (no JS execution required).
  */
 export function buildMetadata(opts: PageMetaInput): Metadata {
-  const fullTitle =
-    opts.title === SITE_NAME ? opts.title : `${opts.title} — ${SITE_NAME}`
+  const fullTitle = opts.exactTitle
+    ? opts.title
+    : opts.title === SITE_NAME
+      ? opts.title
+      : `${opts.title} — ${SITE_NAME}`
   const url = `${SITE_URL}${opts.path}`
-  const image = opts.image ?? DEFAULT_OG_IMAGE
-  const keywords = opts.keywords ?? [...SEO_KEYWORDS]
+
+  const openGraph: NonNullable<Metadata['openGraph']> = {
+    title: fullTitle,
+    description: opts.description,
+    url,
+    siteName: SITE_NAME,
+    type: 'website',
+    locale: 'en_US',
+  }
+
+  const twitter: NonNullable<Metadata['twitter']> = {
+    card: 'summary_large_image',
+    title: fullTitle,
+    description: opts.description,
+  }
+
+  if (opts.image) {
+    openGraph.images = [{ url: opts.image, width: 1200, height: 630, alt: opts.title }]
+    twitter.images = [opts.image]
+  }
 
   return {
     title: fullTitle,
     description: opts.description,
-    keywords,
     alternates: { canonical: url },
     robots: opts.noIndex ? { index: false, follow: false } : undefined,
-    openGraph: {
-      title: fullTitle,
-      description: opts.description,
-      url,
-      siteName: SITE_NAME,
-      images: [{ url: image, width: 1200, height: 630, alt: opts.title }],
-      type: opts.type === 'product' ? 'website' : 'website',
-      locale: 'en_US',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: fullTitle,
-      description: opts.description,
-      images: [image],
-    },
+    openGraph,
+    twitter,
   }
 }
 
