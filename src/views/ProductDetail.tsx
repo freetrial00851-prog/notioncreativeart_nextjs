@@ -358,15 +358,6 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   if (badge === 'sale') tags.push('Sale')
   if (badge === 'featured') tags.push('Featured')
 
-  const formatLabel = 'PDF Download'
-
-  const specs: { icon: string; label: string; value: string }[] = [
-    ...(skillLabel ? [{ icon: 'track_changes', label: 'Skill Level', value: skillLabel === 'Beginner' ? 'Easy' : skillLabel }] : []),
-    { icon: 'language', label: 'Language', value: 'English (US Terms)' },
-    { icon: 'description', label: 'Format', value: formatLabel },
-    ...(product.pdf_pages ? [{ icon: 'auto_stories', label: 'Pages', value: `${product.pdf_pages} pages` }] : []),
-  ]
-
   const TABS: { key: Tab; label: string }[] = [
     { key: 'description', label: 'Description' },
     { key: 'included', label: "What's Included" },
@@ -491,7 +482,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
       </nav>
 
       {/* Hero layout
-          < lg: single column — gallery → title/badges/buy/specs
+          < lg: single column — gallery → title/badges/buy
           ≥ lg: 2-col gallery | info + buy (Etsy-style) */}
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)] gap-6 lg:gap-8 items-start overflow-visible">
         {/* Left — Gallery */}
@@ -645,7 +636,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           </div>
         </div>
 
-        {/* Right — badges, title, buy box, then specs */}
+        {/* Right — badges, title, buy box */}
         <div className="min-w-0 lg:pt-1 lg:sticky lg:top-24 lg:self-start">
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2 lg:mb-3">
@@ -769,20 +760,6 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
             </div>
           )}
           </div>
-
-          <ul className="space-y-2.5 mb-5 mt-6">
-            {specs.map((s) => (
-              <li key={s.label} className="flex items-center gap-3 text-[13px]">
-                <MaterialIcon name={s.icon} size={18} color="var(--color-ink-soft)" />
-                <span className="text-ink-soft">{s.label}:</span>
-                <span className="font-medium text-ink truncate">{s.value}</span>
-              </li>
-            ))}
-          </ul>
-
-          {product.wishlist_count > 0 && (
-            <p className="text-[11px] text-ink-soft mt-5">♡ {product.wishlist_count} {product.wishlist_count === 1 ? 'person has' : 'people have'} saved this pattern</p>
-          )}
         </div>
       </div>
 
