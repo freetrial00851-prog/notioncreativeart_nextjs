@@ -875,14 +875,32 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
       {!product.sold_out && showStickyBar && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-canvas border-t border-line px-5 py-3 flex items-center justify-between gap-4">
           <span className="text-[15px] font-medium shrink-0">{product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}</span>
-          <button
-            onClick={handleBuy}
-            disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-            className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
-            style={{ background: 'var(--color-sale-green)' }}
-          >
-            {product.price === 0 ? 'Download free' : 'Buy now'}
-          </button>
+          {product.price === 0 ? (
+            <button
+              onClick={handleBuy}
+              disabled={downloadingFree}
+              className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
+              style={{ background: 'var(--color-sale-green)' }}
+            >
+              Download free
+            </button>
+          ) : isInCart(product.id) ? (
+            <Link
+              href="/cart"
+              className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity text-center"
+              style={{ background: 'var(--color-sale-green)' }}
+            >
+              In cart
+            </Link>
+          ) : (
+            <button
+              onClick={toggleCart}
+              className="flex-1 py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity"
+              style={{ background: 'var(--color-sale-green)' }}
+            >
+              Add to Cart
+            </button>
+          )}
         </div>
       )}
     </div>
