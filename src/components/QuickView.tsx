@@ -13,6 +13,7 @@ import { downloadFreePattern } from '../lib/downloads'
 import { useToast } from '../context/ToastContext'
 import { profileDisplayName } from '../lib/profileName'
 import { deriveVariantUrl } from '../lib/imageVariants'
+import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 
 export function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const { user, profile } = useAuth()
@@ -30,14 +31,12 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
   const inCart = isInCart(product.id)
   const inWishlist = isWishlisted(product.id)
 
+  useBodyScrollLock(true)
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
+    return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
   const next = () => setActiveImage((i) => (i + 1) % images.length)
@@ -89,12 +88,12 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4 overscroll-none"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-3xl h-[min(85vh,640px)] bg-canvas border border-line rounded-2xl shadow-xl overflow-hidden grid grid-rows-[minmax(0,42%)_minmax(0,1fr)] md:grid-cols-2 md:grid-rows-1">
+      <div className="w-full max-w-3xl max-h-[85vh] bg-canvas border border-line rounded-2xl shadow-xl overflow-hidden flex flex-col md:grid md:grid-cols-2 md:items-stretch">
         <div
-          className="relative bg-surface flex items-center justify-center min-h-0 overflow-hidden md:h-full"
+          className="relative bg-surface flex items-center justify-center shrink-0 p-3 md:p-4 min-h-[200px] max-h-[min(42vh,360px)] md:max-h-[85vh]"
           onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
           onTouchEnd={(e) => {
             if (touchStartX === null) return
@@ -110,7 +109,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
               sizes="(max-width: 768px) 100vw, 480px"
               alt={product.title}
               loading="eager"
-              className="w-full h-full object-cover"
+              className="max-w-full max-h-full w-auto h-auto object-contain"
             />
           ) : (
             <span className="text-ink-soft text-xs">No image yet</span>
@@ -146,9 +145,9 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
           )}
         </div>
 
-        <div className="relative flex flex-col min-h-0 overflow-hidden p-5 md:p-6">
+        <div className="relative flex flex-col min-h-0 max-h-[85vh] p-5 md:p-6">
           <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 z-10 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
-          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
           {product.skill_level && <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1.5 uppercase">{product.skill_level}</p>}
           <h2
             className="font-subheading font-semibold text-xl leading-snug pr-8 mb-2 overflow-hidden"
@@ -160,7 +159,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
           >
             {product.title}
           </h2>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-3">
             {product.price > 0 && product.compare_at_price && product.compare_at_price > product.price ? (
               <>
                 <span className="text-base font-semibold text-ink">${product.price.toFixed(2)}</span>
@@ -171,14 +170,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
             )}
           </div>
           {product.description && (
-            <p
-              className="text-[13px] text-ink-soft leading-relaxed mb-4 whitespace-pre-line overflow-hidden"
-              style={{
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-              }}
-            >
+            <p className="text-[13px] text-ink-soft leading-relaxed mb-2 whitespace-pre-line">
               {product.description}
             </p>
           )}
