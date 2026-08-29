@@ -540,7 +540,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                     alt={product.title}
                     loading="eager"
                     fetchPriority="high"
-                    className="max-w-full max-h-full w-auto h-auto object-contain pointer-events-none select-none"
+                    className="w-full h-full object-contain pointer-events-none select-none"
                     draggable={false}
                   />
                 ) : (
