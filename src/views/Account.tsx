@@ -388,7 +388,6 @@ function ProfileTab() {
     setPwMessage(null)
     if (!oldPassword) { setPwMessage('Enter your current password.'); return }
     if (newPassword.length < 8) { setPwMessage('New password must be at least 8 characters.'); return }
-    if (!/\d/.test(newPassword)) { setPwMessage('New password must include at least one number.'); return }
     if (newPassword !== confirmPassword) { setPwMessage("New passwords don't match."); return }
     setPwSaving(true)
 

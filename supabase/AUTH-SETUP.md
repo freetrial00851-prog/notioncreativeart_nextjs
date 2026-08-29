@@ -79,24 +79,3 @@ No extra code changes needed.
 4. Save
 
 Matches order-confirmation branding: navy `#243B5A`, sage `#6F8760`, Playfair Display + Manrope, with a proper **Confirm Email Address** button.
-
-### Password requirements (client + server)
-
-The app only **requires** 8+ characters and at least one digit. Uppercase, lowercase, and symbols are optional (shown as strength hints in the UI).
-
-Supabase Auth can enforce stricter rules **server-side** even when the client allows a password. If sign-up fails with a weak-password error for passwords like `pattern8`, relax the project setting:
-
-1. Open [Authentication → Sign In / Up → Email → Password Requirements](https://supabase.com/dashboard/project/anlsellghialszuuvipw/auth/providers?provider=Email)
-2. Set **Minimum password length** to `8`
-3. Set **Required characters** to **Digits only** (or **No required characters** if you only want the 8-char minimum enforced by Supabase)
-4. Save
-
-Without this dashboard change, Supabase may still reject passwords missing uppercase/lowercase/symbols regardless of client validation.
-
-
-1. Open [Authentication → Email Templates → Reset password](https://supabase.com/dashboard/project/anlsellghialszuuvipw/auth/templates)
-2. **Subject:** `Reset your Notion Creative Art password`
-3. **Body:** paste the HTML from [`email-templates/reset-password.html`](./email-templates/reset-password.html) (uses `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .SiteURL }}`)
-4. Save
-
-Same layout and branding as confirm-signup, with a **Reset Password** button.
