@@ -510,7 +510,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
 
             <div className="min-w-0 flex-1 w-full">
               <div
-                className="relative bg-surface overflow-hidden rounded-2xl flex items-center justify-center select-none w-full"
+                className="relative bg-surface border border-line overflow-hidden rounded-2xl flex items-center justify-center select-none w-full"
                 style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(78vh, 720px)', touchAction: 'pan-y' }}
                 onTouchStart={(e) => {
                   setTouchStartX(e.touches[0].clientX)
@@ -540,7 +540,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                     alt={product.title}
                     loading="eager"
                     fetchPriority="high"
-                    className="w-full h-full object-cover pointer-events-none select-none"
+                    className="max-w-full max-h-full w-auto h-auto object-contain pointer-events-none select-none"
                     draggable={false}
                   />
                 ) : (
