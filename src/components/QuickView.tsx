@@ -92,9 +92,9 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-3xl bg-canvas border border-line grid md:grid-cols-2 max-h-[85vh] overflow-y-auto">
+      <div className="w-full max-w-3xl bg-canvas border border-line rounded-2xl shadow-xl flex flex-col max-h-[min(88vh,800px)] overflow-hidden md:grid md:grid-cols-2 md:max-h-[85vh]">
         <div
-          className="relative bg-surface flex items-center justify-center aspect-square md:aspect-auto rounded-xl md:rounded-none overflow-hidden"
+          className="relative bg-surface flex items-center justify-center aspect-[4/3] max-h-[38vh] md:max-h-none md:aspect-auto md:min-h-[280px] shrink-0 overflow-hidden"
           onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
           onTouchEnd={(e) => {
             if (touchStartX === null) return
@@ -146,11 +146,11 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
           )}
         </div>
 
-        <div className="p-8 relative">
-          <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
-          {product.skill_level && <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3 uppercase">{product.skill_level}</p>}
-          <h2 className="font-subheading font-semibold text-2xl mb-3">{product.title}</h2>
-          <div className="flex items-center gap-3 mb-6">
+        <div className="relative flex flex-col min-h-0 flex-1 p-5 md:p-6 overflow-y-auto">
+          <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 z-10 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
+          {product.skill_level && <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1.5 uppercase">{product.skill_level}</p>}
+          <h2 className="font-subheading font-semibold text-xl leading-snug line-clamp-2 pr-8 mb-2">{product.title}</h2>
+          <div className="flex items-center gap-3 mb-4">
             {product.price > 0 && product.compare_at_price && product.compare_at_price > product.price ? (
               <>
                 <span className="text-base font-semibold text-ink">${product.price.toFixed(2)}</span>
@@ -161,37 +161,38 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
             )}
           </div>
           {product.description && (
-            <p className="text-[14px] text-ink-soft leading-relaxed mb-6 line-clamp-4 whitespace-pre-line">{product.description}</p>
+            <p className="text-[13px] text-ink-soft leading-relaxed mb-4 line-clamp-3 whitespace-pre-line">{product.description}</p>
           )}
-          <div className="space-y-3">
+          <div className="space-y-2 mt-auto pt-1">
             {product.sold_out ? (
               <div className="w-full py-3.5 border border-line rounded-full text-center text-[12px] tracking-[0.12em] text-ink-soft">SOLD OUT</div>
             ) : (
               <button
                 onClick={handleBuy}
                 disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-                className="w-full py-3.5 bg-ink text-canvas text-[13px] font-semibold hover:opacity-85 transition-opacity rounded-full disabled:opacity-60"
+                className="w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
+                style={{ background: product.price === 0 ? 'var(--color-sale-green)' : 'var(--color-accent)' }}
               >
-                {product.price === 0 ? 'Download free' : 'Buy now — instant download'}
+                {product.price === 0 ? 'Download free' : 'Buy now'}
               </button>
             )}
-            <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-3'}>
-              <button onClick={toggleWishlist} className="py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full w-full">
+            <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-2'}>
+              <button onClick={toggleWishlist} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full w-full">
                 {inWishlist ? '♥ WISHLISTED' : '♡ WISHLIST'}
               </button>
               {!product.sold_out && product.price > 0 && (
                 inCart ? (
-                  <Link href="/cart" onClick={onClose} className="flex items-center justify-center py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
+                  <Link href="/cart" onClick={onClose} className="flex items-center justify-center py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
                     ✓ IN CART
                   </Link>
                 ) : (
-                  <button onClick={toggleCart} className="py-3.5 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
+                  <button onClick={toggleCart} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
                     + ADD TO CART
                   </button>
                 )
               )}
             </div>
-            <Link href={`/pattern/${product.slug}`} onClick={onClose} className="block text-center w-full py-3.5 border border-ink text-[12px] tracking-[0.12em] hover:bg-surface transition-colors rounded-full">
+            <Link href={`/pattern/${product.slug}`} onClick={onClose} className="block text-center w-full py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
               VIEW FULL DETAILS
             </Link>
           </div>
