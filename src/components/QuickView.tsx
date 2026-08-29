@@ -92,9 +92,9 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-3xl bg-canvas border border-line rounded-2xl shadow-xl flex flex-col max-h-[min(88vh,800px)] overflow-hidden md:grid md:grid-cols-2 md:max-h-[85vh]">
+      <div className="w-full max-w-3xl h-[min(85vh,640px)] bg-canvas border border-line rounded-2xl shadow-xl overflow-hidden grid grid-rows-[minmax(0,42%)_minmax(0,1fr)] md:grid-cols-2 md:grid-rows-1">
         <div
-          className="relative bg-surface flex items-center justify-center aspect-[4/3] max-h-[38vh] md:max-h-none md:aspect-auto md:min-h-[280px] shrink-0 overflow-hidden"
+          className="relative bg-surface flex items-center justify-center min-h-0 overflow-hidden md:h-full"
           onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
           onTouchEnd={(e) => {
             if (touchStartX === null) return
@@ -146,10 +146,20 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
           )}
         </div>
 
-        <div className="relative flex flex-col min-h-0 flex-1 p-5 md:p-6 overflow-y-auto">
+        <div className="relative flex flex-col min-h-0 overflow-hidden p-5 md:p-6">
           <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 z-10 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
           {product.skill_level && <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1.5 uppercase">{product.skill_level}</p>}
-          <h2 className="font-subheading font-semibold text-xl leading-snug line-clamp-2 pr-8 mb-2">{product.title}</h2>
+          <h2
+            className="font-subheading font-semibold text-xl leading-snug pr-8 mb-2 overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+            }}
+          >
+            {product.title}
+          </h2>
           <div className="flex items-center gap-3 mb-4">
             {product.price > 0 && product.compare_at_price && product.compare_at_price > product.price ? (
               <>
@@ -161,9 +171,19 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
             )}
           </div>
           {product.description && (
-            <p className="text-[13px] text-ink-soft leading-relaxed mb-4 line-clamp-3 whitespace-pre-line">{product.description}</p>
+            <p
+              className="text-[13px] text-ink-soft leading-relaxed mb-4 whitespace-pre-line overflow-hidden"
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+              }}
+            >
+              {product.description}
+            </p>
           )}
-          <div className="space-y-2 mt-auto pt-1">
+          </div>
+          <div className="space-y-2 shrink-0 pt-2 border-t border-line/60">
             {product.sold_out ? (
               <div className="w-full py-3.5 border border-line rounded-full text-center text-[12px] tracking-[0.12em] text-ink-soft">SOLD OUT</div>
             ) : (
