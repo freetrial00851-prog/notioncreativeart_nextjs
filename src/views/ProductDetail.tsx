@@ -664,6 +664,10 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
             {product.title}
           </h1>
 
+          {product.subtitle?.trim() ? (
+            <p className="text-[14px] text-ink-soft leading-relaxed line-clamp-2 mb-3">{product.subtitle.trim()}</p>
+          ) : null}
+
           {purchaseCount >= 3 && (
             <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5">
               <MaterialIcon name="download_done" size={14} /> {purchaseCount}+ makers have downloaded this pattern
@@ -766,14 +770,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           )}
           </div>
 
-          {/* Fixed slot so specs/tabs don’t jump when subtitle is empty, short, or long. */}
-          <div className="min-h-[2.875rem] mb-5 mt-6" aria-hidden={!product.subtitle?.trim()}>
-            {product.subtitle?.trim() ? (
-              <p className="text-[14px] text-ink-soft leading-relaxed line-clamp-2">{product.subtitle.trim()}</p>
-            ) : null}
-          </div>
-
-          <ul className="space-y-2.5 mb-5">
+          <ul className="space-y-2.5 mb-5 mt-6">
             {specs.map((s) => (
               <li key={s.label} className="flex items-center gap-3 text-[13px]">
                 <MaterialIcon name={s.icon} size={18} color="var(--color-ink-soft)" />
