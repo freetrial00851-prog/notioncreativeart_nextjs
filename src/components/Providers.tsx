@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { AuthProvider } from '@/context/AuthContext'
 import { UIProvider } from '@/context/UIContext'
 import { CartProvider } from '@/context/CartContext'
@@ -29,7 +30,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 <GuestMergeRunner />
                 <PendingActionRunner />
                 <AdminRedirect />
-                <Analytics />
+                <Suspense fallback={null}>
+                  <Analytics />
+                </Suspense>
                 <TabRestoreIndicator />
                 {children}
                 <CookieConsent />
