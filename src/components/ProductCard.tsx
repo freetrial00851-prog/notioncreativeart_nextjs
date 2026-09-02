@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import type { Product } from '../lib/types'
+import type { Product, ReviewStats } from '../lib/types'
 import { useUI } from '../context/UIContext'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
@@ -10,13 +10,22 @@ import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { useState } from 'react'
 import { QuickView } from './QuickView'
+import { ProductCardMeta } from './ProductCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { downloadFreePattern } from '../lib/downloads'
 import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
 
-export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
+export function ProductCard({
+  product,
+  priority = false,
+  reviewStats,
+}: {
+  product: Product
+  priority?: boolean
+  reviewStats?: ReviewStats | null
+}) {
   const { maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { user } = useAuth()
   const { addToCart, removeFromCart, isInCart } = useCart()
@@ -124,6 +133,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
 
         <div className="p-3">
           <p className="text-[13px] font-medium leading-snug line-clamp-2 min-h-[2.2em] mb-1.5">{product.title}</p>
+          <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-2" />
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
               {isOnSale ? (
@@ -161,7 +171,9 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           </div>
         </div>
       </Link>
-      {quickViewOpen && <QuickView product={product} onClose={() => setQuickViewOpen(false)} />}
+      {quickViewOpen && (
+        <QuickView product={product} reviewStats={reviewStats} onClose={() => setQuickViewOpen(false)} />
+      )}
     </>
   )
 }

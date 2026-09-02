@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import type { Product } from '../lib/types'
+import type { Product, ReviewStats } from '../lib/types'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
@@ -14,8 +14,17 @@ import { useToast } from '../context/ToastContext'
 import { profileDisplayName } from '../lib/profileName'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
+import { ProductCardMeta } from './ProductCardMeta'
 
-export function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
+export function QuickView({
+  product,
+  reviewStats,
+  onClose,
+}: {
+  product: Product
+  reviewStats?: ReviewStats | null
+  onClose: () => void
+}) {
   const { user, profile } = useAuth()
   const { requireAuth, maybeOpenNewsletterPrompt, showBusyOverlay, hideBusyOverlay } = useUI()
   const { addToCart, removeFromCart, isInCart } = useCart()
@@ -148,7 +157,6 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
         <div className="relative flex flex-col min-h-0 max-h-[85vh] p-5 md:p-6">
           <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 z-10 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
-          {product.skill_level && <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1.5 uppercase">{product.skill_level}</p>}
           <h2
             className="font-subheading font-semibold text-xl leading-snug pr-8 mb-2 overflow-hidden"
             style={{
@@ -159,6 +167,7 @@ export function QuickView({ product, onClose }: { product: Product; onClose: () 
           >
             {product.title}
           </h2>
+          <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-3" />
           <div className="flex items-center gap-3 mb-3">
             {product.price > 0 && product.compare_at_price && product.compare_at_price > product.price ? (
               <>

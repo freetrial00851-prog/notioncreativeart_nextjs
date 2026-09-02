@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { searchProducts } from '../lib/productSearch'
 import type { Product } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
+import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
 
@@ -52,6 +53,7 @@ export function Search() {
 
   const pageCount = Math.ceil(results.length / PAGE_SIZE)
   const pagedResults = results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const reviewStatsMap = useReviewStatsMapForLists([pagedResults, suggestions])
   const goToPage = (p: number) => {
     setPage(p)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -98,7 +100,9 @@ export function Search() {
       ) : results.length > 0 ? (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
-            {pagedResults.map((p) => <ProductCard key={p.id} product={p} />)}
+            {pagedResults.map((p) => (
+              <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
+            ))}
           </div>
           {pageCount > 1 && (
             <div className="flex items-center justify-center gap-2 mt-14">
@@ -122,7 +126,9 @@ export function Search() {
         <div>
           <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-6">YOU MAY LIKE</p>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10">
-            {suggestions.map((p) => <ProductCard key={p.id} product={p} />)}
+            {suggestions.map((p) => (
+              <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
+            ))}
           </div>
         </div>
       )}

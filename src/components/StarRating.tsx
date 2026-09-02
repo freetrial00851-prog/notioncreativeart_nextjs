@@ -71,3 +71,24 @@ export function StarRatingSummary({
     </span>
   )
 }
+
+/** Card/grid variant: ★★★★★ (12) — stars + count only, no decimal average. */
+export function StarRatingCardSummary({
+  averageRating,
+  reviewCount,
+  size = 12,
+  className = '',
+}: {
+  averageRating: number
+  reviewCount: number
+  size?: number
+  className?: string
+}) {
+  if (reviewCount < 1) return null
+  return (
+    <span className={`inline-flex items-center gap-1 text-[11px] text-ink-soft ${className}`}>
+      <StarRating value={averageRating} size={size} />
+      <span className="tabular-nums">({reviewCount})</span>
+    </span>
+  )
+}

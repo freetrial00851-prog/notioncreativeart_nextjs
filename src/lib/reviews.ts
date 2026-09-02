@@ -11,6 +11,21 @@ export async function fetchProductReviewStats(productId: string): Promise<Review
   }
 }
 
+/** One query for all visible product IDs — returns only products with ≥1 approved review. */
+export async function fetchReviewStatsBatch(productIds: string[]): Promise<Map<string, ReviewStats>> {
+  const map = new Map<string, ReviewStats>()
+  if (productIds.length === 0) return map
+  const { data, error } = await supabase.rpc('get_product_review_stats_batch', { p_product_ids: productIds })
+  if (error || !data) return map
+  for (const row of data as { product_id: string; average_rating: number; review_count: number }[]) {
+    map.set(row.product_id, {
+      averageRating: Number(row.average_rating) || 0,
+      reviewCount: Number(row.review_count) || 0,
+    })
+  }
+  return map
+}
+
 export async function fetchApprovedReviews(productId: string): Promise<Review[]> {
   const { data, error } = await supabase
     .from('reviews')

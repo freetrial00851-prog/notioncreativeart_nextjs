@@ -9,6 +9,7 @@ import { getSubcategoriesWithCounts, type SubcategoryWithCount } from '../lib/ca
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { Product, Category } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
+import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { EmptyState } from '../components/EmptyState'
@@ -154,6 +155,7 @@ export function Shop() {
 
   const pageCount = Math.ceil(sortedProducts.length / PAGE_SIZE)
   const pagedProducts = sortedProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const reviewStatsMap = useReviewStatsMapForLists([pagedProducts, suggestions])
 
   const goToPage = (p: number) => {
     setPage(p)
@@ -347,7 +349,9 @@ export function Shop() {
                 <>
                   <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-6 text-center">YOU MAY ALSO LIKE</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
-                    {suggestions.map((p) => <ProductCard key={p.id} product={p} />)}
+                    {suggestions.map((p) => (
+                      <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
+                    ))}
                   </div>
                 </>
               )}
@@ -355,7 +359,9 @@ export function Shop() {
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
-                {pagedProducts.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 4} />)}
+                {pagedProducts.map((p, i) => (
+                  <ProductCard key={p.id} product={p} priority={i < 4} reviewStats={reviewStatsMap.get(p.id)} />
+                ))}
               </div>
 
               {pageCount > 1 && (

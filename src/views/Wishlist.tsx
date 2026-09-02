@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useWishlist } from '../context/WishlistContext'
 import { ProductCard } from '../components/ProductCard'
+import { useReviewStatsMap } from '../lib/useReviewStatsMap'
 import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
 
@@ -19,6 +20,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
 
   const pageCount = Math.ceil(products.length / PAGE_SIZE)
   const pagedProducts = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const reviewStatsMap = useReviewStatsMap(pagedProducts)
   const goToPage = (p: number) => {
     setPage(p)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -44,7 +46,9 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
-            {pagedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
+            {pagedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
+            ))}
           </div>
           {pageCount > 1 && (
             <div className="flex items-center justify-center gap-2 mt-14">

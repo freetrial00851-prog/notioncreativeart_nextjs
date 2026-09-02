@@ -14,6 +14,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { downloadFreePattern } from '../lib/downloads'
 import { fetchProductReviewStats } from '../lib/reviews'
+import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { useIsMobile } from '../lib/useIsMobile'
 import { ProductCard } from '../components/ProductCard'
 import { ProductReviews } from '../components/ProductReviews'
@@ -127,6 +128,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, reviewCount: 0 })
   const [alsoBought, setAlsoBought] = useState<Product[]>([])
   const isMobileGallery = useIsMobile(769)
+  const carouselReviewStats = useReviewStatsMapForLists([alsoBought, related])
 
   useEffect(() => {
     if (!slug) return
@@ -850,7 +852,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           <div className="flex gap-5 overflow-x-auto pb-2 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
             {alsoBought.map((p) => (
               <div key={p.id} className="w-[220px] shrink-0">
-                <ProductCard product={p} />
+                <ProductCard product={p} reviewStats={carouselReviewStats.get(p.id)} />
               </div>
             ))}
           </div>
@@ -871,7 +873,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           <div className="flex gap-5 overflow-x-auto pb-2 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
             {related.map((p) => (
               <div key={p.id} className="w-[220px] shrink-0">
-                <ProductCard product={p} />
+                <ProductCard product={p} reviewStats={carouselReviewStats.get(p.id)} />
               </div>
             ))}
           </div>
