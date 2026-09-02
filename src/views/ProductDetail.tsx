@@ -456,10 +456,17 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
     return wrapTabWithImage(
       <div className="rounded-xl px-5 py-4 space-y-2.5 text-[14px] max-w-md" style={{ background: 'var(--color-surface)' }}>
         <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-1">PATTERN DETAILS</p>
+        <div className="flex justify-between gap-4"><span className="text-ink-soft">Craft Type</span><span>Crochet</span></div>
         {skillLabel && (
           <div className="flex justify-between gap-4"><span className="text-ink-soft">Skill Level</span><span className="capitalize">{product.skill_level}</span></div>
         )}
-        <div className="flex justify-between gap-4"><span className="text-ink-soft">Language</span><span>English (US terms)</span></div>
+        {product.materials?.trim() && (
+          <div className="flex justify-between gap-4">
+            <span className="text-ink-soft shrink-0">Yarn &amp; Hook Size</span>
+            <span className="text-right min-w-0 flex-1 whitespace-pre-line">{product.materials.trim()}</span>
+          </div>
+        )}
+        <div className="flex justify-between gap-4"><span className="text-ink-soft">Language &amp; Terms</span><span>English (US crochet terms)</span></div>
         <div className="flex justify-between gap-4"><span className="text-ink-soft">Format</span><span>PDF (Printable)</span></div>
         {product.pdf_filename && (
           <div className="flex justify-between gap-4"><span className="text-ink-soft">File</span><span className="text-right truncate max-w-[200px]">{product.pdf_filename}</span></div>
