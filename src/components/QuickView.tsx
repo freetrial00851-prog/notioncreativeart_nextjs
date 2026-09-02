@@ -158,7 +158,7 @@ export function QuickView({
           <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 z-10 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
           <h2
-            className="font-subheading font-semibold text-xl leading-snug pr-8 mb-2 overflow-hidden"
+            className="font-subheading font-semibold text-xl leading-snug pr-8 mb-2 overflow-hidden line-clamp-2 min-h-[2.75em]"
             style={{
               display: '-webkit-box',
               WebkitLineClamp: 2,

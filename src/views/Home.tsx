@@ -15,6 +15,8 @@ import {
 } from '../lib/homeCatalogCache'
 import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialContent } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
+import { ProductTagPill } from '../components/ProductTagPill'
+import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
@@ -436,19 +438,22 @@ export function Home({
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {chapters.map((c) => {
-            const badgeColor = 'var(--color-primary)'
+            const exploreColor = 'var(--color-primary)'
+            const levelLabel = skillLevelTagLabel(c.level)
             return (
               <Link key={c.title} href={c.link} className="group block bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
                 <div className="relative aspect-[4/3] bg-surface overflow-hidden">
                   {c.image && <img src={c.image} alt={c.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />}
-                  <span className="absolute top-3 left-3 text-[9px] font-semibold tracking-wide text-white px-2.5 py-1 rounded-full uppercase" style={{ background: badgeColor }}>
-                    {c.level}
-                  </span>
+                  {levelLabel && (
+                    <div className="absolute top-3 left-3">
+                      <ProductTagPill label={levelLabel} skillLevel={c.level} compact />
+                    </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="font-display font-semibold text-xl mb-2">{c.title}</h3>
                   <p className="text-[14px] text-ink-soft leading-relaxed mb-4">{c.copy}</p>
-                  <span className="text-[12px] font-semibold" style={{ color: badgeColor }}>Explore →</span>
+                  <span className="text-[12px] font-semibold" style={{ color: exploreColor }}>Explore →</span>
                 </div>
               </Link>
             )
@@ -647,8 +652,8 @@ export function Home({
             { icon: 'redeem', title: 'Pattern Bundles', copy: 'More patterns, better value' },
           ].map((b) => (
             <div key={b.title} className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border" style={{ borderColor: 'var(--color-primary)' }}>
-                <MaterialIcon name={b.icon} size={20} color="var(--color-primary)" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border" style={{ borderColor: 'var(--color-accent)' }}>
+                <MaterialIcon name={b.icon} size={20} color="var(--color-accent)" />
               </div>
               <div>
                 <p className="text-[14px] font-semibold">{b.title}</p>
