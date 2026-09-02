@@ -19,7 +19,7 @@ export function ProductTagPill({
 
   return (
     <span
-      className={`inline-flex items-center text-[10px] tracking-[0.14em] uppercase rounded-full whitespace-nowrap ${
+      className={`inline-flex w-fit max-w-full items-center text-[10px] tracking-[0.14em] uppercase rounded-full whitespace-nowrap ${
         compact ? 'px-2.5 py-0.5' : 'px-3 py-1'
       } ${className}`}
       style={

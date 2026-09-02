@@ -17,7 +17,7 @@ export function ProductCardMeta({ product, reviewStats, className = '' }: Produc
   if (!showStars && !skillLabel) return null
 
   return (
-    <div className={`flex flex-col gap-0.5 ${className}`}>
+    <div className={`flex flex-col items-start gap-0.5 ${className}`}>
       {skillLabel && (
         <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
       )}

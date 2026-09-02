@@ -44,12 +44,12 @@
   --color-warning: var(--color-gold);
   --color-warning-soft: #FFF5DF;
   --color-sale-red: var(--color-sale);
-  --color-skill-beginner-soft: #EEF2E8;
-  --color-skill-beginner-ink: #4D6344;
-  --color-skill-intermediate-soft: #FFF5DF;
-  --color-skill-intermediate-ink: #8A6524;
-  --color-skill-advanced-soft: #F7EAE4;
-  --color-skill-advanced-ink: #8B5345;
+  --color-skill-beginner-soft: #C3E0A8;
+  --color-skill-beginner-ink: #2E5A1C;
+  --color-skill-intermediate-soft: #FADE8A;
+  --color-skill-intermediate-ink: #7A4E08;
+  --color-skill-advanced-soft: #F5BFA8;
+  --color-skill-advanced-ink: #96331C;
 
   --font-display: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-subheading: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
