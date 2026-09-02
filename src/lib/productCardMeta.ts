@@ -1,7 +1,7 @@
 import type { Product } from './types'
 
 const SKILL_LABELS: Record<NonNullable<Product['skill_level']>, string> = {
-  beginner: 'Beginner Friendly',
+  beginner: 'Beginner',
   intermediate: 'Intermediate',
   advanced: 'Advanced',
 }
