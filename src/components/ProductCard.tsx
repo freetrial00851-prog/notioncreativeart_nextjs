@@ -133,7 +133,7 @@ export function ProductCard({
 
         <div className="p-3">
           <p className="text-[13px] font-medium leading-snug line-clamp-2 min-h-[2.2em] mb-1.5">{product.title}</p>
-          <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-2" />
+          <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-1" />
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
               {isOnSale ? (
