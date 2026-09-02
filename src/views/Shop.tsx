@@ -20,8 +20,8 @@ export function Shop() {
   const params = useParams()
   const router = useRouter()
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
-  const [searchParams, setSearchParams, searchPending] = useUpdateSearchParams()
-  const [navPending, startNavTransition] = useTransition()
+  const [searchParams, setSearchParams] = useUpdateSearchParams()
+  const [, startNavTransition] = useTransition()
   const level = searchParams?.get('level') ?? null
   const priceFilter = searchParams?.get('price') ?? null
   const bundleFilter = searchParams?.get('bundle') === '1'
@@ -32,7 +32,7 @@ export function Shop() {
   const [suggestions, setSuggestions] = useState<Product[]>([])
   /** True only on cold first paint — never for subsequent filter/category changes. */
   const [initialLoading, setInitialLoading] = useState(true)
-  /** Refetch in flight while previous results stay on screen (dimmed). */
+  /** Refetch in flight while previous results stay on screen. */
   const [filterFetching, setFilterFetching] = useState(false)
   const hasLoadedOnce = useRef(false)
   const fetchGen = useRef(0)
@@ -40,8 +40,6 @@ export function Shop() {
   const currentCategory = categories.find((c) => c.slug === categorySlug)
   const parentCategory = currentCategory?.parent_id ? categories.find((c) => c.id === currentCategory.parent_id) : null
   const categoryName = categorySlug === 'sale' ? 'Sale' : categorySlug === 'new' ? 'New Arrivals' : currentCategory?.name
-
-  const filterPending = searchPending || navPending || filterFetching
 
   /** Soft-navigate shop paths without clearing the grid to a skeleton. */
   const goShop = (href: string) => {
@@ -251,10 +249,6 @@ export function Shop() {
     </>
   )
 
-  const gridPendingClass = filterPending
-    ? 'opacity-50 pointer-events-none transition-opacity duration-200'
-    : 'opacity-100 transition-opacity duration-200'
-
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-14">
       <nav className="text-[11px] tracking-[0.08em] text-ink-soft mb-3 flex items-center gap-2 flex-wrap">
@@ -293,6 +287,20 @@ export function Shop() {
             <option value="price-desc">PRICE: HIGH TO LOW</option>
           </select>
         </div>
+
+        {filterFetching && (
+          <p
+            className="mt-3 flex items-center gap-2 text-[11px] tracking-[0.08em] text-ink-soft"
+            role="status"
+            aria-live="polite"
+          >
+            <span
+              className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border-2 border-ink-soft/25 border-t-[var(--color-accent)] animate-spin motion-reduce:animate-none"
+              aria-hidden
+            />
+            Updating…
+          </p>
+        )}
 
         {/* Mobile: compact Sort + Filter buttons instead of the full panel taking up the screen */}
         <div className="flex md:hidden items-center gap-3">
@@ -334,7 +342,7 @@ export function Shop() {
           {filterPanelContent}
         </aside>
 
-        <div className={`min-w-0 ${gridPendingClass}`} aria-busy={filterPending || undefined}>
+        <div className="min-w-0" aria-busy={filterFetching || undefined}>
           {initialLoading ? (
             <ProductGridSkeleton variant="shop" />
           ) : sortedProducts.length === 0 ? (
