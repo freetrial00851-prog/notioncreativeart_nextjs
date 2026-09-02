@@ -13,6 +13,8 @@ const FOOTER_BG = '#FCFBF8'
 const FOOTER_GREEN = '#1f249c'
 const FOOTER_TEXT = '#202720'
 const FOOTER_MUTED = '#667066'
+/** Digital-products band subtitle only — darker than FOOTER_MUTED for #EFEBDD contrast */
+const FOOTER_BAND_SUBTITLE = '#4F5850'
 const FOOTER_BORDER = '#E3E6E0'
 
 const SHOP_LINKS = [
@@ -82,7 +84,7 @@ function BrandColumn() {
         <DownloadIcon />
         <div className="min-w-0">
           <p className="text-[13px] font-semibold" style={{ color: FOOTER_TEXT }}>Digital Products</p>
-          <p className="text-[12px]" style={{ color: FOOTER_MUTED }}>Instant download after purchase</p>
+          <p className="text-[12px]" style={{ color: FOOTER_BAND_SUBTITLE }}>Instant download after purchase</p>
         </div>
       </div>
     </div>

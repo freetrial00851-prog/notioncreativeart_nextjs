@@ -2,6 +2,9 @@
 
 import { MaterialIcon } from './MaterialIcon'
 
+const STAR_FILLED = 'var(--color-accent)'
+const STAR_EMPTY = '#C4BDB0'
+
 type StarRatingProps = {
   value: number
   /** Max stars (default 5). */
@@ -26,7 +29,7 @@ export function StarRating({ value, max = 5, size = 16, onChange, className = ''
         const filled = value >= star - 0.25
         const half = !filled && value >= star - 0.75
         const icon = filled ? 'star' : half ? 'star_half' : 'star'
-        const color = filled || half ? '#c9a227' : 'var(--color-line)'
+        const color = filled || half ? STAR_FILLED : STAR_EMPTY
 
         if (interactive) {
           return (
@@ -39,7 +42,7 @@ export function StarRating({ value, max = 5, size = 16, onChange, className = ''
               onClick={() => onChange(star)}
               className="p-0.5 -m-0.5 rounded hover:opacity-80 transition-opacity"
             >
-              <MaterialIcon name={icon} size={size} color={value >= star ? '#c9a227' : 'var(--color-line)'} />
+              <MaterialIcon name={icon} size={size} color={value >= star ? STAR_FILLED : STAR_EMPTY} />
             </button>
           )
         }

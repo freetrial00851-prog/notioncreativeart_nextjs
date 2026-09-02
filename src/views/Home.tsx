@@ -332,7 +332,7 @@ export function Home({
                   {heroGroups.length > 1 && (
                     <div className="flex items-center justify-center gap-2 mt-3">
                       {heroGroups.map((_, i) => (
-                        <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-border)' }} />
+                        <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
                       ))}
                     </div>
                   )}
@@ -351,7 +351,7 @@ export function Home({
                 {heroGroups.length > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-4">
                     {heroGroups.map((_, i) => (
-                      <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-border)' }} />
+                      <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
                     ))}
                   </div>
                 )}
@@ -692,7 +692,7 @@ export function Home({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {pageItems.map((t, i) => (
                   <div key={`${page}-${i}`} className="bg-white border border-line rounded-2xl p-6">
-                    <div className="flex gap-0.5 mb-3" style={{ color: 'var(--color-gold)' }}>
+                    <div className="flex gap-0.5 mb-3" style={{ color: 'var(--color-accent)' }}>
                       {Array.from({ length: 5 }).map((_, si) => <MaterialIcon key={si} name="star" size={15} />)}
                     </div>
                     <p className="text-[14px] leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
@@ -729,7 +729,7 @@ export function Home({
                       onClick={() => setTestimonialPage(i)}
                       aria-label={`Go to testimonials page ${i + 1}`}
                       className="w-2 h-2 rounded-full transition-colors"
-                      style={{ background: i === page ? 'var(--color-accent)' : 'var(--color-border)' }}
+                      style={{ background: i === page ? 'var(--color-accent)' : '#B5AEA2' }}
                     />
                   ))}
                 </div>

@@ -246,7 +246,7 @@ export function Shop() {
                 className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
               >
                 <span>{sc.name}</span>
-                <span className="text-[11px] text-ink-soft/70">{sc.count}</span>
+                <span className="text-[11px] text-ink-soft">{sc.count}</span>
               </Link>
             ))}
           </div>
