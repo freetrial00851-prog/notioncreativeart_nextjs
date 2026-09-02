@@ -615,32 +615,10 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 </div>
               </div>
 
-              {/* Dots (mobile only) + wishlist / share (mobile + tablet) */}
-              {images.length > 0 && (
-                <div className="lg:hidden mt-3 flex items-center justify-between px-0.5">
-                  <div className="flex-1" />
-                  <div className="md:hidden">
-                    <GalleryDots count={images.length} active={activeImage} onSelect={setActiveImage} />
-                  </div>
-                  <div className="flex-1 flex items-center justify-end gap-1">
-                    <button
-                      type="button"
-                      onClick={toggleWishlist}
-                      aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                      className="w-9 h-9 flex items-center justify-center text-ink"
-                    >
-                      <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={shareListing}
-                      aria-label="Share listing"
-                      className="w-9 h-9 flex items-center justify-center text-ink"
-                      title={shareHint ?? 'Share'}
-                    >
-                      <ShareIcon size={18} />
-                    </button>
-                  </div>
+              {/* Dots (mobile only) */}
+              {images.length > 1 && (
+                <div className="md:hidden mt-3 flex justify-center px-0.5">
+                  <GalleryDots count={images.length} active={activeImage} onSelect={setActiveImage} />
                 </div>
               )}
 
@@ -756,20 +734,26 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                   ? 'Download free'
                   : 'Buy now'}
               </button>
-              <button
-                onClick={toggleWishlist}
-                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors flex items-center justify-center gap-2"
-              >
-                <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'} />
-                {inWishlist ? 'SAVED TO WISHLIST' : 'ADD TO WISHLIST'}
-              </button>
-              <button
-                onClick={shareListing}
-                className="w-full py-2.5 border border-line text-[12px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors flex items-center justify-center gap-2"
-              >
-                <ShareIcon size={15} />
-                {shareHint ? 'LINK COPIED' : 'SHARE LISTING'}
-              </button>
+              <div className="flex items-stretch gap-2">
+                <button
+                  type="button"
+                  onClick={toggleWishlist}
+                  aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-full border border-line text-[11px] tracking-[0.06em] text-ink-soft hover:text-ink hover:bg-surface transition-colors"
+                >
+                  <FavoriteIcon size={14} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
+                  <span>{inWishlist ? 'Saved' : 'Wishlist'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={shareListing}
+                  aria-label="Share listing"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-full border border-line text-[11px] tracking-[0.06em] text-ink-soft hover:text-ink hover:bg-surface transition-colors"
+                >
+                  <ShareIcon size={14} />
+                  <span>{shareHint ? 'Copied' : 'Share'}</span>
+                </button>
+              </div>
             </div>
           )}
 
