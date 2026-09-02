@@ -23,6 +23,8 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { FavoriteIcon, ShareIcon } from '../components/icons'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductDetailSkeleton } from '../components/Skeleton'
+import { ProductTagPill } from '../components/ProductTagPill'
+import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
 
@@ -337,18 +339,17 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const images = product.images ?? []
   const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
   const badge = product.card_badge
-  const skillLabel = product.skill_level
-    ? product.skill_level.charAt(0).toUpperCase() + product.skill_level.slice(1)
-    : null
+  const skillLabel = skillLevelTagLabel(product.skill_level)
 
-  const tags: string[] = []
-  if (category) tags.push(category.name)
-  if (skillLabel) tags.push(skillLabel === 'Beginner' ? 'Beginner Friendly' : skillLabel)
-  if (product.price === 0) tags.push('Free')
-  if (product.is_bundle) tags.push('Bundle')
-  if (badge === 'new') tags.push('New')
-  if (badge === 'sale') tags.push('Sale')
-  if (badge === 'featured') tags.push('Featured')
+  type DetailTag = { key: string; label: string; skillLevel?: typeof product.skill_level }
+  const tagItems: DetailTag[] = []
+  if (category) tagItems.push({ key: 'category', label: category.name })
+  if (skillLabel) tagItems.push({ key: 'skill', label: skillLabel, skillLevel: product.skill_level })
+  if (product.price === 0) tagItems.push({ key: 'free', label: 'Free' })
+  if (product.is_bundle) tagItems.push({ key: 'bundle', label: 'Bundle' })
+  if (badge === 'new') tagItems.push({ key: 'new', label: 'New' })
+  if (badge === 'sale') tagItems.push({ key: 'sale', label: 'Sale' })
+  if (badge === 'featured') tagItems.push({ key: 'featured', label: 'Featured' })
 
   const TABS: { key: Tab; label: string }[] = [
     { key: 'description', label: 'Description' },
@@ -622,16 +623,10 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
 
         {/* Right — badges, title, buy box */}
         <div className="min-w-0 lg:pt-1 lg:sticky lg:top-24 lg:self-start">
-          {tags.length > 0 && (
+          {tagItems.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2 lg:mb-3">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[10px] tracking-[0.14em] uppercase px-3 py-1 rounded-full"
-                  style={{ background: 'var(--color-surface)', color: 'var(--color-ink-soft)' }}
-                >
-                  {tag}
-                </span>
+              {tagItems.map((tag) => (
+                <ProductTagPill key={tag.key} label={tag.label} skillLevel={tag.skillLevel} />
               ))}
             </div>
           )}

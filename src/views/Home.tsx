@@ -438,7 +438,7 @@ export function Home({
           {chapters.map((c) => {
             const badgeColor = 'var(--color-primary)'
             return (
-              <Link key={c.title} href={c.link} className="group block bg-white rounded-2xl border border-line overflow-hidden hover:shadow-md transition-shadow">
+              <Link key={c.title} href={c.link} className="group block bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
                 <div className="relative aspect-[4/3] bg-surface overflow-hidden">
                   {c.image && <img src={c.image} alt={c.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />}
                   <span className="absolute top-3 left-3 text-[9px] font-semibold tracking-wide text-white px-2.5 py-1 rounded-full uppercase" style={{ background: badgeColor }}>

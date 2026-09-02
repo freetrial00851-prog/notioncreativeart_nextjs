@@ -9,7 +9,7 @@ type ProductCardMetaProps = {
   className?: string
 }
 
-/** Stars + skill pill shared by ProductCard and QuickView. */
+/** Skill pill + stars shared by ProductCard and QuickView. */
 export function ProductCardMeta({ product, reviewStats, className = '' }: ProductCardMetaProps) {
   const showStars = reviewStats && reviewStats.reviewCount >= 1
   const skillLabel = skillLevelTagLabel(product.skill_level)
@@ -17,14 +17,18 @@ export function ProductCardMeta({ product, reviewStats, className = '' }: Produc
   if (!showStars && !skillLabel) return null
 
   return (
-    <div className={`space-y-1 ${className}`}>
-      {showStars && (
-        <StarRatingCardSummary
-          averageRating={reviewStats.averageRating}
-          reviewCount={reviewStats.reviewCount}
-        />
+    <div className={`flex flex-col gap-0.5 ${className}`}>
+      {skillLabel && (
+        <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
       )}
-      {skillLabel && <ProductTagPill label={skillLabel} compact />}
+      <div className="h-3 flex items-center">
+        {showStars && (
+          <StarRatingCardSummary
+            averageRating={reviewStats.averageRating}
+            reviewCount={reviewStats.reviewCount}
+          />
+        )}
+      </div>
     </div>
   )
 }
