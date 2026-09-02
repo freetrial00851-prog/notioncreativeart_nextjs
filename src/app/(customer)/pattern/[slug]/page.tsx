@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { buildMetadata, buildProductJsonLd } from '@/lib/seo'
 import { getProductBySlug } from '@/lib/data/products'
+import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
 import { getSiteSeoContext } from '@/lib/seoSettings'
 import { ProductDetail } from '@/views/ProductDetail'
@@ -58,7 +59,18 @@ export default async function PatternPage({ params }: Props) {
   const { slug } = await params
   const product = await getProductBySlug(slug)
 
-  const jsonLd = product ? buildProductJsonLd(product) : null
+  let jsonLd: ReturnType<typeof buildProductJsonLd> | null = null
+  if (product) {
+    const [reviewStats, reviews] = await Promise.all([
+      getProductReviewStats(product.id),
+      getApprovedReviews(product.id),
+    ])
+    jsonLd = buildProductJsonLd(product, {
+      averageRating: reviewStats.averageRating,
+      reviewCount: reviewStats.reviewCount,
+      reviews,
+    })
+  }
 
   return (
     <>

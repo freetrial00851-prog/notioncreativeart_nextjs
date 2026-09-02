@@ -59,16 +59,30 @@ export function buildMetadata(opts: PageMetaInput): Metadata {
   }
 }
 
+type ProductJsonLdReview = {
+  reviewer_name: string
+  rating: number
+  body: string
+  created_at: string
+}
+
 /** JSON-LD Product schema for rich search results on pattern pages. */
-export function buildProductJsonLd(product: {
-  title: string
-  description: string | null
-  slug: string
-  price: number
-  images: string[]
-  sold_out: boolean
-}) {
-  return {
+export function buildProductJsonLd(
+  product: {
+    title: string
+    description: string | null
+    slug: string
+    price: number
+    images: string[]
+    sold_out: boolean
+  },
+  options?: {
+    averageRating?: number
+    reviewCount?: number
+    reviews?: ProductJsonLdReview[]
+  },
+) {
+  const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
@@ -85,6 +99,36 @@ export function buildProductJsonLd(product: {
       url: `${SITE_URL}/pattern/${product.slug}`,
     },
   }
+
+  const reviewCount = options?.reviewCount ?? 0
+  const averageRating = options?.averageRating ?? 0
+  if (reviewCount >= 1 && averageRating > 0) {
+    jsonLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: Math.round(averageRating * 10) / 10,
+      reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    }
+  }
+
+  const reviews = options?.reviews ?? []
+  if (reviews.length > 0) {
+    jsonLd.review = reviews.map((r) => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.reviewer_name },
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: r.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+      reviewBody: r.body,
+      datePublished: r.created_at,
+    }))
+  }
+
+  return jsonLd
 }
 
 /** JSON-LD Organization schema for the homepage — helps brand recognition in SERPs. */

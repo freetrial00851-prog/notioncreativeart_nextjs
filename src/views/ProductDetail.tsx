@@ -234,28 +234,6 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
     return () => observer.disconnect()
   }, [product])
 
-  useEffect(() => {
-    if (!product) return
-    const script = document.createElement('script')
-    script.type = 'application/ld+json'
-    script.text = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: product.title,
-      description: product.description ?? undefined,
-      image: product.images?.[0],
-      offers: {
-        '@type': 'Offer',
-        price: product.price,
-        priceCurrency: 'USD',
-        availability: product.sold_out ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-        url: `https://notioncreativeart.com/pattern/${slug}`,
-      },
-    })
-    document.head.appendChild(script)
-    return () => { document.head.removeChild(script) }
-  }, [product, slug])
-
   // Preload adjacent gallery stages so swipe/arrow doesn't wait on network.
   useEffect(() => {
     const imgs = product?.images ?? []

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
@@ -40,6 +40,12 @@ export function Shop() {
   const currentCategory = categories.find((c) => c.slug === categorySlug)
   const parentCategory = currentCategory?.parent_id ? categories.find((c) => c.id === currentCategory.parent_id) : null
   const categoryName = categorySlug === 'sale' ? 'Sale' : categorySlug === 'new' ? 'New Arrivals' : currentCategory?.name
+
+  /** Stable key so the product fetch effect doesn't re-run on array reference-only changes. */
+  const categoriesKey = useMemo(
+    () => categories.map((c) => `${c.id}:${c.slug}:${c.parent_id ?? ''}`).sort().join('|'),
+    [categories],
+  )
 
   /** Soft-navigate shop paths without clearing the grid to a skeleton. */
   const goShop = (href: string) => {
@@ -109,7 +115,7 @@ export function Shop() {
       setInitialLoading(false)
       setFilterFetching(false)
     })
-  }, [level, priceFilter, bundleFilter, saleFilter, categorySlug, categories])
+  }, [level, priceFilter, bundleFilter, saleFilter, categorySlug, categoriesKey])
 
   useEffect(() => {
     if (initialLoading || filterFetching || products.length > 0) return
