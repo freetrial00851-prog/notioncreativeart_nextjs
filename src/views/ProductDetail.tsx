@@ -13,14 +13,17 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { downloadFreePattern } from '../lib/downloads'
+import { fetchProductReviewStats } from '../lib/reviews'
 import { useIsMobile } from '../lib/useIsMobile'
 import { ProductCard } from '../components/ProductCard'
+import { ProductReviews } from '../components/ProductReviews'
+import { StarRatingSummary } from '../components/StarRating'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { FavoriteIcon, ShareIcon } from '../components/icons'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductDetailSkeleton } from '../components/Skeleton'
 import { profileDisplayName } from '../lib/profileName'
-import type { Product } from '../lib/types'
+import type { Product, ReviewStats } from '../lib/types'
 
 /** Stage candidates: mobile stops at large (1000w); desktop may use full (1600w). */
 function gallerySrcSet(cardUrl: string, includeFull: boolean) {
@@ -91,7 +94,7 @@ function DescriptionBlocks({ text }: { text: string }) {
   )
 }
 
-type Tab = 'description' | 'included' | 'materials' | 'skill' | 'details'
+type Tab = 'description' | 'included' | 'materials' | 'skill' | 'details' | 'reviews'
 
 export function ProductDetail({ initialProduct = null }: { initialProduct?: Product | null }) {
   const params = useParams()
@@ -121,6 +124,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const [unavailable, setUnavailable] = useState(false)
   const [shareHint, setShareHint] = useState<string | null>(null)
   const [purchaseCount, setPurchaseCount] = useState(0)
+  const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, reviewCount: 0 })
   const [alsoBought, setAlsoBought] = useState<Product[]>([])
   const isMobileGallery = useIsMobile(769)
 
@@ -188,6 +192,14 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   useEffect(() => {
     if (!product) { setPurchaseCount(0); return }
     supabase.rpc('get_purchase_count', { target_product_id: product.id }).then(({ data }) => setPurchaseCount(data ?? 0))
+  }, [product])
+
+  useEffect(() => {
+    if (!product) {
+      setReviewStats({ averageRating: 0, reviewCount: 0 })
+      return
+    }
+    fetchProductReviewStats(product.id).then(setReviewStats)
   }, [product])
 
   useEffect(() => {
@@ -364,6 +376,10 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
     { key: 'materials', label: 'Materials' },
     { key: 'skill', label: 'Skill Level' },
     { key: 'details', label: 'Details' },
+    {
+      key: 'reviews',
+      label: reviewStats.reviewCount > 0 ? `Reviews (${reviewStats.reviewCount})` : 'Reviews',
+    },
   ]
 
   const tabSideImage = images[1] || images[0] || null
@@ -444,6 +460,16 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
             <p>Skill level has not been set for this pattern yet.</p>
           )}
         </div>
+      )
+    }
+    if (tab === 'reviews') {
+      return (
+        <ProductReviews
+          productId={product.id}
+          userId={user?.id ?? null}
+          profile={profile}
+          owned={owned}
+        />
       )
     }
     return wrapTabWithImage(
@@ -658,6 +684,16 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           {product.subtitle?.trim() ? (
             <p className="text-[14px] text-ink-soft leading-relaxed line-clamp-2 mb-3">{product.subtitle.trim()}</p>
           ) : null}
+
+          {reviewStats.reviewCount > 0 && (
+            <div className="mb-3">
+              <StarRatingSummary
+                averageRating={reviewStats.averageRating}
+                reviewCount={reviewStats.reviewCount}
+                size={15}
+              />
+            </div>
+          )}
 
           {purchaseCount >= 3 && (
             <p className="text-[12px] text-ink-soft mb-3 flex items-center gap-1.5">

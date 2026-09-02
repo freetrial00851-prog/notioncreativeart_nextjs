@@ -13,6 +13,7 @@ import { profileDisplayName } from '../lib/profileName'
 import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminBulkUpload } from './AdminBulkUpload'
+import { AdminReviews } from './AdminReviews'
 import { DropzoneUpload } from '../components/DropzoneUpload'
 import { ProductExportModal } from '../components/ProductExportModal'
 import { MaterialIcon } from '../components/MaterialIcon'
@@ -25,7 +26,7 @@ const SIDEBAR_BG = '#f3f1ec'
 const ACCENT = '#1f249c'
 
 type NavItem =
-  | { kind: 'link'; to: string; label: string; icon: string; end?: boolean }
+  | { kind: 'link'; to: string; label: string; icon: string; end?: boolean; badgeKey?: 'reviews' }
   | { kind: 'group'; id: string; label: string; icon: string; children: { to: string; label: string }[] }
 
 const ADMIN_NAV: NavItem[] = [
@@ -33,6 +34,7 @@ const ADMIN_NAV: NavItem[] = [
   { kind: 'link', to: '/admin/listings', label: 'Listings', icon: 'sell' },
   { kind: 'link', to: '/admin/bulk-upload', label: 'Bulk Upload', icon: 'upload_file' },
   { kind: 'link', to: '/admin/orders', label: 'Orders', icon: 'receipt_long' },
+  { kind: 'link', to: '/admin/reviews', label: 'Reviews', icon: 'rate_review', badgeKey: 'reviews' },
   { kind: 'link', to: '/admin/categories', label: 'Categories', icon: 'category' },
   {
     kind: 'group',
@@ -52,7 +54,13 @@ export function Admin() {
   const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ settings: true })
+  const [pendingReviewCount, setPendingReviewCount] = useState(0)
   const shopLabel = profileDisplayName(profile, 'Notion Creative Art')
+
+  useEffect(() => {
+    if (!profile?.is_admin) return
+    supabase.rpc('get_pending_review_count').then(({ data }) => setPendingReviewCount(Number(data) || 0))
+  }, [profile?.is_admin, pathname])
 
   if (loading) return null
   if (!user || !profile?.is_admin) {
@@ -69,6 +77,7 @@ export function Admin() {
       <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
         {ADMIN_NAV.map((item) => {
           if (item.kind === 'link') {
+            const badge = item.badgeKey === 'reviews' && pendingReviewCount > 0 ? pendingReviewCount : null
             return (
               <NavLink
                 key={item.to}
@@ -82,7 +91,12 @@ export function Admin() {
                 }
               >
                 <MaterialIcon name={item.icon} size={18} />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {badge != null && (
+                  <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full text-[10px] font-semibold flex items-center justify-center text-canvas" style={{ background: ACCENT }}>
+                    {badge}
+                  </span>
+                )}
               </NavLink>
             )
           }
@@ -213,6 +227,8 @@ function AdminContent() {
       return <HomepageAdmin />
     case '/admin/orders':
       return <OrdersAdmin />
+    case '/admin/reviews':
+      return <AdminReviews />
     case '/admin/subscribers':
       return <SubscribersAdmin />
     case '/admin/trash':

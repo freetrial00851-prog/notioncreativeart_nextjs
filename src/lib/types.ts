@@ -160,3 +160,26 @@ export type Profile = {
   billing_state: string | null
   name_changed_at: string | null
 }
+
+export type ReviewStatus = 'pending' | 'approved' | 'rejected'
+
+export type Review = {
+  id: string
+  product_id: string
+  user_id: string | null
+  reviewer_name: string
+  reviewer_email: string | null
+  rating: number
+  body: string
+  is_verified: boolean
+  purchase_id: string | null
+  status: ReviewStatus
+  created_at: string
+  moderated_at: string | null
+  moderated_by: string | null
+}
+
+export type ReviewStats = {
+  averageRating: number
+  reviewCount: number
+}
