@@ -42,6 +42,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
+    // Prefer AVIF when the browser accepts it; fall back to WebP.
+    formats: ['image/avif', 'image/webp'],
     // Origin storage sometimes sends Cache-Control: no-cache; keep optimized
     // /_next/image responses warm for a month so hero/product art isn't re-fetched every reload.
     minimumCacheTTL: 60 * 60 * 24 * 30,
