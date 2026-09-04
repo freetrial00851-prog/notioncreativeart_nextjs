@@ -14,12 +14,20 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { EmptyState } from '../components/EmptyState'
 import { ProductListingFilters } from '../components/ProductListingFilters'
+import { fetchPaidPurchaseCounts } from '../lib/purchaseCounts'
 import {
   LISTING_PAGE_SIZE,
   LISTING_PRODUCT_GRID_CLASS,
+  LISTING_SORT_OPTIONS,
   clearListingFilterParams,
+  clearSkillLevelParam,
   countActiveListingFilters,
   filterProductsByListingParams,
+  parseSkillLevels,
+  serializeSkillLevels,
+  sortProductsByListingSort,
+  toggleSkillLevel,
+  type ListingSort,
 } from '../lib/listingFilters'
 
 export function Shop() {
@@ -28,7 +36,8 @@ export function Shop() {
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
   const [searchParams, setSearchParams] = useUpdateSearchParams()
   const [, startNavTransition] = useTransition()
-  const level = searchParams?.get('level') ?? null
+  const levels = useMemo(() => parseSkillLevels(searchParams?.get('level')), [searchParams])
+  const levelsKey = levels.join(',')
   const priceFilter = searchParams?.get('price') ?? null
   const bundleFilter = searchParams?.get('bundle') === '1'
   const saleFilter = searchParams?.get('sale') === '1'
@@ -86,7 +95,7 @@ export function Shop() {
     else setInitialLoading(true)
 
     let query = supabase.from('products').select('*').eq('active', true)
-    if (level) query = query.eq('skill_level', level)
+    if (levels.length > 0) query = query.in('skill_level', levels)
     if (priceFilter === 'free') query = query.eq('price', 0)
     if (bundleFilter) query = query.eq('is_bundle', true)
     if (categorySlug === 'sale') {
@@ -120,7 +129,7 @@ export function Shop() {
       setInitialLoading(false)
       setFilterFetching(false)
     })
-  }, [level, priceFilter, bundleFilter, saleFilter, categorySlug, categoriesKey])
+  }, [levelsKey, priceFilter, bundleFilter, saleFilter, categorySlug, categoriesKey])
 
   useEffect(() => {
     if (initialLoading || filterFetching || products.length > 0) return
@@ -142,25 +151,37 @@ export function Shop() {
             ? 'Free Patterns'
             : saleFilter
               ? 'On Sale'
-              : level
-                ? `${level.charAt(0).toUpperCase()}${level.slice(1)} Patterns`
+              : levels.length > 0
+                ? `${levels.map((l) => l.charAt(0).toUpperCase() + l.slice(1)).join(' & ')} Patterns`
                 : 'All Patterns'
 
-  const [sort, setSort] = useState<'newest' | 'price-asc' | 'price-desc'>('newest')
+  const [sort, setSort] = useState<ListingSort>('newest')
   const [page, setPage] = useState(1)
+  const [purchaseCounts, setPurchaseCounts] = useState<Map<string, number>>(() => new Map())
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   useBodyScrollLock(mobileFiltersOpen)
   const PAGE_SIZE = LISTING_PAGE_SIZE
 
   useEffect(() => {
     setPage(1)
-  }, [level, priceFilter, bundleFilter, saleFilter, categorySlug, sort])
+  }, [levelsKey, priceFilter, bundleFilter, saleFilter, categorySlug, sort])
 
-  const sortedProducts = [...products].sort((a, b) => {
-    if (sort === 'price-asc') return a.price - b.price
-    if (sort === 'price-desc') return b.price - a.price
-    return 0 // already newest-first from the query
-  })
+  useEffect(() => {
+    if (sort !== 'best-selling' || products.length === 0) {
+      setPurchaseCounts(new Map())
+      return
+    }
+    let cancelled = false
+    fetchPaidPurchaseCounts(products.map((p) => p.id)).then((map) => {
+      if (!cancelled) setPurchaseCounts(map)
+    })
+    return () => { cancelled = true }
+  }, [sort, products])
+
+  const sortedProducts = useMemo(
+    () => sortProductsByListingSort(products, sort, purchaseCounts),
+    [products, sort, purchaseCounts],
+  )
 
   const pageCount = Math.ceil(sortedProducts.length / PAGE_SIZE)
   const pagedProducts = sortedProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -179,8 +200,18 @@ export function Shop() {
     })
   }
 
+  const onToggleLevel = (level: (typeof levels)[number]) => {
+    setSearchParams((p) => {
+      const next = toggleSkillLevel(parseSkillLevels(p.get('level')), level)
+      const serialized = serializeSkillLevels(next)
+      if (serialized) p.set('level', serialized)
+      else p.delete('level')
+      return p
+    })
+  }
+
   const activeFilterCount = countActiveListingFilters({
-    level,
+    levels,
     priceFilter,
     saleFilter,
     bundleFilter,
@@ -188,12 +219,13 @@ export function Shop() {
 
   const filterPanelContent = (
     <ProductListingFilters
-      level={level}
+      levels={levels}
       priceFilter={priceFilter}
       saleFilter={saleFilter}
       bundleFilter={bundleFilter}
       onToggleParam={toggleParam}
-      onClearLevel={() => setSearchParams((p) => { p.delete('level'); return p })}
+      onToggleLevel={onToggleLevel}
+      onClearLevels={() => setSearchParams(clearSkillLevelParam)}
       categories={
         sidebarCategories.length > 0 ? (
           <div>
@@ -264,12 +296,12 @@ export function Shop() {
           </div>
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
+            onChange={(e) => setSort(e.target.value as ListingSort)}
             className="hidden md:block text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
           >
-            <option value="newest">NEWEST</option>
-            <option value="price-asc">PRICE: LOW TO HIGH</option>
-            <option value="price-desc">PRICE: HIGH TO LOW</option>
+            {LISTING_SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
         </div>
 
@@ -291,12 +323,12 @@ export function Shop() {
         <div className="flex md:hidden items-center gap-3">
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
+            onChange={(e) => setSort(e.target.value as ListingSort)}
             className="flex-1 text-[12px] border border-line rounded-full px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
           >
-            <option value="newest">Sort: Newest</option>
-            <option value="price-asc">Sort: Price low to high</option>
-            <option value="price-desc">Sort: Price high to low</option>
+            {LISTING_SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.mobileLabel}</option>
+            ))}
           </select>
           <button
             onClick={() => setMobileFiltersOpen(true)}

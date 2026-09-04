@@ -1,90 +1,111 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { LISTING_SKILL_LEVELS } from '../lib/listingFilters'
+import {
+  LISTING_SKILL_LEVELS,
+  type ListingSkillLevel,
+} from '../lib/listingFilters'
+
+const CHECKBOX_CLASS =
+  'listing-filter-check shrink-0 w-4 h-4 rounded-sm border border-line bg-white ' +
+  'appearance-none cursor-pointer transition-colors ' +
+  'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
+
+const ROW_CLASS =
+  'flex items-center gap-2.5 py-1.5 px-1 -mx-1 rounded-md text-[13px] cursor-pointer ' +
+  'text-ink hover:bg-surface transition-colors'
 
 type ProductListingFiltersProps = {
-  level: string | null
+  levels: ListingSkillLevel[]
   priceFilter: string | null
   saleFilter: boolean
   bundleFilter: boolean
-  /** Toggle a query param: if already set to `value`, remove it; otherwise set it. */
+  /** Toggle free / sale / bundle query params. */
   onToggleParam: (key: string, value: string) => void
-  /** Clear skill level (select “All Levels”). */
-  onClearLevel: () => void
+  onToggleLevel: (level: ListingSkillLevel) => void
+  /** Clear skill levels only. */
+  onClearLevels: () => void
   /** Optional browse-only block (Shop subcategory list). Omit on Search. */
   categories?: ReactNode
 }
 
-/** Shared skill-level + free/sale/bundle filters for Shop and Search sidebars. */
+/** Shared skill-level + refine filters for Shop and Search sidebars. */
 export function ProductListingFilters({
-  level,
+  levels,
   priceFilter,
   saleFilter,
   bundleFilter,
   onToggleParam,
-  onClearLevel,
+  onToggleLevel,
+  onClearLevels,
   categories,
 }: ProductListingFiltersProps) {
   return (
-    <>
+    <div className="bg-white border border-line rounded-lg p-5 space-y-6">
       <div>
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">SKILL LEVEL</p>
-        <div className="space-y-0.5">
-          <button
-            type="button"
-            onClick={onClearLevel}
-            className={`w-full text-left px-3 py-2 rounded-full text-[13px] transition-colors ${!level ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
-          >
-            All Levels
-          </button>
-          {LISTING_SKILL_LEVELS.map((l) => (
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <p className="text-[11px] tracking-[0.15em] text-ink-soft">SKILL LEVEL</p>
+          {levels.length > 0 && (
             <button
               type="button"
-              key={l}
-              onClick={() => onToggleParam('level', l)}
-              className={`w-full text-left px-3 py-2 rounded-full text-[13px] capitalize transition-colors ${level === l ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+              onClick={onClearLevels}
+              className="text-[11px] font-semibold underline underline-offset-2 shrink-0"
+              style={{ color: 'var(--color-accent)' }}
             >
-              {l}
+              Clear
             </button>
+          )}
+        </div>
+        <div className="space-y-0.5">
+          {LISTING_SKILL_LEVELS.map((l) => (
+            <label key={l} className={ROW_CLASS}>
+              <input
+                type="checkbox"
+                checked={levels.includes(l)}
+                onChange={() => onToggleLevel(l)}
+                className={CHECKBOX_CLASS}
+              />
+              <span className="capitalize">{l}</span>
+            </label>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FILTERS</p>
-        <div className="space-y-2.5">
-          <label className="flex items-center gap-2.5 text-[13px] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={priceFilter === 'free'}
-              onChange={() => onToggleParam('price', 'free')}
-              className="accent-ink"
-            />
-            Free patterns only
-          </label>
-          <label className="flex items-center gap-2.5 text-[13px] cursor-pointer">
+        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">REFINE</p>
+        <div className="space-y-0.5">
+          <label className={ROW_CLASS}>
             <input
               type="checkbox"
               checked={saleFilter}
               onChange={() => onToggleParam('sale', '1')}
-              className="accent-ink"
+              className={CHECKBOX_CLASS}
             />
-            On sale
+            On Sale
           </label>
-          <label className="flex items-center gap-2.5 text-[13px] cursor-pointer">
+          <label className={ROW_CLASS}>
             <input
               type="checkbox"
               checked={bundleFilter}
               onChange={() => onToggleParam('bundle', '1')}
-              className="accent-ink"
+              className={CHECKBOX_CLASS}
             />
-            Bundles only
+            Bundles
+          </label>
+          <label className={ROW_CLASS}>
+            <input
+              type="checkbox"
+              checked={priceFilter === 'free'}
+              onChange={() => onToggleParam('price', 'free')}
+              className={CHECKBOX_CLASS}
+            />
+            Free Patterns
           </label>
         </div>
       </div>
 
-      {categories}
-    </>
+      {categories ? <div className="pt-1 border-t border-line">{categories}</div> : null}
+    </div>
   )
 }

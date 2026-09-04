@@ -13,19 +13,29 @@ import { ProductGridSkeleton } from '../components/Skeleton'
 import { ProductListingFilters } from '../components/ProductListingFilters'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
+import { fetchPaidPurchaseCounts } from '../lib/purchaseCounts'
 import {
   LISTING_PAGE_SIZE,
   LISTING_PRODUCT_GRID_CLASS,
+  LISTING_SORT_OPTIONS,
   clearListingFilterParams,
+  clearSkillLevelParam,
   countActiveListingFilters,
   filterProductsByListingParams,
+  parseSkillLevels,
+  serializeSkillLevels,
+  sortProductsByListingSort,
+  toggleSkillLevel,
+  type ListingSkillLevel,
+  type ListingSort,
 } from '../lib/listingFilters'
 
 export function Search() {
   const router = useRouter()
   const [searchParams, setSearchParams] = useUpdateSearchParams()
   const q = searchParams?.get('q') ?? ''
-  const level = searchParams?.get('level') ?? null
+  const levels = useMemo(() => parseSkillLevels(searchParams?.get('level')), [searchParams])
+  const levelsKey = levels.join(',')
   const priceFilter = searchParams?.get('price') ?? null
   const bundleFilter = searchParams?.get('bundle') === '1'
   const saleFilter = searchParams?.get('sale') === '1'
@@ -34,6 +44,8 @@ export function Search() {
   const [suggestions, setSuggestions] = useState<Product[]>([])
   const [loading, setLoading] = useState(() => Boolean(q.trim()))
   const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<ListingSort>('newest')
+  const [purchaseCounts, setPurchaseCounts] = useState<Map<string, number>>(() => new Map())
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   useBodyScrollLock(mobileFiltersOpen)
 
@@ -65,17 +77,34 @@ export function Search() {
   const filteredResults = useMemo(
     () =>
       filterProductsByListingParams(results, {
-        level,
+        levels,
         free: priceFilter === 'free',
         sale: saleFilter,
         bundle: bundleFilter,
       }),
-    [results, level, priceFilter, saleFilter, bundleFilter],
+    [results, levels, priceFilter, saleFilter, bundleFilter],
   )
 
   useEffect(() => {
     setPage(1)
-  }, [level, priceFilter, saleFilter, bundleFilter])
+  }, [levelsKey, priceFilter, saleFilter, bundleFilter, sort])
+
+  useEffect(() => {
+    if (sort !== 'best-selling' || filteredResults.length === 0) {
+      setPurchaseCounts(new Map())
+      return
+    }
+    let cancelled = false
+    fetchPaidPurchaseCounts(filteredResults.map((p) => p.id)).then((map) => {
+      if (!cancelled) setPurchaseCounts(map)
+    })
+    return () => { cancelled = true }
+  }, [sort, filteredResults])
+
+  const sortedResults = useMemo(
+    () => sortProductsByListingSort(filteredResults, sort, purchaseCounts),
+    [filteredResults, sort, purchaseCounts],
+  )
 
   useEffect(() => {
     if (loading || !q || results.length > 0) return
@@ -84,8 +113,8 @@ export function Search() {
   }, [loading, q, results.length])
 
   const PAGE_SIZE = LISTING_PAGE_SIZE
-  const pageCount = Math.ceil(filteredResults.length / PAGE_SIZE)
-  const pagedResults = filteredResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const pageCount = Math.ceil(sortedResults.length / PAGE_SIZE)
+  const pagedResults = sortedResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
   const reviewStatsMap = useReviewStatsMapForLists([pagedResults, suggestions])
 
   const goToPage = (p: number) => {
@@ -101,8 +130,18 @@ export function Search() {
     })
   }
 
+  const onToggleLevel = (level: ListingSkillLevel) => {
+    setSearchParams((p) => {
+      const next = toggleSkillLevel(parseSkillLevels(p.get('level')), level)
+      const serialized = serializeSkillLevels(next)
+      if (serialized) p.set('level', serialized)
+      else p.delete('level')
+      return p
+    })
+  }
+
   const activeFilterCount = countActiveListingFilters({
-    level,
+    levels,
     priceFilter,
     saleFilter,
     bundleFilter,
@@ -110,26 +149,42 @@ export function Search() {
 
   const filterPanelContent = (
     <ProductListingFilters
-      level={level}
+      levels={levels}
       priceFilter={priceFilter}
       saleFilter={saleFilter}
       bundleFilter={bundleFilter}
       onToggleParam={toggleParam}
-      onClearLevel={() => setSearchParams((p) => { p.delete('level'); return p })}
+      onToggleLevel={onToggleLevel}
+      onClearLevels={() => setSearchParams(clearSkillLevelParam)}
     />
   )
 
   const showListingChrome = Boolean(q.trim())
 
+  const sortSelectDesktop = (
+    <select
+      value={sort}
+      onChange={(e) => setSort(e.target.value as ListingSort)}
+      className="hidden md:block text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
+    >
+      {LISTING_SORT_OPTIONS.map((opt) => (
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      ))}
+    </select>
+  )
+
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14">
-      <div className="border-b border-line pb-4 mb-8 flex items-center justify-between gap-4 flex-wrap">
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
-        {q && (
-          <p className="text-[11px] tracking-[0.08em] text-ink-soft">
-            {loading ? 'Searching…' : `${filteredResults.length} result${filteredResults.length === 1 ? '' : 's'}`}
-          </p>
-        )}
+      <div className="border-b border-line pb-4 mb-8 flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
+          {q && (
+            <p className="text-[11px] tracking-[0.08em] text-ink-soft mt-2">
+              {loading ? 'Searching…' : `${sortedResults.length} result${sortedResults.length === 1 ? '' : 's'}`}
+            </p>
+          )}
+        </div>
+        {showListingChrome && sortSelectDesktop}
       </div>
 
       {!q && (
@@ -139,6 +194,15 @@ export function Search() {
       {showListingChrome && (
         <>
           <div className="flex md:hidden items-center gap-3 mb-6">
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as ListingSort)}
+              className="flex-1 text-[12px] border border-line rounded-full px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
+            >
+              {LISTING_SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.mobileLabel}</option>
+              ))}
+            </select>
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}
@@ -172,7 +236,7 @@ export function Search() {
             <div className="min-w-0">
               {loading ? (
                 <ProductGridSkeleton variant="search" />
-              ) : filteredResults.length > 0 ? (
+              ) : sortedResults.length > 0 ? (
                 <>
                   <div className={LISTING_PRODUCT_GRID_CLASS}>
                     {pagedResults.map((p) => (
@@ -276,7 +340,7 @@ export function Search() {
                 className="w-full py-3.5 rounded-full text-white text-[13px] font-semibold"
                 style={{ background: 'var(--color-ink)' }}
               >
-                Show {filteredResults.length} result{filteredResults.length === 1 ? '' : 's'}
+                Show {sortedResults.length} result{sortedResults.length === 1 ? '' : 's'}
               </button>
             </div>
           </div>
