@@ -552,7 +552,7 @@ export function Home({
     new_arrivals: !catalogReady ? (
       <div aria-hidden>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
-        <ProductGridSkeleton variant="newArrivals" count={10} />
+        <ProductGridSkeleton variant="newArrivals" count={6} />
       </div>
     ) : newArrivals.length > 0 ? (
       <div>

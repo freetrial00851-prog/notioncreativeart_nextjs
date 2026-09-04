@@ -33,7 +33,7 @@ const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassNam
   },
   newArrivals: {
     className: HOME_PRODUCT_GRID_CLASS,
-    defaultCount: 10,
+    defaultCount: 6,
   },
   freePatterns: {
     className: HOME_PRODUCT_GRID_CLASS,

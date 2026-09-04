@@ -8,8 +8,8 @@ export const HOME_PRODUCT_SECTION_LIMIT = 6
  */
 export const HOME_FEATURED_LIMIT = 6
 
-/** New Arrivals fetch cap — 10 fills two complete rows on an xl:5-column grid. */
-export const HOME_NEW_ARRIVALS_LIMIT = 10
+/** New Arrivals fetch cap — 6 fills clean rows at 2-col / 3-col breakpoints. */
+export const HOME_NEW_ARRIVALS_LIMIT = 6
 
 /**
  * Featured Items, New Arrivals, Free Patterns — column tiers aligned to Shop card width:
