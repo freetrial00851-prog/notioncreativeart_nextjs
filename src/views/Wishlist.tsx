@@ -8,7 +8,9 @@ import { useReviewStatsMap } from '../lib/useReviewStatsMap'
 import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
 
-const PAGE_SIZE = 15
+import { LISTING_PAGE_SIZE, LISTING_PRODUCT_GRID_CLASS } from '../lib/listingFilters'
+
+const PAGE_SIZE = LISTING_PAGE_SIZE
 
 /** Wishlist grid — use `embedded` inside the account shell so sidebar nav stays visible. */
 export function Wishlist({ embedded = false }: { embedded?: boolean }) {
@@ -45,7 +47,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
+          <div className={LISTING_PRODUCT_GRID_CLASS}>
             {pagedProducts.map((p) => (
               <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
             ))}

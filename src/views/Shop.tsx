@@ -13,8 +13,14 @@ import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { EmptyState } from '../components/EmptyState'
-
-const LEVELS = ['beginner', 'intermediate', 'advanced'] as const
+import { ProductListingFilters } from '../components/ProductListingFilters'
+import {
+  LISTING_PAGE_SIZE,
+  LISTING_PRODUCT_GRID_CLASS,
+  clearListingFilterParams,
+  countActiveListingFilters,
+  filterProductsByListingParams,
+} from '../lib/listingFilters'
 
 export function Shop() {
   const params = useParams()
@@ -107,9 +113,8 @@ export function Shop() {
       let rows = (data as Product[]) ?? []
       // "On sale" isn't a single-column filter (needs compare_at_price > price,
       // not just "is set") — Supabase can't compare two columns directly, so
-      // this stays a real client-side check on the already-fetched rows,
-      // matching the exact same isOnSale logic ProductCard uses for the badge.
-      if (saleFilter) rows = rows.filter((p) => p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price)
+      // this stays a real client-side check on the already-fetched rows.
+      if (saleFilter) rows = filterProductsByListingParams(rows, { sale: true })
       setProducts(rows)
       hasLoadedOnce.current = true
       setInitialLoading(false)
@@ -145,7 +150,7 @@ export function Shop() {
   const [page, setPage] = useState(1)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   useBodyScrollLock(mobileFiltersOpen)
-  const PAGE_SIZE = 15
+  const PAGE_SIZE = LISTING_PAGE_SIZE
 
   useEffect(() => {
     setPage(1)
@@ -174,85 +179,59 @@ export function Shop() {
     })
   }
 
-  const activeFilterCount = (level ? 1 : 0) + (priceFilter === 'free' ? 1 : 0) + (saleFilter ? 1 : 0) + (bundleFilter ? 1 : 0)
+  const activeFilterCount = countActiveListingFilters({
+    level,
+    priceFilter,
+    saleFilter,
+    bundleFilter,
+  })
 
   const filterPanelContent = (
-    <>
-      <div>
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">SKILL LEVEL</p>
-        <div className="space-y-0.5">
-          <button
-            onClick={() => setSearchParams((p) => { p.delete('level'); return p })}
-            className={`w-full text-left px-3 py-2 rounded-full text-[13px] transition-colors ${!level ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
-          >
-            All Levels
-          </button>
-          {LEVELS.map((l) => (
-            <button
-              key={l}
-              onClick={() => toggleParam('level', l)}
-              className={`w-full text-left px-3 py-2 rounded-full text-[13px] capitalize transition-colors ${level === l ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
-            >
-              {l}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FILTERS</p>
-        <div className="space-y-2.5">
-          <label className="flex items-center gap-2.5 text-[13px] cursor-pointer">
-            <input type="checkbox" checked={priceFilter === 'free'} onChange={() => toggleParam('price', 'free')} className="accent-ink" />
-            Free patterns only
-          </label>
-          <label className="flex items-center gap-2.5 text-[13px] cursor-pointer">
-            <input type="checkbox" checked={saleFilter} onChange={() => toggleParam('sale', '1')} className="accent-ink" />
-            On sale
-          </label>
-          <label className="flex items-center gap-2.5 text-[13px] cursor-pointer">
-            <input type="checkbox" checked={bundleFilter} onChange={() => toggleParam('bundle', '1')} className="accent-ink" />
-            Bundles only
-          </label>
-        </div>
-      </div>
-
-      {sidebarCategories.length > 0 && (
-        <div>
-          <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">
-            {parentCategory ? parentCategory.name.toUpperCase() : currentCategory?.name.toUpperCase()} CATEGORIES
-          </p>
-          <div className="space-y-0.5">
-            <Link
-              href={`/shop/${(parentCategory ?? currentCategory)!.slug}`}
-              onClick={(e) => {
-                e.preventDefault()
-                setMobileFiltersOpen(false)
-                goShop(`/shop/${(parentCategory ?? currentCategory)!.slug}`)
-              }}
-              className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${!parentCategory ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
-            >
-              All {(parentCategory ?? currentCategory)!.name}
-            </Link>
-            {sidebarCategories.map((sc) => (
+    <ProductListingFilters
+      level={level}
+      priceFilter={priceFilter}
+      saleFilter={saleFilter}
+      bundleFilter={bundleFilter}
+      onToggleParam={toggleParam}
+      onClearLevel={() => setSearchParams((p) => { p.delete('level'); return p })}
+      categories={
+        sidebarCategories.length > 0 ? (
+          <div>
+            <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">
+              {parentCategory ? parentCategory.name.toUpperCase() : currentCategory?.name.toUpperCase()} CATEGORIES
+            </p>
+            <div className="space-y-0.5">
               <Link
-                key={sc.id}
-                href={`/shop/${sc.slug}`}
+                href={`/shop/${(parentCategory ?? currentCategory)!.slug}`}
                 onClick={(e) => {
                   e.preventDefault()
                   setMobileFiltersOpen(false)
-                  goShop(`/shop/${sc.slug}`)
+                  goShop(`/shop/${(parentCategory ?? currentCategory)!.slug}`)
                 }}
-                className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+                className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${!parentCategory ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
               >
-                <span>{sc.name}</span>
-                <span className="text-[11px] text-ink-soft">{sc.count}</span>
+                All {(parentCategory ?? currentCategory)!.name}
               </Link>
-            ))}
+              {sidebarCategories.map((sc) => (
+                <Link
+                  key={sc.id}
+                  href={`/shop/${sc.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setMobileFiltersOpen(false)
+                    goShop(`/shop/${sc.slug}`)
+                  }}
+                  className={`flex items-center justify-between px-3 py-2 rounded-full text-[13px] transition-colors ${sc.slug === categorySlug ? 'bg-surface font-medium text-ink' : 'text-ink-soft hover:bg-surface hover:text-ink'}`}
+                >
+                  <span>{sc.name}</span>
+                  <span className="text-[11px] text-ink-soft">{sc.count}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </>
+        ) : undefined
+      }
+    />
   )
 
   return (
@@ -338,7 +317,7 @@ export function Shop() {
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start space-y-8">
           {activeFilterCount > 0 && (
             <button
-              onClick={() => setSearchParams((p) => { p.delete('level'); p.delete('price'); p.delete('sale'); p.delete('bundle'); return p })}
+              onClick={() => setSearchParams(clearListingFilterParams)}
               className="text-[11px] font-semibold tracking-[0.1em] underline underline-offset-2"
               style={{ color: 'var(--color-accent)' }}
             >
@@ -372,7 +351,7 @@ export function Shop() {
             </EmptyState>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
+              <div className={LISTING_PRODUCT_GRID_CLASS}>
                 {pagedProducts.map((p, i) => (
                   <ProductCard key={p.id} product={p} priority={i < 4} reviewStats={reviewStatsMap.get(p.id)} />
                 ))}
@@ -425,7 +404,7 @@ export function Shop() {
               <div className="flex items-center gap-4">
                 {activeFilterCount > 0 && (
                   <button
-                    onClick={() => setSearchParams((p) => { p.delete('level'); p.delete('price'); p.delete('sale'); p.delete('bundle'); return p })}
+                    onClick={() => setSearchParams(clearListingFilterParams)}
                     className="text-[12px] font-semibold underline underline-offset-2"
                     style={{ color: 'var(--color-accent)' }}
                   >

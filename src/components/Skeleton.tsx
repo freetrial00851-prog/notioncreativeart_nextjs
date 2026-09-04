@@ -1,6 +1,7 @@
 /** Shared pulse skeleton building blocks — each variant mirrors its real content layout. */
 
 import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
+import { LISTING_PAGE_SIZE, LISTING_PRODUCT_GRID_CLASS } from '../lib/listingFilters'
 
 function Bone({ className = '' }: { className?: string }) {
   return <div className={`bg-skeleton rounded animate-pulse ${className}`} />
@@ -39,19 +40,19 @@ const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassNam
     className: HOME_PRODUCT_GRID_CLASS,
     defaultCount: 6,
   },
-  // Shop / category listing (PAGE_SIZE 15)
+  // Shop / category listing (PAGE_SIZE 12)
   shop: {
-    className: 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14',
-    defaultCount: 15,
+    className: LISTING_PRODUCT_GRID_CLASS,
+    defaultCount: LISTING_PAGE_SIZE,
   },
-  // Search results — same column ladder as Home product grids
+  // Search results — same column ladder + page size as Shop
   search: {
-    className: 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14',
-    defaultCount: 15,
+    className: LISTING_PRODUCT_GRID_CLASS,
+    defaultCount: LISTING_PAGE_SIZE,
   },
   // Wishlist / account grids
   wishlist: {
-    className: 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14',
+    className: LISTING_PRODUCT_GRID_CLASS,
     defaultCount: 8,
   },
 }
@@ -285,15 +286,26 @@ export function PageSkeleton() {
   )
 }
 
-/** Search results loading. */
+/** Search results loading — sidebar column + Shop-aligned product grid. */
 export function SearchSkeleton() {
   return (
-    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-10 md:py-14 space-y-8" aria-hidden>
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14 space-y-8" aria-hidden>
       <div className="border-b border-line pb-4 flex items-center justify-between">
         <Bone className="h-3 w-16" />
         <Bone className="h-3 w-20" />
       </div>
-      <ProductGridSkeleton variant="search" />
+      <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-10">
+        <div className="hidden lg:block space-y-6">
+          <Bone className="h-4 w-24" />
+          <Bone className="h-10 w-full rounded-full" />
+          <Bone className="h-10 w-full rounded-full" />
+          <Bone className="h-4 w-20" />
+          <Bone className="h-5 w-40" />
+          <Bone className="h-5 w-32" />
+          <Bone className="h-5 w-36" />
+        </div>
+        <ProductGridSkeleton variant="search" />
+      </div>
     </div>
   )
 }
