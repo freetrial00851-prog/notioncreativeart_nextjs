@@ -15,14 +15,41 @@ import {
 } from '../lib/homeCatalogCache'
 import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialContent } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
-import { ProductTagPill } from '../components/ProductTagPill'
-import { skillLevelTagLabel } from '../lib/productCardMeta'
+import { SKILL_PILL_STYLES } from '../lib/productCardMeta'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { NewsletterBanner } from '../components/NewsletterBanner'
 import { ProductGridSkeleton, CategoryRowSkeleton, ChaptersSkeleton, SkillBrowseSkeleton, TestimonialsSkeleton } from '../components/Skeleton'
 import { SectionBand } from '../components/SectionBand'
 import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
+
+const SKILL_DIFFICULTY_FILLED: Record<'beginner' | 'intermediate' | 'advanced', number> = {
+  beginner: 1,
+  intermediate: 2,
+  advanced: 3,
+}
+
+function SkillDifficultyDots({ level }: { level: 'beginner' | 'intermediate' | 'advanced' }) {
+  const filled = SKILL_DIFFICULTY_FILLED[level]
+  const fillColor = SKILL_PILL_STYLES[level].color
+  const label = level.charAt(0).toUpperCase() + level.slice(1)
+  return (
+    <div
+      className="flex items-center gap-1.5"
+      role="img"
+      aria-label={`Difficulty: ${label} (${filled} of 3)`}
+    >
+      {Array.from({ length: 3 }, (_, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="block w-1.5 h-1.5 rounded-full"
+          style={{ background: i < filled ? fillColor : 'var(--color-line)' }}
+        />
+      ))}
+    </div>
+  )
+}
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
@@ -437,27 +464,36 @@ export function Home({
         <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {chapters.map((c) => {
-            const exploreColor = 'var(--color-primary)'
-            const levelLabel = skillLevelTagLabel(c.level)
-            return (
-              <Link key={c.title} href={c.link} className="group block bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
-                <div className="relative aspect-[4/3] bg-surface overflow-hidden">
-                  {c.image && <img src={c.image} alt={c.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />}
-                  {levelLabel && (
-                    <div className="absolute top-3 left-3">
-                      <ProductTagPill label={levelLabel} skillLevel={c.level} compact />
-                    </div>
+          {chapters.map((c) => (
+              <Link
+                key={c.title}
+                href={c.link}
+                className="group flex flex-row md:flex-col bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
+              >
+                <div className="relative w-28 sm:w-32 shrink-0 aspect-square md:w-full md:aspect-[4/3] bg-surface overflow-hidden">
+                  {c.image && (
+                    <img
+                      src={c.image}
+                      alt={c.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    />
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="font-display font-semibold text-xl mb-2">{c.title}</h3>
-                  <p className="text-[14px] text-ink-soft leading-relaxed mb-4">{c.copy}</p>
-                  <span className="text-[12px] font-semibold" style={{ color: exploreColor }}>Explore →</span>
+                <div className="flex-1 min-w-0 p-4 md:p-6 flex flex-col">
+                  <h3 className="font-display font-semibold text-lg md:text-xl mb-1.5 md:mb-2">{c.title}</h3>
+                  <div className="mb-2 md:mb-3">
+                    <SkillDifficultyDots level={c.level} />
+                  </div>
+                  <p className="text-[13px] md:text-[14px] text-ink-soft leading-relaxed mb-3 md:mb-4 line-clamp-3 md:line-clamp-none">
+                    {c.copy}
+                  </p>
+                  <span className="text-[12px] font-semibold mt-auto" style={{ color: 'var(--color-accent)' }}>
+                    Explore →
+                  </span>
                 </div>
               </Link>
-            )
-          })}
+            ))}
         </div>
       </div>
     ) : null,

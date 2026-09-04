@@ -110,18 +110,26 @@ export function CategoryRowSkeleton({ count = 6 }: { count?: number }) {
   )
 }
 
-/** Skill Level Chapters cards — aspect-[4/3] image + title + copy + CTA. */
+/** Skill Level Chapters cards — mobile horizontal / desktop vertical. */
 export function ChaptersSkeleton({ count = 3 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5" aria-hidden>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <Bone className="aspect-[4/3] rounded-none" />
-          <div className="p-6 space-y-3">
-            <Bone className="h-6 w-2/3" />
+        <div
+          key={i}
+          className="bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-row md:flex-col"
+        >
+          <Bone className="w-28 sm:w-32 shrink-0 aspect-square md:w-full md:aspect-[4/3] rounded-none" />
+          <div className="flex-1 min-w-0 p-4 md:p-6 space-y-3">
+            <Bone className="h-5 md:h-6 w-2/3" />
+            <div className="flex gap-1.5">
+              <Bone className="h-1.5 w-1.5 rounded-full" />
+              <Bone className="h-1.5 w-1.5 rounded-full" />
+              <Bone className="h-1.5 w-1.5 rounded-full" />
+            </div>
             <Bone className="h-3.5 w-full" />
             <Bone className="h-3.5 w-5/6" />
-            <Bone className="h-3.5 w-20 mt-2" />
+            <Bone className="h-3.5 w-20 mt-1" />
           </div>
         </div>
       ))}
