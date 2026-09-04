@@ -11,6 +11,8 @@ import { useToast } from '../context/ToastContext'
 import { useState } from 'react'
 import { QuickView } from './QuickView'
 import { ProductCardMeta } from './ProductCardMeta'
+import { ProductTagPill } from './ProductTagPill'
+import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { downloadFreePattern } from '../lib/downloads'
@@ -67,6 +69,7 @@ export function ProductCard({
 
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
   const badge = product.card_badge
+  const skillLabel = skillLevelTagLabel(product.skill_level)
 
   return (
     <>
@@ -132,6 +135,11 @@ export function ProductCard({
         </div>
 
         <div className="p-3">
+          {skillLabel && (
+            <div className="mb-1.5">
+              <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
+            </div>
+          )}
           <p className="text-[13px] font-medium leading-snug line-clamp-2 min-h-[2.75em] mb-1.5">{product.title}</p>
           <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-1" />
           <div className="flex items-center justify-between gap-2">

@@ -15,6 +15,8 @@ import { profileDisplayName } from '../lib/profileName'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { ProductCardMeta } from './ProductCardMeta'
+import { ProductTagPill } from './ProductTagPill'
+import { skillLevelTagLabel } from '../lib/productCardMeta'
 
 export function QuickView({
   product,
@@ -39,6 +41,7 @@ export function QuickView({
   const hasMultiple = images.length > 1
   const inCart = isInCart(product.id)
   const inWishlist = isWishlisted(product.id)
+  const skillLabel = skillLevelTagLabel(product.skill_level)
 
   useBodyScrollLock(true)
 
@@ -157,6 +160,11 @@ export function QuickView({
         <div className="relative flex flex-col min-h-0 max-h-[85vh] p-5 md:p-6">
           <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 z-10 text-ink-soft hover:text-ink text-lg leading-none">✕</button>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+          {skillLabel && (
+            <div className="mb-2">
+              <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
+            </div>
+          )}
           <h2
             className="font-subheading font-semibold text-xl leading-snug pr-8 mb-2 overflow-hidden line-clamp-2 min-h-[2.75em]"
             style={{
