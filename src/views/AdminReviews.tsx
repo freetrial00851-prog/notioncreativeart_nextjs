@@ -24,13 +24,14 @@ export function AdminReviews() {
     setLoading(true)
     let query = supabase
       .from('reviews')
+      // Admin-only path (RLS): includes reviewer_email for moderation context.
       .select('*, product:products(title, slug)')
       .order('created_at', { ascending: false })
 
     if (filter !== 'all') query = query.eq('status', filter)
 
     const { data } = await query
-    setReviews((data ?? []) as ReviewRow[])
+    setReviews((data ?? []) as unknown as ReviewRow[])
     setLoading(false)
   }, [filter])
 

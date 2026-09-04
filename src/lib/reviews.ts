@@ -1,6 +1,10 @@
 import { supabase } from './supabase'
 import type { Review, ReviewStats } from './types'
 
+/** Columns safe for public / product-page review reads — never includes reviewer_email. */
+export const PUBLIC_REVIEW_COLUMNS =
+  'id, product_id, reviewer_name, rating, body, created_at, is_verified, status' as const
+
 export async function fetchProductReviewStats(productId: string): Promise<ReviewStats> {
   const { data, error } = await supabase.rpc('get_product_review_stats', { p_product_id: productId })
   if (error || !data?.length) return { averageRating: 0, reviewCount: 0 }
@@ -29,7 +33,7 @@ export async function fetchReviewStatsBatch(productIds: string[]): Promise<Map<s
 export async function fetchApprovedReviews(productId: string): Promise<Review[]> {
   const { data, error } = await supabase
     .from('reviews')
-    .select('*')
+    .select(PUBLIC_REVIEW_COLUMNS)
     .eq('product_id', productId)
     .eq('status', 'approved')
     .order('created_at', { ascending: false })
@@ -37,10 +41,11 @@ export async function fetchApprovedReviews(productId: string): Promise<Review[]>
   return (data ?? []) as Review[]
 }
 
+/** Own review for the signed-in user — still omits reviewer_email from the client payload. */
 export async function fetchUserReview(productId: string, userId: string): Promise<Review | null> {
   const { data, error } = await supabase
     .from('reviews')
-    .select('*')
+    .select(PUBLIC_REVIEW_COLUMNS)
     .eq('product_id', productId)
     .eq('user_id', userId)
     .maybeSingle()

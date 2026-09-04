@@ -1,5 +1,6 @@
 import { createStaticClient } from '@/lib/supabase/static'
 import type { Review, ReviewStats } from '@/lib/types'
+import { PUBLIC_REVIEW_COLUMNS } from '@/lib/reviews'
 
 /** Server-side review stats for JSON-LD and static generation (no cookies). */
 export async function getProductReviewStats(productId: string): Promise<ReviewStats> {
@@ -18,7 +19,7 @@ export async function getApprovedReviews(productId: string, limit = 5): Promise<
   const supabase = createStaticClient()
   const { data, error } = await supabase
     .from('reviews')
-    .select('*')
+    .select(PUBLIC_REVIEW_COLUMNS)
     .eq('product_id', productId)
     .eq('status', 'approved')
     .order('created_at', { ascending: false })

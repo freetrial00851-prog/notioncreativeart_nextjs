@@ -25,18 +25,17 @@ export async function checkAuthRateLimit(
             return 'Too many attempts — please wait a bit and try again.'
           }
         } catch {
-          /* fall through */
+          /* fall through to fail-closed */
         }
       }
-      // Fail open only on transport/function-missing errors so a deploy lag
-      // doesn't lock every customer out of login — platform Auth limits still apply.
+      // Fail closed: never allow auth through when the rate-limit check itself fails.
       console.warn('auth-rate-limit invoke failed:', error.message)
-      return null
+      return 'Unable to verify rate limits right now — please try again in a moment.'
     }
     if (data?.error) return String(data.error)
     return null
   } catch (err) {
     console.warn('auth-rate-limit unexpected error:', err)
-    return null
+    return 'Unable to verify rate limits right now — please try again in a moment.'
   }
 }

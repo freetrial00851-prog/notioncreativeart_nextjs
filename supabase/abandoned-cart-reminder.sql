@@ -86,6 +86,8 @@ as $$
 $$;
 
 revoke all on function public.get_abandoned_cart_candidates() from public;
+revoke execute on function public.get_abandoned_cart_candidates() from anon;
+revoke execute on function public.get_abandoned_cart_candidates() from authenticated;
 grant execute on function public.get_abandoned_cart_candidates() to service_role;
 
 -- ── 4. Manual test queries ──────────────────────────────────────────────────
