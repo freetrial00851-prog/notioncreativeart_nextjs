@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from '
 import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { processAndUploadImage, sanitizeFilename, validateImageFile } from '../lib/imageVariants'
+import { validatePdfFile } from '../lib/uploadValidation'
 import type { Category } from '../lib/types'
 import {
   BULK_CSV_HEADERS,
@@ -171,15 +172,20 @@ export function AdminBulkUpload() {
 
     if (pdfs.length === 1) {
       const pdf = pdfs[0]
-      const { error: pdfError } = await supabase.storage.from('patterns').upload(`${productId}.pdf`, pdf, {
-        upsert: true,
-        contentType: 'application/pdf',
-        metadata: { originalName: pdf.name },
-      })
-      if (pdfError) {
-        draftReason = `PDF upload failed: ${pdfError.message}`
+      const pdfValidation = await validatePdfFile(pdf)
+      if (!pdfValidation.ok) {
+        draftReason = `PDF rejected: ${pdfValidation.reason}`
       } else {
-        await supabase.from('products').update({ pdf_filename: pdf.name }).eq('id', productId)
+        const { error: pdfError } = await supabase.storage.from('patterns').upload(`${productId}.pdf`, pdf, {
+          upsert: true,
+          contentType: 'application/pdf',
+          metadata: { originalName: pdf.name },
+        })
+        if (pdfError) {
+          draftReason = `PDF upload failed: ${pdfError.message}`
+        } else {
+          await supabase.from('products').update({ pdf_filename: pdf.name }).eq('id', productId)
+        }
       }
     } else {
       draftReason = pdfs.length === 0 ? 'No PDF in folder.' : `${pdfs.length} PDFs in folder — none attached.`

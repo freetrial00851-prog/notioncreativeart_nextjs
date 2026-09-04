@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { NavLink } from '@/components/NavLink'
 import { supabase } from '../lib/supabase'
 import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, IMAGE_MAX } from '../lib/imageVariants'
+import { validatePdfFile } from '../lib/uploadValidation'
 import { compressImage } from '../lib/imageCompress'
 import { useAuth } from '../context/AuthContext'
 import type { Product, Category } from '../lib/types'
@@ -376,6 +377,12 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
   }
   const uploadPdf = async (file: File, productId: string) => {
     setUploadingPdf(true)
+    const validation = await validatePdfFile(file)
+    if (!validation.ok) {
+      alert(validation.reason)
+      setUploadingPdf(false)
+      return
+    }
     const { error } = await supabase.storage.from('patterns').upload(`${productId}.pdf`, file, {
       upsert: true,
       contentType: 'application/pdf',
@@ -1206,12 +1213,23 @@ function CategoriesAdmin() {
 
   const uploadImage = async (file: File) => {
     setUploading(true)
+    const validation = await validateImageFile(file)
+    if (!validation.ok) {
+      alert(validation.reason)
+      setUploading(false)
+      return
+    }
     const compressed = await compressImage(file, IMAGE_MAX.category, 0.8)
     const path = `categories/${crypto.randomUUID()}-${compressed.name}`
-    const { error: err } = await supabase.storage.from('product-images').upload(path, compressed, { cacheControl: '31536000' })
+    const { error: err } = await supabase.storage.from('product-images').upload(path, compressed, {
+      cacheControl: '31536000',
+      contentType: compressed.type || 'image/webp',
+    })
     if (!err) {
       const { data } = supabase.storage.from('product-images').getPublicUrl(path)
       setForm((f) => ({ ...f, image: data.publicUrl }))
+    } else {
+      alert(`Image upload failed: ${err.message}`)
     }
     setUploading(false)
   }
@@ -1694,10 +1712,11 @@ function PdfDropzone({ uploading, uploaded, info, productId, productTitle, onSel
 
   const displayName = info?.originalName || fileName || (productTitle ? `${productTitle}.pdf` : null)
 
-  const handleFile = (file?: File) => {
+  const handleFile = async (file?: File) => {
     if (!file) return
-    if (file.type !== 'application/pdf') {
-      alert('Only PDF files are allowed.')
+    const validation = await validatePdfFile(file)
+    if (!validation.ok) {
+      alert(validation.reason)
       return
     }
     setFileName(file.name)

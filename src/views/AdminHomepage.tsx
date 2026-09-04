@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { compressImage } from '../lib/imageCompress'
-import { IMAGE_MAX } from '../lib/imageVariants'
+import { IMAGE_MAX, validateImageFile } from '../lib/imageVariants'
 import type { HeroContent, ChapterContent, CategoryContent, AnnouncementsContent, SocialContent, LayoutSection, TestimonialContent, SiteSeoContent } from '../lib/types'
 import { DEFAULT_ANNOUNCEMENT_COLORS, normalizeAnnouncements } from '../lib/types'
 import { DEFAULT_SITE_SEO } from '../lib/seoSettings'
@@ -75,12 +75,22 @@ export function HomepageAdmin() {
       : IMAGE_MAX.general
     const urls: string[] = []
     for (const rawFile of files) {
+      const validation = await validateImageFile(rawFile)
+      if (!validation.ok) {
+        alert(`${rawFile.name}: ${validation.reason}`)
+        continue
+      }
       const file = await compressImage(rawFile, maxDim, 0.8)
       const path = `homepage/${tag}-${crypto.randomUUID()}-${file.name}`
-      const { error } = await supabase.storage.from('product-images').upload(path, file, { cacheControl: '31536000' })
+      const { error } = await supabase.storage.from('product-images').upload(path, file, {
+        cacheControl: '31536000',
+        contentType: file.type || 'image/webp',
+      })
       if (!error) {
         const { data } = supabase.storage.from('product-images').getPublicUrl(path)
         urls.push(data.publicUrl)
+      } else {
+        alert(`${rawFile.name} failed to upload: ${error.message}`)
       }
     }
     if (urls.length) onDone(urls)

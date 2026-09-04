@@ -34,34 +34,8 @@ export const IMAGE_MAX = {
   general: 1600,
 } as const
 
-const SIGNATURES: Record<string, number[]> = {
-  jpeg: [0xff, 0xd8, 0xff],
-  png: [0x89, 0x50, 0x4e, 0x47],
-  webp: [0x52, 0x49, 0x46, 0x46], // 'RIFF' — WebP is RIFF + 'WEBP' at offset 8
-}
-
-const MAX_UPLOAD_BYTES = 20 * 1024 * 1024 // 20MB ceiling — rejects anything absurd
-
-export type ValidationResult = { ok: true } | { ok: false; reason: string }
-
-export async function validateImageFile(file: File): Promise<ValidationResult> {
-  if (!file.type.startsWith('image/')) return { ok: false, reason: 'Not an image file.' }
-  if (file.size > MAX_UPLOAD_BYTES) return { ok: false, reason: 'File is larger than 20MB.' }
-
-  const header = new Uint8Array(await file.slice(0, 12).arrayBuffer())
-  const matchesJpeg = SIGNATURES.jpeg.every((b, i) => header[i] === b)
-  const matchesPng = SIGNATURES.png.every((b, i) => header[i] === b)
-  const matchesWebp =
-    SIGNATURES.webp.every((b, i) => header[i] === b) &&
-    header[8] === 0x57 &&
-    header[9] === 0x45 &&
-    header[10] === 0x42 &&
-    header[11] === 0x50
-  if (!matchesJpeg && !matchesPng && !matchesWebp) {
-    return { ok: false, reason: "This doesn't look like a valid JPEG, PNG, or WebP file." }
-  }
-  return { ok: true }
-}
+export type { ValidationResult } from './uploadValidation'
+export { validateImageFile, IMAGE_UPLOAD_MAX_BYTES } from './uploadValidation'
 
 export function sanitizeFilename(name: string) {
   const base = name
