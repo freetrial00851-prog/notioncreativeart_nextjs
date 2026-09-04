@@ -26,14 +26,14 @@ function ProductCardSkeleton() {
 export type ProductGridVariant = 'featured' | 'newArrivals' | 'freePatterns' | 'shop' | 'search' | 'wishlist'
 
 const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassName?: string; defaultCount: number }> = {
-  // Home Featured Items, New Arrivals, Free Patterns — 2 / 3 / 6 column tiers
+  // Home Featured / New Arrivals / Free — 2 / 3 / 4 / 5 column tiers
   featured: {
     className: HOME_PRODUCT_GRID_CLASS,
     defaultCount: 6,
   },
   newArrivals: {
     className: HOME_PRODUCT_GRID_CLASS,
-    defaultCount: 6,
+    defaultCount: 10,
   },
   freePatterns: {
     className: HOME_PRODUCT_GRID_CLASS,
@@ -44,9 +44,9 @@ const PRODUCT_GRID: Record<ProductGridVariant, { className: string; itemClassNam
     className: 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14',
     defaultCount: 15,
   },
-  // Search results
+  // Search results — same column ladder as Home product grids
   search: {
-    className: 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14',
+    className: 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14',
     defaultCount: 15,
   },
   // Wishlist / account grids

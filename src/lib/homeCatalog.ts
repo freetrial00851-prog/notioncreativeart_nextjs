@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getCategoriesWithProducts, type CategoryWithCount } from './categories'
 import { mergeLayout } from './defaultLayout'
-import { HOME_PRODUCT_SECTION_LIMIT } from './homeProductGrid'
+import { HOME_FEATURED_LIMIT, HOME_NEW_ARRIVALS_LIMIT, HOME_PRODUCT_SECTION_LIMIT } from './homeProductGrid'
 import type {
   Product,
   HeroContent,
@@ -50,13 +50,13 @@ export async function loadHomeCatalog(
     .eq('active', true)
     .eq('featured', true)
     .order('created_at', { ascending: false })
-    .limit(HOME_PRODUCT_SECTION_LIMIT)
+    .limit(HOME_FEATURED_LIMIT)
   const newP = supabase
     .from('products')
     .select('*')
     .eq('active', true)
     .order('created_at', { ascending: false })
-    .limit(HOME_PRODUCT_SECTION_LIMIT)
+    .limit(HOME_NEW_ARRIVALS_LIMIT)
   const bundlesP = supabase
     .from('products')
     .select('*')

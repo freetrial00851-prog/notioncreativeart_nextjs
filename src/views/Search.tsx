@@ -60,7 +60,7 @@ export function Search() {
   }
 
   return (
-    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-10 md:py-14">
+    <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14">
       <div className="border-b border-line pb-4 mb-8 flex items-center justify-between">
         <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
         {q && (
@@ -99,7 +99,7 @@ export function Search() {
         <ProductGridSkeleton variant="search" />
       ) : results.length > 0 ? (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14">
             {pagedResults.map((p) => (
               <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
             ))}
@@ -125,7 +125,7 @@ export function Search() {
       ) : suggestions.length > 0 && (
         <div>
           <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-6">YOU MAY LIKE</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10">
             {suggestions.map((p) => (
               <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
             ))}
