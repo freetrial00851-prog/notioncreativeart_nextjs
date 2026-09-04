@@ -72,7 +72,7 @@ export function ProductCard({
     <>
       <Link
         href={`/pattern/${product.slug}`}
-        className="group block bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
+        className="group block bg-white rounded-lg border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >

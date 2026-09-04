@@ -9,7 +9,7 @@ function Bone({ className = '' }: { className?: string }) {
 /** Matches `ProductCard`: square image, 2-line title, price + circular action. */
 function ProductCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]" aria-hidden>
+    <div className="bg-white rounded-lg border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]" aria-hidden>
       <Bone className="aspect-square rounded-none" />
       <div className="p-3">
         <Bone className="h-3.5 w-full mb-1.5" />
@@ -86,7 +86,7 @@ export function SkillBrowseSkeleton({ count = 3 }: { count?: number }) {
     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-6" aria-hidden>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i}>
-          <Bone className="aspect-square rounded-xl mb-2" />
+          <Bone className="aspect-square rounded-lg mb-2" />
           <Bone className="h-3 w-full mb-1" />
           <Bone className="h-3.5 w-12" />
         </div>

@@ -558,7 +558,7 @@ export function Home({
               <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-6">
                 {skillProducts.slice(0, 3).map((p) => (
                   <Link key={p.id} href={`/pattern/${p.slug}`} className="group block">
-                    <div className="aspect-square rounded-xl overflow-hidden bg-canvas mb-2">
+                    <div className="aspect-square rounded-lg overflow-hidden bg-canvas mb-2">
                       {p.images?.[0] && <img src={p.images[0]} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
                     </div>
                     <p className="text-[12px] font-medium leading-tight line-clamp-1">{p.title}</p>
