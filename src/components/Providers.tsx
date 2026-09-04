@@ -10,6 +10,7 @@ import { PendingActionRunner } from '@/components/PendingActionRunner'
 import { GuestMergeRunner } from '@/components/GuestMergeRunner'
 import { AdminRedirect } from '@/components/AdminRedirect'
 import { Analytics } from '@/components/Analytics'
+import { PinterestTag } from '@/components/PinterestTag'
 import { CookieConsent } from '@/components/CookieConsent'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { TabRestoreIndicator } from '@/components/TabRestoreIndicator'
@@ -32,6 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 <AdminRedirect />
                 <Suspense fallback={null}>
                   <Analytics />
+                  <PinterestTag />
                 </Suspense>
                 <TabRestoreIndicator />
                 {children}

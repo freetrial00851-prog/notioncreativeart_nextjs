@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { DownloadReceiptButton } from '../components/DownloadReceiptButton'
+import { trackPinterestPurchase } from '../lib/pinterest'
 
 type RecentOrder = {
   id: string
@@ -31,7 +32,15 @@ const { user, loading: authLoading } = useAuth()
       supabase.from('orders').select('id, lemon_order_id, customer_email, status').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle()
         .then(({ data }) => {
           if (cancelled) return
-          if (data) { setOrder(data as RecentOrder); setChecking(false); return }
+          if (data) {
+            setOrder(data as RecentOrder)
+            setChecking(false)
+            trackPinterestPurchase({
+              orderId: data.id,
+              lemonOrderId: data.lemon_order_id,
+            })
+            return
+          }
           attempts += 1
           if (attempts < 6) setTimeout(poll, 1500)
           else setChecking(false)

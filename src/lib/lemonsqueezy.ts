@@ -10,6 +10,7 @@ declare global {
 }
 
 import { supabase } from './supabase'
+import { trackPinterestCheckout } from './pinterest'
 
 const FALLBACK_CHECKOUT_ERROR = "Couldn't start checkout — please try again in a moment."
 
@@ -85,5 +86,6 @@ export async function startApiCheckout(
   } else {
     openCheckout(data.url)
   }
+  trackPinterestCheckout({ productIds })
   return { ok: true }
 }

@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from './AuthContext'
 import { useToast } from './ToastContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
+import { trackPinterestAddToCart } from '../lib/pinterest'
 import { profileDisplayName } from '../lib/profileName'
 import {
   GUEST_MERGE_DONE_EVENT,
@@ -169,7 +170,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = async (productId: string) => {
     const { data: product } = await supabase
       .from('products')
-      .select('price')
+      .select('price, title')
       .eq('id', productId)
       .maybeSingle()
     if (!product || Number(product.price) === 0) {
@@ -183,6 +184,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setJustAdded(true)
       setDrawerOpen(true)
       setTimeout(() => setJustAdded(false), 2500)
+      trackPinterestAddToCart({
+        productId,
+        value: Number(product.price),
+        productName: product.title ?? undefined,
+      })
       return
     }
 
@@ -194,6 +200,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setJustAdded(true)
     setDrawerOpen(true)
     setTimeout(() => setJustAdded(false), 2500)
+    trackPinterestAddToCart({
+      productId,
+      value: Number(product.price),
+      productName: product.title ?? undefined,
+    })
   }
 
   const removeFromCart = async (productId: string) => {

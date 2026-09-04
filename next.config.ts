@@ -13,13 +13,13 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  // Next hydration + JSON-LD inline; GA gtag loader; Lemon.js overlay
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://assets.lemonsqueezy.com",
+  // Next hydration + JSON-LD inline; GA gtag loader; Lemon.js overlay; Pinterest Tag
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://assets.lemonsqueezy.com https://s.pinimg.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.supabase.co https://notioncreativeart.com https://www.notioncreativeart.com https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
+  "img-src 'self' data: blob: https://*.supabase.co https://notioncreativeart.com https://www.notioncreativeart.com https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://ct.pinterest.com https://*.pinimg.com",
   // next/font self-hosts — no fonts.googleapis.com
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.lemonsqueezy.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.lemonsqueezy.com https://ct.pinterest.com https://*.pinterest.com",
   // Lemon checkout overlay (+ nested Stripe card iframe inside overlay)
   "frame-src https://*.lemonsqueezy.com https://lemonsqueezy.com https://js.stripe.com",
   "frame-ancestors 'none'",

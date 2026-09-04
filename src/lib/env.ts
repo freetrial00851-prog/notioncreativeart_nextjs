@@ -20,6 +20,7 @@ export const env = {
   lemonStoreSlug: process.env.NEXT_PUBLIC_LEMON_STORE_SLUG,
   lemonVariantTestId: process.env.NEXT_PUBLIC_LEMON_VARIANT_TEST_ID,
   gaMeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+  pinterestTagId: process.env.NEXT_PUBLIC_PINTEREST_TAG_ID,
   siteUrl: resolveSiteUrl(),
 } as const
 
