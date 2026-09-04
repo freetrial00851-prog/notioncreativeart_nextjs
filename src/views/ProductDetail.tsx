@@ -36,10 +36,17 @@ function gallerySrcSet(cardUrl: string, includeFull: boolean) {
   return `${cardUrl} 640w, ${large} 1000w, ${deriveVariantUrl(cardUrl, 'full')} 1600w`
 }
 
+/**
+ * Main gallery sizes — stable across SSR and hydration.
+ * Must NOT depend on useIsMobile: SSR defaults that hook to false (desktop),
+ * so a mobile-only sizes/src flip after hydrate causes late LCP discovery
+ * (preload for desktop URL/sizes, then a second request for the mobile one).
+ */
+const GALLERY_LCP_SIZES =
+  '(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw'
+
 function gallerySizes(includeFull: boolean) {
-  return includeFull
-    ? '(max-width: 1024px) 62vw, 52vw'
-    : '100vw'
+  return includeFull ? GALLERY_LCP_SIZES : '100vw'
 }
 
 /** Warm the browser cache for a gallery stage URL (and its srcset). */
@@ -503,33 +510,8 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
         {/* Left — Gallery */}
         <div className="min-w-0 relative z-20">
           <div className={`flex flex-col ${images.length > 1 ? 'md:flex-row md:gap-3' : ''} md:items-start`}>
-            {/* Vertical thumbnails — tablet + desktop (≥768) */}
-            {images.length > 1 && (
-              <div
-                className="hidden md:flex flex-col gap-2.5 shrink-0 overflow-y-auto max-h-[min(78vh,720px)] py-0.5"
-                style={{ scrollbarWidth: 'thin' }}
-              >
-                {images.map((img, i) => (
-                  <button
-                    key={`v-${img}-${i}`}
-                    type="button"
-                    onClick={() => setActiveImage(i)}
-                    className={`relative w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
-                    style={{ background: 'var(--color-surface)' }}
-                  >
-                    <Image
-                      src={deriveVariantUrl(img, 'micro')}
-                      alt={`${product.title} — photo ${i + 1}`}
-                      fill
-                      sizes="72px"
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div className="min-w-0 flex-1 w-full">
+            {/* Main stage first in DOM so LCP is discoverable before thumbs (CSS order keeps thumbs left on md+). */}
+            <div className="min-w-0 flex-1 w-full order-1 md:order-2">
               <div
                 className="relative bg-surface border border-line overflow-hidden rounded-2xl flex items-center justify-center select-none w-full"
                 style={{ aspectRatio: '1 / 1.05', maxHeight: 'min(78vh, 720px)', touchAction: 'pan-y' }}
@@ -555,11 +537,12 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
               >
                 {images[activeImage] ? (
                   <Image
-                    src={deriveVariantUrl(images[activeImage], isMobileGallery ? 'large' : 'full')}
+                    src={deriveVariantUrl(images[activeImage], 'full')}
                     alt={product.title}
                     fill
-                    priority
-                    sizes={isMobileGallery ? '100vw' : '(max-width: 1024px) 62vw, 52vw'}
+                    priority={activeImage === 0}
+                    fetchPriority={activeImage === 0 ? 'high' : 'auto'}
+                    sizes={GALLERY_LCP_SIZES}
                     className="object-contain pointer-events-none select-none"
                     draggable={false}
                   />
@@ -637,6 +620,32 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 </div>
               )}
             </div>
+
+            {/* Vertical thumbnails — tablet + desktop (≥768); after main in DOM for LCP */}
+            {images.length > 1 && (
+              <div
+                className="hidden md:flex flex-col gap-2.5 shrink-0 overflow-y-auto max-h-[min(78vh,720px)] py-0.5 order-2 md:order-1"
+                style={{ scrollbarWidth: 'thin' }}
+              >
+                {images.map((img, i) => (
+                  <button
+                    key={`v-${img}-${i}`}
+                    type="button"
+                    onClick={() => setActiveImage(i)}
+                    className={`relative w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                    style={{ background: 'var(--color-surface)' }}
+                  >
+                    <Image
+                      src={deriveVariantUrl(img, 'micro')}
+                      alt={`${product.title} — photo ${i + 1}`}
+                      fill
+                      sizes="72px"
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { getImageProps } from 'next/image'
+import { preload } from 'react-dom'
 import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd } from '@/lib/seo'
 import { getCategoryById, getProductBySlug } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
@@ -7,6 +9,10 @@ import { getSiteSeoContext } from '@/lib/seoSettings'
 import { ProductDetail } from '@/views/ProductDetail'
 
 type Props = { params: Promise<{ slug: string }> }
+
+/** Must match ProductDetail main gallery `sizes` (SSR-stable; no useIsMobile). */
+const GALLERY_LCP_SIZES =
+  '(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw'
 
 /** Allow product pages added after the last deploy (not only build-time slugs). */
 export const dynamicParams = true
@@ -54,6 +60,25 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }))
 }
 
+/** High-priority preload for the gallery LCP image — in the first HTML, no client JS. */
+function preloadProductLcpImage(cardUrl: string, alt: string) {
+  const src = deriveVariantUrl(cardUrl, 'full')
+  const { props } = getImageProps({
+    src,
+    alt,
+    width: 1600,
+    height: 1600,
+    sizes: GALLERY_LCP_SIZES,
+    priority: true,
+  })
+  preload(props.src, {
+    as: 'image',
+    imageSrcSet: props.srcSet,
+    imageSizes: props.sizes,
+    fetchPriority: 'high',
+  })
+}
+
 /** Product detail page with JSON-LD structured data for rich search results. */
 export default async function PatternPage({ params }: Props) {
   const { slug } = await params
@@ -63,6 +88,10 @@ export default async function PatternPage({ params }: Props) {
   let breadcrumbJsonLd: ReturnType<typeof buildBreadcrumbListJsonLd> | null = null
 
   if (product) {
+    if (product.images?.[0]) {
+      preloadProductLcpImage(product.images[0], product.title)
+    }
+
     const [reviewStats, reviews, category] = await Promise.all([
       getProductReviewStats(product.id),
       getApprovedReviews(product.id),
