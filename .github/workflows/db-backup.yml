@@ -29,8 +29,19 @@ jobs:
       - name: Install tools
         run: |
           set -euo pipefail
+          # Ubuntu's default apt only ships older clients (runner has 16.x).
+          # Supabase is Postgres 17.6 — install client 17 from apt.postgresql.org (PGDG).
           sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-client gnupg
+          sudo apt-get install -y -qq curl ca-certificates gnupg lsb-release
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          # Prefer PGDG 17 binaries over any preinstalled older pg_dump on PATH
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+          /usr/lib/postgresql/17/bin/pg_dump --version
 
       - name: Dump and encrypt database
         env:
@@ -52,6 +63,7 @@ jobs:
           DUMP="nca-db-${STAMP}.dump"
           ENC="${DUMP}.gpg"
 
+          echo "Using: $(pg_dump --version)"
           echo "Starting pg_dump (custom format)…"
           pg_dump "$SUPABASE_DB_URL" \
             --format=custom \
