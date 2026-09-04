@@ -7,6 +7,7 @@ export const metadata = buildMetadata({
   title: 'Search Patterns',
   description: 'Search crochet PDF patterns by name, category, or skill level at Notion Creative Art.',
   path: '/search',
+  noIndex: true,
 })
 
 export default function SearchPage() {
