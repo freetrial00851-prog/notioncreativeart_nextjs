@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { buildMetadata, buildProductJsonLd } from '@/lib/seo'
-import { getProductBySlug } from '@/lib/data/products'
+import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd } from '@/lib/seo'
+import { getCategoryById, getProductBySlug } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
 import { getSiteSeoContext } from '@/lib/seoSettings'
@@ -59,25 +59,42 @@ export default async function PatternPage({ params }: Props) {
   const { slug } = await params
   const product = await getProductBySlug(slug)
 
-  let jsonLd: ReturnType<typeof buildProductJsonLd> | null = null
+  let productJsonLd: ReturnType<typeof buildProductJsonLd> | null = null
+  let breadcrumbJsonLd: ReturnType<typeof buildBreadcrumbListJsonLd> | null = null
+
   if (product) {
-    const [reviewStats, reviews] = await Promise.all([
+    const [reviewStats, reviews, category] = await Promise.all([
       getProductReviewStats(product.id),
       getApprovedReviews(product.id),
+      product.category_id ? getCategoryById(product.category_id) : Promise.resolve(null),
     ])
-    jsonLd = buildProductJsonLd(product, {
+    productJsonLd = buildProductJsonLd(product, {
       averageRating: reviewStats.averageRating,
       reviewCount: reviewStats.reviewCount,
       reviews,
     })
+
+    // Mirror visible breadcrumb: Home › [Category ›] Product
+    const crumbItems: { name: string; path: string }[] = [{ name: 'Home', path: '/' }]
+    if (category) {
+      crumbItems.push({ name: category.name, path: `/shop/${category.slug}` })
+    }
+    crumbItems.push({ name: product.title, path: `/pattern/${product.slug}` })
+    breadcrumbJsonLd = buildBreadcrumbListJsonLd(crumbItems)
   }
 
   return (
     <>
-      {jsonLd && (
+      {productJsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        />
+      )}
+      {breadcrumbJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
       )}
       <ProductDetail initialProduct={product} />

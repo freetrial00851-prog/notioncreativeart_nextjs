@@ -30,3 +30,16 @@ export async function getAllCategories() {
   const { data } = await supabase.from('categories').select('slug').order('sort_order')
   return data ?? []
 }
+
+/** Category name + slug for breadcrumb UI / BreadcrumbList JSON-LD. */
+export async function getCategoryById(
+  id: string,
+): Promise<{ name: string; slug: string } | null> {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('categories')
+    .select('name, slug')
+    .eq('id', id)
+    .maybeSingle()
+  return data as { name: string; slug: string } | null
+}

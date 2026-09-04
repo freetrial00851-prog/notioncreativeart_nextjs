@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -43,7 +44,7 @@ function gallerySizes(includeFull: boolean) {
 
 /** Warm the browser cache for a gallery stage URL (and its srcset). */
 function preloadGalleryStage(cardUrl: string, includeFull: boolean) {
-  const img = new Image()
+  const img = new window.Image()
   img.decoding = 'async'
   img.sizes = gallerySizes(includeFull)
   img.srcset = gallerySrcSet(cardUrl, includeFull)
@@ -513,10 +514,16 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                     key={`v-${img}-${i}`}
                     type="button"
                     onClick={() => setActiveImage(i)}
-                    className={`w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                    className={`relative w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
-                    <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                    <Image
+                      src={deriveVariantUrl(img, 'micro')}
+                      alt={`${product.title} — photo ${i + 1}`}
+                      fill
+                      sizes="72px"
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -547,14 +554,13 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 }}
               >
                 {images[activeImage] ? (
-                  <img
+                  <Image
                     src={deriveVariantUrl(images[activeImage], isMobileGallery ? 'large' : 'full')}
-                    srcSet={gallerySrcSet(images[activeImage], !isMobileGallery)}
-                    sizes={isMobileGallery ? '100vw' : '(max-width: 1024px) 62vw, 52vw'}
                     alt={product.title}
-                    loading="eager"
-                    fetchPriority="high"
-                    className="w-full h-full object-contain pointer-events-none select-none"
+                    fill
+                    priority
+                    sizes={isMobileGallery ? '100vw' : '(max-width: 1024px) 62vw, 52vw'}
+                    className="object-contain pointer-events-none select-none"
                     draggable={false}
                   />
                 ) : (
@@ -616,10 +622,16 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                       key={`h-${img}-${i}`}
                       type="button"
                       onClick={() => setActiveImage(i)}
-                      className={`w-14 h-14 shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                      className={`relative w-14 h-14 shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                       style={{ background: 'var(--color-surface)' }}
                     >
-                      <img src={deriveVariantUrl(img, 'micro')} alt={`${product.title} — photo ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                      <Image
+                        src={deriveVariantUrl(img, 'micro')}
+                        alt={`${product.title} — photo ${i + 1}`}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
                     </button>
                   ))}
                 </div>

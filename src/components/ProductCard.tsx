@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Product, ReviewStats } from '../lib/types'
@@ -14,7 +15,6 @@ import { ProductCardMeta } from './ProductCardMeta'
 import { ProductTagPill } from './ProductTagPill'
 import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
-import { deriveVariantUrl } from '../lib/imageVariants'
 import { downloadFreePattern } from '../lib/downloads'
 import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
@@ -81,14 +81,13 @@ export function ProductCard({
       >
         <div className="relative aspect-square bg-surface overflow-hidden">
           {product.images?.[0] ? (
-            <img
+            <Image
               src={product.images[0]}
-              srcSet={`${deriveVariantUrl(product.images[0], 'micro')} 160w, ${deriveVariantUrl(product.images[0], 'thumb')} 320w, ${product.images[0]} 640w, ${deriveVariantUrl(product.images[0], 'large')} 1000w`}
-              sizes="(max-width: 768px) 50vw, 25vw"
               alt={product.title}
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : 'auto'}
-              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02] ${product.sold_out ? 'opacity-50' : ''}`}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              priority={priority}
+              className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${product.sold_out ? 'opacity-50' : ''}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs">No image yet</div>

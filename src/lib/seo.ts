@@ -131,6 +131,25 @@ export function buildProductJsonLd(
   return jsonLd
 }
 
+/**
+ * JSON-LD BreadcrumbList — mirrors the visible Home › Category › Product trail
+ * on pattern pages (omit category when the product has none).
+ */
+export function buildBreadcrumbListJsonLd(
+  items: { name: string; path: string }[],
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path}`,
+    })),
+  }
+}
+
 /** JSON-LD Organization schema for the homepage — helps brand recognition in SERPs. */
 export function buildOrganizationJsonLd() {
   return {
