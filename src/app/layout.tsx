@@ -45,6 +45,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
     description,
+    // Pinterest Business domain verification (site-wide)
+    other: {
+      'p:domain_verify': 'e8b985884176f6922bcdd25b8e3e06b0',
+    },
   }
 
   if (siteOgImage) {
