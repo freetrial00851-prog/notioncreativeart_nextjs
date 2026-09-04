@@ -129,18 +129,30 @@ function HeroImage({
   )
 }
 
-function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: string[]; className?: string }) {
+function HeroCollage({
+  group,
+  className = 'h-[280px] md:h-full',
+  mobileBleed = false,
+}: {
+  group: string[]
+  className?: string
+  /** Mobile full-bleed: no tile radius / gaps so the collage can sit edge-to-edge. */
+  mobileBleed?: boolean
+}) {
+  const gap = mobileBleed ? 'gap-0' : 'gap-3'
+  const tileRadius = mobileBleed ? 'rounded-none' : 'rounded-[18px]'
+
   if (group.length >= 3) {
     return (
-      <div className={`grid grid-cols-[1.5fr_1fr] gap-3 ${className}`}>
-        <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+      <div className={`grid grid-cols-[1.5fr_1fr] ${gap} ${className}`}>
+        <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
           <HeroImage src={group[0]} priority sizes="(max-width: 768px) 60vw, 35vw" />
         </div>
-        <div className="grid grid-rows-2 gap-3 min-h-0">
-          <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+        <div className={`grid grid-rows-2 ${gap} min-h-0`}>
+          <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
             <HeroImage src={group[1]} sizes="(max-width: 768px) 40vw, 20vw" />
           </div>
-          <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+          <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
             <HeroImage src={group[2]} sizes="(max-width: 768px) 40vw, 20vw" />
           </div>
         </div>
@@ -149,18 +161,18 @@ function HeroCollage({ group, className = 'h-[280px] md:h-full' }: { group: stri
   }
   if (group.length === 2) {
     return (
-      <div className={`grid grid-cols-2 gap-3 ${className}`}>
-        <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+      <div className={`grid grid-cols-2 ${gap} ${className}`}>
+        <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
           <HeroImage src={group[0]} priority sizes="(max-width: 768px) 50vw, 28vw" />
         </div>
-        <div className="relative rounded-[18px] overflow-hidden bg-surface min-h-0">
+        <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
           <HeroImage src={group[1]} sizes="(max-width: 768px) 50vw, 28vw" />
         </div>
       </div>
     )
   }
   return (
-    <div className={`relative rounded-[18px] overflow-hidden bg-surface ${className}`}>
+    <div className={`relative ${tileRadius} overflow-hidden bg-surface ${className}`}>
       <HeroImage src={group[0]} priority sizes="(max-width: 768px) 100vw, 55vw" />
     </div>
   )
@@ -338,7 +350,7 @@ export function Home({
                 className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
                 style={{ background: 'var(--color-accent)' }}
               >
-                {hero?.cta_text || 'Shop Patterns'}
+                {(hero?.cta_text || 'Shop Patterns').replace(/\s*→\s*$/, '')} →
               </Link>
               <Link
                 href={hero?.secondary_cta_link || '/shop?price=free'}
@@ -349,22 +361,22 @@ export function Home({
               </Link>
             </div>
 
-            {/* Mobile: image sits here, right after the CTAs, before the benefits row */}
+            {/* Mobile: full-bleed collage (breaks out of SectionBand px-6); desktop column unchanged */}
             <div className="md:hidden mb-8">
-              {!heroReady ? (
-                <div className="h-[280px] rounded-[18px] bg-surface animate-pulse" aria-hidden />
-              ) : currentHeroGroup.length > 0 ? (
-                <>
-                  <HeroCollage group={currentHeroGroup} />
-                  {heroGroups.length > 1 && (
-                    <div className="flex items-center justify-center gap-2 mt-3">
-                      {heroGroups.map((_, i) => (
-                        <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : null}
+              <div className="-mx-6">
+                {!heroReady ? (
+                  <div className="h-[280px] rounded-none bg-surface animate-pulse" aria-hidden />
+                ) : currentHeroGroup.length > 0 ? (
+                  <HeroCollage group={currentHeroGroup} mobileBleed />
+                ) : null}
+              </div>
+              {heroReady && currentHeroGroup.length > 0 && heroGroups.length > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  {heroGroups.map((_, i) => (
+                    <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
