@@ -1,0 +1,100 @@
+# Encrypted Postgres dump → GitHub Actions artifact (off Supabase Free).
+# See docs/database-backups.md for secrets, restore steps, Storage caveat, IPv6 notes.
+#
+# Required secrets: SUPABASE_DB_URL, BACKUP_GPG_PASSPHRASE
+
+name: Database backup
+
+on:
+  schedule:
+    # Daily 04:00 UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Dump, encrypt, upload artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client gnupg
+
+      - name: Dump and encrypt database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_GPG_PASSPHRASE: ${{ secrets.BACKUP_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::Missing secret SUPABASE_DB_URL"
+            exit 1
+          fi
+          if [ -z "${BACKUP_GPG_PASSPHRASE:-}" ]; then
+            echo "::error::Missing secret BACKUP_GPG_PASSPHRASE"
+            exit 1
+          fi
+
+          STAMP="$(date -u +%Y%m%d-%H%M%S)"
+          DUMP="nca-db-${STAMP}.dump"
+          ENC="${DUMP}.gpg"
+
+          echo "Starting pg_dump (custom format)…"
+          pg_dump "$SUPABASE_DB_URL" \
+            --format=custom \
+            --no-owner \
+            --no-acl \
+            --file="$DUMP"
+
+          if [ ! -s "$DUMP" ]; then
+            echo "::error::pg_dump produced an empty file"
+            exit 1
+          fi
+
+          RAW_BYTES="$(wc -c < "$DUMP" | tr -d ' ')"
+          echo "Dump size (unencrypted): ${RAW_BYTES} bytes"
+
+          echo "Encrypting with AES256…"
+          printf '%s' "$BACKUP_GPG_PASSPHRASE" | gpg --batch --yes \
+            --pinentry-mode loopback \
+            --passphrase-fd 0 \
+            --symmetric \
+            --cipher-algo AES256 \
+            --output "$ENC" \
+            "$DUMP"
+
+          # Remove plaintext dump before artifact upload
+          shred -u "$DUMP" 2>/dev/null || rm -f "$DUMP"
+
+          if [ ! -s "$ENC" ]; then
+            echo "::error::Encryption produced an empty file"
+            exit 1
+          fi
+
+          ENC_BYTES="$(wc -c < "$ENC" | tr -d ' ')"
+          echo "Encrypted artifact size: ${ENC_BYTES} bytes"
+          echo "ENC_PATH=$ENC" >> "$GITHUB_ENV"
+          echo "ENC_NAME=$ENC" >> "$GITHUB_ENV"
+
+      - name: Upload encrypted backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: ${{ env.ENC_PATH }}
+          if-no-files-found: error
+          # Conservative rolling window — shared ~500MB Actions storage on Free.
+          retention-days: 14
+          compression-level: 0
