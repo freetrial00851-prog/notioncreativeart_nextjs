@@ -14,9 +14,27 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
+/** Per-slug SEO overrides when categories have no meta_* columns yet. */
+const CATEGORY_META_OVERRIDES: Record<string, { title: string; description: string }> = {
+  'no-sew-amigurumi': {
+    title: 'No-Sew Amigurumi Patterns',
+    description:
+      'Browse no-sew amigurumi patterns worked in one continuous piece—quick PDF downloads from Notion Creative Art for keychains, charms, and gifts.',
+  },
+}
+
 /** Dynamic SEO metadata per shop category — critical for category landing pages. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { categorySlug } = await params
+  const override = CATEGORY_META_OVERRIDES[categorySlug]
+  if (override) {
+    return buildMetadata({
+      title: override.title,
+      description: override.description,
+      path: `/shop/${categorySlug}`,
+    })
+  }
+
   const virtual = virtualShopCategoryTitle(categorySlug)
   const category = virtual ? null : await getCategoryBySlug(categorySlug)
   const label =
