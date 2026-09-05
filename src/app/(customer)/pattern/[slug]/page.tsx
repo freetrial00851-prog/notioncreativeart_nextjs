@@ -62,12 +62,13 @@ export async function generateStaticParams() {
 
 /** High-priority preload for the gallery LCP image — in the first HTML, no client JS. */
 function preloadProductLcpImage(cardUrl: string, alt: string) {
-  const src = deriveVariantUrl(cardUrl, 'full')
+  // `large` (~1000px) — near-identical to `full` (~1024px) but smaller on the wire.
+  const src = deriveVariantUrl(cardUrl, 'large')
   const { props } = getImageProps({
     src,
     alt,
-    width: 1600,
-    height: 1600,
+    width: 1000,
+    height: 1000,
     sizes: GALLERY_LCP_SIZES,
     priority: true,
   })

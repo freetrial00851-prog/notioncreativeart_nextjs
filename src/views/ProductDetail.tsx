@@ -16,7 +16,6 @@ import { useToast } from '../context/ToastContext'
 import { downloadFreePattern } from '../lib/downloads'
 import { fetchProductReviewStats } from '../lib/reviews'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
-import { useIsMobile } from '../lib/useIsMobile'
 import { ProductCard } from '../components/ProductCard'
 import { ProductReviews } from '../components/ProductReviews'
 import { StarRatingSummary } from '../components/StarRating'
@@ -29,11 +28,10 @@ import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
 
-/** Stage candidates: mobile stops at large (1000w); desktop may use full (1600w). */
-function gallerySrcSet(cardUrl: string, includeFull: boolean) {
+/** Stage candidates for swipe-neighbor cache warming (matches main gallery: large). */
+function gallerySrcSet(cardUrl: string) {
   const large = deriveVariantUrl(cardUrl, 'large')
-  if (!includeFull) return `${cardUrl} 640w, ${large} 1000w`
-  return `${cardUrl} 640w, ${large} 1000w, ${deriveVariantUrl(cardUrl, 'full')} 1600w`
+  return `${cardUrl} 640w, ${large} 1000w`
 }
 
 /**
@@ -45,17 +43,13 @@ function gallerySrcSet(cardUrl: string, includeFull: boolean) {
 const GALLERY_LCP_SIZES =
   '(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw'
 
-function gallerySizes(includeFull: boolean) {
-  return includeFull ? GALLERY_LCP_SIZES : '100vw'
-}
-
 /** Warm the browser cache for a gallery stage URL (and its srcset). */
-function preloadGalleryStage(cardUrl: string, includeFull: boolean) {
+function preloadGalleryStage(cardUrl: string) {
   const img = new window.Image()
   img.decoding = 'async'
-  img.sizes = gallerySizes(includeFull)
-  img.srcset = gallerySrcSet(cardUrl, includeFull)
-  img.src = deriveVariantUrl(cardUrl, includeFull ? 'full' : 'large')
+  img.sizes = GALLERY_LCP_SIZES
+  img.srcset = gallerySrcSet(cardUrl)
+  img.src = deriveVariantUrl(cardUrl, 'large')
 }
 
 type DescriptionBlock = { type: 'heading' | 'check' | 'warning' | 'paragraph'; content: string }
@@ -137,7 +131,6 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const [purchaseCount, setPurchaseCount] = useState(0)
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, reviewCount: 0 })
   const [alsoBought, setAlsoBought] = useState<Product[]>([])
-  const isMobileGallery = useIsMobile(769)
   const carouselReviewStats = useReviewStatsMapForLists([alsoBought, related])
 
   useEffect(() => {
@@ -248,16 +241,15 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   useEffect(() => {
     const imgs = product?.images ?? []
     if (imgs.length < 2) return
-    const includeFull = !isMobileGallery
     const neighbors = [
       (activeImage + 1) % imgs.length,
       (activeImage - 1 + imgs.length) % imgs.length,
     ]
     for (const i of new Set(neighbors)) {
       const url = imgs[i]
-      if (url) preloadGalleryStage(url, includeFull)
+      if (url) preloadGalleryStage(url)
     }
-  }, [product?.images, activeImage, isMobileGallery])
+  }, [product?.images, activeImage])
 
   // Warm the category shop route so breadcrumb clicks feel instant.
   // Must stay above any conditional returns (Rules of Hooks).
@@ -537,7 +529,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
               >
                 {images[activeImage] ? (
                   <Image
-                    src={deriveVariantUrl(images[activeImage], 'full')}
+                    src={deriveVariantUrl(images[activeImage], 'large')}
                     alt={product.title}
                     fill
                     priority={activeImage === 0}

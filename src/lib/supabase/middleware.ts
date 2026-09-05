@@ -2,6 +2,27 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { env } from '@/lib/env'
 
+/**
+ * Legacy WordPress / WooCommerce home query strings that used to resolve to
+ * posts/products. Serving `/` for these is a soft-404; rewrite to a missing
+ * path so the App Router returns a real 404 (not homepage 200).
+ */
+const WP_LEGACY_HOME_QUERY = new Set([
+  'p',
+  'page_id',
+  'attachment_id',
+  'product',
+  'post_type',
+])
+
+function isWordPressLegacyHomeQuery(request: NextRequest): boolean {
+  if (request.nextUrl.pathname !== '/') return false
+  for (const key of WP_LEGACY_HOME_QUERY) {
+    if (request.nextUrl.searchParams.has(key)) return true
+  }
+  return false
+}
+
 /** Soft-nav / Flight requests (visible in middleware before Next strips RSC headers). */
 function isSoftNavigation(request: NextRequest): boolean {
   const rsc = request.headers.get('rsc') ?? request.headers.get('RSC')
@@ -25,6 +46,13 @@ function isSoftNavigation(request: NextRequest): boolean {
  * client homeCatalogCache instead.
  */
 export async function updateSession(request: NextRequest) {
+  if (isWordPressLegacyHomeQuery(request)) {
+    const gone = request.nextUrl.clone()
+    gone.pathname = '/__wordpress-removed'
+    gone.search = ''
+    return NextResponse.rewrite(gone)
+  }
+
   const requestHeaders = new Headers(request.headers)
   if (isSoftNavigation(request)) {
     requestHeaders.set('x-nca-soft-nav', '1')

@@ -13,15 +13,20 @@ const manrope = Manrope({
   display: 'swap',
 })
 
-/** Playfair Display — hero + section headings only. */
+/**
+ * Playfair Display — homepage / marketing `font-heading` only.
+ * preload: false — not used above-the-fold on PDP (titles use Manrope `font-display`);
+ * still available via CSS variable when a below-fold section needs it.
+ */
 const playfair = Playfair_Display({
   subsets: ['latin'],
   weight: ['500', '600', '700'],
   variable: '--font-playfair',
   display: 'swap',
+  preload: false,
 })
 
-/** Baloo 2 — logo wordmark only (NCA / NotionCreativeArt). */
+/** Baloo 2 — logo wordmark only (NCA / NotionCreativeArt). Preload kept: logo is ATF in Header. */
 const baloo2 = Baloo_2({
   subsets: ['latin'],
   weight: ['700', '800'],

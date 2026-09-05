@@ -68,6 +68,73 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['@supabase/supabase-js'],
   },
+  /**
+   * WordPress / WooCommerce cutover — 308 permanent redirects only where a
+   * real Next.js equivalent exists. Patterns with no equivalent stay 404
+   * (do not soft-redirect to `/`).
+   *
+   * Wayback Machine / Common Crawl had no usable captures for this domain
+   * (Archive.org offline / empty CDX). Mapping uses standard WooCommerce
+   * permalinks plus live slug parity checks (e.g. /product/{slug} → /pattern/{slug}).
+   */
+  async redirects() {
+    return [
+      // WooCommerce default product base → Next.js pattern PDP
+      {
+        source: '/product/:slug',
+        destination: '/pattern/:slug',
+        permanent: true,
+      },
+      // Occasional alternate product base
+      {
+        source: '/products/:slug',
+        destination: '/pattern/:slug',
+        permanent: true,
+      },
+      // WooCommerce product categories → shop category routes
+      {
+        source: '/product-category/:slug',
+        destination: '/shop/:slug',
+        permanent: true,
+      },
+      // WooCommerce customer account area
+      {
+        source: '/my-account',
+        destination: '/account',
+        permanent: true,
+      },
+      {
+        source: '/my-account/orders',
+        destination: '/account/orders',
+        permanent: true,
+      },
+      {
+        source: '/my-account/view-order/:orderId',
+        destination: '/account/orders/:orderId',
+        permanent: true,
+      },
+      {
+        source: '/my-account/downloads',
+        destination: '/account/downloads',
+        permanent: true,
+      },
+      {
+        source: '/my-account/edit-account',
+        destination: '/account/profile',
+        permanent: true,
+      },
+      {
+        source: '/my-account/edit-address',
+        destination: '/account/addresses',
+        permanent: true,
+      },
+      {
+        source: '/my-account/lost-password',
+        destination: '/reset-password',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
