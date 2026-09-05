@@ -100,7 +100,7 @@ export function ProductListingFilters({
               onChange={() => onToggleParam('price', 'paid')}
               className={CHECKBOX_CLASS}
             />
-            Paid Patterns
+            Shop
           </label>
           <label className={ROW_CLASS}>
             <input

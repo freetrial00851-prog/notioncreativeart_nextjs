@@ -151,7 +151,7 @@ export function Shop() {
           : priceFilter === 'free'
             ? 'Free Patterns'
             : priceFilter === 'paid'
-              ? 'Paid Patterns'
+              ? 'Shop'
               : saleFilter
               ? 'On Sale'
               : levels.length > 0
