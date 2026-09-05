@@ -374,7 +374,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
             src={tabSideImage}
             srcSet={`${tabSideImage} 640w, ${deriveVariantUrl(tabSideImage, 'large')} 1000w`}
             sizes="(max-width: 1024px) 100vw, 380px"
-            alt=""
+            alt={`${product.title} — lifestyle photo`}
             loading="lazy"
             className="w-full h-auto max-h-[420px] object-contain"
           />
@@ -383,12 +383,15 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
     </div>
   )
 
-  const renderTabContent = (tab: Tab) => {
+  const renderTabContent = (tab: Tab, opts?: { includeSectionHeading?: boolean }) => {
+    const includeHeading = opts?.includeSectionHeading !== false
     if (tab === 'description') {
       return wrapTabWithImage(
         product.description ? (
           <div>
-            <h3 className="font-subheading font-semibold text-xl mb-4">Pattern Description</h3>
+            {includeHeading ? (
+              <h2 className="font-subheading font-semibold text-xl mb-4">Pattern Description</h2>
+            ) : null}
             <DescriptionBlocks text={product.description} />
           </div>
         ) : (
@@ -792,7 +795,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
           ))}
         </div>
         <div className="hidden md:block pt-8">
-          {renderTabContent(activeTab)}
+          {renderTabContent(activeTab, { includeSectionHeading: true })}
         </div>
 
         <div className="md:hidden border-t border-line">
@@ -807,7 +810,8 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
               </button>
               {openAccordion === t.key && (
                 <div className="pb-5">
-                  {renderTabContent(t.key)}
+                  {/* Accordion button already names the section — omit duplicate heading */}
+                  {renderTabContent(t.key, { includeSectionHeading: false })}
                 </div>
               )}
             </div>

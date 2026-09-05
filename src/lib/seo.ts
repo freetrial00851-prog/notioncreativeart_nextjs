@@ -5,6 +5,90 @@ import { env } from '@/lib/env'
 export const SITE_NAME = 'Notion Creative Art'
 export const SITE_URL = env.siteUrl
 
+/** Full document title budget for SERP display (Google often truncates near ~60). */
+export const META_TITLE_MAX = 60
+
+/** ` — Notion Creative Art` — reserved when appending the brand suffix. */
+export const META_TITLE_BRAND_SUFFIX = ` — ${SITE_NAME}`
+
+/** Trailing connector words that make a truncated SERP title sound unfinished. */
+const TITLE_TRAILING_STOPWORDS = new Set([
+  'with',
+  'and',
+  'for',
+  'in',
+  'on',
+  'a',
+  'the',
+])
+
+/**
+ * After a word-boundary cut: strip trailing punctuation and connector stopwords
+ * so the SERP title doesn't end on "," / "with" / etc.
+ */
+function polishTruncatedTitleBase(cut: string): string {
+  let result = cut.trim()
+  // Repeat — e.g. "Pattern, with" → drop comma → drop "with"
+  for (let i = 0; i < 8; i++) {
+    const before = result
+
+    // 1) Trailing punctuation
+    result = result.replace(/[\s|/·•,;:！!？?]+$/u, '').trim()
+    result = result.replace(/[-—–]+$/u, '').trim()
+
+    // 2) Trailing connector stopwords
+    const parts = result.split(/\s+/).filter(Boolean)
+    if (parts.length >= 2) {
+      const last = parts[parts.length - 1]!.toLowerCase().replace(/[^a-z']/gi, '')
+      if (TITLE_TRAILING_STOPWORDS.has(last)) {
+        parts.pop()
+        result = parts.join(' ')
+      }
+    }
+
+    // 3) Dangling ", fragment" left after a mid-list cut (e.g. "Pattern, Cute")
+    const commaIdx = result.lastIndexOf(',')
+    if (commaIdx > 0) {
+      const after = result.slice(commaIdx + 1).trim()
+      const afterWords = after.split(/\s+/).filter(Boolean)
+      if (after.length > 0 && afterWords.length <= 2) {
+        result = result.slice(0, commaIdx).trim()
+      }
+    }
+
+    if (result === before) break
+  }
+
+  return result.replace(/[\s|/·•,;:—–-]+$/u, '').trim()
+}
+
+/**
+ * Truncate a page/product title so `{title}${META_TITLE_BRAND_SUFFIX}` stays ≤ maxLen.
+ * Prefer cutting on a word boundary; polish trailing punctuation / connector words.
+ */
+export function truncateTitleForBrandSuffix(
+  title: string,
+  maxFull: number = META_TITLE_MAX,
+): string {
+  const raw = title.trim()
+  if (!raw) return raw
+  const maxBase = maxFull - META_TITLE_BRAND_SUFFIX.length
+  if (maxBase < 8) return raw.slice(0, Math.max(1, maxBase)).trim()
+  if (raw.length <= maxBase) return raw
+
+  let cut = raw.slice(0, maxBase)
+  const nextChar = raw[maxBase]
+  // If we split mid-word, back up to the previous space
+  if (nextChar && nextChar !== ' ' && !/\s/.test(cut[cut.length - 1] ?? '')) {
+    const lastSpace = cut.lastIndexOf(' ')
+    if (lastSpace >= Math.floor(maxBase * 0.45)) {
+      cut = cut.slice(0, lastSpace)
+    }
+  }
+  cut = cut.replace(/[\s|/·•—–-]+$/u, '').trim()
+  return polishTruncatedTitleBase(cut)
+}
+
 export type PageMetaInput = {
   title: string
   description: string
@@ -15,6 +99,10 @@ export type PageMetaInput = {
   noIndex?: boolean
   /** Use title verbatim (no " — Site Name" suffix). For homepage meta title with embedded brand. */
   exactTitle?: boolean
+  /**
+   * When true (product pages), truncate `title` so the branded full title stays ≤ {@link META_TITLE_MAX}.
+   */
+  truncateForSerp?: boolean
 }
 
 /**
@@ -22,11 +110,14 @@ export type PageMetaInput = {
  * Server-rendered metadata is indexable immediately (no JS execution required).
  */
 export function buildMetadata(opts: PageMetaInput): Metadata {
+  const baseTitle = opts.truncateForSerp
+    ? truncateTitleForBrandSuffix(opts.title)
+    : opts.title.trim()
   const fullTitle = opts.exactTitle
-    ? opts.title
-    : opts.title === SITE_NAME
-      ? opts.title
-      : `${opts.title} — ${SITE_NAME}`
+    ? baseTitle
+    : baseTitle === SITE_NAME
+      ? baseTitle
+      : `${baseTitle}${META_TITLE_BRAND_SUFFIX}`
   const url = `${SITE_URL}${opts.path}`
 
   const openGraph: NonNullable<Metadata['openGraph']> = {

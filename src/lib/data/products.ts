@@ -31,6 +31,19 @@ export async function getAllCategories() {
   return data ?? []
 }
 
+/** Category by slug — for shop SSR titles / metadata. */
+export async function getCategoryBySlug(
+  slug: string,
+): Promise<{ id: string; name: string; slug: string } | null> {
+  const supabase = createStaticClient()
+  const { data } = await supabase
+    .from('categories')
+    .select('id, name, slug')
+    .eq('slug', slug)
+    .maybeSingle()
+  return data as { id: string; name: string; slug: string } | null
+}
+
 /** Category name + slug for breadcrumb UI / BreadcrumbList JSON-LD. */
 export async function getCategoryById(
   id: string,

@@ -179,6 +179,9 @@ export function Search() {
       <div className="border-b border-line pb-4 mb-8 flex items-end justify-between gap-4 flex-wrap">
         <div>
           <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
+          <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight mt-2 break-words">
+            {q.trim() ? `Search: "${q.trim()}"` : 'Search Results'}
+          </h1>
           {q && (
             <p className="text-[11px] tracking-[0.08em] text-ink-soft mt-2">
               {loading ? 'Searching…' : `${sortedResults.length} result${sortedResults.length === 1 ? '' : 's'}`}

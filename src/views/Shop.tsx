@@ -29,8 +29,17 @@ import {
   toggleSkillLevel,
   type ListingSort,
 } from '../lib/listingFilters'
+import { resolveShopPageTitle } from '../lib/shopTitle'
 
-export function Shop() {
+export function Shop({
+  initialTitle,
+  initialCategoryName = null,
+}: {
+  /** Server-resolved listing title — used for first paint / SSR H1. */
+  initialTitle: string
+  /** Real category name when on /shop/[slug] (avoids H1 "Shop" before categories load). */
+  initialCategoryName?: string | null
+}) {
   const params = useParams()
   const router = useRouter()
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
@@ -138,25 +147,16 @@ export function Shop() {
       .then(({ data }) => setSuggestions((data as Product[]) ?? []))
   }, [initialLoading, filterFetching, products.length])
 
-  const title = categorySlug === 'new'
-    ? 'New Arrivals'
-    : categorySlug === 'sale'
-      ? 'Sale'
-      : categorySlug === 'bestsellers'
-        ? 'Featured Items'
-        : categorySlug
-          ? currentCategory?.name ?? 'Shop'
-        : bundleFilter
-          ? 'Pattern Bundles'
-          : priceFilter === 'free'
-            ? 'Free Patterns'
-            : priceFilter === 'paid'
-              ? 'Shop'
-              : saleFilter
-              ? 'On Sale'
-              : levels.length > 0
-                ? `${levels.map((l) => l.charAt(0).toUpperCase() + l.slice(1)).join(' & ')} Patterns`
-                : 'All Patterns'
+  const title = resolveShopPageTitle({
+    categorySlug,
+    categoryName: currentCategory?.name ?? initialCategoryName,
+    price: priceFilter,
+    bundle: bundleFilter ? '1' : null,
+    sale: saleFilter ? '1' : null,
+    level: levelsKey || null,
+  })
+  // Prefer live resolution; fall back to server title if filters haven't hydrated yet
+  const displayTitle = title || initialTitle
 
   const [sort, setSort] = useState<ListingSort>('newest')
   const [page, setPage] = useState(1)
@@ -289,13 +289,13 @@ export function Shop() {
           </>
         )}
         <span>/</span>
-        <span className="text-ink">{title.toUpperCase()}</span>
+        <span className="text-ink">{displayTitle.toUpperCase()}</span>
       </nav>
 
       <div className="border-b border-line pb-4 md:pb-5 mb-4 md:mb-6">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-3 md:mb-0">
           <div>
-            <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words">{title}</h1>
+            <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words">{displayTitle}</h1>
           </div>
           <select
             value={sort}
