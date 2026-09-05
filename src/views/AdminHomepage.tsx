@@ -4,11 +4,29 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { compressImage } from '../lib/imageCompress'
 import { IMAGE_MAX, validateImageFile } from '../lib/imageVariants'
-import type { HeroContent, ChapterContent, CategoryContent, AnnouncementsContent, SocialContent, LayoutSection, TestimonialContent, SiteSeoContent } from '../lib/types'
-import { DEFAULT_ANNOUNCEMENT_COLORS, normalizeAnnouncements } from '../lib/types'
+import type {
+  HeroContent,
+  ChapterContent,
+  CategoryContent,
+  AnnouncementsContent,
+  SocialContent,
+  LayoutSection,
+  TestimonialContent,
+  SiteSeoContent,
+  FreePatternsBannerContent,
+  Product,
+} from '../lib/types'
+import {
+  DEFAULT_ANNOUNCEMENT_COLORS,
+  DEFAULT_FREE_PATTERNS_BANNER,
+  normalizeAnnouncements,
+  normalizeFreePatternsBanner,
+} from '../lib/types'
 import { DEFAULT_SITE_SEO } from '../lib/seoSettings'
 import { mergeLayout } from '../lib/defaultLayout'
 import { DropzoneUpload } from '../components/DropzoneUpload'
+
+const FREE_COLLAGE_MAX = 4
 
 export function HomepageAdmin() {
   const [hero, setHero] = useState<HeroContent | null>(null)
@@ -20,12 +38,18 @@ export function HomepageAdmin() {
   const [testimonials, setTestimonials] = useState<TestimonialContent[]>([])
   const [layout, setLayout] = useState<LayoutSection[] | null>(null)
   const [seo, setSeo] = useState<SiteSeoContent | null>(null)
+  const [freePatterns, setFreePatterns] = useState<FreePatternsBannerContent>(DEFAULT_FREE_PATTERNS_BANNER)
+  const [freeProductOptions, setFreeProductOptions] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [savingKey, setSavingKey] = useState<string | null>(null)
   const [uploadingKey, setUploadingKey] = useState<string | null>(null)
 
   const load = () => {
-    supabase.from('site_settings').select('key, value').in('key', ['hero', 'chapters', 'categories', 'announcements', 'social', 'homepage_layout', 'testimonials', 'seo']).then(({ data }) => {
+    supabase
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['hero', 'chapters', 'categories', 'announcements', 'social', 'homepage_layout', 'testimonials', 'seo', 'free_patterns'])
+      .then(({ data }) => {
       let foundAnnouncements = false
       let foundSeo = false
       for (const row of data ?? []) {
@@ -39,6 +63,7 @@ export function HomepageAdmin() {
         if (row.key === 'social') setSocial(row.value as SocialContent)
         if (row.key === 'homepage_layout') setLayout(mergeLayout(row.value as LayoutSection[]))
         if (row.key === 'testimonials') setTestimonials(row.value as TestimonialContent[])
+        if (row.key === 'free_patterns') setFreePatterns(normalizeFreePatternsBanner(row.value))
         if (row.key === 'seo') {
           setSeo({ ...DEFAULT_SITE_SEO, ...(row.value as Partial<SiteSeoContent>) })
           foundSeo = true
@@ -57,9 +82,45 @@ export function HomepageAdmin() {
   useEffect(load, [])
   useEffect(() => {
     supabase.from('categories').select('id, name, slug').order('sort_order').then(({ data }) => setRealCategories(data ?? []))
+    supabase
+      .from('products')
+      .select('id, title, images, price, active, created_at')
+      .eq('active', true)
+      .eq('price', 0)
+      .order('created_at', { ascending: false })
+      .limit(80)
+      .then(({ data }) => {
+        const withImages = ((data as Product[]) ?? []).filter((p) => p.images?.[0])
+        setFreeProductOptions(withImages)
+      })
   }, [])
 
-  const save = async (key: 'hero' | 'chapters' | 'categories' | 'announcements' | 'social' | 'homepage_layout' | 'testimonials' | 'seo', value: unknown) => {
+  // Ensure already-selected collage products appear even if missing from the free options query
+  useEffect(() => {
+    const missing = freePatterns.product_ids.filter((id) => !freeProductOptions.some((p) => p.id === id))
+    if (missing.length === 0) return
+    supabase
+      .from('products')
+      .select('id, title, images, price, active')
+      .in('id', missing)
+      .then(({ data }) => {
+        const extras = ((data as Product[]) ?? []).filter((p) => p.images?.[0])
+        if (extras.length === 0) return
+        setFreeProductOptions((prev) => {
+          const seen = new Set(prev.map((p) => p.id))
+          const merged = [...prev]
+          for (const p of extras) {
+            if (!seen.has(p.id)) merged.push(p)
+          }
+          return merged
+        })
+      })
+  }, [freePatterns.product_ids, freeProductOptions])
+
+  const save = async (
+    key: 'hero' | 'chapters' | 'categories' | 'announcements' | 'social' | 'homepage_layout' | 'testimonials' | 'seo' | 'free_patterns',
+    value: unknown,
+  ) => {
     setSavingKey(key)
     await supabase.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() })
     setSavingKey(null)
@@ -173,16 +234,35 @@ export function HomepageAdmin() {
             <TextField label="Title" value={hero.title} onChange={(v) => setHero({ ...hero, title: v })} multiline />
             <div className="grid grid-cols-2 gap-4">
               <TextField label="Button 1 text" value={hero.cta_text} onChange={(v) => setHero({ ...hero, cta_text: v })} />
-              <TextField label="Button 1 link" value={hero.cta_link} onChange={(v) => setHero({ ...hero, cta_link: v })} />
+              <TextField label="Button 1 link (paid shop: /shop?price=paid)" value={hero.cta_link} onChange={(v) => setHero({ ...hero, cta_link: v })} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <TextField label="Button 2 text" value={hero.secondary_cta_text ?? ''} onChange={(v) => setHero({ ...hero, secondary_cta_text: v })} />
-              <TextField label="Button 2 link" value={hero.secondary_cta_link ?? ''} onChange={(v) => setHero({ ...hero, secondary_cta_link: v })} />
+              <TextField label="Button 2 link (free shop: /shop?price=free)" value={hero.secondary_cta_link ?? ''} onChange={(v) => setHero({ ...hero, secondary_cta_link: v })} />
             </div>
             <SaveButton onClick={() => save('hero', hero)} saving={savingKey === 'hero'} />
           </div>
         </div>
       )}
+
+      {/* START WITH FREE — collage from free product images */}
+      <div>
+        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-2">START WITH FREE — COLLAGE IMAGES</p>
+        <p className="text-[11px] text-ink-soft/80 mb-4">
+          Pick 2–4 free patterns whose primary photos appear in the homepage collage. Mobile shows the first only; tablet up to 2; desktop up to 4. Order = display order.
+        </p>
+        <div className="border border-line rounded-2xl p-6 space-y-4 bg-white">
+          <FreePatternsCollagePicker
+            selectedIds={freePatterns.product_ids}
+            options={freeProductOptions}
+            onChange={(product_ids) => setFreePatterns({ product_ids })}
+          />
+          <SaveButton
+            onClick={() => save('free_patterns', normalizeFreePatternsBanner(freePatterns))}
+            saving={savingKey === 'free_patterns'}
+          />
+        </div>
+      </div>
 
       {/* CHAPTERS */}
       {chapters.length > 0 && (
@@ -407,6 +487,124 @@ export function HomepageAdmin() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function FreePatternsCollagePicker({
+  selectedIds,
+  options,
+  onChange,
+}: {
+  selectedIds: string[]
+  options: Product[]
+  onChange: (ids: string[]) => void
+}) {
+  const byId = new Map(options.map((p) => [p.id, p]))
+  // Keep selected products that may not be in the latest free list (inactive/price change)
+  const selected = selectedIds
+    .map((id) => byId.get(id))
+    .filter((p): p is Product => !!p)
+
+  const toggle = (id: string) => {
+    if (selectedIds.includes(id)) {
+      onChange(selectedIds.filter((x) => x !== id))
+      return
+    }
+    if (selectedIds.length >= FREE_COLLAGE_MAX) return
+    onChange([...selectedIds, id])
+  }
+
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= selectedIds.length) return
+    const next = [...selectedIds]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    onChange(next)
+  }
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <p className="text-[10px] tracking-[0.1em] text-ink-soft mb-2">
+          SELECTED ({selectedIds.length}/{FREE_COLLAGE_MAX}) — drag order via arrows
+        </p>
+        {selected.length === 0 ? (
+          <p className="text-[13px] text-ink-soft">None selected — homepage falls back to the newest free pattern photo.</p>
+        ) : (
+          <ul className="space-y-2">
+            {selected.map((p, i) => (
+              <li key={p.id} className="flex items-center gap-3 border border-line rounded-xl p-2 bg-surface/40">
+                <img src={p.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" />
+                <span className="text-[13px] flex-1 min-w-0 truncate">{p.title}</span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    aria-label="Move up"
+                    disabled={i === 0}
+                    onClick={() => move(i, i - 1)}
+                    className="px-2 py-1 text-[11px] border border-line rounded disabled:opacity-30"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move down"
+                    disabled={i === selected.length - 1}
+                    onClick={() => move(i, i + 1)}
+                    className="px-2 py-1 text-[11px] border border-line rounded disabled:opacity-30"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggle(p.id)}
+                    className="px-2 py-1 text-[11px] text-ink-soft hover:text-madder"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div>
+        <p className="text-[10px] tracking-[0.1em] text-ink-soft mb-2">FREE PATTERNS WITH PHOTOS</p>
+        {options.length === 0 ? (
+          <p className="text-[13px] text-ink-soft">No free products with images found.</p>
+        ) : (
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[320px] overflow-y-auto pr-1">
+            {options.map((p) => {
+              const on = selectedIds.includes(p.id)
+              const full = !on && selectedIds.length >= FREE_COLLAGE_MAX
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  disabled={full}
+                  onClick={() => toggle(p.id)}
+                  title={p.title}
+                  className={`relative rounded-xl overflow-hidden border text-left disabled:opacity-40 ${
+                    on ? 'border-ink ring-2 ring-ink/20' : 'border-line hover:border-ink/40'
+                  }`}
+                >
+                  <img src={p.images[0]} alt="" className="aspect-square w-full object-cover" />
+                  <span className="absolute inset-x-0 bottom-0 bg-black/55 text-white text-[10px] px-1.5 py-1 truncate">
+                    {p.title}
+                  </span>
+                  {on && (
+                    <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-ink text-canvas text-[10px] flex items-center justify-center">
+                      {selectedIds.indexOf(p.id) + 1}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

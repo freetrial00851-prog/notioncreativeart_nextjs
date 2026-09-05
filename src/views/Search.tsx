@@ -79,6 +79,7 @@ export function Search() {
       filterProductsByListingParams(results, {
         levels,
         free: priceFilter === 'free',
+        paid: priceFilter === 'paid',
         sale: saleFilter,
         bundle: bundleFilter,
       }),

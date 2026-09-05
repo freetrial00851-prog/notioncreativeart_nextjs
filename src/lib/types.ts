@@ -117,6 +117,26 @@ export type HeroContent = {
   secondary_cta_link?: string
 }
 
+/**
+ * Homepage "Start With Free" collage — site_settings key: `free_patterns`.
+ * Ordered product IDs (2–4 recommended); primary image of each is shown.
+ */
+export type FreePatternsBannerContent = {
+  product_ids: string[]
+}
+
+export const DEFAULT_FREE_PATTERNS_BANNER: FreePatternsBannerContent = {
+  product_ids: [],
+}
+
+export function normalizeFreePatternsBanner(raw: unknown): FreePatternsBannerContent {
+  const value = (raw && typeof raw === 'object' ? raw : {}) as Partial<FreePatternsBannerContent>
+  const ids = Array.isArray(value.product_ids)
+    ? value.product_ids.map(String).filter(Boolean).slice(0, 4)
+    : []
+  return { product_ids: ids }
+}
+
 /** Homepage + site-wide social/SEO fields (site_settings key: `seo`). */
 export type SiteSeoContent = {
   homepage_meta_title: string

@@ -19,6 +19,7 @@ export async function getHomeCatalogServer(): Promise<HomeCatalogFetchResult> {
         bundles: [],
         freeProducts: [],
         freeProduct: null,
+        freePatternCollage: [],
         categories: [],
         chapters: [],
         testimonials: [],

@@ -97,6 +97,7 @@ export function Shop() {
     let query = supabase.from('products').select('*').eq('active', true)
     if (levels.length > 0) query = query.in('skill_level', levels)
     if (priceFilter === 'free') query = query.eq('price', 0)
+    if (priceFilter === 'paid') query = query.gt('price', 0)
     if (bundleFilter) query = query.eq('is_bundle', true)
     if (categorySlug === 'sale') {
       query = query.not('compare_at_price', 'is', null)
@@ -149,7 +150,9 @@ export function Shop() {
           ? 'Pattern Bundles'
           : priceFilter === 'free'
             ? 'Free Patterns'
-            : saleFilter
+            : priceFilter === 'paid'
+              ? 'Paid Patterns'
+              : saleFilter
               ? 'On Sale'
               : levels.length > 0
                 ? `${levels.map((l) => l.charAt(0).toUpperCase() + l.slice(1)).join(' & ')} Patterns`

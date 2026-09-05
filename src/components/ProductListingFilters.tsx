@@ -96,6 +96,15 @@ export function ProductListingFilters({
           <label className={ROW_CLASS}>
             <input
               type="checkbox"
+              checked={priceFilter === 'paid'}
+              onChange={() => onToggleParam('price', 'paid')}
+              className={CHECKBOX_CLASS}
+            />
+            Paid Patterns
+          </label>
+          <label className={ROW_CLASS}>
+            <input
+              type="checkbox"
               checked={priceFilter === 'free'}
               onChange={() => onToggleParam('price', 'free')}
               className={CHECKBOX_CLASS}

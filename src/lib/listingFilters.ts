@@ -23,6 +23,8 @@ export type ListingFilterParams = {
   levels?: ListingSkillLevel[]
   /** When true, only price === 0 */
   free?: boolean
+  /** When true, only price > 0 */
+  paid?: boolean
   /** When true, paid products with a real compare-at discount (same as ProductCard badge). */
   sale?: boolean
   /** When true, only bundles */
@@ -69,12 +71,13 @@ export function isProductOnSale(p: Product): boolean {
  */
 export function filterProductsByListingParams(
   products: Product[],
-  { levels, free, sale, bundle }: ListingFilterParams,
+  { levels, free, paid, sale, bundle }: ListingFilterParams,
 ): Product[] {
   const selected = levels ?? []
   return products.filter((p) => {
     if (selected.length > 0 && (!p.skill_level || !selected.includes(p.skill_level))) return false
     if (free && p.price !== 0) return false
+    if (paid && !(p.price > 0)) return false
     if (sale && !isProductOnSale(p)) return false
     if (bundle && !p.is_bundle) return false
     return true
@@ -89,7 +92,7 @@ export function countActiveListingFilters(params: {
 }): number {
   return (
     (params.levels.length > 0 ? 1 : 0) +
-    (params.priceFilter === 'free' ? 1 : 0) +
+    (params.priceFilter === 'free' || params.priceFilter === 'paid' ? 1 : 0) +
     (params.saleFilter ? 1 : 0) +
     (params.bundleFilter ? 1 : 0)
   )

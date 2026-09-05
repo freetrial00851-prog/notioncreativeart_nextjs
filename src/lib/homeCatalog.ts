@@ -9,6 +9,7 @@ import type {
   LayoutSection,
   TestimonialContent,
 } from './types'
+import { normalizeFreePatternsBanner } from './types'
 
 /** Shared homepage catalog shape — used by SSR bootstrap and the client module cache. */
 export type HomeCatalogSnapshot = {
@@ -17,8 +18,10 @@ export type HomeCatalogSnapshot = {
   bundles: Product[]
   /** Up to {@link HOME_PRODUCT_SECTION_LIMIT} free patterns for the homepage grid (when built). */
   freeProducts: Product[]
-  /** First free product — used by the current Free Patterns banner. */
+  /** First free product — fallback image when no collage IDs are configured. */
   freeProduct: Product | null
+  /** Admin-selected products for the Start With Free collage (ordered, with images). */
+  freePatternCollage: Product[]
   categories: CategoryWithCount[]
   chapters: ChapterContent[]
   testimonials: TestimonialContent[]
@@ -55,6 +58,7 @@ export async function loadHomeCatalog(
     .from('products')
     .select('*')
     .eq('active', true)
+    .gt('price', 0)
     .order('created_at', { ascending: false })
     .limit(HOME_NEW_ARRIVALS_LIMIT)
   const bundlesP = supabase
@@ -75,7 +79,7 @@ export async function loadHomeCatalog(
   const settingsP = supabase
     .from('site_settings')
     .select('key, value')
-    .in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials'])
+    .in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials', 'free_patterns'])
   const categoriesP = getCategoriesWithProducts(supabase)
   const skillCountPs = (['beginner', 'intermediate', 'advanced'] as const).map((level) =>
     supabase
@@ -110,6 +114,7 @@ export async function loadHomeCatalog(
   let chapters: ChapterContent[] = []
   let layout: LayoutSection[] | null = null
   let testimonials: TestimonialContent[] = []
+  let freePatternsBanner = normalizeFreePatternsBanner(null)
 
   for (const row of settingsRes.data ?? []) {
     if (row.key === 'hero') hero = row.value as HeroContent
@@ -117,6 +122,9 @@ export async function loadHomeCatalog(
     if (row.key === 'homepage_layout') layout = mergeLayout(row.value as LayoutSection[])
     if (row.key === 'testimonials') {
       testimonials = (row.value as TestimonialContent[]).filter((t) => t.quote && t.name)
+    }
+    if (row.key === 'free_patterns') {
+      freePatternsBanner = normalizeFreePatternsBanner(row.value)
     }
   }
 
@@ -129,12 +137,31 @@ export async function loadHomeCatalog(
     ? 'Simulated featured failure'
     : featuredRes.error?.message ?? null
 
+  const freeList = (freeRes.data as Product[]) ?? []
+  let freePatternCollage: Product[] = []
+  const collageIds = freePatternsBanner.product_ids
+  if (collageIds.length > 0) {
+    const { data: collageRows } = await supabase
+      .from('products')
+      .select('*')
+      .eq('active', true)
+      .in('id', collageIds)
+    const byId = new Map(((collageRows as Product[]) ?? []).map((p) => [p.id, p]))
+    freePatternCollage = collageIds
+      .map((id) => byId.get(id))
+      .filter((p): p is Product => !!p && Array.isArray(p.images) && p.images.length > 0)
+  }
+  if (freePatternCollage.length === 0 && freeList[0]?.images?.[0]) {
+    freePatternCollage = [freeList[0]]
+  }
+
   const snapshot: HomeCatalogSnapshot = {
     trending: featuredError ? [] : ((featuredRes.data as Product[]) ?? []),
     newArrivals: (newRes.data as Product[]) ?? [],
     bundles: (bundlesRes.data as Product[]) ?? [],
-    freeProducts: (freeRes.data as Product[]) ?? [],
-    freeProduct: (freeRes.data as Product[])?.[0] ?? null,
+    freeProducts: freeList,
+    freeProduct: freeList[0] ?? null,
+    freePatternCollage,
     categories: cats,
     chapters,
     testimonials,

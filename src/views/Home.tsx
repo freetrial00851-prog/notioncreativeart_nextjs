@@ -63,6 +63,7 @@ function applyCatalogSnapshot(
     setNewArrivals: (v: Product[]) => void
     setBundles: (v: Product[]) => void
     setFreeProduct: (v: Product | null) => void
+    setFreePatternCollage: (v: Product[]) => void
     setCategories: (v: CategoryWithCount[]) => void
     setChapters: (v: ChapterContent[]) => void
     setTestimonials: (v: TestimonialContent[]) => void
@@ -78,6 +79,7 @@ function applyCatalogSnapshot(
   setters.setNewArrivals(snap.newArrivals)
   setters.setBundles(snap.bundles)
   setters.setFreeProduct(snap.freeProduct)
+  setters.setFreePatternCollage(snap.freePatternCollage ?? [])
   setters.setCategories(snap.categories)
   setters.setChapters(snap.chapters)
   setters.setTestimonials(snap.testimonials)
@@ -103,6 +105,107 @@ function applyCatalogSnapshot(
       return same ? prev : next
     })
   }
+}
+
+/** Resolve hero CTAs — migrate stale `/shop` links to paid/free filters. */
+function heroPrimaryHref(link: string | undefined) {
+  const raw = (link ?? '').trim()
+  if (!raw || raw === '/shop' || raw === '/shop/' || raw === '/shop/new') return '/shop?price=paid'
+  return raw
+}
+
+function heroSecondaryHref(link: string | undefined) {
+  const raw = (link ?? '').trim()
+  if (!raw || raw === '/shop' || raw === '/shop/') return '/shop?price=free'
+  return raw
+}
+
+/** Start With Free — staggered photo stack; 1 / 2 / 3–4 by breakpoint. */
+function FreePatternsCollage({ products }: { products: Product[] }) {
+  const shots = products
+    .map((p) => ({ src: p.images?.[0], alt: p.title, id: p.id, slug: p.slug }))
+    .filter((s): s is { src: string; alt: string; id: string; slug: string } => !!s.src && !!s.slug)
+  if (shots.length === 0) return null
+
+  const card =
+    'absolute rounded-xl overflow-hidden border border-line bg-surface shadow-[0_8px_24px_rgba(0,0,0,0.08)] cursor-pointer transition-shadow hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] group'
+
+  return (
+    <div className="relative w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[180px] md:h-[200px] shrink-0 mx-auto sm:mx-0">
+      {/* Mobile: first image only */}
+      <Link href={`/pattern/${shots[0].slug}`} className={`md:hidden ${card} inset-0`}>
+        <img
+          src={shots[0].src}
+          alt={shots[0].alt}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+        />
+      </Link>
+
+      {/* Tablet: up to 2 staggered */}
+      <div className="hidden md:block lg:hidden absolute inset-0">
+        {shots.slice(0, 2).map((s, i) => (
+          <Link
+            key={s.id}
+            href={`/pattern/${s.slug}`}
+            className={card}
+            style={{
+              width: '68%',
+              height: '88%',
+              left: i === 0 ? '0%' : '32%',
+              top: i === 0 ? '12%' : '0%',
+              zIndex: i + 1,
+              transform: i === 0 ? 'rotate(-4deg)' : 'rotate(5deg)',
+            }}
+          >
+            <img
+              src={s.src}
+              alt={s.alt}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+            />
+          </Link>
+        ))}
+      </div>
+
+      {/* Desktop: up to 4 staggered */}
+      <div className="hidden lg:block absolute inset-0">
+        {shots.slice(0, 4).map((s, i) => {
+          const layouts = [
+            { left: '0%', top: '18%', rot: '-6deg', z: 1 },
+            { left: '22%', top: '0%', rot: '3deg', z: 3 },
+            { left: '44%', top: '14%', rot: '-3deg', z: 2 },
+            { left: '58%', top: '4%', rot: '6deg', z: 4 },
+          ]
+          const n = Math.min(shots.length, 4)
+          const L = layouts.slice(0, n)
+          const pos = L[i] ?? layouts[0]
+          return (
+            <Link
+              key={s.id}
+              href={`/pattern/${s.slug}`}
+              className={card}
+              style={{
+                width: n <= 2 ? '68%' : n === 3 ? '52%' : '46%',
+                height: '86%',
+                left: pos.left,
+                top: pos.top,
+                zIndex: pos.z,
+                transform: `rotate(${pos.rot})`,
+              }}
+            >
+              <img
+                src={s.src}
+                alt={s.alt}
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              />
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 function HeroImage({
@@ -196,6 +299,9 @@ export function Home({
   const [newArrivals, setNewArrivals] = useState<Product[]>(() => seed?.newArrivals ?? [])
   const [bundles, setBundles] = useState<Product[]>(() => seed?.bundles ?? [])
   const [freeProduct, setFreeProduct] = useState<Product | null>(() => seed?.freeProduct ?? null)
+  const [freePatternCollage, setFreePatternCollage] = useState<Product[]>(
+    () => seed?.freePatternCollage ?? (seed?.freeProduct ? [seed.freeProduct] : []),
+  )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
   const [heroReady, setHeroReady] = useState(() =>
     Boolean((seed?.hero ?? initialHero)?.images?.length) || Boolean(seed),
@@ -252,6 +358,7 @@ export function Home({
       setNewArrivals,
       setBundles,
       setFreeProduct,
+      setFreePatternCollage,
       setCategories,
       setChapters,
       setTestimonials,
@@ -346,14 +453,14 @@ export function Home({
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
               <Link
-                href={hero?.cta_link || '/shop/new'}
+                href={heroPrimaryHref(hero?.cta_link)}
                 className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
                 style={{ background: 'var(--color-accent)' }}
               >
                 {(hero?.cta_text || 'Shop Patterns').replace(/\s*→\s*$/, '')} →
               </Link>
               <Link
-                href={hero?.secondary_cta_link || '/shop?price=free'}
+                href={heroSecondaryHref(hero?.secondary_cta_link)}
                 className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-[13px] font-semibold border bg-white hover:bg-surface transition-colors"
                 style={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
               >
@@ -668,10 +775,10 @@ export function Home({
       <div aria-hidden>
         <div className="bg-white border border-line rounded-2xl p-8 md:p-10 min-h-[180px] animate-pulse" />
       </div>
-    ) : freeProduct ? (
+    ) : freePatternCollage.length > 0 || freeProduct ? (
       <div>
-        <div className="bg-white border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div>
+        <div className="bg-white border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-8">
+          <div className="min-w-0">
             <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FREE PATTERNS</p>
             <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2">Start With Free</h2>
             <p className="text-[14px] text-ink-soft leading-relaxed mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
@@ -683,9 +790,15 @@ export function Home({
               Explore free patterns
             </Link>
           </div>
-          {freeProduct.images?.[0] && (
-            <img src={freeProduct.images[0]} alt={freeProduct.title} loading="lazy" className="w-[140px] h-[140px] md:w-[160px] md:h-[160px] rounded-xl object-cover shrink-0" />
-          )}
+          <FreePatternsCollage
+            products={
+              freePatternCollage.length > 0
+                ? freePatternCollage
+                : freeProduct
+                  ? [freeProduct]
+                  : []
+            }
+          />
         </div>
       </div>
     ) : null,
