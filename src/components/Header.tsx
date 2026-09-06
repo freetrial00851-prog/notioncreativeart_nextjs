@@ -21,7 +21,7 @@ import {
 import { profileDisplayName, profileInitial } from '../lib/profileName'
 import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
-import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, CartIcon, UI_ICON_SIZE } from './icons'
+import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, UI_ICON_SIZE } from './icons'
 
 const HEADER_ICON = '#111111'
 
@@ -381,7 +381,7 @@ export function Header() {
                   onClick={openMobileCart}
                   className="relative w-10 h-10 shrink-0 flex items-center justify-center"
                 >
-                  <CartIcon size={22} color={HEADER_ICON} />
+                  <MaterialIcon name="shopping_bag" size={22} color={HEADER_ICON} filled />
                   {cartCount > 0 && (
                     <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
                       {cartCount}
@@ -649,7 +649,7 @@ function HeaderActions({
         title={user ? 'Cart' : 'Cart — items saved for 7 days while signed out'}
         className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
       >
-        <CartIcon size={iconSize} color={HEADER_ICON} />
+        <MaterialIcon name="shopping_bag" size={iconSize} color={HEADER_ICON} filled />
         {cartCount > 0 && (
           <span
             className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
