@@ -7,18 +7,16 @@ type ProductCardMetaProps = {
   className?: string
 }
 
-/** Reserved stars row shared by ProductCard and QuickView (skill pill renders above the title). */
+/** Stars row for ProductCard / QuickView — renders only when real rating data exists. */
 export function ProductCardMeta({ reviewStats, className = '' }: ProductCardMetaProps) {
-  const showStars = reviewStats && reviewStats.reviewCount >= 1
+  if (!reviewStats || reviewStats.reviewCount < 1) return null
 
   return (
     <div className={`h-3 flex items-center ${className}`}>
-      {showStars && (
-        <StarRatingCardSummary
-          averageRating={reviewStats.averageRating}
-          reviewCount={reviewStats.reviewCount}
-        />
-      )}
+      <StarRatingCardSummary
+        averageRating={reviewStats.averageRating}
+        reviewCount={reviewStats.reviewCount}
+      />
     </div>
   )
 }

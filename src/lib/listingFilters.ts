@@ -5,7 +5,7 @@ export type ListingSkillLevel = (typeof LISTING_SKILL_LEVELS)[number]
 
 /** Shared Shop / Search / Wishlist product grid column ladder. */
 export const LISTING_PRODUCT_GRID_CLASS =
-  'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14'
+  'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 md:gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-14'
 
 export const LISTING_PAGE_SIZE = 12
 

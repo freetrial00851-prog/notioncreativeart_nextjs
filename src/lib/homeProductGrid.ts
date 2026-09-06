@@ -19,7 +19,7 @@ export const HOME_NEW_ARRIVALS_LIMIT = 6
  *   ≥1280      → 5 columns (≈ Shop 4-col + sidebar card width)
  */
 export const HOME_PRODUCT_GRID_CLASS =
-  'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12'
+  'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 md:gap-x-6 lg:gap-x-8 gap-y-10 lg:gap-y-12'
 
 /**
  * Responsive visibility for homepage product grids that fetch 6 items:
