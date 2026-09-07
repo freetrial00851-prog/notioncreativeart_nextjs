@@ -3,113 +3,132 @@
 import type { ReactNode } from 'react'
 import {
   LISTING_SKILL_LEVELS,
+  LISTING_SORT_OPTIONS,
   type ListingSkillLevel,
+  type ListingSort,
 } from '../lib/listingFilters'
 
 const CHECKBOX_CLASS =
-  'listing-filter-check shrink-0 w-4 h-4 rounded-sm border border-line bg-white ' +
+  'listing-filter-check shrink-0 w-5 h-5 rounded-sm border border-line bg-white ' +
   'appearance-none cursor-pointer transition-colors ' +
   'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
 
+const RADIO_CLASS =
+  'listing-filter-radio shrink-0 w-5 h-5 rounded-full border border-line bg-white ' +
+  'appearance-none cursor-pointer transition-colors ' +
+  'checked:bg-white checked:border-[var(--color-accent)] ' +
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
+
+/** Label left, control right — matches Sort & Filter mockup / Etsy-style rows. */
 const ROW_CLASS =
-  'flex items-center gap-2.5 py-1.5 px-1 -mx-1 rounded-md text-[13px] cursor-pointer ' +
+  'flex items-center justify-between gap-3 py-2.5 px-1 -mx-1 rounded-md text-[14px] cursor-pointer ' +
   'text-ink hover:bg-surface transition-colors'
+
+const SECTION_TITLE_CLASS = 'text-[11px] tracking-[0.15em] text-ink-soft mb-1'
+
+const SORT_SHEET_LABELS: Record<ListingSort, string> = {
+  newest: 'Newest',
+  'price-asc': 'Price: Low to High',
+  'price-desc': 'Price: High to Low',
+  'best-selling': 'Best Selling',
+}
 
 type ProductListingFiltersProps = {
   levels: ListingSkillLevel[]
   priceFilter: string | null
-  saleFilter: boolean
-  bundleFilter: boolean
-  /** Toggle free / sale / bundle query params. */
+  /** Toggle free / paid (and legacy sale/bundle if still in URL tooling). */
   onToggleParam: (key: string, value: string) => void
   onToggleLevel: (level: ListingSkillLevel) => void
-  /** Clear skill levels only. */
-  onClearLevels: () => void
   /** Optional browse-only block (Shop subcategory list). Omit on Search. */
   categories?: ReactNode
+  /** When set, renders the Sort section (mobile Sort & Filter sheet). */
+  sort?: ListingSort
+  onSortChange?: (sort: ListingSort) => void
+  /**
+   * Mobile sheet: no outer card chrome, tighter vertical rhythm.
+   * Desktop sidebar keeps the bordered card.
+   */
+  variant?: 'panel' | 'sheet'
 }
 
-/** Shared skill-level + refine filters for Shop and Search sidebars. */
+/** Shared skill-level + pricing (+ optional sort) filters for Shop and Search. */
 export function ProductListingFilters({
   levels,
   priceFilter,
-  saleFilter,
-  bundleFilter,
   onToggleParam,
   onToggleLevel,
-  onClearLevels,
   categories,
+  sort,
+  onSortChange,
+  variant = 'panel',
 }: ProductListingFiltersProps) {
+  const showSort = sort !== undefined && onSortChange !== undefined
+  const sectionsClass = variant === 'sheet' ? 'space-y-5' : 'space-y-6'
+  const wrapClass =
+    variant === 'sheet'
+      ? sectionsClass
+      : `bg-white border border-line rounded-lg p-5 ${sectionsClass}`
+
   return (
-    <div className="bg-white border border-line rounded-lg p-5 space-y-6">
-      <div>
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <p className="text-[11px] tracking-[0.15em] text-ink-soft">SKILL LEVEL</p>
-          {levels.length > 0 && (
-            <button
-              type="button"
-              onClick={onClearLevels}
-              className="text-[11px] font-semibold underline underline-offset-2 shrink-0"
-              style={{ color: 'var(--color-accent)' }}
-            >
-              Clear
-            </button>
-          )}
+    <div className={wrapClass}>
+      {showSort && (
+        <div>
+          <p className={SECTION_TITLE_CLASS}>SORT</p>
+          <div className="space-y-0">
+            {LISTING_SORT_OPTIONS.map((opt) => (
+              <label key={opt.value} className={ROW_CLASS}>
+                <span>{SORT_SHEET_LABELS[opt.value]}</span>
+                <input
+                  type="radio"
+                  name="listing-sort"
+                  checked={sort === opt.value}
+                  onChange={() => onSortChange(opt.value)}
+                  className={RADIO_CLASS}
+                />
+              </label>
+            ))}
+          </div>
         </div>
-        <div className="space-y-0.5">
+      )}
+
+      <div>
+        <p className={SECTION_TITLE_CLASS}>SKILL LEVEL</p>
+        <div className="space-y-0">
           {LISTING_SKILL_LEVELS.map((l) => (
             <label key={l} className={ROW_CLASS}>
+              <span className="capitalize">{l}</span>
               <input
                 type="checkbox"
                 checked={levels.includes(l)}
                 onChange={() => onToggleLevel(l)}
                 className={CHECKBOX_CLASS}
               />
-              <span className="capitalize">{l}</span>
             </label>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">REFINE</p>
-        <div className="space-y-0.5">
+        <p className={SECTION_TITLE_CLASS}>PRICING</p>
+        <div className="space-y-0">
           <label className={ROW_CLASS}>
-            <input
-              type="checkbox"
-              checked={saleFilter}
-              onChange={() => onToggleParam('sale', '1')}
-              className={CHECKBOX_CLASS}
-            />
-            On Sale
-          </label>
-          <label className={ROW_CLASS}>
-            <input
-              type="checkbox"
-              checked={bundleFilter}
-              onChange={() => onToggleParam('bundle', '1')}
-              className={CHECKBOX_CLASS}
-            />
-            Bundles
-          </label>
-          <label className={ROW_CLASS}>
+            <span>Paid</span>
             <input
               type="checkbox"
               checked={priceFilter === 'paid'}
               onChange={() => onToggleParam('price', 'paid')}
               className={CHECKBOX_CLASS}
             />
-            Shop
           </label>
           <label className={ROW_CLASS}>
+            <span>Free</span>
             <input
               type="checkbox"
               checked={priceFilter === 'free'}
               onChange={() => onToggleParam('price', 'free')}
               className={CHECKBOX_CLASS}
             />
-            Free Patterns
           </label>
         </div>
       </div>

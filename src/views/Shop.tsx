@@ -20,7 +20,6 @@ import {
   LISTING_PRODUCT_GRID_CLASS,
   LISTING_SORT_OPTIONS,
   clearListingFilterParams,
-  clearSkillLevelParam,
   countActiveListingFilters,
   filterProductsByListingParams,
   parseSkillLevels,
@@ -224,11 +223,8 @@ export function Shop({
     <ProductListingFilters
       levels={levels}
       priceFilter={priceFilter}
-      saleFilter={saleFilter}
-      bundleFilter={bundleFilter}
       onToggleParam={toggleParam}
       onToggleLevel={onToggleLevel}
-      onClearLevels={() => setSearchParams(clearSkillLevelParam)}
       categories={
         sidebarCategories.length > 0 ? (
           <div>
@@ -268,6 +264,23 @@ export function Shop({
       }
     />
   )
+
+  const sheetFilterContent = (
+    <ProductListingFilters
+      variant="sheet"
+      levels={levels}
+      priceFilter={priceFilter}
+      onToggleParam={toggleParam}
+      onToggleLevel={onToggleLevel}
+      sort={sort}
+      onSortChange={setSort}
+    />
+  )
+
+  const resetSortAndFilters = () => {
+    setSort('newest')
+    setSearchParams(clearListingFilterParams)
+  }
 
   return (
     <div className="max-w-site w-full mx-auto px-4 md:px-16 xl:px-24 2xl:px-32 py-14">
@@ -322,23 +335,15 @@ export function Shop({
           </p>
         )}
 
-        {/* Mobile: compact Sort + Filter buttons instead of the full panel taking up the screen */}
+        {/* Mobile: single Sort & Filter trigger (options live in the bottom sheet) */}
         <div className="flex md:hidden items-center gap-3">
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as ListingSort)}
-            className="flex-1 text-[12px] border border-line rounded-full px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
-          >
-            {LISTING_SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.mobileLabel}</option>
-            ))}
-          </select>
           <button
+            type="button"
             onClick={() => setMobileFiltersOpen(true)}
-            className="flex items-center gap-1.5 border border-line rounded-full px-4 py-2.5 text-[12px] shrink-0"
+            className="flex flex-1 items-center justify-center gap-1.5 border border-line rounded-full px-4 py-2.5 text-[12px]"
           >
             <MaterialIcon name="tune" size={15} />
-            Filter
+            Sort & Filter
             {activeFilterCount > 0 && (
               <span className="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
                 {activeFilterCount}
@@ -429,36 +434,43 @@ export function Shop({
         </div>
       </div>
 
-      {/* Mobile filter bottom sheet — Etsy-style: compact trigger button, full options in a sheet */}
+      {/* Mobile Sort & Filter bottom sheet */}
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-ink/40" onClick={() => setMobileFiltersOpen(false)} />
-          <div className="absolute left-0 right-0 bottom-0 max-h-[85vh] bg-canvas rounded-t-2xl flex flex-col">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-line shrink-0">
-              <span className="font-subheading text-lg">Filters</span>
+          <div className="absolute left-0 right-0 bottom-0 bg-canvas rounded-t-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-line shrink-0">
+              <span className="font-subheading text-lg">Sort & Filter</span>
               <div className="flex items-center gap-4">
-                {activeFilterCount > 0 && (
-                  <button
-                    onClick={() => setSearchParams(clearListingFilterParams)}
-                    className="text-[12px] font-semibold underline underline-offset-2"
-                    style={{ color: 'var(--color-accent)' }}
-                  >
-                    Reset
-                  </button>
-                )}
-                <button aria-label="Close filters" onClick={() => setMobileFiltersOpen(false)} className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-ink text-lg leading-none">✕</button>
+                <button
+                  type="button"
+                  onClick={resetSortAndFilters}
+                  className="text-[12px] font-semibold underline underline-offset-2"
+                  style={{ color: 'var(--color-accent)' }}
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  aria-label="Close filters"
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-ink text-lg leading-none"
+                >
+                  ✕
+                </button>
               </div>
             </div>
-            <div className="overflow-y-auto px-6 py-5 space-y-8">
-              {filterPanelContent}
+            <div className="px-5 py-3 shrink-0">
+              {sheetFilterContent}
             </div>
-            <div className="p-4 border-t border-line shrink-0">
+            <div className="px-5 pt-2 pb-5 shrink-0">
               <button
+                type="button"
                 onClick={() => setMobileFiltersOpen(false)}
                 className="w-full py-3.5 rounded-full text-white text-[13px] font-semibold"
                 style={{ background: 'var(--color-ink)' }}
               >
-                Show {sortedProducts.length} result{sortedProducts.length === 1 ? '' : 's'}
+                Show Results
               </button>
             </div>
           </div>
