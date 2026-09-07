@@ -10,10 +10,10 @@ import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { Product, Category } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
-import { MaterialIcon } from '../components/MaterialIcon'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { EmptyState } from '../components/EmptyState'
 import { ProductListingFilters } from '../components/ProductListingFilters'
+import { SortFilterTriggerButton } from '../components/SortFilterTriggerButton'
 import { fetchPaidPurchaseCounts } from '../lib/purchaseCounts'
 import {
   LISTING_PAGE_SIZE,
@@ -306,14 +306,19 @@ export function Shop({
       </nav>
 
       <div className="border-b border-line pb-4 md:pb-5 mb-4 md:mb-6">
-        <div className="flex items-end justify-between flex-wrap gap-4 mb-3 md:mb-0">
-          <div>
+        <div className="flex items-end justify-between gap-3 md:gap-4">
+          <div className="min-w-0 flex-1">
             <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words">{displayTitle}</h1>
           </div>
+          <SortFilterTriggerButton
+            className="md:hidden mb-0.5"
+            activeFilterCount={activeFilterCount}
+            onClick={() => setMobileFiltersOpen(true)}
+          />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as ListingSort)}
-            className="hidden md:block text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
+            className="hidden md:block shrink-0 text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
           >
             {LISTING_SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -334,23 +339,6 @@ export function Shop({
             Updating…
           </p>
         )}
-
-        {/* Mobile: single Sort & Filter trigger (options live in the bottom sheet) */}
-        <div className="flex md:hidden items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setMobileFiltersOpen(true)}
-            className="flex flex-1 items-center justify-center gap-1.5 border border-line rounded-full px-4 py-2.5 text-[12px]"
-          >
-            <MaterialIcon name="tune" size={15} />
-            Sort & Filter
-            {activeFilterCount > 0 && (
-              <span className="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-10">

@@ -11,7 +11,7 @@ import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { ProductListingFilters } from '../components/ProductListingFilters'
-import { MaterialIcon } from '../components/MaterialIcon'
+import { SortFilterTriggerButton } from '../components/SortFilterTriggerButton'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { fetchPaidPurchaseCounts } from '../lib/purchaseCounts'
 import {
@@ -179,7 +179,7 @@ export function Search() {
     <select
       value={sort}
       onChange={(e) => setSort(e.target.value as ListingSort)}
-      className="hidden md:block text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
+      className="hidden md:block shrink-0 text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
     >
       {LISTING_SORT_OPTIONS.map((opt) => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -189,8 +189,8 @@ export function Search() {
 
   return (
     <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14">
-      <div className="border-b border-line pb-4 mb-8 flex items-end justify-between gap-4 flex-wrap">
-        <div>
+      <div className="border-b border-line pb-4 mb-8 flex items-end justify-between gap-3 md:gap-4">
+        <div className="min-w-0 flex-1">
           <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
           <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight mt-2 break-words">
             {q.trim() ? `Search: "${q.trim()}"` : 'Search Results'}
@@ -201,7 +201,16 @@ export function Search() {
             </p>
           )}
         </div>
-        {showListingChrome && sortSelectDesktop}
+        {showListingChrome && (
+          <>
+            <SortFilterTriggerButton
+              className="md:hidden mb-0.5"
+              activeFilterCount={activeFilterCount}
+              onClick={() => setMobileFiltersOpen(true)}
+            />
+            {sortSelectDesktop}
+          </>
+        )}
       </div>
 
       {!q && (
@@ -210,22 +219,6 @@ export function Search() {
 
       {showListingChrome && (
         <>
-          <div className="flex md:hidden items-center gap-3 mb-6">
-            <button
-              type="button"
-              onClick={() => setMobileFiltersOpen(true)}
-              className="flex flex-1 items-center justify-center gap-1.5 border border-line rounded-full px-4 py-2.5 text-[12px]"
-            >
-              <MaterialIcon name="tune" size={15} />
-              Sort & Filter
-              {activeFilterCount > 0 && (
-                <span className="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-10">
             <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start space-y-8">
               {activeFilterCount > 0 && (
