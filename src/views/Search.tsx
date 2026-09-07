@@ -314,9 +314,9 @@ export function Search() {
       {mobileFiltersOpen && showListingChrome && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-ink/40" onClick={() => setMobileFiltersOpen(false)} />
-          <div className="absolute left-0 right-0 bottom-0 bg-canvas rounded-t-2xl flex flex-col">
-            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-line shrink-0">
-              <span className="font-subheading text-lg">Sort & Filter</span>
+          <div className="absolute left-0 right-0 bottom-0 bg-canvas rounded-t-2xl flex flex-col max-h-[min(52vh,480px)]">
+            <div className="flex items-center justify-between px-5 pt-3 pb-2 border-b border-line shrink-0">
+              <span className="font-subheading text-[18px] font-bold leading-tight">Sort & Filter</span>
               <div className="flex items-center gap-4">
                 <button
                   type="button"
@@ -336,14 +336,14 @@ export function Search() {
                 </button>
               </div>
             </div>
-            <div className="px-5 py-3 shrink-0">
+            <div className="px-5 py-2 overflow-y-auto min-h-0 flex-1" style={{ scrollbarWidth: 'thin' }}>
               {sheetFilterContent}
             </div>
-            <div className="px-5 pt-2 pb-5 shrink-0">
+            <div className="px-5 pt-1.5 pb-4 shrink-0">
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3.5 rounded-full text-white text-[13px] font-semibold"
+                className="w-full py-3 rounded-full text-white text-[13px] font-semibold"
                 style={{ background: 'var(--color-ink)' }}
               >
                 Show Results
