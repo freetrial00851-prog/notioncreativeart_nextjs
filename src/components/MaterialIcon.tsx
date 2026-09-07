@@ -81,6 +81,20 @@ const PATHS: Record<string, string> = {
 const OUTLINE_FAVORITE =
   'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z'
 
+/**
+ * Material Symbols Outlined shopping_bag FILL=1 (weight 400, grade 0, 24px asset).
+ * Verbatim path from google/material-design-icons
+ * `symbols/web/shopping_bag/materialsymbolsoutlined/shopping_bag_fill1_24px.svg`
+ * (= `@material-symbols/svg-400/outlined/shopping_bag-fill.svg`).
+ * Symbols use a 960-unit grid (viewBox 0 -960 960 960); we map into 24×24 via
+ * {@link MATERIAL_SYMBOLS_TO_24}. Rounded FILL=1 is identical; sharp differs.
+ */
+const SHOPPING_BAG_FILLED =
+  'M240-80q-33 0-56.5-23.5T160-160v-480q0-33 23.5-56.5T240-720h80q0-66 47-113t113-47q66 0 113 47t47 113h80q33 0 56.5 23.5T800-640v480q0 33-23.5 56.5T720-80H240Zm160-640h160q0-33-23.5-56.5T480-800q-33 0-56.5 23.5T400-720Zm200 200q17 0 28.5-11.5T640-560v-80h-80v80q0 17 11.5 28.5T600-520Zm-240 0q17 0 28.5-11.5T400-560v-80h-80v80q0 17 11.5 28.5T360-520Z'
+
+/** Maps Material Symbols path space into viewBox="0 0 24 24". */
+const MATERIAL_SYMBOLS_TO_24 = 'scale(0.025) translate(0 960)'
+
 export function MaterialIcon({
   name,
   size = 20,
@@ -89,10 +103,13 @@ export function MaterialIcon({
   className = '',
   style,
 }: IconProps) {
-  const path =
-    name === 'favorite' && !filled
+  const useSymbolsFilledBag = name === 'shopping_bag' && filled
+
+  const path = useSymbolsFilledBag
+    ? SHOPPING_BAG_FILLED
+    : name === 'favorite' && !filled
       ? OUTLINE_FAVORITE
-      : PATHS[name] ?? PATHS.help
+      : (PATHS[name] ?? PATHS.help)
 
   return (
     <svg
@@ -106,7 +123,13 @@ export function MaterialIcon({
       aria-hidden="true"
       focusable="false"
     >
-      <path d={path} />
+      {useSymbolsFilledBag ? (
+        <g transform={MATERIAL_SYMBOLS_TO_24}>
+          <path d={path} />
+        </g>
+      ) : (
+        <path d={path} />
+      )}
     </svg>
   )
 }
