@@ -426,9 +426,9 @@ export function Shop({
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-ink/40" onClick={() => setMobileFiltersOpen(false)} />
-          <div className="absolute left-0 right-0 bottom-0 bg-canvas rounded-t-2xl flex flex-col max-h-[min(52vh,480px)]">
-            <div className="flex items-center justify-between px-5 pt-3 pb-2 border-b border-line shrink-0">
-              <span className="font-subheading text-[18px] font-bold leading-tight">Sort & Filter</span>
+          <div className="absolute left-0 right-0 bottom-0 bg-canvas rounded-t-2xl flex flex-col overflow-hidden shadow-[0_-8px_32px_rgba(0,0,0,0.12)]">
+            <div className="flex items-center justify-between px-5 pt-3.5 pb-2.5 border-b border-line shrink-0">
+              <span className="font-subheading text-[20px] font-bold leading-tight">Sort & Filter</span>
               <div className="flex items-center gap-4">
                 <button
                   type="button"
@@ -448,10 +448,14 @@ export function Shop({
                 </button>
               </div>
             </div>
-            <div className="px-5 py-2 overflow-y-auto min-h-0 flex-1" style={{ scrollbarWidth: 'thin' }}>
+            {/* max-h on the body alone — footer stays a sibling outside scroll, never overlaps */}
+            <div
+              className="listing-sheet-scroll overflow-y-auto overscroll-contain min-h-0 pb-2"
+              style={{ maxHeight: 'min(62dvh, 460px)' }}
+            >
               {sheetFilterContent}
             </div>
-            <div className="px-5 pt-1.5 pb-4 shrink-0">
+            <div className="px-5 pt-3 pb-4 border-t border-line bg-canvas shrink-0">
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
