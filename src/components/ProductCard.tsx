@@ -75,7 +75,7 @@ export function ProductCard({
     <>
       <Link
         href={`/pattern/${product.slug}`}
-        className="group block bg-white rounded-lg border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
+        className="group block bg-white rounded-[20px] border border-line overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition-shadow"
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
@@ -97,9 +97,14 @@ export function ProductCard({
             <button
               onClick={toggleWishlist}
               aria-label="Add to wishlist"
-              className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-ink hover:opacity-70 transition-opacity"
+              className="w-8 h-8 flex items-center justify-center rounded-full shadow-sm hover:opacity-90 transition-opacity"
+              style={{ background: 'rgba(30,30,30,0.35)' }}
             >
-              <FavoriteIcon size={15} filled={inWishlist} color={inWishlist ? 'var(--color-madder)' : 'currentColor'} />
+              <FavoriteIcon
+                size={15}
+                filled={inWishlist}
+                color={inWishlist ? 'var(--color-madder)' : '#FFFFFF'}
+              />
             </button>
           </div>
 
@@ -133,49 +138,51 @@ export function ProductCard({
           </button>
         </div>
 
-        <div className="p-3">
+        <div className="p-3.5">
           {skillLabel && (
             <div className="mb-1.5">
               <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
             </div>
           )}
-          <p className="text-[13px] font-medium leading-snug line-clamp-2 min-h-[2.75em] mb-1.5">{product.title}</p>
-          <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-1" />
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
-              {isOnSale ? (
-                <>
-                  <span className="text-[15px] font-semibold text-ink">${product.price.toFixed(2)}</span>
-                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-[12px]">${product.compare_at_price!.toFixed(2)}</span>
-                </>
-              ) : (
-                <span className="text-[15px] font-semibold text-ink">{product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}</span>
-              )}
-            </div>
-
-            {!product.sold_out && (
-              product.price === 0 ? (
-                <button
-                  onClick={downloadFree}
-                  disabled={downloadingFree}
-                  aria-label="Download free"
-                  className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-                  style={{ background: 'var(--color-accent)' }}
-                >
-                  <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
-                </button>
-              ) : (
-                <button
-                  onClick={toggleCart}
-                  aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
-                  className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-opacity"
-                  style={{ background: inCart ? 'var(--color-accent-hover)' : 'var(--color-accent)' }}
-                >
-                  <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={16} />
-                </button>
-              )
+          <div className="flex items-start justify-between gap-2 mb-2 min-h-[2.75em]">
+            <p className="text-[13px] font-medium leading-snug line-clamp-2 min-w-0 flex-1">{product.title}</p>
+            <ProductCardMeta product={product} reviewStats={reviewStats} className="shrink-0 mt-0.5" />
+          </div>
+          <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
+            {isOnSale ? (
+              <>
+                <span className="text-[15px] font-semibold text-ink">${product.price.toFixed(2)}</span>
+                <span style={{ color: 'var(--color-madder)' }} className="line-through text-[12px]">${product.compare_at_price!.toFixed(2)}</span>
+              </>
+            ) : (
+              <span className="text-[15px] font-semibold text-ink">{product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}</span>
             )}
           </div>
+
+          {!product.sold_out && (
+            product.price === 0 ? (
+              <button
+                onClick={downloadFree}
+                disabled={downloadingFree}
+                aria-label="Download free"
+                className="mt-3 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                style={{ background: 'var(--color-accent)' }}
+              >
+                <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
+                {downloadingFree ? 'Downloading…' : 'Download Free'}
+              </button>
+            ) : (
+              <button
+                onClick={toggleCart}
+                aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
+                className="mt-3 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity"
+                style={{ background: inCart ? 'var(--color-accent-hover)' : 'var(--color-accent)' }}
+              >
+                <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={16} />
+                {inCart ? 'In Cart' : 'Add to Cart'}
+              </button>
+            )
+          )}
         </div>
       </Link>
       {quickViewOpen && (
