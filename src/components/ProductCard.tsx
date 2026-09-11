@@ -79,7 +79,7 @@ export function ProductCard({
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
-        <div className="p-3">
+        <div className="p-2">
           <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
             {product.images?.[0] ? (
               <Image
@@ -140,7 +140,7 @@ export function ProductCard({
           </div>
         </div>
 
-        <div className="p-3.5">
+        <div className="px-3.5 pt-1.5 pb-3.5">
           {skillLabel && (
             <div className="mb-1.5">
               <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
