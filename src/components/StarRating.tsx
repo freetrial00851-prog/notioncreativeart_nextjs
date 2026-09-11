@@ -75,7 +75,7 @@ export function StarRatingSummary({
   )
 }
 
-/** Card/grid variant: ★★★★★ (12) — stars + count only, no decimal average. */
+/** Card/grid variant: ★ 4.8 (20) — single filled star + average + count. */
 export function StarRatingCardSummary({
   averageRating,
   reviewCount,
@@ -89,8 +89,13 @@ export function StarRatingCardSummary({
 }) {
   if (reviewCount < 1) return null
   return (
-    <span className={`inline-flex items-center gap-1 text-[11px] text-ink-soft ${className}`}>
-      <StarRating value={averageRating} size={size} />
+    <span
+      className={`inline-flex items-center gap-1 text-[11px] text-ink-soft ${className}`}
+      role="img"
+      aria-label={`${averageRating.toFixed(1)} out of 5 stars, ${reviewCount} review${reviewCount === 1 ? '' : 's'}`}
+    >
+      <MaterialIcon name="star" size={size} color={STAR_FILLED} />
+      <span className="tabular-nums text-ink font-medium">{averageRating.toFixed(1)}</span>
       <span className="tabular-nums">({reviewCount})</span>
     </span>
   )
