@@ -79,63 +79,65 @@ export function ProductCard({
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
-        <div className="relative aspect-square bg-surface overflow-hidden">
-          {product.images?.[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.title}
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              priority={priority}
-              className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${product.sold_out ? 'opacity-50' : ''}`}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs">No image yet</div>
-          )}
-
-          <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
-            <button
-              onClick={toggleWishlist}
-              aria-label="Add to wishlist"
-              className="w-8 h-8 flex items-center justify-center rounded-full shadow-sm hover:opacity-90 transition-opacity"
-              style={{ background: 'rgba(30,30,30,0.35)' }}
-            >
-              <FavoriteIcon
-                size={15}
-                filled={inWishlist}
-                color={inWishlist ? 'var(--color-madder)' : '#FFFFFF'}
+        <div className="p-3">
+          <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
+            {product.images?.[0] ? (
+              <Image
+                src={product.images[0]}
+                alt={product.title}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                priority={priority}
+                className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${product.sold_out ? 'opacity-50' : ''}`}
               />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs">No image yet</div>
+            )}
+
+            <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
+              <button
+                onClick={toggleWishlist}
+                aria-label="Add to wishlist"
+                className="w-8 h-8 flex items-center justify-center rounded-full shadow-sm hover:opacity-90 transition-opacity"
+                style={{ background: 'rgba(30,30,30,0.35)' }}
+              >
+                <FavoriteIcon
+                  size={15}
+                  filled={inWishlist}
+                  color={inWishlist ? 'var(--color-madder)' : '#FFFFFF'}
+                />
+              </button>
+            </div>
+
+            <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
+              {product.sold_out && (
+                <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SOLD OUT</span>
+              )}
+              {!product.sold_out && product.price === 0 && (
+                <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>FREE</span>
+              )}
+              {!product.sold_out && badge === 'sale' && (
+                <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SALE</span>
+              )}
+              {!product.sold_out && badge === 'new' && (
+                <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>NEW</span>
+              )}
+              {!product.sold_out && badge === 'featured' && (
+                <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">FEATURED</span>
+              )}
+            </div>
+
+            {!product.sold_out && (
+              <div className="hidden md:block absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            )}
+            <button
+              onClick={(e) => { e.preventDefault(); setQuickViewOpen(true) }}
+              className="hidden md:flex items-center justify-center gap-1.5 absolute bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] bg-white text-ink text-[11px] tracking-[0.1em] py-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-ink hover:text-white"
+            >
+              <MaterialIcon name="visibility" size={14} />
+              QUICK VIEW
             </button>
           </div>
-
-          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
-            {product.sold_out && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SOLD OUT</span>
-            )}
-            {!product.sold_out && product.price === 0 && (
-              <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>FREE</span>
-            )}
-            {!product.sold_out && badge === 'sale' && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SALE</span>
-            )}
-            {!product.sold_out && badge === 'new' && (
-              <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>NEW</span>
-            )}
-            {!product.sold_out && badge === 'featured' && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">FEATURED</span>
-            )}
-          </div>
-
-          {!product.sold_out && (
-            <div className="hidden md:block absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-          )}
-          <button
-            onClick={(e) => { e.preventDefault(); setQuickViewOpen(true) }}
-            className="hidden md:flex items-center justify-center gap-1.5 absolute bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] bg-white text-ink text-[11px] tracking-[0.1em] py-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-ink hover:text-white"
-          >
-            <MaterialIcon name="visibility" size={14} />
-            QUICK VIEW
-          </button>
         </div>
 
         <div className="p-3.5">
