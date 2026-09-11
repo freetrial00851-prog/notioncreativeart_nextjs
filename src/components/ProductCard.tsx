@@ -140,15 +140,15 @@ export function ProductCard({
           </div>
         </div>
 
-        <div className="px-3.5 pt-1.5 pb-3.5">
+        <div className="px-3.5 pt-1 pb-3">
           {skillLabel && (
-            <div className="mb-1.5">
+            <div className="mb-1">
               <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
             </div>
           )}
-          <div className="flex items-start justify-between gap-2 mb-1 min-h-[2.75em]">
-            <p className="text-[13px] font-medium leading-snug line-clamp-2 min-w-0 flex-1">{product.title}</p>
-            <ProductCardMeta product={product} reviewStats={reviewStats} className="shrink-0 mt-0.5" />
+          <div className="flex items-center justify-between gap-2 mb-0.5">
+            <p className="text-[13px] font-medium leading-snug truncate min-w-0 flex-1">{product.title}</p>
+            <ProductCardMeta product={product} reviewStats={reviewStats} className="shrink-0" />
           </div>
           <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
             {isOnSale ? (
@@ -167,7 +167,7 @@ export function ProductCard({
                 onClick={downloadFree}
                 disabled={downloadingFree}
                 aria-label="Download free"
-                className="mt-1.5 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                className="mt-1 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
                 style={{ background: 'var(--color-accent)' }}
               >
                 <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
@@ -177,7 +177,7 @@ export function ProductCard({
               <button
                 onClick={toggleCart}
                 aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
-                className="mt-1.5 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity"
+                className="mt-1 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity"
                 style={{ background: inCart ? 'var(--color-accent-hover)' : 'var(--color-accent)' }}
               >
                 <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={16} />
