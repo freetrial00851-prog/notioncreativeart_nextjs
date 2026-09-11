@@ -75,7 +75,7 @@ export function ProductCard({
     <>
       <Link
         href={`/pattern/${product.slug}`}
-        className="group block bg-white rounded-[20px] border border-line overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition-shadow"
+        className="group flex h-full flex-col bg-white rounded-[20px] border border-line overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition-shadow"
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
@@ -98,8 +98,11 @@ export function ProductCard({
               <button
                 onClick={toggleWishlist}
                 aria-label="Add to wishlist"
-                className="w-8 h-8 flex items-center justify-center rounded-full shadow-sm hover:opacity-90 transition-opacity"
-                style={{ background: 'rgba(30,30,30,0.35)' }}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-90 transition-opacity"
+                style={{
+                  background: 'rgba(30,30,30,0.5)',
+                  boxShadow: '0 0 0 1px rgba(255,255,255,0.55), 0 1px 3px rgba(0,0,0,0.22)',
+                }}
               >
                 <FavoriteIcon
                   size={15}
@@ -140,7 +143,7 @@ export function ProductCard({
           </div>
         </div>
 
-        <div className="px-3.5 pt-1 pb-3">
+        <div className="flex flex-1 flex-col px-3.5 pt-1 pb-3">
           {skillLabel && (
             <div className="mb-1">
               <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
@@ -162,28 +165,30 @@ export function ProductCard({
           </div>
 
           {!product.sold_out && (
-            product.price === 0 ? (
-              <button
-                onClick={downloadFree}
-                disabled={downloadingFree}
-                aria-label="Download free"
-                className="mt-1 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-                style={{ background: 'var(--color-accent)' }}
-              >
-                <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
-                {downloadingFree ? 'Downloading…' : 'Download Free'}
-              </button>
-            ) : (
-              <button
-                onClick={toggleCart}
-                aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
-                className="mt-1 w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity"
-                style={{ background: inCart ? 'var(--color-accent-hover)' : 'var(--color-accent)' }}
-              >
-                <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={16} />
-                {inCart ? 'In Cart' : 'Add to Cart'}
-              </button>
-            )
+            <div className="mt-auto pt-1">
+              {product.price === 0 ? (
+                <button
+                  onClick={downloadFree}
+                  disabled={downloadingFree}
+                  aria-label="Download free"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                  style={{ background: 'var(--color-accent)' }}
+                >
+                  <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
+                  {downloadingFree ? 'Downloading…' : 'Download Free'}
+                </button>
+              ) : (
+                <button
+                  onClick={toggleCart}
+                  aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity"
+                  style={{ background: inCart ? 'var(--color-accent-hover)' : 'var(--color-accent)' }}
+                >
+                  <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={16} />
+                  {inCart ? 'In Cart' : 'Add to Cart'}
+                </button>
+              )}
+            </div>
           )}
         </div>
       </Link>

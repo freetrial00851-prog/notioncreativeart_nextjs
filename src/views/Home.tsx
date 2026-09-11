@@ -638,7 +638,7 @@ export function Home({
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <div className={HOME_PRODUCT_GRID_CLASS}>
           {trending.map((p, i) => (
-            <div key={p.id} className={homeProductCardVisibilityClass(i)}>
+            <div key={p.id} className={`h-full ${homeProductCardVisibilityClass(i)}`.trim()}>
               <ProductCard product={p} priority={i < 4} reviewStats={reviewStatsMap.get(p.id)} />
             </div>
           ))}
@@ -668,7 +668,7 @@ export function Home({
         <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
         <div className={HOME_PRODUCT_GRID_CLASS}>
           {newArrivals.map((p, i) => (
-            <div key={p.id} className={homeProductCardVisibilityClass(i)}>
+            <div key={p.id} className={`h-full ${homeProductCardVisibilityClass(i)}`.trim()}>
               <ProductCard product={p} reviewStats={reviewStatsMap.get(p.id)} />
             </div>
           ))}

@@ -188,7 +188,7 @@ export function Search() {
   )
 
   return (
-    <div className="max-w-site w-full mx-auto px-6 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14">
+    <div className="max-w-site w-full mx-auto px-4 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14">
       <div className="border-b border-line pb-4 mb-8 flex items-end justify-between gap-3 md:gap-4">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
