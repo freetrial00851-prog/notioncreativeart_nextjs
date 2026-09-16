@@ -203,3 +203,10 @@ export type ReviewStats = {
   averageRating: number
   reviewCount: number
 }
+
+/** First-party storefront visit recorded for Shop Manager Views stats. */
+export type PageView = {
+  id: string
+  path: string
+  created_at: string
+}

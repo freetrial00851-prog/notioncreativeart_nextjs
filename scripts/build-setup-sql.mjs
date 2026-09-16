@@ -47,6 +47,7 @@ const ORDER = [
   'products-pdf-filename.sql',
   'abandoned-cart-reminder.sql',
   'grants-api-access.sql',
+  'page-views.sql',
   'seed-initial-data.sql',
 ]
 
