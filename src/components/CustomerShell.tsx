@@ -12,6 +12,7 @@ import { AuthSheet } from '@/components/AuthSheet'
 import { NewsletterPromptModal } from '@/components/NewsletterPromptModal'
 import { useUI } from '@/context/UIContext'
 import { ScrollToTop } from '@/components/ScrollToTop'
+import { StorefrontPageViewTracker } from '@/components/StorefrontPageViewTracker'
 
 /**
  * Customer-facing shell — header, footer, cart drawer, auth sheet.
@@ -31,6 +32,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ScrollToTop />
+      <StorefrontPageViewTracker />
       <AdminAreaGuard />
       <CartDrawer />
       <CheckoutOverlay />

@@ -9,7 +9,7 @@ import { profileDisplayName } from '../lib/profileName'
 import { useAuth } from '../context/AuthContext'
 
 type DashStats = {
-  viewsToday: number
+  views: number
   ordersToday: number
   revenueToday: number
   ordersPrev: number
@@ -75,6 +75,7 @@ export function AdminDashboard() {
         { count: totalSales },
         { data: recentOrders },
         { data: recentFavs },
+        { count: pageViewCount },
       ] = await Promise.all([
         supabase.from('products').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('active', true),
         supabase.from('products').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('active', false),
@@ -84,6 +85,7 @@ export function AdminDashboard() {
         supabase.from('purchases').select('id', { count: 'exact', head: true }),
         supabase.from('orders').select('id, customer_email, amount, currency, created_at, product_ids, status').order('created_at', { ascending: false }).limit(20),
         supabase.from('wishlist').select('id, product_id, created_at').order('created_at', { ascending: false }).limit(20),
+        supabase.from('page_views').select('id', { count: 'exact', head: true }).gte('created_at', rangeStart.toISOString()),
       ])
 
       const sumPaid = (rows: { amount: number; status: string }[] | null) =>
@@ -92,7 +94,7 @@ export function AdminDashboard() {
         (rows ?? []).filter((o) => o.status !== 'refunded').length
 
       setStats({
-        viewsToday: 0,
+        views: pageViewCount ?? 0,
         ordersToday: countPaid(rangeOrders),
         revenueToday: sumPaid(rangeOrders),
         ordersPrev: countPaid(prevOrders),
@@ -237,7 +239,8 @@ export function AdminDashboard() {
                 <option value="30d">Last 30 days</option>
               </select>
             </div>
-            <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden grid grid-cols-2 lg:grid-cols-4">
+            <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden grid grid-cols-2 lg:grid-cols-5">
+              <StatCell label="Views" value={String(stats?.views ?? '—')} />
               <StatCell label="Orders" value={String(stats?.ordersToday ?? '—')} pct={ordersPct} />
               <StatCell
                 label="Revenue"
