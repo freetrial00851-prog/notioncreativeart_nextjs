@@ -1032,6 +1032,8 @@ grant insert on table public.page_views to anon, authenticated;
 grant select on table public.page_views to authenticated;
 grant all on table public.page_views to service_role;
 
+notify pgrst, 'reload schema';
+
 
 -- ═══ seed-initial-data.sql ═══
 -- Initial seed data for notioncreativeart_nextjs (NEW independent database)
