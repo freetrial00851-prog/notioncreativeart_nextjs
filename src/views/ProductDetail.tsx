@@ -602,43 +602,21 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                   <GalleryDots count={images.length} active={activeImage} onSelect={setActiveImage} />
                 </div>
               )}
-
-              {/* Horizontal thumbnails — mobile only (<768), no side arrows */}
-              {images.length > 1 && (
-                <div className="md:hidden mt-3 flex gap-2 overflow-x-auto py-0.5" style={{ scrollbarWidth: 'none' }}>
-                  {images.map((img, i) => (
-                    <button
-                      key={`h-${img}-${i}`}
-                      type="button"
-                      onClick={() => setActiveImage(i)}
-                      className={`relative w-14 h-14 shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
-                      style={{ background: 'var(--color-surface)' }}
-                    >
-                      <Image
-                        src={deriveVariantUrl(img, 'micro')}
-                        alt={`${product.title} — photo ${i + 1}`}
-                        fill
-                        sizes="56px"
-                        className="object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* Vertical thumbnails — tablet + desktop (≥768); after main in DOM for LCP */}
+            {/* Single thumbnail strip — one Image per photo (no mobile+desktop duplicate fetches).
+                Row under stage on mobile; column left of stage on md+ (CSS order). */}
             {images.length > 1 && (
               <div
-                className="hidden md:flex flex-col gap-2.5 shrink-0 overflow-y-auto max-h-[min(78vh,720px)] py-0.5 order-2 md:order-1"
+                className="flex gap-2 overflow-x-auto mt-3 py-0.5 order-2 md:mt-0 md:flex-col md:gap-2.5 md:overflow-y-auto md:overflow-x-hidden md:max-h-[min(78vh,720px)] md:order-1 md:shrink-0"
                 style={{ scrollbarWidth: 'thin' }}
               >
                 {images.map((img, i) => (
                   <button
-                    key={`v-${img}-${i}`}
+                    key={`${img}-${i}`}
                     type="button"
                     onClick={() => setActiveImage(i)}
-                    className={`relative w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
+                    className={`relative w-14 h-14 md:w-[72px] md:h-[72px] shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${i === activeImage ? 'border-[var(--color-accent)]' : 'border-transparent'}`}
                     style={{ background: 'var(--color-surface)' }}
                   >
                     <Image
