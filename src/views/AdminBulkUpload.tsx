@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from 'react'
 import Link from 'next/link'
 import { supabase } from '../lib/supabase'
-import { processAndUploadImage, sanitizeFilename, validateImageFile } from '../lib/imageVariants'
+import { processAndUploadImage, sanitizeFilename, validateImageFile, PRODUCT_IMAGE_CACHE_CONTROL } from '../lib/imageVariants'
 import { validatePdfFile } from '../lib/uploadValidation'
 import type { Category } from '../lib/types'
 import {
@@ -156,7 +156,7 @@ export function AdminBulkUpload() {
       try {
         const result = await processAndUploadImage(file, async (path, blob) => {
           const { error } = await supabase.storage.from('product-images').upload(path, blob, {
-            cacheControl: '31536000',
+            cacheControl: PRODUCT_IMAGE_CACHE_CONTROL,
             contentType: blob.type,
           })
           if (error) throw error

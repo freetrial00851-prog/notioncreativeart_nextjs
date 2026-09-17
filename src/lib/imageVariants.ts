@@ -10,6 +10,18 @@
  *     size is a natural result of max edge + WebP quality ~75–80%.
  */
 
+/**
+ * Supabase Storage `cacheControl` for product-images uploads (seconds).
+ * Filenames are UUID-versioned variants that are not overwritten in place.
+ *
+ * Note: `curl -I` (HEAD) always reports `Cache-Control: no-cache` on the
+ * public object endpoint; a real GET returns `max-age=<this value>`.
+ * There is no separate bucket-level Cache-Control toggle — upload option
+ * is the mechanism. Alternatives if origin caching were insufficient:
+ * front the bucket with Cloudflare/Bunny, or move assets to Vercel Blob.
+ */
+export const PRODUCT_IMAGE_CACHE_CONTROL = '31536000'
+
 const SIZES = { micro: 160, thumb: 320, card: 640, large: 1000, full: 1600 } as const
 
 /** WebP quality per variant — fixed; we do not ratchet down to hit a byte cap. */

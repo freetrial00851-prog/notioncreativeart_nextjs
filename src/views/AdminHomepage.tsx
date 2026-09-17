@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { compressImage } from '../lib/imageCompress'
-import { IMAGE_MAX, validateImageFile } from '../lib/imageVariants'
+import { IMAGE_MAX, validateImageFile, PRODUCT_IMAGE_CACHE_CONTROL } from '../lib/imageVariants'
 import type {
   HeroContent,
   ChapterContent,
@@ -144,7 +144,7 @@ export function HomepageAdmin() {
       const file = await compressImage(rawFile, maxDim, 0.8)
       const path = `homepage/${tag}-${crypto.randomUUID()}-${file.name}`
       const { error } = await supabase.storage.from('product-images').upload(path, file, {
-        cacheControl: '31536000',
+        cacheControl: PRODUCT_IMAGE_CACHE_CONTROL,
         contentType: file.type || 'image/webp',
       })
       if (!error) {

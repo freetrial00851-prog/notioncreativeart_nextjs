@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { NavLink } from '@/components/NavLink'
 import { supabase } from '../lib/supabase'
-import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, IMAGE_MAX } from '../lib/imageVariants'
+import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, IMAGE_MAX, PRODUCT_IMAGE_CACHE_CONTROL } from '../lib/imageVariants'
 import { validatePdfFile } from '../lib/uploadValidation'
 import { compressImage } from '../lib/imageCompress'
 import { useAuth } from '../context/AuthContext'
@@ -346,7 +346,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       const basePath = `${crypto.randomUUID()}-${sanitizeFilename(file.name)}`
       try {
         const result = await processAndUploadImage(file, async (path, blob) => {
-          const { error } = await supabase.storage.from('product-images').upload(path, blob, { cacheControl: '31536000', contentType: blob.type })
+          const { error } = await supabase.storage.from('product-images').upload(path, blob, { cacheControl: PRODUCT_IMAGE_CACHE_CONTROL, contentType: blob.type })
           if (error) throw error
           return supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl
         }, basePath)
@@ -1222,7 +1222,7 @@ function CategoriesAdmin() {
     const compressed = await compressImage(file, IMAGE_MAX.category, 0.8)
     const path = `categories/${crypto.randomUUID()}-${compressed.name}`
     const { error: err } = await supabase.storage.from('product-images').upload(path, compressed, {
-      cacheControl: '31536000',
+      cacheControl: PRODUCT_IMAGE_CACHE_CONTROL,
       contentType: compressed.type || 'image/webp',
     })
     if (!err) {

@@ -52,8 +52,8 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1600],
     // Thumbnails / icons (next/image `sizes` in px) — keep Next defaults.
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Origin storage sometimes sends Cache-Control: no-cache; keep optimized
-    // /_next/image responses warm for a month so hero/product art isn't re-fetched every reload.
+    // Product-image GET responses already use max-age=31536000 (upload cacheControl);
+    // keep optimized /_next/image responses warm for a month as well.
     minimumCacheTTL: 60 * 60 * 24 * 30,
     // Next 16 defaults to [75] only — allowlist 85 for hero sharpness.
     qualities: [75, 85],
