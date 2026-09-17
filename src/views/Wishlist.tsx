@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useWishlist } from '../context/WishlistContext'
 import { ProductCard } from '../components/ProductCard'
+import { ListingPagination } from '../components/ListingPagination'
 import { useReviewStatsMap } from '../lib/useReviewStatsMap'
 import { EmptyState } from '../components/EmptyState'
 import { ProductGridSkeleton } from '../components/Skeleton'
@@ -52,23 +53,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
               <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />
             ))}
           </div>
-          {pageCount > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-14">
-              <button onClick={() => goToPage(page - 1)} disabled={page === 1} aria-label="Previous page" className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors">‹</button>
-              {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => goToPage(p)}
-                  aria-current={p === page ? 'page' : undefined}
-                  className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${p === page ? 'text-white' : 'border border-line hover:bg-surface'}`}
-                  style={p === page ? { background: 'var(--color-accent)' } : undefined}
-                >
-                  {p}
-                </button>
-              ))}
-              <button onClick={() => goToPage(page + 1)} disabled={page === pageCount} aria-label="Next page" className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors">›</button>
-            </div>
-          )}
+          <ListingPagination currentPage={page} pageCount={pageCount} onPageChange={goToPage} />
         </>
       )}
     </>

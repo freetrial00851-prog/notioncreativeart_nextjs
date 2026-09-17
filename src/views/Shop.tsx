@@ -9,6 +9,7 @@ import { getSubcategoriesWithCounts, type SubcategoryWithCount } from '../lib/ca
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { Product, Category } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
+import { ListingPagination } from '../components/ListingPagination'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { EmptyState } from '../components/EmptyState'
@@ -385,38 +386,7 @@ export function Shop({
                 ))}
               </div>
 
-              {pageCount > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-14">
-                  <button
-                    onClick={() => goToPage(page - 1)}
-                    disabled={page === 1}
-                    aria-label="Previous page"
-                    className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  >
-                    ‹
-                  </button>
-                  {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => goToPage(p)}
-                      aria-label={`Page ${p}`}
-                      aria-current={p === page ? 'page' : undefined}
-                      className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${p === page ? 'text-white' : 'border border-line hover:bg-surface'}`}
-                      style={p === page ? { background: 'var(--color-accent)' } : undefined}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => goToPage(page + 1)}
-                    disabled={page === pageCount}
-                    aria-label="Next page"
-                    className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  >
-                    ›
-                  </button>
-                </div>
-              )}
+              <ListingPagination currentPage={page} pageCount={pageCount} onPageChange={goToPage} />
             </>
           )}
         </div>
