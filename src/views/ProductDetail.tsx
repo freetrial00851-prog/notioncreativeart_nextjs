@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import Image from 'next/image'
+import Image, { getImageProps } from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -28,12 +28,6 @@ import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
 
-/** Stage candidates for swipe-neighbor cache warming (matches main gallery: large). */
-function gallerySrcSet(cardUrl: string) {
-  const large = deriveVariantUrl(cardUrl, 'large')
-  return `${cardUrl} 640w, ${large} 1000w`
-}
-
 /**
  * Main gallery sizes — stable across SSR and hydration.
  * Must NOT depend on useIsMobile: SSR defaults that hook to false (desktop),
@@ -43,13 +37,30 @@ function gallerySrcSet(cardUrl: string) {
 const GALLERY_LCP_SIZES =
   '(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw'
 
-/** Warm the browser cache for a gallery stage URL (and its srcset). */
+/**
+ * Warm Vercel `/_next/image` for a gallery neighbor — must match the stage
+ * `<Image>` URL (optimizer src/srcSet), not raw Supabase, or swipe stays cold.
+ */
 function preloadGalleryStage(cardUrl: string) {
-  const img = new window.Image()
-  img.decoding = 'async'
-  img.sizes = GALLERY_LCP_SIZES
-  img.srcset = gallerySrcSet(cardUrl)
-  img.src = deriveVariantUrl(cardUrl, 'large')
+  const src = deriveVariantUrl(cardUrl, 'large')
+  const { props } = getImageProps({
+    src,
+    alt: '',
+    width: 1000,
+    height: 1000,
+    sizes: GALLERY_LCP_SIZES,
+  })
+  const id = `nca-gallery-preload-${src}`
+  if (document.getElementById(id)) return
+
+  const link = document.createElement('link')
+  link.id = id
+  link.rel = 'preload'
+  link.as = 'image'
+  if (props.srcSet) link.setAttribute('imageSrcSet', props.srcSet)
+  if (props.sizes) link.setAttribute('imageSizes', props.sizes)
+  if (props.src) link.href = props.src
+  document.head.appendChild(link)
 }
 
 type DescriptionBlock = { type: 'heading' | 'check' | 'warning' | 'paragraph'; content: string }
