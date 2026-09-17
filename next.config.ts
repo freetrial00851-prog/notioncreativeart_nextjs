@@ -47,6 +47,11 @@ const nextConfig: NextConfig = {
   images: {
     // Prefer AVIF when the browser accepts it; fall back to WebP.
     formats: ['image/avif', 'image/webp'],
+    // Gallery sources top out at large≈1000 / full≈1600; stage CSS width is rarely
+    // above ~1200. Cap deviceSizes so /_next/image does not cold-encode 1920–3840.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1600],
+    // Thumbnails / icons (next/image `sizes` in px) — keep Next defaults.
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Origin storage sometimes sends Cache-Control: no-cache; keep optimized
     // /_next/image responses warm for a month so hero/product art isn't re-fetched every reload.
     minimumCacheTTL: 60 * 60 * 24 * 30,
