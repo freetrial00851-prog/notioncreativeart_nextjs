@@ -118,7 +118,7 @@ export function CartDrawer() {
                     <p className="text-[11px] mt-1 font-medium" style={{ color: 'var(--color-sale-green)' }}>Digital PDF Pattern</p>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-[13px] font-medium">
-                        {item.product?.price === 0 ? 'Free' : `$${item.product?.price.toFixed(2)}`}
+                        {(item.product?.price ?? 0) === 0 ? 'Free' : `$${(item.product?.price ?? 0).toFixed(2)}`}
                       </span>
                     </div>
                   </div>

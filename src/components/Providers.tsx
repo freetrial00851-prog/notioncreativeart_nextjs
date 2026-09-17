@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
+import { usePathname } from 'next/navigation'
 import { AuthProvider } from '@/context/AuthContext'
 import { UIProvider } from '@/context/UIContext'
 import { CartProvider } from '@/context/CartContext'
@@ -16,13 +17,22 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { TabRestoreIndicator } from '@/components/TabRestoreIndicator'
 
 /**
+ * Resets the error UI when the App Router pathname changes (e.g. browser Back)
+ * without remounting providers via a key (which would wipe auth/cart state).
+ */
+function RouteAwareErrorBoundary({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  return <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>
+}
+
+/**
  * Client-side provider tree — wraps the entire app.
  * Auth, cart, toast, and UI state must live in client context
  * because they depend on browser APIs (sessionStorage, cookies, DOM).
  */
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ErrorBoundary>
+    <RouteAwareErrorBoundary>
       <AuthProvider>
         <ToastProvider>
           <UIProvider>
@@ -43,6 +53,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
           </UIProvider>
         </ToastProvider>
       </AuthProvider>
-    </ErrorBoundary>
+    </RouteAwareErrorBoundary>
   )
 }

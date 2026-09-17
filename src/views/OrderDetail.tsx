@@ -127,7 +127,7 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
                 <Link href={item.product ? `/pattern/${item.product.slug}` : '#'} className="text-[13px] font-medium hover:underline underline-offset-2 truncate block">
                   {item.product?.title ?? 'Pattern no longer available'}
                 </Link>
-                {item.product && <p className="text-[12px] text-ink-soft mt-0.5">${item.product.price.toFixed(2)}</p>}
+                {item.product && <p className="text-[12px] text-ink-soft mt-0.5">${(item.product.price ?? 0).toFixed(2)}</p>}
               </div>
               {item.product && (
                 <button

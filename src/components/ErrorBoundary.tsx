@@ -1,8 +1,12 @@
 'use client'
 
-import { Component, type ReactNode } from 'react'
+import { Component, type ErrorInfo, type ReactNode } from 'react'
 
-type Props = { children: ReactNode }
+type Props = {
+  children: ReactNode
+  /** When this value changes after an error, the boundary resets so route Back recovers without a full reload. */
+  resetKey?: string
+}
 type State = { hasError: boolean }
 
 /**
@@ -19,8 +23,18 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true }
   }
 
-  componentDidCatch(error: unknown, info: unknown) {
-    console.error('Caught by ErrorBoundary:', error, info)
+  componentDidCatch(error: unknown, info: ErrorInfo) {
+    console.error('[ErrorBoundary]', error, info.componentStack)
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (
+      this.state.hasError &&
+      prevProps.resetKey !== this.props.resetKey &&
+      this.props.resetKey !== undefined
+    ) {
+      this.setState({ hasError: false })
+    }
   }
 
   render() {
