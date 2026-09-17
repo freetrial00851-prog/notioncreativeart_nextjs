@@ -10,6 +10,7 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { downloadFreePattern } from '../lib/downloads'
+import { isFreeProduct } from '../lib/product'
 import { useToast } from '../context/ToastContext'
 import { profileDisplayName } from '../lib/profileName'
 import { deriveVariantUrl } from '../lib/imageVariants'
@@ -55,7 +56,7 @@ export function QuickView({
   const prev = () => setActiveImage((i) => (i - 1 + images.length) % images.length)
 
   const handleBuy = async () => {
-    if (product.price === 0) {
+    if (isFreeProduct(product)) {
       if (downloadingFree) return
       setDownloadingFree(true)
       showBusyOverlay('download')
@@ -93,7 +94,7 @@ export function QuickView({
   }
 
   const toggleCart = async () => {
-    if (product.price === 0) return
+    if (isFreeProduct(product) || Number(product.price) === 0) return
     if (inCart) await removeFromCart(product.id)
     else await addToCart(product.id)
   }
@@ -176,16 +177,18 @@ export function QuickView({
             {product.title}
           </h2>
           <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-3" />
-          <div className="flex items-center gap-3 mb-3">
-            {product.price > 0 && product.compare_at_price && product.compare_at_price > product.price ? (
-              <>
-                <span className="text-base font-semibold text-ink">${product.price.toFixed(2)}</span>
-                <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price.toFixed(2)}</span>
-              </>
-            ) : (
-              <span className="text-base">{product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}</span>
-            )}
-          </div>
+          {!isFreeProduct(product) && Number(product.price) !== 0 && (
+            <div className="flex items-center gap-3 mb-3">
+              {product.compare_at_price && product.compare_at_price > product.price ? (
+                <>
+                  <span className="text-base font-semibold text-ink">${product.price.toFixed(2)}</span>
+                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price.toFixed(2)}</span>
+                </>
+              ) : (
+                <span className="text-base">${product.price.toFixed(2)}</span>
+              )}
+            </div>
+          )}
           {product.description && (
             <p className="text-[13px] text-ink-soft leading-relaxed mb-2 whitespace-pre-line">
               {product.description}
@@ -198,14 +201,14 @@ export function QuickView({
             ) : (
               <button
                 onClick={handleBuy}
-                disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
+                disabled={(isFreeProduct(product) && downloadingFree) || (product.price > 0 && buying)}
                 className="w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
-                style={{ background: product.price === 0 ? 'var(--color-sale-green)' : 'var(--color-accent)' }}
+                style={{ background: isFreeProduct(product) ? 'var(--color-sale-green)' : 'var(--color-accent)' }}
               >
-                {product.price === 0 ? 'Download free' : 'Buy now'}
+                {isFreeProduct(product) ? 'Download' : 'Buy now'}
               </button>
             )}
-            <div className={product.sold_out || product.price === 0 ? '' : 'grid grid-cols-2 gap-2'}>
+            <div className={product.sold_out || isFreeProduct(product) ? '' : 'grid grid-cols-2 gap-2'}>
               <button onClick={toggleWishlist} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full w-full">
                 {inWishlist ? '♥ WISHLISTED' : '♡ WISHLIST'}
               </button>

@@ -16,6 +16,7 @@ import { ProductTagPill } from './ProductTagPill'
 import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { downloadFreePattern } from '../lib/downloads'
+import { isFreeProduct } from '../lib/product'
 import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
 
@@ -116,7 +117,7 @@ export function ProductCard({
               {product.sold_out && (
                 <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SOLD OUT</span>
               )}
-              {!product.sold_out && product.price === 0 && (
+              {isFreeProduct(product) && (
                 <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>FREE</span>
               )}
               {!product.sold_out && badge === 'sale' && (
@@ -153,29 +154,31 @@ export function ProductCard({
             <p className="text-[13px] font-medium leading-snug truncate min-w-0 flex-1">{product.title}</p>
             <ProductCardMeta product={product} reviewStats={reviewStats} className="shrink-0" />
           </div>
-          <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
-            {isOnSale ? (
-              <>
+          {!isFreeProduct(product) && Number(product.price) !== 0 && (
+            <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
+              {isOnSale ? (
+                <>
+                  <span className="text-[15px] font-semibold text-ink">${product.price.toFixed(2)}</span>
+                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-[12px]">${product.compare_at_price!.toFixed(2)}</span>
+                </>
+              ) : (
                 <span className="text-[15px] font-semibold text-ink">${product.price.toFixed(2)}</span>
-                <span style={{ color: 'var(--color-madder)' }} className="line-through text-[12px]">${product.compare_at_price!.toFixed(2)}</span>
-              </>
-            ) : (
-              <span className="text-[15px] font-semibold text-ink">{product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}</span>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {!product.sold_out && (
             <div className="mt-auto pt-1">
-              {product.price === 0 ? (
+              {isFreeProduct(product) ? (
                 <button
                   onClick={downloadFree}
                   disabled={downloadingFree}
-                  aria-label="Download free"
+                  aria-label="Download"
                   className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
                   style={{ background: 'var(--color-accent)' }}
                 >
                   <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
-                  {downloadingFree ? 'Downloading…' : 'Download Free'}
+                  {downloadingFree ? 'Downloading…' : 'Download'}
                 </button>
               ) : (
                 <button

@@ -14,6 +14,7 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { downloadFreePattern } from '../lib/downloads'
+import { isFreeProduct } from '../lib/product'
 import { fetchProductReviewStats } from '../lib/reviews'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { ProductCard } from '../components/ProductCard'
@@ -285,7 +286,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   )
 
   const handleBuy = async () => {
-    if (product.price === 0) {
+    if (isFreeProduct(product)) {
       if (downloadingFree) return
       setDownloadingFree(true)
       showBusyOverlay('download')
@@ -325,7 +326,7 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   }
 
   const toggleCart = async () => {
-    if (!product || product.price === 0) return
+    if (!product || isFreeProduct(product) || Number(product.price) === 0) return
     if (isInCart(product.id)) await removeFromCart(product.id)
     else await addToCart(product.id)
   }
@@ -356,7 +357,6 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
   const tagItems: DetailTag[] = []
   if (category) tagItems.push({ key: 'category', label: category.name })
   if (skillLabel) tagItems.push({ key: 'skill', label: skillLabel, skillLevel: product.skill_level })
-  if (product.price === 0) tagItems.push({ key: 'free', label: 'Free' })
   if (product.is_bundle) tagItems.push({ key: 'bundle', label: 'Bundle' })
   if (badge === 'new') tagItems.push({ key: 'new', label: 'New' })
   if (badge === 'sale') tagItems.push({ key: 'sale', label: 'Sale' })
@@ -578,6 +578,11 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 )}
 
                 <div className="absolute top-3 left-3 z-10 flex gap-2 pointer-events-none">
+                  {isFreeProduct(product) && (
+                    <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-primary)' }}>
+                      FREE
+                    </span>
+                  )}
                   {badge === 'new' && (
                     <span className="text-[10px] tracking-[0.12em] font-semibold uppercase px-2.5 py-1 rounded-md text-canvas" style={{ background: 'var(--color-sale-green)' }}>
                       New
@@ -673,12 +678,12 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
                 <span className="text-2xl sm:text-[1.75rem] font-semibold text-ink">${product.price.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
                 <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price!.toFixed(2)}</span>
               </div>
-            ) : (
+            ) : product.price > 0 ? (
               <p className="text-2xl sm:text-[1.75rem] font-semibold text-ink">
-                {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
-                {product.price > 0 && <span className="text-sm font-normal text-ink-soft ml-1">USD</span>}
+                ${product.price.toFixed(2)}
+                <span className="text-sm font-normal text-ink-soft ml-1">USD</span>
               </p>
-            )}
+            ) : null}
             {product.price > 0 && (
               <p className="text-[12px] text-ink-soft leading-tight">One-time purchase</p>
             )}
@@ -709,14 +714,14 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
               )}
               <button
                 onClick={handleBuy}
-                disabled={(product.price === 0 && downloadingFree) || (product.price > 0 && buying)}
-                className={product.price === 0
+                disabled={(isFreeProduct(product) && downloadingFree) || (product.price > 0 && buying)}
+                className={isFreeProduct(product)
                   ? 'w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60'
                   : 'w-full py-3 border border-ink text-[13px] font-semibold hover:bg-surface transition-colors rounded-full disabled:opacity-60'}
-                style={product.price === 0 ? { background: 'var(--color-sale-green)' } : undefined}
+                style={isFreeProduct(product) ? { background: 'var(--color-sale-green)' } : undefined}
               >
-                {product.price === 0
-                  ? 'Download free'
+                {isFreeProduct(product)
+                  ? 'Download'
                   : 'Buy now'}
               </button>
               <div className="flex items-stretch gap-2">
@@ -856,14 +861,14 @@ export function ProductDetail({ initialProduct = null }: { initialProduct?: Prod
 
       {!product.sold_out && showStickyBar && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-canvas border-t border-line px-5 py-3">
-          {product.price === 0 ? (
+          {isFreeProduct(product) ? (
             <button
               onClick={handleBuy}
               disabled={downloadingFree}
               className="w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
               style={{ background: 'var(--color-sale-green)' }}
             >
-              Download free
+              Download
             </button>
           ) : isInCart(product.id) ? (
             <Link
