@@ -81,7 +81,7 @@ export function ProductCard({
         onTouchStart={() => prefetchProduct(product.slug)}
       >
         <div className="px-2">
-          <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
+          <div className="relative aspect-square bg-surface overflow-hidden rounded-[12px]">
             {product.images?.[0] ? (
               <Image
                 src={product.images[0]}
