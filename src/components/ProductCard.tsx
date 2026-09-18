@@ -80,8 +80,9 @@ export function ProductCard({
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
-        <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
-          {product.images?.[0] ? (
+        <div className="px-2">
+          <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
+            {product.images?.[0] ? (
               <Image
                 src={product.images[0]}
                 alt={product.title}
@@ -140,9 +141,10 @@ export function ProductCard({
               <MaterialIcon name="visibility" size={14} />
               QUICK VIEW
             </button>
+          </div>
         </div>
 
-        <div className="flex flex-1 flex-col px-3.5 pt-1 pb-3">
+        <div className="flex flex-1 flex-col px-2 pt-1 pb-3">
           {skillLabel && (
             <div className="mb-1">
               <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
