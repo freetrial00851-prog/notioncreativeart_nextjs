@@ -76,7 +76,7 @@ export function ProductCard({
     <>
       <Link
         href={`/pattern/${product.slug}`}
-        className="group flex h-full flex-col bg-white rounded-[20px] overflow-hidden"
+        className="group flex h-full flex-col rounded-[20px] overflow-hidden"
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
