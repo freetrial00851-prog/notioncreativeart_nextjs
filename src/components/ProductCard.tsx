@@ -76,13 +76,12 @@ export function ProductCard({
     <>
       <Link
         href={`/pattern/${product.slug}`}
-        className="group flex h-full flex-col bg-white rounded-[20px] border border-line overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition-shadow"
+        className="group flex h-full flex-col bg-white rounded-[20px] overflow-hidden"
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
-        <div className="p-2">
-          <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
-            {product.images?.[0] ? (
+        <div className="relative aspect-square bg-surface overflow-hidden rounded-[16px]">
+          {product.images?.[0] ? (
               <Image
                 src={product.images[0]}
                 alt={product.title}
@@ -141,7 +140,6 @@ export function ProductCard({
               <MaterialIcon name="visibility" size={14} />
               QUICK VIEW
             </button>
-          </div>
         </div>
 
         <div className="flex flex-1 flex-col px-3.5 pt-1 pb-3">
