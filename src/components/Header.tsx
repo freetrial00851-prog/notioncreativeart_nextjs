@@ -176,9 +176,9 @@ export function Header() {
         </div>
       )}
 
-      {/* ── Desktop ≥1025: logo + Categories | capped search | icons immediately after ── */}
-      <div className="hidden desktop:flex items-center gap-5 px-6 md:px-16 xl:px-24 2xl:px-32 py-3.5 max-w-site">
-        <div className="flex items-center gap-3 shrink-0">
+      {/* ── Desktop ≥1025: logo + Categories | prominent search | icons ── */}
+      <div className="hidden desktop:flex items-center gap-4 px-6 md:px-16 xl:px-24 2xl:px-32 py-3 max-w-site">
+        <div className="flex items-center gap-2 shrink-0">
           <Logo variant="full" />
           <div ref={categoriesWrapRef} className="relative">
             <button
@@ -189,7 +189,7 @@ export function Header() {
               className="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-surface transition-colors"
             >
               <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
-              <span className="text-[13px] font-medium text-ink whitespace-nowrap">Categories</span>
+              <span className="text-body font-medium text-ink whitespace-nowrap">Categories</span>
             </button>
             {categoriesOpen && (
               <DesktopCategoriesMenu
@@ -200,9 +200,8 @@ export function Header() {
           </div>
         </div>
 
-        {/* Search capped (~680px); icon group sits ~32px after it — leftover space is to the right */}
-        <div className="flex items-center gap-8 min-w-0 flex-1">
-          <div className="flex items-center gap-3 min-w-0 flex-1 max-w-[680px]">
+        <div className="flex items-center gap-5 min-w-0 flex-1">
+          <div className="flex items-center gap-3 min-w-0 flex-1 max-w-[760px]">
             <div ref={searchWrapRef} className="relative flex-1 min-w-0">
               <SearchPill
                 inputRef={desktopSearchInputRef}
@@ -211,9 +210,9 @@ export function Header() {
                 onFocus={() => setSearchFocused(true)}
                 onSubmit={submitSearch}
                 onClear={clearSearch}
-                placeholder="Search"
-                buttonSize={36}
-                iconSize={18}
+                placeholder="Search for patterns"
+                buttonSize={40}
+                iconSize={20}
               />
               {searchFocused && query && (
                 <SuggestionsDropdown
@@ -228,7 +227,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
-                className="text-[13px] text-ink-soft hover:text-ink shrink-0"
+                className="text-body text-ink-soft hover:text-ink shrink-0"
               >
                 Cancel
               </button>
@@ -290,9 +289,9 @@ export function Header() {
               onFocus={() => setSearchFocused(true)}
               onSubmit={submitSearch}
               onClear={clearSearch}
-              placeholder="Search"
-              buttonSize={34}
-              iconSize={17}
+              placeholder="Search for patterns"
+              buttonSize={36}
+              iconSize={18}
             />
             {searchFocused && query && (
               <SuggestionsDropdown
@@ -495,18 +494,18 @@ export function Header() {
           aria-hidden="true"
         />
         <div
-          className="fixed left-0 right-0 z-[46] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] overflow-y-auto desktop:hidden"
+          className="fixed left-0 right-0 z-[46] bg-white border-b border-line shadow-[0_12px_28px_rgba(0,0,0,0.12)] overflow-y-auto desktop:hidden"
           style={{ top: browsePanelTop, maxHeight: `min(78vh, calc(100vh - ${browsePanelTop}px))` }}
         >
           <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
-            <h2 className="text-[17px] font-semibold text-black tracking-[-0.02em] leading-none">
+            <h2 className="text-h3 font-semibold text-ink tracking-tight leading-none">
               Browse Categories
             </h2>
             <button
               type="button"
               aria-label="Close categories"
               onClick={closeMobileBrowse}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-ink-soft"
             >
               <MaterialIcon name="close" size={22} />
             </button>
@@ -515,7 +514,7 @@ export function Header() {
             <Link
               href="/shop/new"
               onClick={closeMobileBrowse}
-              className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
+              className="flex items-center px-5 py-3.5 text-body font-semibold text-ink leading-snug border-b border-line"
             >
               New Arrivals
             </Link>
@@ -524,12 +523,12 @@ export function Header() {
               const subs = mobileSubcategoriesCache[c.id]
               const hasSubsCached = subs !== undefined
               return (
-                <div key={c.link} className="border-b border-[#ebe8e2]">
+                <div key={c.link} className="border-b border-line">
                   <div className="flex items-stretch">
                     <Link
                       href={c.link}
                       onClick={closeMobileBrowse}
-                      className="flex-1 px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug"
+                      className="flex-1 px-5 py-3.5 text-body font-semibold text-ink leading-snug"
                     >
                       {c.name}
                     </Link>
@@ -546,7 +545,7 @@ export function Header() {
                           )
                         }
                       }}
-                      className="px-4 text-black"
+                      className="px-4 text-ink"
                     >
                       <MaterialIcon
                         name="chevron_right"
@@ -556,16 +555,16 @@ export function Header() {
                     </button>
                   </div>
                   {expanded && (
-                    <div className="bg-[#f0eee8] pb-1">
+                    <div className="bg-surface pb-1">
                       {(subs?.length ?? 0) === 0 && hasSubsCached ? (
-                        <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
+                        <p className="px-8 py-2 text-caption text-ink-soft">No subcategories</p>
                       ) : (
                         (subs ?? []).map((sub) => (
                           <Link
                             key={sub.id}
                             href={`/shop/${sub.slug}`}
                             onClick={closeMobileBrowse}
-                            className="block px-8 py-2.5 text-[15px] font-semibold text-black tracking-[-0.015em]"
+                            className="block px-8 py-2.5 text-body font-medium text-ink"
                           >
                             {sub.name}
                           </Link>
@@ -576,13 +575,13 @@ export function Header() {
                 </div>
               )
             })}
-            <Link href="/shop" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+            <Link href="/shop" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-body font-semibold text-ink leading-snug border-b border-line">
               All Patterns
             </Link>
-            <Link href="/shop?price=free" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
+            <Link href="/shop?price=free" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-body font-semibold text-ink leading-snug border-b border-line">
               Free Patterns
             </Link>
-            <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug">
+            <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-body font-semibold text-ink leading-snug">
               Sale
             </Link>
           </nav>
@@ -687,7 +686,7 @@ function SearchPill({
   leading?: React.ReactNode
 }) {
   return (
-    <form onSubmit={onSubmit} className="relative flex items-center border-2 border-ink rounded-full bg-white pl-0.5 pr-1.5 focus-within:ring-2 focus-within:ring-ink/20">
+    <form onSubmit={onSubmit} className="relative flex items-center h-12 border-2 border-ink rounded-full bg-white pl-1 pr-1.5 shadow-none focus-within:ring-2 focus-within:ring-ink/15">
       {leading}
       {leading && <div className="w-px self-stretch my-2.5 bg-line shrink-0" />}
       <input
@@ -696,7 +695,7 @@ function SearchPill({
         onChange={(e) => setQuery(e.target.value)}
         onFocus={onFocus}
         placeholder={placeholder}
-        className={`flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[14px] placeholder:text-ink-soft focus:outline-none ${leading ? 'pl-2' : 'pl-4'}`}
+        className={`flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-body placeholder:text-ink-soft focus:outline-none ${leading ? 'pl-2' : 'pl-4'}`}
       />
       {query && (
         <button type="button" onClick={onClear} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft hover:text-ink mr-1">

@@ -1,29 +1,16 @@
 import type { Metadata, Viewport } from 'next'
-import { Baloo_2, Manrope, Playfair_Display } from 'next/font/google'
+import { Baloo_2, Manrope } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
 import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
-/** Manrope — body, nav, UI. Self-hosted via next/font (no layout shift). */
+/** Manrope — body, headings, UI. Self-hosted via next/font (no layout shift). */
 const manrope = Manrope({
   subsets: ['latin'],
   variable: '--font-manrope',
   display: 'swap',
-})
-
-/**
- * Playfair Display — homepage / marketing `font-heading` only.
- * preload: false — not used above-the-fold on PDP (titles use Manrope `font-display`);
- * still available via CSS variable when a below-fold section needs it.
- */
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-playfair',
-  display: 'swap',
-  preload: false,
 })
 
 /** Baloo 2 — logo wordmark only (NCA / NotionCreativeArt). Preload kept: logo is ATF in Header. */
@@ -39,7 +26,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#FCFBF8',
+  themeColor: '#FFFFFF',
 }
 
 /** Site-wide metadata defaults — child pages override title, description, canonical, and image. */
@@ -74,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={`${manrope.variable} ${playfair.variable} ${baloo2.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${baloo2.variable}`}>
       <head>
         {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
