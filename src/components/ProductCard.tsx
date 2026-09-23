@@ -15,7 +15,6 @@ import { ProductCardMeta } from './ProductCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
-import { SITE_NAME } from '../lib/seo'
 import { MaterialIcon } from './MaterialIcon'
 import { FavoriteIcon } from './icons'
 
@@ -78,7 +77,7 @@ export function ProductCard({
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
-        <div className="relative aspect-square bg-surface overflow-hidden rounded-lg">
+        <div className="relative aspect-square bg-surface overflow-hidden rounded-lg border border-line">
           {product.images?.[0] ? (
             <Image
               src={product.images[0]}
@@ -136,7 +135,6 @@ export function ProductCard({
         </div>
 
         <div className="flex flex-1 flex-col pt-2 pb-1 gap-0.5 min-w-0">
-          <p className="text-caption text-ink-soft truncate">{SITE_NAME}</p>
           <p className="text-body font-normal text-ink leading-snug line-clamp-2">{product.title}</p>
           <ProductCardMeta product={product} reviewStats={reviewStats} className="mt-0.5" />
 

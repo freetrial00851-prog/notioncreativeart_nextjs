@@ -133,7 +133,10 @@ function SectionHeader({
   className?: string
 }) {
   return (
-    <div className={`flex items-end justify-between gap-4 mb-6 md:mb-8 ${className}`}>
+    <div
+      className={`flex items-end justify-between gap-4 mb-6 md:mb-8 pb-3 border-b ${className}`}
+      style={{ borderBottomColor: '#D0D0D0' }}
+    >
       <h2 className="font-heading font-semibold text-h2 md:text-[1.75rem] text-ink tracking-tight">{title}</h2>
       {href ? (
         <Link
@@ -144,6 +147,32 @@ function SectionHeader({
         </Link>
       ) : null}
     </div>
+  )
+}
+
+/** Hero trust/stats row — pattern count + rating from live catalog; makers is a marketing figure. */
+const HERO_STATS = [
+  { value: '122+', label: 'Patterns Live' },
+  { value: '12.8k', label: 'Makers Served' },
+  { value: '5.0/5', label: 'Avg. Rating' },
+] as const
+
+function HeroStats() {
+  return (
+    <ul className="flex flex-wrap items-center gap-x-0 gap-y-2 mt-6 list-none p-0 m-0">
+      {HERO_STATS.map((s, i) => (
+        <li key={s.label} className="flex items-center text-caption text-ink-soft leading-tight">
+          {i > 0 && (
+            <span className="mx-3 sm:mx-4 w-px h-3.5 shrink-0 bg-[#D0D0D0]" aria-hidden />
+          )}
+          <span>
+            <span className="font-semibold text-ink">{s.value}</span>
+            {' '}
+            {s.label}
+          </span>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -478,7 +507,7 @@ export function Home({
             <p className="text-body text-ink-soft leading-relaxed mb-6 max-w-md">
               Instantly download easy-to-follow crochet patterns designed with love for makers around the world.
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6 md:mb-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <Link
                 href={heroPrimaryHref(hero?.cta_link)}
                 className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-body font-semibold hover:opacity-90 transition-opacity"
@@ -495,12 +524,14 @@ export function Home({
               </Link>
             </div>
 
+            <HeroStats />
+
             <div className="md:hidden mt-6 mb-2">
               <div className="-mx-4">
                 {!heroReady ? (
-                  <div className="h-[240px] rounded-none bg-surface animate-pulse" aria-hidden />
+                  <div className="h-[220px] rounded-none bg-surface animate-pulse" aria-hidden />
                 ) : currentHeroGroup.length > 0 ? (
-                  <HeroCollage group={currentHeroGroup} className="h-[240px]" mobileBleed />
+                  <HeroCollage group={currentHeroGroup} className="h-[220px]" mobileBleed />
                 ) : null}
               </div>
               {heroReady && currentHeroGroup.length > 0 && heroGroups.length > 1 && (
@@ -513,12 +544,12 @@ export function Home({
             </div>
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden md:block self-center">
             {!heroReady ? (
-              <div className="aspect-[4/3] max-h-[380px] rounded-xl bg-surface animate-pulse" aria-hidden />
+              <div className="h-[280px] lg:h-[300px] rounded-xl bg-surface animate-pulse" aria-hidden />
             ) : currentHeroGroup.length > 0 ? (
               <>
-                <HeroCollage group={currentHeroGroup} className="aspect-[4/3] max-h-[380px]" />
+                <HeroCollage group={currentHeroGroup} className="h-[280px] lg:h-[300px]" />
                 {heroGroups.length > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-3">
                     {heroGroups.map((_, i) => (
