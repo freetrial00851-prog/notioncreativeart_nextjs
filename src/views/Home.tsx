@@ -134,14 +134,16 @@ function SectionHeader({
 }) {
   return (
     <div
-      className={`flex items-end justify-between gap-4 mb-6 md:mb-8 pb-3 border-b ${className}`}
+      className={`flex w-full justify-between items-end gap-4 border-b pb-3 mb-6 md:mb-8 ${className}`}
       style={{ borderBottomColor: '#D0D0D0' }}
     >
-      <h2 className="font-heading font-semibold text-h2 md:text-[1.75rem] text-ink tracking-tight">{title}</h2>
+      <h2 className="font-heading font-semibold text-h2 md:text-[1.75rem] text-ink tracking-tight min-w-0">
+        {title}
+      </h2>
       {href ? (
         <Link
           href={href}
-          className="shrink-0 text-caption font-semibold text-ink underline-offset-2 hover:underline pb-0.5"
+          className="shrink-0 text-caption font-semibold text-ink underline-offset-2 hover:underline"
         >
           {linkLabel}
         </Link>
@@ -159,13 +161,19 @@ const HERO_STATS = [
 
 function HeroStats() {
   return (
-    <ul className="flex flex-wrap items-center gap-x-0 gap-y-2 mt-6 list-none p-0 m-0">
+    <ul className="mt-5 tablet:mt-6 list-none p-0 m-0 flex flex-col gap-1.5 tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-0">
       {HERO_STATS.map((s, i) => (
-        <li key={s.label} className="flex items-center text-caption text-ink-soft leading-tight">
+        <li
+          key={s.label}
+          className="flex items-center text-[11px] leading-snug tablet:text-caption tablet:leading-tight text-ink-soft"
+        >
           {i > 0 && (
-            <span className="mx-3 sm:mx-4 w-px h-3.5 shrink-0 bg-[#D0D0D0]" aria-hidden />
+            <span
+              className="hidden tablet:block mx-3 md:mx-4 w-px h-3.5 shrink-0 bg-[#D0D0D0]"
+              aria-hidden
+            />
           )}
-          <span>
+          <span className="whitespace-nowrap">
             <span className="font-semibold text-ink">{s.value}</span>
             {' '}
             {s.label}
@@ -499,25 +507,30 @@ export function Home({
     hero: (
       <>
           <div>
-            <p className="text-caption font-semibold tracking-[0.14em] uppercase mb-3" style={{ color: 'var(--color-accent)' }}>{hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}</p>
-            <h1 className="font-heading font-bold text-h1 md:text-display leading-tight mb-4">
+            <p
+              className="text-[10px] tablet:text-caption font-semibold tracking-[0.12em] tablet:tracking-[0.14em] uppercase mb-2 tablet:mb-3"
+              style={{ color: 'var(--color-accent)' }}
+            >
+              {hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}
+            </p>
+            <h1 className="font-heading font-bold text-[1.75rem] leading-[1.12] tablet:text-h1 tablet:leading-tight md:text-display mb-3 tablet:mb-4">
               <span className="block text-ink">Beautiful Patterns.</span>
               <span className="block" style={{ color: 'var(--color-accent)' }}>Made for You.</span>
             </h1>
-            <p className="text-body text-ink-soft leading-relaxed mb-6 max-w-md">
+            <p className="text-[13px] leading-relaxed tablet:text-body text-ink-soft mb-4 tablet:mb-6 max-w-md">
               Instantly download easy-to-follow crochet patterns designed with love for makers around the world.
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex flex-col tablet:flex-row tablet:items-center gap-2.5 tablet:gap-3">
               <Link
                 href={heroPrimaryHref(hero?.cta_link)}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-body font-semibold hover:opacity-90 transition-opacity"
+                className="w-full tablet:w-auto text-center px-5 tablet:px-6 py-2.5 tablet:py-3 rounded-full text-white text-[13px] tablet:text-body font-semibold hover:opacity-90 transition-opacity"
                 style={{ background: 'var(--color-accent)' }}
               >
                 {(hero?.cta_text || 'Shop Patterns').replace(/\s*→\s*$/, '')} →
               </Link>
               <Link
                 href={heroSecondaryHref(hero?.secondary_cta_link)}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-body font-semibold border bg-white hover:bg-surface transition-colors"
+                className="w-full tablet:w-auto text-center px-5 tablet:px-6 py-2.5 tablet:py-3 rounded-full text-[13px] tablet:text-body font-semibold border bg-white hover:bg-surface transition-colors"
                 style={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
               >
                 {hero?.secondary_cta_text || 'Explore Free Patterns'}
@@ -526,12 +539,12 @@ export function Home({
 
             <HeroStats />
 
-            <div className="md:hidden mt-6 mb-2">
+            <div className="md:hidden mt-5 mb-2">
               <div className="-mx-4">
                 {!heroReady ? (
-                  <div className="h-[220px] rounded-none bg-surface animate-pulse" aria-hidden />
+                  <div className="h-[200px] rounded-none bg-surface animate-pulse" aria-hidden />
                 ) : currentHeroGroup.length > 0 ? (
-                  <HeroCollage group={currentHeroGroup} className="h-[220px]" mobileBleed />
+                  <HeroCollage group={currentHeroGroup} className="h-[200px]" mobileBleed />
                 ) : null}
               </div>
               {heroReady && currentHeroGroup.length > 0 && heroGroups.length > 1 && (
