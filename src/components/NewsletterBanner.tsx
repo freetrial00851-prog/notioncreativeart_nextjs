@@ -15,13 +15,13 @@ import { subscribeToNewsletter } from '../lib/newsletter'
 export function NewsletterBanner(_props: { image?: string; standalone?: boolean }) {
   const card = (
     <div
-      className="rounded-xl px-6 py-8 md:px-10 md:py-10 flex flex-col text-center gap-5 md:text-left md:gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8 text-white"
+      className="rounded-2xl px-8 py-10 md:px-14 md:py-12 flex flex-col text-center gap-6 md:text-left md:gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8 text-white"
       style={{ background: 'var(--color-primary)' }}
     >
       <div className="min-w-0 w-full lg:flex-1">
-        <p className="text-caption tracking-[0.14em] uppercase opacity-70 mb-2">Join our maker community</p>
-        <h2 className="font-heading font-semibold text-h2 md:text-[1.75rem] mb-2 tracking-tight">Get 10% Off Your Next Order</h2>
-        <p className="text-body opacity-80 leading-relaxed max-w-sm mx-auto md:mx-0 md:max-w-none lg:max-w-sm">
+        <p className="text-[10px] tracking-[0.2em] opacity-70 mb-2">JOIN OUR MAKER COMMUNITY</p>
+        <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2 md:mb-3">Get 10% Off Your Next Order</h2>
+        <p className="text-[14px] opacity-80 leading-relaxed max-w-sm mx-auto md:mx-0 md:max-w-none lg:max-w-sm">
           Get exclusive patterns, tips, new releases and special offers directly to your inbox.
         </p>
       </div>
@@ -31,7 +31,7 @@ export function NewsletterBanner(_props: { image?: string; standalone?: boolean 
 
   if (_props.standalone) {
     return (
-      <section className="max-w-site px-4 md:px-16 py-10 md:py-14">
+      <section className="max-w-site px-6 md:px-16 py-3.5 md:py-5">
         {card}
       </section>
     )

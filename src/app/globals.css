@@ -6,24 +6,22 @@
      Everything below this block is an alias pointing back to these. */
   --color-primary: #111111;
   --color-primary-hover: #000000;
-  --color-primary-soft: #F2F2F2;
+  --color-primary-soft: #EDEDED;
   --color-accent: #1f249c;
   --color-accent-hover: #191d7d;
   --color-accent-soft: #e9eaf5;
   --color-logo-accent: #D68A3E;
   --color-secondary: #6F8760;
-  --color-secondary-soft: #F0F2EF;
-  /* Near-black ink + mid-grey soft — crisp marketplace contrast */
-  --color-text: #222222;
-  --color-muted: #595959;
-  --color-muted-light: #8C8C8C;
-  /* Clean white + light neutral grey (no cream/beige) */
-  --color-background: #FFFFFF;
-  --color-surface: #F5F5F5;
+  --color-secondary-soft: #EEF2E8;
+  --color-text: #1F2933;
+  --color-muted: #5B6472;
+  --color-muted-light: #9AA1A9;
+  --color-background: #FCFBF8;
+  --color-surface: #F8F4ED;
   --color-surface-card: #FFFFFF;
-  --color-border: #E1E3E1;
+  --color-border: #E7E1D8;
   /* Pulse placeholders — contrasts with both --color-background and --color-surface bands */
-  --color-skeleton: #E8E8E8;
+  --color-skeleton: #E5DFD4;
   --color-sale: #E24B4A;
   --color-sale-dark: #C13332;
   --color-error: #B94A48;
@@ -53,27 +51,12 @@
   --color-skill-advanced-soft: #F5BFA8;
   --color-skill-advanced-ink: #96331C;
 
-  /* Single sans stack site-wide (Baloo 2 reserved for logo only) */
   --font-display: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-subheading: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: var(--font-manrope), system-ui, sans-serif;
-  --font-heading: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: var(--font-playfair), Georgia, serif;
   --font-logo: var(--font-baloo-2), 'Baloo 2', system-ui, sans-serif;
-
-  /* Type scale — use text-display / text-h1 / text-h2 / text-h3 / text-body / text-caption */
-  --text-display: 2.5rem;
-  --text-display--line-height: 1.1;
-  --text-h1: 2rem;
-  --text-h1--line-height: 1.15;
-  --text-h2: 1.5rem;
-  --text-h2--line-height: 1.25;
-  --text-h3: 1.125rem;
-  --text-h3--line-height: 1.35;
-  --text-body: 0.875rem;
-  --text-body--line-height: 1.5;
-  --text-caption: 0.75rem;
-  --text-caption--line-height: 1.4;
 
   /* Shared page column — Header, Home, Shop, Product, Footer, etc. use max-w-site */
   --max-width-site: 1600px;
@@ -113,8 +96,6 @@ html { background: var(--color-canvas); overflow-x: hidden; }
 body {
   margin: 0;
   font-family: var(--font-body);
-  font-size: var(--text-body);
-  line-height: var(--text-body--line-height);
   color: var(--color-ink);
   background: var(--color-canvas);
   -webkit-font-smoothing: antialiased;

@@ -3,7 +3,7 @@
 import { MaterialIcon } from './MaterialIcon'
 
 const STAR_FILLED = 'var(--color-accent)'
-const STAR_EMPTY = '#D4D4D4'
+const STAR_EMPTY = '#C4BDB0'
 
 type StarRatingProps = {
   value: number

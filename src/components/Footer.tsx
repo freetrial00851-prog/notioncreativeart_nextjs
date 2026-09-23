@@ -9,14 +9,13 @@ import { getCategoriesWithProducts } from '../lib/categories'
 import type { SocialContent, CategoryContent } from '../lib/types'
 import { MaterialIcon } from './MaterialIcon'
 
-const FOOTER_BG = 'var(--color-background)'
-const FOOTER_GREEN = 'var(--color-accent)'
-const FOOTER_TEXT = 'var(--color-ink)'
-const FOOTER_MUTED = 'var(--color-ink-soft)'
-/** Digital-products band subtitle */
-const FOOTER_BAND_SUBTITLE = 'var(--color-ink-soft)'
-const FOOTER_BORDER = 'var(--color-line)'
-const FOOTER_BAND_BG = 'var(--color-surface)'
+const FOOTER_BG = '#FCFBF8'
+const FOOTER_GREEN = '#1f249c'
+const FOOTER_TEXT = '#202720'
+const FOOTER_MUTED = '#667066'
+/** Digital-products band subtitle only — darker than FOOTER_MUTED for #EFEBDD contrast */
+const FOOTER_BAND_SUBTITLE = '#4F5850'
+const FOOTER_BORDER = '#E3E6E0'
 
 const SHOP_LINKS = [
   { label: 'All Patterns', to: '/shop' },
@@ -81,7 +80,7 @@ function BrandColumn() {
         Beautiful crochet patterns for makers of all skill levels. Instant digital downloads. Create something wonderful.
       </p>
       <SocialRow />
-      <div className="flex items-center gap-3 mt-5 rounded-xl px-4 py-3" style={{ background: FOOTER_BAND_BG, border: `1px solid ${FOOTER_BORDER}` }}>
+      <div className="flex items-center gap-3 mt-5 rounded-xl px-4 py-3" style={{ background: '#EFEBDD', border: `1px solid ${FOOTER_BORDER}` }}>
         <DownloadIcon />
         <div className="min-w-0">
           <p className="text-[13px] font-semibold" style={{ color: FOOTER_TEXT }}>Digital Products</p>
@@ -128,8 +127,8 @@ function SocialRow() {
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-caption font-bold tracking-wide uppercase mb-4" style={{ color: FOOTER_TEXT }}>{title}</p>
-      <ul className="space-y-2.5 text-body" style={{ color: FOOTER_MUTED }}>{children}</ul>
+      <p className="text-[12px] font-bold tracking-wide mb-4" style={{ color: FOOTER_TEXT }}>{title}</p>
+      <ul className="space-y-2.5 text-[13px]" style={{ color: FOOTER_MUTED }}>{children}</ul>
     </div>
   )
 }

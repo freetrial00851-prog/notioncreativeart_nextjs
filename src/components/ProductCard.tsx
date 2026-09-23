@@ -12,6 +12,8 @@ import { useToast } from '../context/ToastContext'
 import { useState } from 'react'
 import { QuickView } from './QuickView'
 import { ProductCardMeta } from './ProductCardMeta'
+import { ProductTagPill } from './ProductTagPill'
+import { skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
@@ -68,107 +70,124 @@ export function ProductCard({
 
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
   const badge = product.card_badge
+  const skillLabel = skillLevelTagLabel(product.skill_level)
 
   return (
     <>
       <Link
         href={`/pattern/${product.slug}`}
-        className="group flex h-full flex-col"
+        className="group flex h-full flex-col rounded-[20px] overflow-hidden"
         onMouseEnter={() => prefetchProduct(product.slug)}
         onTouchStart={() => prefetchProduct(product.slug)}
       >
-        <div className="relative aspect-square bg-surface overflow-hidden rounded-lg border border-line">
-          {product.images?.[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.title}
-              fill
-              sizes="(max-width: 768px) 50vw, 20vw"
-              priority={priority}
-              className={`object-cover transition-transform duration-500 group-hover:scale-[1.03] ${product.sold_out ? 'opacity-50' : ''}`}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-ink-soft text-caption">No image yet</div>
-          )}
-
-          <div className="absolute top-2 right-2 z-[1]">
-            <button
-              onClick={toggleWishlist}
-              aria-label="Add to wishlist"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors"
-            >
-              <FavoriteIcon
-                size={15}
-                filled={inWishlist}
-                color={inWishlist ? 'var(--color-madder)' : 'var(--color-ink)'}
+        <div className="px-2">
+          <div className="relative aspect-square bg-surface overflow-hidden rounded-[12px]">
+            {product.images?.[0] ? (
+              <Image
+                src={product.images[0]}
+                alt={product.title}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                priority={priority}
+                className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${product.sold_out ? 'opacity-50' : ''}`}
               />
-            </button>
-          </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs">No image yet</div>
+            )}
 
-          <div className="absolute top-2 left-2 flex flex-col gap-1 items-start z-[1]">
-            {product.sold_out && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-0.5 rounded">SOLD OUT</span>
-            )}
-            {isFreeProduct(product) && (
-              <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-0.5 rounded" style={{ background: 'var(--color-accent)' }}>FREE</span>
-            )}
-            {!product.sold_out && badge === 'sale' && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-0.5 rounded">SALE</span>
-            )}
-            {!product.sold_out && badge === 'new' && (
-              <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-0.5 rounded" style={{ background: 'var(--color-accent)' }}>NEW</span>
-            )}
-            {!product.sold_out && badge === 'featured' && (
-              <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-0.5 rounded">FEATURED</span>
-            )}
-          </div>
+            <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
+              <button
+                onClick={toggleWishlist}
+                aria-label="Add to wishlist"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:opacity-90 transition-opacity"
+                style={{
+                  background: 'rgba(30,30,30,0.5)',
+                  boxShadow: '0 0 0 1px rgba(255,255,255,0.55), 0 1px 3px rgba(0,0,0,0.22)',
+                }}
+              >
+                <FavoriteIcon
+                  size={15}
+                  filled={inWishlist}
+                  color={inWishlist ? 'var(--color-madder)' : '#FFFFFF'}
+                />
+              </button>
+            </div>
 
-          {!product.sold_out && (
+            <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
+              {product.sold_out && (
+                <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SOLD OUT</span>
+              )}
+              {isFreeProduct(product) && (
+                <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>FREE</span>
+              )}
+              {!product.sold_out && badge === 'sale' && (
+                <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">SALE</span>
+              )}
+              {!product.sold_out && badge === 'new' && (
+                <span className="text-[10px] font-semibold tracking-wide text-white px-2 py-1 rounded-full" style={{ background: 'var(--color-primary)' }}>NEW</span>
+              )}
+              {!product.sold_out && badge === 'featured' && (
+                <span className="text-[10px] font-semibold tracking-wide bg-ink text-white px-2 py-1 rounded-full">FEATURED</span>
+              )}
+            </div>
+
+            {!product.sold_out && (
+              <div className="hidden md:block absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            )}
             <button
               onClick={(e) => { e.preventDefault(); setQuickViewOpen(true) }}
-              className="hidden md:flex items-center justify-center gap-1.5 absolute bottom-2 left-1/2 -translate-x-1/2 w-[calc(100%-16px)] bg-white text-ink text-caption font-semibold py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-ink hover:text-white"
+              className="hidden md:flex items-center justify-center gap-1.5 absolute bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] bg-white text-ink text-[11px] tracking-[0.1em] py-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-ink hover:text-white"
             >
               <MaterialIcon name="visibility" size={14} />
-              Quick view
+              QUICK VIEW
             </button>
-          )}
+          </div>
         </div>
 
-        <div className="flex flex-1 flex-col pt-2 pb-1 gap-0.5 min-w-0">
-          <p className="text-body font-normal text-ink leading-snug line-clamp-2">{product.title}</p>
-          <ProductCardMeta product={product} reviewStats={reviewStats} className="mt-0.5" />
-
-          {isFreeProduct(product) || Number(product.price) === 0 ? (
-            <p className="text-body font-bold text-ink mt-0.5">Free</p>
-          ) : (
-            <div className="flex items-baseline gap-1.5 mt-0.5 min-w-0">
-              <span className="text-body font-bold text-ink">${product.price.toFixed(2)}</span>
-              {isOnSale && (
-                <span className="text-caption text-ink-soft line-through">${product.compare_at_price!.toFixed(2)}</span>
+        <div className="flex flex-1 flex-col px-2 pt-1 pb-3">
+          {skillLabel && (
+            <div className="mb-1">
+              <ProductTagPill label={skillLabel} skillLevel={product.skill_level} compact />
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2 mb-0.5">
+            <p className="text-[13px] font-medium leading-snug truncate min-w-0 flex-1">{product.title}</p>
+            <ProductCardMeta product={product} reviewStats={reviewStats} className="shrink-0" />
+          </div>
+          {!isFreeProduct(product) && Number(product.price) !== 0 && (
+            <div className="flex items-baseline gap-1.5 text-[13px] min-w-0">
+              {isOnSale ? (
+                <>
+                  <span className="text-[15px] font-semibold text-ink">${product.price.toFixed(2)}</span>
+                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-[12px]">${product.compare_at_price!.toFixed(2)}</span>
+                </>
+              ) : (
+                <span className="text-[15px] font-semibold text-ink">${product.price.toFixed(2)}</span>
               )}
             </div>
           )}
 
           {!product.sold_out && (
-            <div className="mt-auto pt-2">
+            <div className="mt-auto pt-1">
               {isFreeProduct(product) ? (
                 <button
                   onClick={downloadFree}
                   disabled={downloadingFree}
                   aria-label="Download"
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2 text-caption font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
                   style={{ background: 'var(--color-accent)' }}
                 >
-                  <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={14} />
+                  <MaterialIcon name={downloadingFree ? 'hourglass_empty' : 'download'} size={16} />
                   {downloadingFree ? 'Downloading…' : 'Download'}
                 </button>
               ) : (
                 <button
                   onClick={toggleCart}
                   aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2 text-caption font-semibold border border-line bg-white text-ink hover:border-ink transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-[12px] font-semibold text-white hover:opacity-90 transition-opacity"
+                  style={{ background: inCart ? 'var(--color-accent-hover)' : 'var(--color-accent)' }}
                 >
-                  <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={14} />
+                  <MaterialIcon name={inCart ? 'check' : 'shopping_bag'} size={16} />
                   {inCart ? 'In Cart' : 'Add to Cart'}
                 </button>
               )}

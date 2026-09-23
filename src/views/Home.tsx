@@ -120,70 +120,6 @@ function heroSecondaryHref(link: string | undefined) {
   return raw
 }
 
-/** Shared section title + optional “See all” link — left-aligned marketplace pattern. */
-function SectionHeader({
-  title,
-  href,
-  linkLabel = 'See all',
-  className = '',
-}: {
-  title: string
-  href?: string
-  linkLabel?: string
-  className?: string
-}) {
-  return (
-    <div
-      className={`flex w-full justify-between items-end gap-4 border-b pb-3 mb-6 md:mb-8 ${className}`}
-      style={{ borderBottomColor: '#D0D0D0' }}
-    >
-      <h2 className="font-heading font-semibold text-h2 md:text-[1.75rem] text-ink tracking-tight min-w-0">
-        {title}
-      </h2>
-      {href ? (
-        <Link
-          href={href}
-          className="shrink-0 text-caption font-semibold text-ink underline-offset-2 hover:underline"
-        >
-          {linkLabel}
-        </Link>
-      ) : null}
-    </div>
-  )
-}
-
-/** Hero trust/stats row — pattern count + rating from live catalog; makers is a marketing figure. */
-const HERO_STATS = [
-  { value: '122+', label: 'Patterns Live' },
-  { value: '12.8k', label: 'Makers Served' },
-  { value: '5.0/5', label: 'Avg. Rating' },
-] as const
-
-function HeroStats() {
-  return (
-    <ul className="mt-5 tablet:mt-6 list-none p-0 m-0 flex flex-col gap-1.5 tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-0">
-      {HERO_STATS.map((s, i) => (
-        <li
-          key={s.label}
-          className="flex items-center text-[11px] leading-snug tablet:text-caption tablet:leading-tight text-ink-soft"
-        >
-          {i > 0 && (
-            <span
-              className="hidden tablet:block mx-3 md:mx-4 w-px h-3.5 shrink-0 bg-[#D0D0D0]"
-              aria-hidden
-            />
-          )}
-          <span className="whitespace-nowrap">
-            <span className="font-semibold text-ink">{s.value}</span>
-            {' '}
-            {s.label}
-          </span>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 /** Start With Free — staggered photo stack; 1 / 2 / 3–4 by breakpoint. */
 function FreePatternsCollage({ products }: { products: Product[] }) {
   const shots = products
@@ -192,7 +128,7 @@ function FreePatternsCollage({ products }: { products: Product[] }) {
   if (shots.length === 0) return null
 
   const card =
-    'absolute rounded-lg overflow-hidden border border-line bg-white cursor-pointer transition-shadow hover:shadow-md group'
+    'absolute rounded-xl overflow-hidden border border-line bg-surface shadow-[0_8px_24px_rgba(0,0,0,0.08)] cursor-pointer transition-shadow hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] group'
 
   return (
     <div className="relative w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[180px] md:h-[200px] shrink-0 mx-auto sm:mx-0">
@@ -307,7 +243,7 @@ function HeroCollage({
   mobileBleed?: boolean
 }) {
   const gap = mobileBleed ? 'gap-0' : 'gap-3'
-  const tileRadius = mobileBleed ? 'rounded-none' : 'rounded-xl'
+  const tileRadius = mobileBleed ? 'rounded-none' : 'rounded-[18px]'
 
   if (group.length >= 3) {
     return (
@@ -507,66 +443,61 @@ export function Home({
     hero: (
       <>
           <div>
-            <p
-              className="text-[10px] tablet:text-caption font-semibold tracking-[0.12em] tablet:tracking-[0.14em] uppercase mb-2 tablet:mb-3"
-              style={{ color: 'var(--color-accent)' }}
-            >
-              {hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}
-            </p>
-            <h1 className="font-heading font-bold text-[1.75rem] leading-[1.12] tablet:text-h1 tablet:leading-tight md:text-display mb-3 tablet:mb-4">
+            <p className="text-[11px] font-semibold tracking-[0.2em] mb-4" style={{ color: 'var(--color-accent)' }}>{hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}</p>
+            <h1 className="font-heading font-semibold text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5">
               <span className="block text-ink">Beautiful Patterns.</span>
               <span className="block" style={{ color: 'var(--color-accent)' }}>Made for You.</span>
             </h1>
-            <p className="text-[13px] leading-relaxed tablet:text-body text-ink-soft mb-4 tablet:mb-6 max-w-md">
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-7 max-w-md">
               Instantly download easy-to-follow crochet patterns designed with love for makers around the world.
             </p>
-            <div className="flex flex-col tablet:flex-row tablet:items-center gap-2.5 tablet:gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
               <Link
                 href={heroPrimaryHref(hero?.cta_link)}
-                className="w-full tablet:w-auto text-center px-5 tablet:px-6 py-2.5 tablet:py-3 rounded-full text-white text-[13px] tablet:text-body font-semibold hover:opacity-90 transition-opacity"
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
                 style={{ background: 'var(--color-accent)' }}
               >
                 {(hero?.cta_text || 'Shop Patterns').replace(/\s*→\s*$/, '')} →
               </Link>
               <Link
                 href={heroSecondaryHref(hero?.secondary_cta_link)}
-                className="w-full tablet:w-auto text-center px-5 tablet:px-6 py-2.5 tablet:py-3 rounded-full text-[13px] tablet:text-body font-semibold border bg-white hover:bg-surface transition-colors"
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-[13px] font-semibold border bg-white hover:bg-surface transition-colors"
                 style={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
               >
                 {hero?.secondary_cta_text || 'Explore Free Patterns'}
               </Link>
             </div>
 
-            <HeroStats />
-
-            <div className="md:hidden mt-5 mb-2">
-              <div className="-mx-4">
+            {/* Mobile: full-bleed collage (breaks out of SectionBand px-6); desktop column unchanged */}
+            <div className="md:hidden mb-8">
+              <div className="-mx-6">
                 {!heroReady ? (
-                  <div className="h-[200px] rounded-none bg-surface animate-pulse" aria-hidden />
+                  <div className="h-[280px] rounded-none bg-surface animate-pulse" aria-hidden />
                 ) : currentHeroGroup.length > 0 ? (
-                  <HeroCollage group={currentHeroGroup} className="h-[200px]" mobileBleed />
+                  <HeroCollage group={currentHeroGroup} mobileBleed />
                 ) : null}
               </div>
               {heroReady && currentHeroGroup.length > 0 && heroGroups.length > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-3">
                   {heroGroups.map((_, i) => (
-                    <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-muted-light)' }} />
+                    <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
                   ))}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="hidden md:block self-center">
+          {/* Desktop: collage lives in the right column */}
+          <div className="hidden md:block">
             {!heroReady ? (
-              <div className="h-[280px] lg:h-[300px] rounded-xl bg-surface animate-pulse" aria-hidden />
+              <div className="h-[420px] rounded-[18px] bg-surface animate-pulse" aria-hidden />
             ) : currentHeroGroup.length > 0 ? (
               <>
-                <HeroCollage group={currentHeroGroup} className="h-[280px] lg:h-[300px]" />
+                <HeroCollage group={currentHeroGroup} className="h-[420px]" />
                 {heroGroups.length > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-3">
+                  <div className="flex items-center justify-center gap-2 mt-4">
                     {heroGroups.map((_, i) => (
-                      <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : 'var(--color-muted-light)' }} />
+                      <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
                     ))}
                   </div>
                 )}
@@ -576,33 +507,39 @@ export function Home({
       </>
     ),
     trust: (
-      <div className="bg-white border border-line rounded-xl px-3 md:px-8 py-4 flex flex-nowrap items-start md:items-center justify-between md:justify-center gap-2 md:gap-x-12">
+      <div className="bg-white border border-line rounded-xl px-4 md:px-10 py-5 flex flex-nowrap items-start md:items-center justify-between md:justify-center gap-2 md:gap-x-12">
           {[
             { icon: 'bolt', label: 'Instant Digital Access' },
             { icon: 'verified', label: 'Guaranteed Quality' },
             { icon: 'lock', label: 'Secure Payment' },
           ].map((s) => (
-            <div key={s.label} className="flex-1 md:flex-initial flex flex-col md:flex-row items-center text-center md:text-left gap-1.5 md:gap-3">
-              <MaterialIcon name={s.icon} size={20} color="var(--color-accent)" />
-              <p className="text-caption md:text-body font-semibold leading-tight md:whitespace-nowrap">{s.label}</p>
+            <div key={s.label} className="flex-1 md:flex-initial flex flex-col md:flex-row items-center md:items-center text-center md:text-left gap-1.5 md:gap-3">
+              <MaterialIcon name={s.icon} size={20} color="var(--color-primary)" />
+              <p className="text-[11px] md:text-[14px] font-semibold leading-tight md:whitespace-nowrap">{s.label}</p>
             </div>
           ))}
       </div>
     ),
     categories: !catalogReady ? (
       <div aria-hidden>
-        <SectionHeader title="Shop by Category" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Shop by Category</h2>
         <CategoryRowSkeleton count={6} />
       </div>
     ) : categories.length > 0 ? (
       <div>
-        <SectionHeader title="Shop by Category" href="/shop" linkLabel="View all" />
+        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
+        <div className="relative mb-10">
+          <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl">Shop by Category</h2>
+          <Link href="/shop" className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 text-[11px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-60">
+            VIEW ALL CATEGORIES →
+          </Link>
+        </div>
         <div className="relative">
           {categories.length > 4 && (
             <button
               onClick={() => categoryScrollRef.current?.scrollBy({ left: -240, behavior: 'smooth' })}
               aria-label="Scroll categories left"
-              className="flex absolute -left-2 md:-left-4 top-[42px] -translate-y-1/2 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white border border-line items-center justify-center hover:bg-surface"
+              className="flex absolute -left-2 md:-left-4 top-[42px] -translate-y-1/2 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-canvas border border-line items-center justify-center shadow-sm hover:bg-surface"
             >
               <MaterialIcon name="chevron_left" size={18} />
             </button>
@@ -619,8 +556,8 @@ export function Home({
                     </div>
                   )}
                 </div>
-                <p className="font-medium text-body">{c.name}</p>
-                <p className="text-caption text-ink-soft mt-0.5">{c.count > 0 ? `${c.count}+ Patterns` : '0 Patterns'}</p>
+                <p className="font-medium text-[13px]">{c.name}</p>
+                <p className="text-[11px] text-ink-soft mt-0.5">{c.count > 0 ? `${c.count}+ Patterns` : '0 Patterns'}</p>
               </Link>
             ))}
           </div>
@@ -628,7 +565,7 @@ export function Home({
             <button
               onClick={() => categoryScrollRef.current?.scrollBy({ left: 240, behavior: 'smooth' })}
               aria-label="Scroll categories right"
-              className="flex absolute -right-2 md:-right-4 top-[42px] -translate-y-1/2 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white border border-line items-center justify-center hover:bg-surface"
+              className="flex absolute -right-2 md:-right-4 top-[42px] -translate-y-1/2 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-canvas border border-line items-center justify-center shadow-sm hover:bg-surface"
             >
               <MaterialIcon name="chevron_right" size={18} />
             </button>
@@ -638,18 +575,19 @@ export function Home({
     ) : null,
     chapters: !catalogReady ? (
       <div aria-hidden>
-        <SectionHeader title="Skill Level Chapters" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
         <ChaptersSkeleton count={3} />
       </div>
     ) : chapters.length > 0 ? (
       <div>
-        <SectionHeader title="Skill Level Chapters" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {chapters.map((c) => (
               <Link
                 key={c.title}
                 href={c.link}
-                className="group flex flex-row md:flex-col bg-white rounded-xl border border-line overflow-hidden hover:border-ink/20 transition-colors"
+                className="group flex flex-row md:flex-col bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
               >
                 <div className="relative w-28 sm:w-32 shrink-0 aspect-square md:w-full md:aspect-[4/3] bg-surface overflow-hidden">
                   {c.image && (
@@ -657,19 +595,19 @@ export function Home({
                       src={c.image}
                       alt={c.title}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   )}
                 </div>
-                <div className="flex-1 min-w-0 p-4 md:p-5 flex flex-col">
-                  <h3 className="font-heading font-semibold text-h3 mb-1.5">{c.title}</h3>
-                  <div className="mb-2">
+                <div className="flex-1 min-w-0 p-4 md:p-6 flex flex-col">
+                  <h3 className="font-display font-semibold text-lg md:text-xl mb-1.5 md:mb-2">{c.title}</h3>
+                  <div className="mb-2 md:mb-3">
                     <SkillDifficultyDots level={c.level} />
                   </div>
-                  <p className="text-body text-ink-soft leading-relaxed mb-3 line-clamp-3 md:line-clamp-none">
+                  <p className="text-[13px] md:text-[14px] text-ink-soft leading-relaxed mb-3 md:mb-4 line-clamp-3 md:line-clamp-none">
                     {c.copy}
                   </p>
-                  <span className="text-caption font-semibold mt-auto" style={{ color: 'var(--color-accent)' }}>
+                  <span className="text-[12px] font-semibold mt-auto" style={{ color: 'var(--color-accent)' }}>
                     Explore →
                   </span>
                 </div>
@@ -680,26 +618,24 @@ export function Home({
     ) : null,
     trending: !catalogReady ? (
       <div>
-        <SectionHeader title="Featured Items" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <ProductGridSkeleton variant="featured" count={6} />
       </div>
     ) : featuredError ? (
-      <div>
-        <SectionHeader title="Featured Items" />
-        <p className="text-body text-ink-soft mb-5 text-center">Couldn&apos;t load featured items. Please try again.</p>
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={retryFeaturedCatalog}
-            className="inline-block px-6 py-2.5 rounded-full border text-body font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
-          >
-            Try again
-          </button>
-        </div>
+      <div className="text-center py-4">
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
+        <p className="text-[14px] text-ink-soft mb-5">Couldn&apos;t load featured items. Please try again.</p>
+        <button
+          type="button"
+          onClick={retryFeaturedCatalog}
+          className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+        >
+          Try again
+        </button>
       </div>
     ) : trending.length > 0 ? (
       <div>
-        <SectionHeader title="Featured Items" href="/shop/bestsellers" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
         <div className={HOME_PRODUCT_GRID_CLASS}>
           {trending.map((p, i) => (
             <div key={p.id} className={`h-full ${homeProductCardVisibilityClass(i)}`.trim()}>
@@ -707,21 +643,29 @@ export function Home({
             </div>
           ))}
         </div>
+        <div className="text-center mt-10">
+          <Link
+            href="/shop/bestsellers"
+            className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+          >
+            View all
+          </Link>
+        </div>
       </div>
     ) : (
-      <div>
-        <SectionHeader title="Featured Items" />
-        <p className="text-body text-ink-soft text-center">No featured items yet.</p>
+      <div className="text-center py-6">
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
+        <p className="text-[14px] text-ink-soft">No featured items yet.</p>
       </div>
     ),
     new_arrivals: !catalogReady ? (
       <div aria-hidden>
-        <SectionHeader title="New Arrivals" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
         <ProductGridSkeleton variant="newArrivals" count={6} />
       </div>
     ) : newArrivals.length > 0 ? (
       <div>
-        <SectionHeader title="New Arrivals" href="/shop/new" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
         <div className={HOME_PRODUCT_GRID_CLASS}>
           {newArrivals.map((p, i) => (
             <div key={p.id} className={`h-full ${homeProductCardVisibilityClass(i)}`.trim()}>
@@ -729,13 +673,21 @@ export function Home({
             </div>
           ))}
         </div>
+        <div className="text-center mt-10">
+          <Link
+            href="/shop/new"
+            className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
+          >
+            View all
+          </Link>
+        </div>
       </div>
     ) : null,
     skill_browse: (
       <div>
-        <div className="bg-white border border-line rounded-xl p-5 md:p-7 flex flex-col lg:flex-row gap-6">
+        <div className="bg-white border border-line rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row gap-6">
           <div className="lg:w-[200px] shrink-0">
-            <p className="font-heading font-semibold text-h3 mb-4">Browse by Skill Level</p>
+            <p className="font-display font-semibold text-lg mb-4">Browse by Skill Level</p>
             <div className="grid grid-cols-3 lg:flex lg:flex-col gap-2">
               {([
                 { level: 'beginner' as const, icon: 'eco' },
@@ -745,13 +697,13 @@ export function Home({
                 <button
                   key={s.level}
                   onClick={() => setActiveSkill(s.level)}
-                  className={`flex flex-col lg:flex-row items-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-3 rounded-full text-center lg:text-left transition-colors ${activeSkill === s.level ? 'text-white' : 'bg-white hover:bg-surface text-ink border border-line'}`}
-                  style={activeSkill === s.level ? { background: 'var(--color-accent)' } : undefined}
+                  className={`flex flex-col lg:flex-row items-center lg:items-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-3 rounded-full text-center lg:text-left transition-colors ${activeSkill === s.level ? 'text-white' : 'bg-white hover:bg-canvas text-ink'}`}
+                  style={activeSkill === s.level ? { background: 'var(--color-primary)' } : undefined}
                 >
-                  <MaterialIcon name={s.icon} size={16} color={activeSkill === s.level ? '#fff' : 'var(--color-accent)'} />
+                  <MaterialIcon name={s.icon} size={16} color={activeSkill === s.level ? '#fff' : 'var(--color-primary)'} />
                   <span className="leading-tight">
-                    <span className="block text-caption lg:text-body font-semibold capitalize">{s.level}</span>
-                    <span className={`block text-[10px] lg:text-caption whitespace-nowrap ${activeSkill === s.level ? 'text-white/80' : 'text-ink-soft'}`}>{skillCounts[s.level]} Patterns</span>
+                    <span className="block text-[12px] lg:text-[13px] font-semibold capitalize">{s.level}</span>
+                    <span className={`block text-[10px] lg:text-[11px] whitespace-nowrap ${activeSkill === s.level ? 'text-white/80' : 'text-ink-soft'}`}>{skillCounts[s.level]} Patterns</span>
                   </span>
                 </button>
               ))}
@@ -762,31 +714,31 @@ export function Home({
             {skillLoading ? (
               <SkillBrowseSkeleton count={3} />
             ) : skillProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-5">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-6">
                 {skillProducts.slice(0, 3).map((p) => (
                   <Link key={p.id} href={`/pattern/${p.slug}`} className="group block">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-surface mb-2">
+                    <div className="aspect-square rounded-lg overflow-hidden bg-canvas mb-2">
                       {p.images?.[0] && <img src={p.images[0]} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
                     </div>
-                    <p className="text-caption font-medium leading-tight line-clamp-1">{p.title}</p>
-                    <p className="text-body font-bold text-ink mt-0.5">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</p>
+                    <p className="text-[12px] font-medium leading-tight line-clamp-1">{p.title}</p>
+                    <p className="text-[13px] font-semibold text-ink mt-0.5">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</p>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="h-40 flex items-center justify-center text-ink-soft text-body text-center px-6">
+              <div className="h-40 flex items-center justify-center text-ink-soft text-[13px] text-center px-6">
                 No {activeSkill} patterns yet — check back soon.
               </div>
             )}
           </div>
 
           {layout.find((s) => s.id === 'bundles')?.visible && bundles.length > 0 && (
-            <div className="lg:w-[300px] shrink-0 rounded-xl p-5" style={{ background: 'var(--color-accent-soft)' }}>
-              <p className="font-heading font-semibold text-h3 mb-1.5">Pattern Bundles</p>
-              <p className="text-body text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
+            <div className="lg:w-[300px] shrink-0 rounded-xl p-6" style={{ background: 'var(--color-accent-soft)' }}>
+              <p className="font-display font-semibold text-lg mb-1.5">Pattern Bundles</p>
+              <p className="text-[14px] text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
               <Link
                 href="/shop?bundle=1"
-                className="inline-block px-4 py-2 rounded-full text-white text-caption font-semibold hover:opacity-90 transition-opacity mb-4"
+                className="inline-block px-4 py-2 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity mb-4"
                 style={{ background: 'var(--color-accent)' }}
               >
                 Shop Bundles →
@@ -797,17 +749,17 @@ export function Home({
                   return (
                     <Link key={b.id} href={`/pattern/${b.slug}`} className="group block">
                       <div className="relative aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
-                        {b.images?.[0] && <img src={b.images[0]} alt={b.title} loading="lazy" className="w-full h-full object-cover" />}
+                        {b.images?.[0] && <img src={b.images[0]} alt={b.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
                         {savePct !== null && savePct > 0 && (
-                          <span className="absolute top-1.5 left-1.5 text-[8px] font-semibold text-white px-1.5 py-0.5 rounded" style={{ background: 'var(--color-accent)' }}>
+                          <span className="absolute top-1.5 left-1.5 text-[8px] font-semibold text-white px-1.5 py-0.5 rounded-full" style={{ background: 'var(--color-primary)' }}>
                             SAVE {savePct}%
                           </span>
                         )}
                       </div>
-                      <p className="text-caption font-medium leading-tight line-clamp-1">{b.title}</p>
+                      <p className="text-[11px] font-medium leading-tight line-clamp-1">{b.title}</p>
                       <p className="text-[11px] text-ink-soft">{b.bundle_includes.length} Patterns</p>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <span className="text-caption font-bold text-ink">${b.price.toFixed(2)}</span>
+                        <span className="text-[12px] font-semibold text-ink">${b.price.toFixed(2)}</span>
                         {b.compare_at_price && b.compare_at_price > b.price && <span className="text-[10px] line-through text-ink-soft">${b.compare_at_price.toFixed(2)}</span>}
                       </div>
                     </Link>
@@ -821,18 +773,18 @@ export function Home({
     ),
     free_patterns: !catalogReady ? (
       <div aria-hidden>
-        <div className="bg-white border border-line rounded-xl p-8 md:p-10 min-h-[160px] animate-pulse" />
+        <div className="bg-white border border-line rounded-2xl p-8 md:p-10 min-h-[180px] animate-pulse" />
       </div>
     ) : freePatternCollage.length > 0 || freeProduct ? (
       <div>
-        <div className="bg-white border border-line rounded-xl p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-8">
+        <div className="bg-white border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-8">
           <div className="min-w-0">
-            <p className="text-caption tracking-[0.12em] uppercase text-ink-soft mb-2">Free patterns</p>
-            <h2 className="font-heading font-semibold text-h2 md:text-[1.75rem] mb-2 tracking-tight">Start With Free</h2>
-            <p className="text-body text-ink-soft leading-relaxed mb-5 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
+            <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FREE PATTERNS</p>
+            <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2">Start With Free</h2>
+            <p className="text-[14px] text-ink-soft leading-relaxed mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
             <Link
               href="/shop?price=free"
-              className="inline-block px-6 py-2.5 rounded-full text-white text-body font-semibold hover:opacity-90 transition-opacity"
+              className="inline-block px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
               style={{ background: 'var(--color-accent)' }}
             >
               Explore free patterns
@@ -853,8 +805,9 @@ export function Home({
     bundles: null,
     why_us: (
       <div>
-        <SectionHeader title="Why Makers Love NCA" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Why Makers Love NCA</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
           {[
             { icon: 'checklist', title: 'Easy to Follow', copy: 'Clear instructions for every step' },
             { icon: 'verified', title: 'Tested Patterns', copy: 'Every pattern is tested twice' },
@@ -864,12 +817,12 @@ export function Home({
             { icon: 'redeem', title: 'Pattern Bundles', copy: 'More patterns, better value' },
           ].map((b) => (
             <div key={b.title} className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 border border-line bg-white">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border" style={{ borderColor: 'var(--color-accent)' }}>
                 <MaterialIcon name={b.icon} size={20} color="var(--color-accent)" />
               </div>
               <div>
-                <p className="text-body font-semibold">{b.title}</p>
-                <p className="text-body text-ink-soft leading-relaxed">{b.copy}</p>
+                <p className="text-[14px] font-semibold">{b.title}</p>
+                <p className="text-[14px] text-ink-soft leading-relaxed">{b.copy}</p>
               </div>
             </div>
           ))}
@@ -878,12 +831,13 @@ export function Home({
     ),
     testimonials: !catalogReady ? (
       <div aria-hidden>
-        <SectionHeader title="What Our Makers Say" />
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">What Our Makers Say</h2>
         <TestimonialsSkeleton count={3} />
       </div>
     ) : testimonials.length > 0 ? (
       <div>
-        <SectionHeader title="What Our Makers Say" />
+        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
+        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">What Our Makers Say</h2>
         {(() => {
           const perPage = 3
           const pageCount = Math.ceil(testimonials.length / perPage)
@@ -895,18 +849,18 @@ export function Home({
                 <button
                   onClick={() => setTestimonialPage((p) => (p - 1 + pageCount) % pageCount)}
                   aria-label="Previous testimonials"
-                  className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-line items-center justify-center hover:bg-surface"
+                  className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-line items-center justify-center shadow-sm hover:bg-surface"
                 >
                   <MaterialIcon name="chevron_left" size={18} />
                 </button>
               )}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {pageItems.map((t, i) => (
-                  <div key={`${page}-${i}`} className="bg-white border border-line rounded-xl p-5">
+                  <div key={`${page}-${i}`} className="bg-white border border-line rounded-2xl p-6">
                     <div className="flex gap-0.5 mb-3" style={{ color: 'var(--color-accent)' }}>
-                      {Array.from({ length: 5 }).map((_, si) => <MaterialIcon key={si} name="star" size={14} />)}
+                      {Array.from({ length: 5 }).map((_, si) => <MaterialIcon key={si} name="star" size={15} />)}
                     </div>
-                    <p className="text-body leading-relaxed mb-4">&ldquo;{t.quote}&rdquo;</p>
+                    <p className="text-[14px] leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
                     <div className="flex items-center gap-3">
                       {t.photo ? (
                         <img src={t.photo} alt={t.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
@@ -916,8 +870,8 @@ export function Home({
                         </div>
                       )}
                       <div className="leading-tight">
-                        <p className="text-body font-semibold">{t.name}</p>
-                        <p className="text-caption text-ink-soft">{t.role}</p>
+                        <p className="text-[13px] font-semibold">{t.name}</p>
+                        <p className="text-[11px] text-ink-soft">{t.role}</p>
                       </div>
                     </div>
                   </div>
@@ -927,20 +881,20 @@ export function Home({
                 <button
                   onClick={() => setTestimonialPage((p) => (p + 1) % pageCount)}
                   aria-label="Next testimonials"
-                  className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-line items-center justify-center hover:bg-surface"
+                  className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-line items-center justify-center shadow-sm hover:bg-surface"
                 >
                   <MaterialIcon name="chevron_right" size={18} />
                 </button>
               )}
               {pageCount > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-6">
+                <div className="flex items-center justify-center gap-2 mt-8">
                   {Array.from({ length: pageCount }).map((_, i) => (
                     <button
                       key={i}
                       onClick={() => setTestimonialPage(i)}
                       aria-label={`Go to testimonials page ${i + 1}`}
                       className="w-2 h-2 rounded-full transition-colors"
-                      style={{ background: i === page ? 'var(--color-accent)' : 'var(--color-muted-light)' }}
+                      style={{ background: i === page ? 'var(--color-accent)' : '#B5AEA2' }}
                     />
                   ))}
                 </div>
@@ -965,8 +919,8 @@ export function Home({
           key={s.id}
           index={i}
           compact={s.id === 'trust'}
-          className={s.id === 'hero' ? 'overflow-hidden' : undefined}
-          innerClassName={s.id === 'hero' ? 'grid grid-cols-1 md:grid-cols-[45%_55%] gap-8 md:gap-10 items-center' : undefined}
+          className={s.id === 'hero' ? 'md:pt-0 md:pb-5 overflow-hidden' : undefined}
+          innerClassName={s.id === 'hero' ? 'py-10 md:py-0 md:h-[520px] grid grid-cols-1 md:grid-cols-[45%_55%] gap-10 md:gap-12 items-center' : undefined}
         >
           {s.node}
         </SectionBand>

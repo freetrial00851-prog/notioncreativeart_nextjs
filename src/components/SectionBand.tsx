@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 
-/** Even index → white canvas, odd → light neutral surface. */
+/** Even index → background (#FCFBF8), odd → surface (#F8F4ED). */
 export function sectionBandStyle(index: number): CSSProperties {
   return {
     background: index % 2 === 0 ? 'var(--color-background)' : 'var(--color-surface)',
@@ -8,8 +8,10 @@ export function sectionBandStyle(index: number): CSSProperties {
 }
 
 /**
- * Full-bleed section band: alternating background + consistent vertical padding.
- * Standard scale: py-10 mobile / py-14 desktop (compact strips use py-6 / py-8).
+ * Full-bleed section band: alternating background + balanced vertical padding.
+ * Both top and bottom are set so content never sits flush on a color edge.
+ * Values are half the target gap so adjacent bands stack to ~24–28px mobile
+ * and ~32–40px desktop between sections (not ~150px).
  */
 export function SectionBand({
   index,
@@ -25,7 +27,8 @@ export function SectionBand({
   innerClassName?: string
   compact?: boolean
 }) {
-  const padY = compact ? 'py-6 md:py-8' : 'py-10 md:py-14'
+  // Per side: mobile 12–14px, desktop 16–20px → stacked gap ~24–28 / ~32–40.
+  const padY = compact ? 'py-3 md:py-4' : 'py-3.5 md:py-5'
 
   return (
     <section
