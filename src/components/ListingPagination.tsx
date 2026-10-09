@@ -4,6 +4,12 @@ export type ListingPaginationProps = {
   currentPage: number
   pageCount: number
   onPageChange: (page: number) => void
+  /**
+   * `full` = numbered pages (default; always visible — Search/Wishlist).
+   * `simple` = Page X of N (shop mobile/tablet).
+   * `desktop` = numbered pages, laptop-only (shop).
+   */
+  variant?: 'full' | 'simple' | 'desktop'
 }
 
 type PageItem = number | 'ellipsis'
@@ -25,7 +31,6 @@ export function getListingPageItems(currentPage: number, pageCount: number): Pag
     if (p >= 1 && p <= pageCount) set.add(p)
   }
 
-  // Near the start or end, keep a denser run so we don't show awkward 1 … 2 3 patterns
   if (current <= 3) {
     for (let p = 1; p <= 4; p++) set.add(p)
   }
@@ -44,20 +49,61 @@ export function getListingPageItems(currentPage: number, pageCount: number): Pag
 }
 
 /**
- * Shared Shop / Search / Wishlist pagination with ellipsis compression for long lists.
+ * Shared Shop / Search / Wishlist pagination — DESIGN_SPEC §4.2.
  */
-export function ListingPagination({ currentPage, pageCount, onPageChange }: ListingPaginationProps) {
+export function ListingPagination({
+  currentPage,
+  pageCount,
+  onPageChange,
+  variant = 'full',
+}: ListingPaginationProps) {
   if (pageCount <= 1) return null
 
+  const btn =
+    'w-9 h-9 flex items-center justify-center rounded-full border border-border hover:bg-surface-warm disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-ink'
+
+  if (variant === 'simple') {
+    return (
+      <div className="flex lg:hidden items-center justify-center gap-4 mt-10">
+        <button
+          type="button"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          aria-label="Previous page"
+          className={btn}
+        >
+          ‹
+        </button>
+        <span className="text-[13px] text-muted">
+          Page {currentPage} of {pageCount}
+        </span>
+        <button
+          type="button"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === pageCount}
+          aria-label="Next page"
+          className={btn}
+        >
+          ›
+        </button>
+      </div>
+    )
+  }
+
   const items = getListingPageItems(currentPage, pageCount)
+  const wrapClass =
+    variant === 'desktop'
+      ? 'hidden lg:flex items-center justify-center gap-2 mt-14'
+      : 'flex items-center justify-center gap-2 mt-14'
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-14">
+    <div className={wrapClass}>
       <button
+        type="button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         aria-label="Previous page"
-        className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className={btn}
       >
         ‹
       </button>
@@ -66,28 +112,33 @@ export function ListingPagination({ currentPage, pageCount, onPageChange }: List
           <span
             key={`ellipsis-${i}`}
             aria-hidden="true"
-            className="w-9 h-9 flex items-center justify-center text-[13px] text-ink-soft select-none"
+            className="w-9 h-9 flex items-center justify-center text-[13px] text-muted select-none"
           >
             …
           </span>
         ) : (
           <button
+            type="button"
             key={item}
             onClick={() => onPageChange(item)}
             aria-label={`Page ${item}`}
             aria-current={item === currentPage ? 'page' : undefined}
-            className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${item === currentPage ? 'text-white' : 'border border-line hover:bg-surface'}`}
-            style={item === currentPage ? { background: 'var(--color-accent)' } : undefined}
+            className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${
+              item === currentPage
+                ? 'bg-primary text-white'
+                : 'border border-border hover:bg-surface-warm text-ink'
+            }`}
           >
             {item}
           </button>
         ),
       )}
       <button
+        type="button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === pageCount}
         aria-label="Next page"
-        className="w-9 h-9 flex items-center justify-center rounded-full border border-line hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className={btn}
       >
         ›
       </button>

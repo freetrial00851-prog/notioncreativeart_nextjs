@@ -41,6 +41,43 @@ export async function fetchApprovedReviews(productId: string): Promise<Review[]>
   return (data ?? []) as Review[]
 }
 
+/** Homepage “What makers say” — real approved reviews + pattern title. Empty → hide section. */
+export type MakerReviewCard = {
+  id: string
+  rating: number
+  body: string
+  reviewerFirstName: string
+  patternTitle: string
+}
+
+export async function fetchMakerReviewsForHome(limit = 3): Promise<MakerReviewCard[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('id, rating, body, reviewer_name, products(title)')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error || !data?.length) return []
+
+  return data
+    .map((row) => {
+      const product = row.products as { title?: string } | { title?: string }[] | null
+      const title = Array.isArray(product) ? product[0]?.title : product?.title
+      const name = (row.reviewer_name as string | null)?.trim() || ''
+      const first = name.split(/\s+/)[0] || 'Maker'
+      const body = (row.body as string | null)?.trim() || ''
+      if (!body) return null
+      return {
+        id: row.id as string,
+        rating: Number(row.rating) || 0,
+        body,
+        reviewerFirstName: first,
+        patternTitle: (title || '').trim() || 'Pattern',
+      }
+    })
+    .filter((r): r is MakerReviewCard => r !== null)
+}
+
 /** Own review for the signed-in user — still omits reviewer_email from the client payload. */
 export async function fetchUserReview(productId: string, userId: string): Promise<Review | null> {
   const { data, error } = await supabase

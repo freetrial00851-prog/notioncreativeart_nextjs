@@ -11,7 +11,7 @@ import {
   setHomeCatalogCache,
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
-import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialContent } from '../lib/types'
+import type { Product, HeroContent, ChapterContent, LayoutSection } from '../lib/types'
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
 import { LevelBadge, StatusBadge } from '../components/ui/Badge'
@@ -20,6 +20,7 @@ import { EmailSignup } from '../components/EmailSignup'
 import { FaqAccordion } from '../components/FaqAccordion'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { ProductGridSkeleton } from '../components/Skeleton'
+import { fetchMakerReviewsForHome, type MakerReviewCard } from '../lib/reviews'
 
 const SKILL_COPY: Record<
   'beginner' | 'intermediate' | 'advanced',
@@ -54,7 +55,6 @@ function applyCatalogSnapshot(
     setFreeProduct: (v: Product | null) => void
     setFreePatternCollage: (v: Product[]) => void
     setChapters: (v: ChapterContent[]) => void
-    setTestimonials: (v: TestimonialContent[]) => void
     setHero: Dispatch<SetStateAction<HeroContent | null>>
   },
 ) {
@@ -62,7 +62,6 @@ function applyCatalogSnapshot(
   setters.setFreeProduct(snap.freeProduct)
   setters.setFreePatternCollage(snap.freePatternCollage ?? [])
   setters.setChapters(snap.chapters)
-  setters.setTestimonials(snap.testimonials)
   if (snap.hero) {
     setters.setHero((prev) => {
       const prevUrls = (prev?.images ?? []).join('|')
@@ -196,7 +195,7 @@ export function Home({
   )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
   const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
-  const [testimonials, setTestimonials] = useState<TestimonialContent[]>(() => seed?.testimonials ?? [])
+  const [makerReviews, setMakerReviews] = useState<MakerReviewCard[]>([])
   const [catalogReady, setCatalogReady] = useState(() => Boolean(seed))
   const [featuredError, setFeaturedError] = useState<string | null>(() => initialFeaturedError ?? null)
   const [catalogReloadKey, setCatalogReloadKey] = useState(0)
@@ -220,7 +219,6 @@ export function Home({
       setFreeProduct,
       setFreePatternCollage,
       setChapters,
-      setTestimonials,
       setHero,
     }
 
@@ -262,6 +260,16 @@ export function Home({
       cancelled = true
     }
   }, [catalogReloadKey, initialCatalog, initialFeaturedError])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchMakerReviewsForHome(3).then((rows) => {
+      if (!cancelled) setMakerReviews(rows)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const skillLevels = (['beginner', 'intermediate', 'advanced'] as const).map((level) => {
     const fromCms = chapters.find((c) => c.level === level)
@@ -536,8 +544,8 @@ export function Home({
         </div>
       </section>
 
-      {/* Testimonials — §4.1.9 hide if empty; 2 on mobile, 3 on tablet+ */}
-      {testimonials.length > 0 && (
+      {/* What makers say — §4.1.9 from reviews table; hide if none; 2 on mobile, 3 on md+ */}
+      {makerReviews.length > 0 && (
         <section id="reviews" className="bg-surface-warm">
           <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
             <div className="text-center mb-10">
@@ -545,20 +553,23 @@ export function Home({
               <p className="text-[14px] text-muted">Real reviews from people who made our patterns.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {testimonials.slice(0, 3).map((t, i) => (
+              {makerReviews.slice(0, 3).map((t, i) => (
                 <article
-                  key={`${t.name}-${i}`}
+                  key={t.id}
                   className={`rounded-2xl border border-border bg-surface p-6 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
                 >
-                  <div className="flex gap-0.5 mb-3 text-gold" aria-label="5 star rating">
+                  <div
+                    className="flex gap-0.5 mb-3 text-gold"
+                    aria-label={`${t.rating} out of 5 stars`}
+                  >
                     {Array.from({ length: 5 }).map((_, si) => (
-                      <Star key={si} />
+                      <Star key={si} filled={si < Math.round(t.rating)} />
                     ))}
                   </div>
-                  <p className="text-[14px] text-ink leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
+                  <p className="text-[14px] text-ink leading-relaxed mb-5">&ldquo;{t.body}&rdquo;</p>
                   <p className="text-[13px] font-semibold text-ink">
-                    {t.name}
-                    {t.role ? <span className="font-normal text-muted"> · {t.role}</span> : null}
+                    {t.reviewerFirstName}
+                    <span className="font-normal text-muted"> · {t.patternTitle}</span>
                   </p>
                 </article>
               ))}
@@ -609,9 +620,18 @@ function DownloadGlyph() {
   )
 }
 
-function Star() {
+function Star({ filled = true }: { filled?: boolean }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth={filled ? 0 : 1.5}
+      aria-hidden
+      className={filled ? undefined : 'opacity-35'}
+    >
       <path d="M12 2.8l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 16.7 6.6 19.6l1-6.1L3.2 9.2l6.1-.9L12 2.8z" />
     </svg>
   )
