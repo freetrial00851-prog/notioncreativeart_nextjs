@@ -1,11 +1,13 @@
 /* TEMPORARY styleguide — DESIGN_SPEC step 1-2. Delete before final launch (step 10). */
 
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { AnnouncementBar } from '@/components/AnnouncementBar'
 import { PatternCard } from '@/components/PatternCard'
 import { PatternGrid } from '@/components/PatternGrid'
 import { Button } from '@/components/ui/Button'
 import { CategoryChip, LevelBadge, StatusBadge } from '@/components/ui/Badge'
+import { isVercelProduction } from '@/lib/env'
 import type { Product } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -44,6 +46,8 @@ const SAMPLE: Product = {
 }
 
 export default function StyleguidePage() {
+  if (isVercelProduction()) notFound()
+
   return (
     <div className="min-h-screen bg-bg text-ink">
       <AnnouncementBar />

@@ -30,3 +30,12 @@ export function assertEnv() {
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY')
   }
 }
+
+/**
+ * True only on Vercel production deploys.
+ * Prefer for server components / build-time checks (`VERCEL_ENV`).
+ * Client bundles should receive this as a prop from a server page.
+ */
+export function isVercelProduction(): boolean {
+  return process.env.VERCEL_ENV === 'production'
+}

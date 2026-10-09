@@ -83,7 +83,7 @@ function heroSecondaryHref(link: string | undefined) {
   return raw
 }
 
-const FAQ_ITEMS = [
+const FAQ_ITEMS_READY = [
   {
     question: 'How do I get my pattern after paying?',
     answer:
@@ -104,18 +104,20 @@ const FAQ_ITEMS = [
     answer:
       'Beginner patterns use basic stitches and short steps. Intermediate and Advanced add shaping and finer details. Each product page shows the level.',
   },
-  {
-    question: 'What if something is wrong with my file?',
-    answer: (
-      <>
-        {/* TODO: real refund policy summary from owner */}
-        [REFUND POLICY SUMMARY] You can also write to{' '}
-        {/* TODO: support email from owner */}
-        <span className="text-primary underline">[SUPPORT EMAIL]</span> and we will help.
-      </>
-    ),
-  },
 ]
+
+/** Preview/local only — contains owner TODO placeholders; omitted in production. */
+const FAQ_ITEM_FILE_ISSUE_PLACEHOLDER = {
+  question: 'What if something is wrong with my file?',
+  answer: (
+    <>
+      {/* TODO: real refund policy summary from owner */}
+      [REFUND POLICY SUMMARY] You can also write to{' '}
+      {/* TODO: support email from owner */}
+      <span className="text-primary underline">[SUPPORT EMAIL]</span> and we will help.
+    </>
+  ),
+}
 
 const HERO_TINTS = [
   'var(--color-tint-lavender)',
@@ -181,11 +183,14 @@ export function Home({
   initialFeaturedError = null,
   initialHero = null,
   initialLayout,
+  hideOwnerCopyPlaceholders = false,
 }: {
   initialCatalog?: HomeCatalogSnapshot | null
   initialFeaturedError?: string | null
   initialHero?: HeroContent | null
   initialLayout?: LayoutSection[]
+  /** When true (Vercel production), omit sections/lines waiting on owner copy. */
+  hideOwnerCopyPlaceholders?: boolean
 }) {
   const seed = readCachedCatalog() ?? initialCatalog ?? null
   const [trending, setTrending] = useState<Product[]>(() => seed?.trending ?? [])
@@ -224,19 +229,25 @@ export function Home({
 
     const cached = getHomeCatalogCache()
     if (cached) {
-      applyCatalogSnapshot(cached, setters)
-      setFeaturedError(null)
-      setCatalogReady(true)
+      queueMicrotask(() => {
+        if (cancelled) return
+        applyCatalogSnapshot(cached, setters)
+        setFeaturedError(null)
+        setCatalogReady(true)
+      })
       return () => {
         cancelled = true
       }
     }
 
     if (initialCatalog && catalogReloadKey === 0) {
-      setHomeCatalogCache(initialCatalog)
-      applyCatalogSnapshot(initialCatalog, setters)
-      setFeaturedError(initialFeaturedError)
-      setCatalogReady(true)
+      queueMicrotask(() => {
+        if (cancelled) return
+        setHomeCatalogCache(initialCatalog)
+        applyCatalogSnapshot(initialCatalog, setters)
+        setFeaturedError(initialFeaturedError)
+        setCatalogReady(true)
+      })
       return () => {
         cancelled = true
       }
@@ -283,6 +294,10 @@ export function Home({
       tint: copy.tint,
     }
   })
+
+  const faqItems = hideOwnerCopyPlaceholders
+    ? FAQ_ITEMS_READY
+    : [...FAQ_ITEMS_READY, FAQ_ITEM_FILE_ISSUE_PLACEHOLDER]
 
   return (
     <div className="bg-bg">
@@ -504,45 +519,47 @@ export function Home({
         </div>
       </section>
 
-      {/* Meet the maker — §4.1.8 TODOs */}
-      <section className="bg-surface-warm">
-        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div
-            className="relative aspect-[4/5] rounded-2xl border border-border overflow-hidden"
-            style={{ background: 'var(--color-tint-cream)' }}
-          >
-            <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-primary mb-3">Meet the maker</p>
-            {/* TODO: story headline from owner */}
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-4">
-              [Story headline: why these patterns exist]
-            </h2>
-            {/* TODO: maker story copy from owner */}
-            <p className="text-[15px] text-muted leading-relaxed mb-8">
-              [Two or three sentences in your own voice: who designs the patterns, how each one is tested, and what a
-              buyer can trust about them.]
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-              {[
-                { n: '[N]', l: 'Patterns designed' },
-                { n: '[N]', l: 'Makers helped' },
-                { n: '[N]', l: 'Years crocheting' },
-              ].map((s) => (
-                <div key={s.l}>
-                  {/* TODO: real stats from owner */}
-                  <p className="text-2xl font-extrabold text-primary">{s.n}</p>
-                  <p className="text-[12px] text-muted">{s.l}</p>
-                </div>
-              ))}
+      {/* Meet the maker — §4.1.8; hidden in production until owner copy/stats exist */}
+      {!hideOwnerCopyPlaceholders && (
+        <section className="bg-surface-warm">
+          <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div
+              className="relative aspect-[4/5] rounded-2xl border border-border overflow-hidden"
+              style={{ background: 'var(--color-tint-cream)' }}
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
             </div>
-            <Link href="/about" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
-              Read our story →
-            </Link>
+            <div>
+              <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-primary mb-3">Meet the maker</p>
+              {/* TODO: story headline from owner */}
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-4">
+                [Story headline: why these patterns exist]
+              </h2>
+              {/* TODO: maker story copy from owner */}
+              <p className="text-[15px] text-muted leading-relaxed mb-8">
+                [Two or three sentences in your own voice: who designs the patterns, how each one is tested, and what a
+                buyer can trust about them.]
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                {[
+                  { n: '[N]', l: 'Patterns designed' },
+                  { n: '[N]', l: 'Makers helped' },
+                  { n: '[N]', l: 'Years crocheting' },
+                ].map((s) => (
+                  <div key={s.l}>
+                    {/* TODO: real stats from owner */}
+                    <p className="text-2xl font-extrabold text-primary">{s.n}</p>
+                    <p className="text-[12px] text-muted">{s.l}</p>
+                  </div>
+                ))}
+              </div>
+              <Link href="/about" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
+                Read our story →
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* What makers say — §4.1.9 from reviews table; hide if none; 2 on mobile, 3 on md+ */}
       {makerReviews.length > 0 && (
@@ -589,12 +606,14 @@ export function Home({
           <div>
             <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">Questions, answered</h2>
             <p className="text-[14px] text-muted mb-3">The basics before you buy.</p>
-            <p className="text-[14px] text-muted">
-              Still stuck? Write to {/* TODO: support email from owner */}
-              <span className="text-primary underline">[SUPPORT EMAIL]</span>
-            </p>
+            {!hideOwnerCopyPlaceholders && (
+              <p className="text-[14px] text-muted">
+                Still stuck? Write to {/* TODO: support email from owner */}
+                <span className="text-primary underline">[SUPPORT EMAIL]</span>
+              </p>
+            )}
           </div>
-          <FaqAccordion items={FAQ_ITEMS} />
+          <FaqAccordion items={faqItems} />
         </div>
       </section>
 

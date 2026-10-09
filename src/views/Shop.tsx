@@ -34,6 +34,8 @@ import {
 } from '../lib/listingFilters'
 import { resolveShopPageTitle } from '../lib/shopTitle'
 
+const EMPTY_PURCHASE_COUNTS = new Map<string, number>()
+
 function isListingSort(v: string | null): v is ListingSort {
   return LISTING_SORT_OPTIONS.some((o) => o.value === v)
 }
@@ -158,10 +160,7 @@ export function Shop({
   }, [levelsKey, priceFilter, bundleFilter, saleFilter, categorySlug, categoriesKey])
 
   useEffect(() => {
-    if (sort !== 'best-selling' || products.length === 0) {
-      setPurchaseCounts(new Map())
-      return
-    }
+    if (sort !== 'best-selling' || products.length === 0) return
     let cancelled = false
     fetchPaidPurchaseCounts(products.map((p) => p.id)).then((map) => {
       if (!cancelled) setPurchaseCounts(map)
@@ -171,9 +170,11 @@ export function Shop({
     }
   }, [sort, products])
 
+  const countsForSort = sort === 'best-selling' ? purchaseCounts : EMPTY_PURCHASE_COUNTS
+
   const sortedProducts = useMemo(
-    () => sortProductsByListingSort(products, sort, purchaseCounts),
-    [products, sort, purchaseCounts],
+    () => sortProductsByListingSort(products, sort, countsForSort),
+    [products, sort, countsForSort],
   )
 
   const pageCount = Math.max(1, Math.ceil(sortedProducts.length / LISTING_PAGE_SIZE))

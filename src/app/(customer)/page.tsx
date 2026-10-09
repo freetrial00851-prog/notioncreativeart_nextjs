@@ -4,6 +4,7 @@ import { Home } from '@/views/Home'
 import { getHomeCatalogServer } from '@/lib/data/home'
 import { mergeLayout } from '@/lib/defaultLayout'
 import { getSiteSeoContext } from '@/lib/seoSettings'
+import { isVercelProduction } from '@/lib/env'
 
 /**
  * ISR homepage — catalog is server-fetched and CDN-cached for 60s.
@@ -32,6 +33,7 @@ export default async function HomePage() {
       initialFeaturedError={featuredError}
       initialHero={snapshot.hero}
       initialLayout={snapshot.layout?.length ? snapshot.layout : mergeLayout([])}
+      hideOwnerCopyPlaceholders={isVercelProduction()}
     />
   )
 }
