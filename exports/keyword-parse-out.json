@@ -1,0 +1,289 @@
+﻿{
+  "total": 52,
+  "noSewCount": 9,
+  "noSewSlugs": [
+    "chubby-kitten-amigurumi-crochet-pattern",
+    "fox-amigurumi-crochet-pattern",
+    "frog-with-heart-amigurumi-crochet-pattern",
+    "mini-crab-amigurumi-pattern-cute-beach-crochet-sea-animal-toy-easy-beginner-plush-crab-softie-nursery-decor-pdf-pattern-instant-download",
+    "mini-mouse-amigurumi-crochet-pattern",
+    "amigurumi-gecko-lizard-crochet-pattern",
+    "corgi-amigurumi-crochet-pattern",
+    "heart-cactus-crochet-pattern",
+    "mini-pug-amigurumi-crochet-pattern"
+  ],
+  "withKeywordCount": 36,
+  "withKeyword": [
+    {
+      "slug": "chubby-kitten-amigurumi-crochet-pattern",
+      "title": "Chubby Kitten Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi cat free pattern",
+      "volume": "390.0",
+      "difficulty": "17.0"
+    },
+    {
+      "slug": "fox-amigurumi-crochet-pattern",
+      "title": "Fox Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi fox",
+      "volume": "210.0",
+      "difficulty": "14.0"
+    },
+    {
+      "slug": "frog-with-heart-amigurumi-crochet-pattern",
+      "title": "Frog with Heart Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi frog crochet pattern",
+      "volume": "90.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "mini-crab-amigurumi-pattern-cute-beach-crochet-sea-animal-toy-easy-beginner-plush-crab-softie-nursery-decor-pdf-pattern-instant-download",
+      "title": "Mini Crab Amigurumi Pattern, Cute Beach Crochet Sea Animal Toy, Easy Beginner Plush Crab Softie, Nursery Decor, PDF Pattern Instant Download",
+      "target_keyword": "free crochet amigurumi crab pattern",
+      "volume": "30.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "mini-mouse-amigurumi-crochet-pattern",
+      "title": "Mini Mouse Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi crochet mouse pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "bunny-in-a-swimsuit-amigurumi-crochet-pattern",
+      "title": "Bunny in a Swimsuit Amigurumi Crochet Pattern",
+      "target_keyword": "bunny amigurumi pattern no sew",
+      "volume": "1000.0",
+      "difficulty": "21.0"
+    },
+    {
+      "slug": "bunny-rattle-amigurumi-crochet-pattern",
+      "title": "Bunny Rattle Amigurumi Crochet Pattern",
+      "target_keyword": "bunny amigurumi pattern no sew",
+      "volume": "1000.0",
+      "difficulty": "21.0"
+    },
+    {
+      "slug": "bunny-with-flower-amigurumi-crochet-pattern",
+      "title": "Bunny with Flower Amigurumi Crochet Pattern",
+      "target_keyword": "bunny amigurumi pattern no sew",
+      "volume": "1000.0",
+      "difficulty": "21.0"
+    },
+    {
+      "slug": "cat-mushroom-amigurumi-crochet-pattern-easy-toadstool-cat-plushie-champignon-cat-keychain-toy-pdf-pattern-instant-download-beginner",
+      "title": "Cat Mushroom Amigurumi Crochet Pattern, Easy Toadstool Cat Plushie, Champignon Cat Keychain Toy, PDF Pattern Instant Download, Beginner",
+      "target_keyword": "amigurumi cat free pattern",
+      "volume": "390.0",
+      "difficulty": "17.0"
+    },
+    {
+      "slug": "cat-with-headphones-crochet-pdf-pattern",
+      "title": "Cat with Headphones Crochet PDF Pattern",
+      "target_keyword": "amigurumi cat free pattern",
+      "volume": "390.0",
+      "difficulty": "17.0"
+    },
+    {
+      "slug": "colorful-kitten-amigurumi-crochet-pattern",
+      "title": "Colorful Kitten Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi cat free pattern",
+      "volume": "390.0",
+      "difficulty": "17.0"
+    },
+    {
+      "slug": "rosita-the-cat-amigurumi-crochet-pattern",
+      "title": "Rosita the Cat Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi cat free pattern",
+      "volume": "390.0",
+      "difficulty": "17.0"
+    },
+    {
+      "slug": "smiling-kitten-amigurumi-crochet-pattern-pdf-easy-beginner-cat-stuffed-animal-jointed-amigurumi-kitten-sewing-pattern-instant-download",
+      "title": "Smiling Kitten Amigurumi Crochet Pattern PDF, Easy Beginner Cat Stuffed Animal, Jointed Amigurumi Kitten Sewing Pattern Instant Download",
+      "target_keyword": "amigurumi cat free pattern",
+      "volume": "390.0",
+      "difficulty": "17.0"
+    },
+    {
+      "slug": "woodland-fox-amigurumi-crochet-pattern",
+      "title": "Woodland Fox Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi fox",
+      "volume": "210.0",
+      "difficulty": "14.0"
+    },
+    {
+      "slug": "rooster-on-a-stick-crochet-pattern-amigurumi-lollipop-rooster-pdf-easy-farmhouse-chicken-cake-topper-digital-download-crochet-tutorial-for-beginners",
+      "title": "Rooster on a Stick Crochet Pattern, Amigurumi Lollipop Rooster PDF, Easy Farmhouse Chicken Cake Topper, Digital Download Crochet Tutorial for Beginners",
+      "target_keyword": "amigurumi chicken crochet pattern",
+      "volume": "170.0",
+      "difficulty": "8.0"
+    },
+    {
+      "slug": "amigurumi-bear-trio-crochet-pattern",
+      "title": "Amigurumi Bear Trio Crochet Pattern",
+      "target_keyword": "crochet amigurumi bear pattern",
+      "volume": "140.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "mini-teddy-bear-crochet-pattern-pdf-easy-amigurumi-bear-pattern-beginner-friendly-plush-bear-toy-nursery-decor-instant-download",
+      "title": "Mini Teddy Bear Crochet Pattern PDF, Easy Amigurumi Bear Pattern, Beginner Friendly Plush Bear Toy, Nursery Decor, Instant Download",
+      "target_keyword": "crochet amigurumi bear pattern",
+      "volume": "140.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "teddy-bear-amigurumi-crochet-pattern-hand-crocheted-plush-bear-cub-nursery-baby-shower-gift-intermediate-pdf-pattern-instant-download",
+      "title": "Teddy Bear Amigurumi Crochet Pattern, Hand Crocheted Plush Bear Cub, Nursery Baby Shower Gift, Intermediate PDF Pattern Instant Download",
+      "target_keyword": "crochet amigurumi bear pattern",
+      "volume": "140.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "teddy-bear-in-a-dress-amigurumi-crochet-pattern",
+      "title": "Teddy Bear in a Dress Amigurumi Crochet Pattern",
+      "target_keyword": "crochet amigurumi bear pattern",
+      "volume": "140.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "teddy-bear-keychain-amigurumi-crochet-pattern",
+      "title": "Teddy Bear Keychain Amigurumi Crochet Pattern",
+      "target_keyword": "crochet amigurumi bear pattern",
+      "volume": "140.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "frog-with-sunflower-amigurumi-crochet-pattern",
+      "title": "Frog with Sunflower Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi frog crochet pattern",
+      "volume": "90.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "sitting-frog-amigurumi-crochet-pattern",
+      "title": "Sitting Frog Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi frog crochet pattern",
+      "volume": "90.0",
+      "difficulty": "18.0"
+    },
+    {
+      "slug": "baby-horse-lovey-amigurumi-crochet-pattern",
+      "title": "Baby Horse Lovey Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi horse crochet pattern",
+      "volume": "70.0",
+      "difficulty": "10.0"
+    },
+    {
+      "slug": "hobby-horse-amigurumi-crochet-pattern",
+      "title": "Hobby Horse Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi horse crochet pattern",
+      "volume": "70.0",
+      "difficulty": "10.0"
+    },
+    {
+      "slug": "long-haired-horse-amigurumi-crochet-pattern",
+      "title": "Long Haired Horse Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi horse crochet pattern",
+      "volume": "70.0",
+      "difficulty": "10.0"
+    },
+    {
+      "slug": "baby-dolphin-amigurumi-crochet-pattern",
+      "title": "Baby Dolphin Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi dolphin crochet pattern",
+      "volume": "30.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "cuddly-lamb-amigurumi-crochet-pattern",
+      "title": "Cuddly Lamb Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi lamb free crochet pattern",
+      "volume": "30.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "plush-hippo-amigurumi-crochet-pattern",
+      "title": "Plush Hippo Amigurumi Crochet Pattern",
+      "target_keyword": "crochet hippo amigurumi free pattern",
+      "volume": "30.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "plush-squirrel-amigurumi-crochet-pattern",
+      "title": "Plush Squirrel Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi squirrel crochet pattern",
+      "volume": "30.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "amigurumi-santa-claus-crochet-pattern",
+      "title": "Amigurumi Santa Claus Crochet Pattern",
+      "target_keyword": "amigurumi crochet santa claus patterns",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "capybara-in-a-bathtub-amigurumi-crochet-pattern",
+      "title": "Capybara in a Bathtub Amigurumi Crochet Pattern",
+      "target_keyword": "capybara amigurumi crochet pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "capybara-in-a-skirt-amigurumi-crochet-pattern",
+      "title": "Capybara in a Skirt Amigurumi Crochet Pattern",
+      "target_keyword": "capybara amigurumi crochet pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "capybara-in-an-orange-hat-amigurumi-crochet-pattern",
+      "title": "Capybara in an Orange Hat Amigurumi Crochet Pattern",
+      "target_keyword": "capybara amigurumi crochet pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "little-jellyfish-crochet-pattern-amigurumi-jellyfish-keychain-charm-cute-sea-animal-nursery-decor-toy-pdf-pattern-instant-download",
+      "title": "Little Jellyfish Crochet Pattern, Amigurumi Jellyfish Keychain Charm, Cute Sea Animal Nursery Decor Toy, PDF Pattern Instant Download",
+      "target_keyword": "amigurumi jellyfish crochet pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "plush-koala-amigurumi-crochet-pattern",
+      "title": "Plush Koala Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi koala crochet pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    },
+    {
+      "slug": "plush-panda-amigurumi-crochet-pattern",
+      "title": "Plush Panda Amigurumi Crochet Pattern",
+      "target_keyword": "amigurumi panda bear crochet pattern",
+      "volume": "20.0",
+      "difficulty": ""
+    }
+  ],
+  "emptyKeywordCount": 16,
+  "emptyKeywordSlugs": [
+    "amigurumi-gecko-lizard-crochet-pattern",
+    "corgi-amigurumi-crochet-pattern",
+    "heart-cactus-crochet-pattern",
+    "mini-pug-amigurumi-crochet-pattern",
+    "baby-elephant-boy-girl-set-amigurumi-crochet-pattern",
+    "baby-goat-boy-girl-set-amigurumi-crochet-pattern",
+    "baby-hedgehog-amigurumi-crochet-pattern",
+    "baby-kid-goat-amigurumi-crochet-pattern",
+    "beaver-on-a-swing-car-charm-amigurumi-crochet-pattern",
+    "beaver-with-branch-amigurumi-crochet-pattern",
+    "flower-bee-amigurumi-crochet-pattern",
+    "long-ear-puppy-amigurumi-crochet-pattern",
+    "mini-pony-amigurumi-crochet-pattern",
+    "nessie-amigurumi-crochet-pattern",
+    "paw-print-keychain-amigurumi-crochet-pattern",
+    "zebra-rattle-amigurumi-crochet-pattern"
+  ]
+}

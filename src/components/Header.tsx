@@ -12,12 +12,7 @@ import { searchProducts } from '../lib/productSearch'
 import { getCategoriesWithProducts, getSubcategoriesWithCounts, type CategoryWithCount, type SubcategoryWithCount } from '../lib/categories'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
-import type { AnnouncementsContent, Product } from '../lib/types'
-import {
-  activeAnnouncementMessages,
-  normalizeAnnouncements,
-  shouldShowAnnouncementBar,
-} from '../lib/types'
+import type { Product } from '../lib/types'
 import { profileDisplayName, profileInitial } from '../lib/profileName'
 import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
@@ -42,19 +37,11 @@ export function Header() {
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [mobileExpandedCategory, setMobileExpandedCategory] = useState<string | null>(null)
   const [mobileSubcategoriesCache, setMobileSubcategoriesCache] = useState<Record<string, SubcategoryWithCount[]>>({})
-  /** null until site_settings loads — avoids flashing a hardcoded fallback. */
-  const [announcement, setAnnouncement] = useState<AnnouncementsContent | null>(null)
-  const [messageIndex, setMessageIndex] = useState(0)
-
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Product[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapRef = useRef<HTMLDivElement>(null)
-  const tabletSearchWrapRef = useRef<HTMLDivElement>(null)
-  const mobileSearchWrapRef = useRef<HTMLDivElement>(null)
   const desktopSearchInputRef = useRef<HTMLInputElement>(null)
-  const tabletSearchInputRef = useRef<HTMLInputElement>(null)
-  const mobileSearchInputRef = useRef<HTMLInputElement>(null)
   const headerRef = useRef<HTMLElement>(null)
   const [browsePanelTop, setBrowsePanelTop] = useState(0)
 
@@ -68,25 +55,9 @@ export function Header() {
     setBrowsePanelTop(headerRef.current.getBoundingClientRect().bottom)
   }
 
-  const announcementMessages = announcement ? activeAnnouncementMessages(announcement) : []
-  const showAnnouncement = shouldShowAnnouncementBar(announcement)
-
   useEffect(() => {
-    supabase.from('site_settings').select('value').eq('key', 'announcements').maybeSingle().then(({ data }) => {
-      setAnnouncement(normalizeAnnouncements(data?.value))
-    })
     getCategoriesWithProducts(supabase).then(setCategories)
   }, [])
-
-  useEffect(() => {
-    if (announcementMessages.length <= 1) return
-    const timer = setInterval(() => setMessageIndex((i) => (i + 1) % announcementMessages.length), 4000)
-    return () => clearInterval(timer)
-  }, [announcementMessages.length])
-
-  useEffect(() => {
-    setMessageIndex(0)
-  }, [announcementMessages.join('|')])
 
   useEffect(() => {
     if (!query.trim()) return setSuggestions([])
@@ -99,11 +70,7 @@ export function Header() {
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const t = e.target as Node
-      const insideSearch =
-        (searchWrapRef.current?.contains(t) ?? false) ||
-        (tabletSearchWrapRef.current?.contains(t) ?? false) ||
-        (mobileSearchWrapRef.current?.contains(t) ?? false)
-      if (!insideSearch) setSearchFocused(false)
+      if (!(searchWrapRef.current?.contains(t) ?? false)) setSearchFocused(false)
       if (
         !(desktopAccountWrapRef.current?.contains(t) ?? false) &&
         !(tabletAccountWrapRef.current?.contains(t) ?? false)
@@ -127,15 +94,13 @@ export function Header() {
     updateBrowsePanelTop()
     window.addEventListener('resize', updateBrowsePanelTop)
     return () => window.removeEventListener('resize', updateBrowsePanelTop)
-  }, [mobileOpen, showAnnouncement, announcementMessages.length])
+  }, [mobileOpen])
 
   const submitSearch = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!query.trim()) return
     setSearchFocused(false)
     desktopSearchInputRef.current?.blur()
-    tabletSearchInputRef.current?.blur()
-    mobileSearchInputRef.current?.blur()
     router.push(`/search?q=${encodeURIComponent(query.trim())}`)
   }
 
@@ -161,113 +126,67 @@ export function Header() {
     <>
     <header ref={headerRef} className="sticky top-0 z-40 bg-canvas border-b border-line">
       <div className="relative z-[3] bg-canvas">
-      {showAnnouncement && (
-        <div
-          className="w-full text-[11px] sm:text-[12px] tracking-[0.04em] text-center py-2.5 px-4"
-          style={{
-            background: announcement!.bg_color,
-            color: announcement!.text_color,
-          }}
-          role="status"
-        >
-          <p key={messageIndex} className="max-w-site mx-auto leading-snug animate-[fadeIn_0.4s_ease-out]">
-            {announcementMessages[messageIndex]}
-          </p>
-        </div>
-      )}
+      {/* AnnouncementBar lives in CustomerShell (DESIGN_SPEC §3.1). */}
 
-      {/* ── Desktop ≥1025: logo + Categories | capped search | icons immediately after ── */}
-      <div className="hidden desktop:flex items-center gap-5 px-6 md:px-16 xl:px-24 2xl:px-32 py-3.5 max-w-site">
-        <div className="flex items-center gap-3 shrink-0">
-          <Logo variant="full" />
-          <div ref={categoriesWrapRef} className="relative">
-            <button
-              type="button"
-              onClick={() => { setMobileOpen(false); setCategoriesOpen((v) => !v) }}
-              aria-label="Browse categories"
-              aria-expanded={categoriesOpen}
-              className="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-surface transition-colors"
-            >
-              <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
-              <span className="text-[13px] font-medium text-ink whitespace-nowrap">Categories</span>
-            </button>
-            {categoriesOpen && (
-              <DesktopCategoriesMenu
-                categories={categories}
-                onClose={() => setCategoriesOpen(false)}
-              />
-            )}
-          </div>
+      {/* ── Desktop ≥1024: logo + text nav | search | heart, cart, Sign in ── */}
+      <div className="hidden desktop:flex items-center gap-4 lg:gap-6 px-6 md:px-10 lg:px-8 py-3.5 max-w-site w-full">
+        <Logo variant="full" />
+        <nav className="hidden lg:flex items-center gap-5 shrink-0" aria-label="Primary">
+          {[
+            { href: '/shop', label: 'Shop' },
+            { href: '/shop?level=beginner', label: 'Skill levels' },
+            { href: '/shop?price=free', label: 'Free patterns' },
+            { href: '/#reviews', label: 'Reviews' },
+          ].map((l) => (
+            <Link key={l.href} href={l.href} className="text-[13px] font-medium text-ink whitespace-nowrap hover:text-primary">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+        <div ref={categoriesWrapRef} className="relative lg:hidden shrink-0">
+          <button
+            type="button"
+            onClick={() => { setMobileOpen(false); setCategoriesOpen((v) => !v) }}
+            aria-label="Browse categories"
+            aria-expanded={categoriesOpen}
+            className="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-surface-warm transition-colors"
+          >
+            <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
+            <span className="text-[13px] font-medium text-ink whitespace-nowrap">Shop</span>
+          </button>
+          {categoriesOpen && (
+            <DesktopCategoriesMenu
+              categories={categories}
+              onClose={() => setCategoriesOpen(false)}
+            />
+          )}
         </div>
 
-        {/* Search capped (~680px); icon group sits ~32px after it — leftover space is to the right */}
-        <div className="flex items-center gap-8 min-w-0 flex-1">
-          <div className="flex items-center gap-3 min-w-0 flex-1 max-w-[680px]">
-            <div ref={searchWrapRef} className="relative flex-1 min-w-0">
-              <SearchPill
-                inputRef={desktopSearchInputRef}
+        <div className="flex items-center gap-4 min-w-0 flex-1 justify-end">
+          <div ref={searchWrapRef} className="relative min-w-0 flex-1 max-w-[280px]">
+            <SearchPill
+              inputRef={desktopSearchInputRef}
+              query={query}
+              setQuery={setQuery}
+              onFocus={() => setSearchFocused(true)}
+              onSubmit={submitSearch}
+              onClear={clearSearch}
+              placeholder="Search patterns"
+              buttonSize={36}
+              iconSize={18}
+            />
+            {searchFocused && query && (
+              <SuggestionsDropdown
+                suggestions={suggestions}
                 query={query}
-                setQuery={setQuery}
-                onFocus={() => setSearchFocused(true)}
-                onSubmit={submitSearch}
-                onClear={clearSearch}
-                placeholder="Search"
-                buttonSize={36}
-                iconSize={18}
+                onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
+                onSeeAll={() => submitSearch()}
               />
-              {searchFocused && query && (
-                <SuggestionsDropdown
-                  suggestions={suggestions}
-                  query={query}
-                  onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
-                  onSeeAll={() => submitSearch()}
-                />
-              )}
-            </div>
-            {pathname === '/search' && (
-              <button
-                type="button"
-                onClick={() => { clearSearch(); router.push('/'); desktopSearchInputRef.current?.blur() }}
-                className="text-[13px] text-ink-soft hover:text-ink shrink-0"
-              >
-                Cancel
-              </button>
             )}
           </div>
 
           <HeaderActions
             wrapRef={desktopAccountWrapRef}
-            iconSize={24}
-            cartCount={cartCount}
-            onCart={openCart}
-            user={user}
-            profile={profile}
-            requireAuth={requireAuth}
-            signOut={signOut}
-            accountOpen={desktopAccountOpen}
-            setAccountOpen={setDesktopAccountOpen}
-            onWishlist={goWishlist}
-          />
-        </div>
-      </div>
-
-      {/* ── Tablet 481–1024: row 1 hamburger+logo | icons; row 2 full-width search ── */}
-      <div className="hidden tablet:block desktop:hidden">
-        <div className="flex items-center justify-between gap-4 px-5 py-3 max-w-site">
-          <div className="flex items-center gap-1 min-w-0">
-            <button
-              type="button"
-              aria-label="Browse categories"
-              aria-expanded={mobileOpen}
-              onClick={() => { setCategoriesOpen(false); setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
-              className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-[#ececec]' : ''}`}
-            >
-              <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
-            </button>
-            <Logo variant="full" />
-          </div>
-          <HeaderActions
-            wrapRef={tabletAccountWrapRef}
             iconSize={22}
             cartCount={cartCount}
             onCart={openCart}
@@ -278,147 +197,93 @@ export function Header() {
             accountOpen={desktopAccountOpen}
             setAccountOpen={setDesktopAccountOpen}
             onWishlist={goWishlist}
-            gapClass="gap-4"
+            showWishlist
+            signInPill
           />
-        </div>
-        <div className="px-5 pb-3 max-w-site">
-          <div ref={tabletSearchWrapRef} className="relative w-full min-w-0">
-            <SearchPill
-              inputRef={tabletSearchInputRef}
-              query={query}
-              setQuery={setQuery}
-              onFocus={() => setSearchFocused(true)}
-              onSubmit={submitSearch}
-              onClear={clearSearch}
-              placeholder="Search"
-              buttonSize={34}
-              iconSize={17}
-            />
-            {searchFocused && query && (
-              <SuggestionsDropdown
-                suggestions={suggestions}
-                query={query}
-                onPick={() => { setSearchFocused(false); tabletSearchInputRef.current?.blur() }}
-                onSeeAll={() => submitSearch()}
-              />
-            )}
-          </div>
         </div>
       </div>
 
-      {/* ── Mobile <481: single row — hamburger, logo, search (flex-1), account, cart ── */}
+      {/* ── Tablet 768–1023: logo | search, heart, cart, hamburger (DESIGN_SPEC) ── */}
+      <div className="hidden tablet:flex desktop:hidden items-center justify-between gap-4 px-5 py-3 max-w-site w-full">
+        <Logo variant="full" />
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            aria-label="Search patterns"
+            onClick={() => router.push('/search')}
+            className="touch-target w-11 h-11 flex items-center justify-center hover:opacity-70"
+          >
+            <MaterialIcon name="search" size={22} color={HEADER_ICON} />
+          </button>
+          <button
+            type="button"
+            aria-label="Wishlist"
+            onClick={goWishlist}
+            className="touch-target w-11 h-11 flex items-center justify-center hover:opacity-70"
+          >
+            <MaterialIcon name="favorite" size={22} color={HEADER_ICON} />
+          </button>
+          <button
+            type="button"
+            aria-label="Cart"
+            onClick={openCart}
+            className="relative touch-target w-11 h-11 flex items-center justify-center hover:opacity-70"
+          >
+            <MaterialIcon name="shopping_bag" size={22} color={HEADER_ICON} />
+            {cartCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center bg-primary">
+                {cartCount}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            onClick={() => { setCategoriesOpen(false); setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
+            className={`touch-target w-11 h-11 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-surface-warm' : ''}`}
+          >
+            <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Mobile <768: hamburger, logo, search icon, cart (no heart) ── */}
       <div className="tablet:hidden relative z-50">
-        <div ref={mobileSearchWrapRef} className="px-3 py-2 relative z-[2] bg-canvas">
-          <div className="flex items-center h-10 gap-0.5">
-            {!searchFocused && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
-                  aria-label="Browse categories"
-                  aria-expanded={mobileOpen}
-                  className={`w-10 h-10 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-[#ececec]' : ''}`}
-                >
-                  <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
-                </button>
-
-                <div className="shrink-0 mr-1">
-                  <Logo variant="compact" />
-                </div>
-              </>
-            )}
-
-            <form
-              onSubmit={submitSearch}
-              className={`relative flex items-center h-10 border-2 border-ink rounded-full bg-white pl-3 pr-1.5 gap-1 min-w-0 ${searchFocused ? 'flex-1' : 'flex-1 mr-1'}`}
-            >
-              <input
-                ref={mobileSearchInputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                placeholder="Search"
-                className="flex-1 min-w-0 h-full bg-transparent text-[14px] placeholder:text-ink-soft focus:outline-none"
-              />
-              {query ? (
-                <button
-                  type="button"
-                  onClick={() => { setQuery(''); setSuggestions([]); mobileSearchInputRef.current?.focus() }}
-                  aria-label="Clear search"
-                  className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft"
-                >
-                  <MaterialIcon name="close" size={18} />
-                </button>
-              ) : null}
-              <button type="submit" aria-label="Search" className="shrink-0 w-7 h-7 rounded-full text-white flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                <MaterialIcon name="search" size={16} />
-              </button>
-            </form>
-
-            {searchFocused ? (
-              <button
-                type="button"
-                onClick={() => { setSearchFocused(false); mobileSearchInputRef.current?.blur() }}
-                className="text-[15px] font-medium text-ink shrink-0 ml-1.5"
-              >
-                Cancel
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  aria-label="Your account"
-                  title="Your account"
-                  onClick={() => (user ? setMobileAccountOpen(true) : requireAuth())}
-                  className="w-10 h-10 shrink-0 flex items-center justify-center"
-                >
-                  <MaterialIcon name="person" size={22} color={HEADER_ICON} />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Cart"
-                  title="Cart"
-                  onClick={openMobileCart}
-                  className="relative w-10 h-10 shrink-0 flex items-center justify-center"
-                >
-                  <MaterialIcon name="shopping_bag" size={22} color={HEADER_ICON} filled />
-                  {cartCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full text-white text-[8px] flex items-center justify-center" style={{ background: 'var(--color-accent)' }}>
-                      {cartCount}
-                    </span>
-                  )}
-                </button>
-              </>
-            )}
+        <div className="px-3 py-2 flex items-center gap-1 bg-canvas">
+          <button
+            type="button"
+            onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            className={`touch-target w-11 h-11 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-surface-warm' : ''}`}
+          >
+            <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
+          </button>
+          <div className="flex-1 min-w-0 flex justify-center">
+            <Logo variant="full" />
           </div>
-
-          {searchFocused && query && (
-            <div className="absolute left-3 right-3 top-full mt-1 bg-canvas border border-line shadow-lg z-50 max-h-[60vh] overflow-y-auto rounded-lg">
-              {suggestions.length > 0 ? (
-                <>
-                  {suggestions.map((p) => (
-                    <Link
-                      key={p.id}
-                      href={`/pattern/${p.slug}`}
-                      onClick={() => { setSearchFocused(false); mobileSearchInputRef.current?.blur() }}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-surface"
-                    >
-                      <div className="w-10 h-10 shrink-0 bg-surface rounded-md overflow-hidden">
-                        {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
-                      </div>
-                      <span className="text-[13px] truncate">{p.title}</span>
-                      <span className="ml-auto text-[12px] text-ink-soft shrink-0">${p.price.toFixed(2)}</span>
-                    </Link>
-                  ))}
-                  <button type="button" onClick={() => submitSearch()} className="block w-full text-left px-4 py-3 text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink border-t border-line">
-                    SEE ALL RESULTS FOR "{query.toUpperCase()}" →
-                  </button>
-                </>
-              ) : (
-                <p className="px-4 py-4 text-[13px] text-ink-soft">No patterns matched "{query}"</p>
-              )}
-            </div>
-          )}
+          <button
+            type="button"
+            aria-label="Search patterns"
+            onClick={() => router.push('/search')}
+            className="touch-target w-11 h-11 shrink-0 flex items-center justify-center hover:opacity-70"
+          >
+            <MaterialIcon name="search" size={22} color={HEADER_ICON} />
+          </button>
+          <button
+            type="button"
+            aria-label="Cart"
+            onClick={openCart}
+            className="relative touch-target w-11 h-11 shrink-0 flex items-center justify-center hover:opacity-70"
+          >
+            <MaterialIcon name="shopping_bag" size={22} color={HEADER_ICON} />
+            {cartCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center bg-primary">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
       </div>
@@ -606,7 +471,9 @@ function HeaderActions({
   signOut,
   accountOpen,
   setAccountOpen,
-  gapClass = 'gap-5',
+  gapClass = 'gap-3',
+  showWishlist = true,
+  signInPill = false,
 }: {
   wrapRef: React.RefObject<HTMLDivElement | null>
   iconSize: number
@@ -620,45 +487,56 @@ function HeaderActions({
   accountOpen: boolean
   setAccountOpen: React.Dispatch<React.SetStateAction<boolean>>
   gapClass?: string
+  showWishlist?: boolean
+  signInPill?: boolean
 }) {
   return (
-    <div className={`flex items-center ${gapClass} shrink-0 text-[#111111]`}>
-      <HeaderAccountControl
-        wrapRef={wrapRef}
-        iconSize={iconSize}
-        open={accountOpen}
-        setOpen={setAccountOpen}
-        user={user}
-        profile={profile}
-        requireAuth={requireAuth}
-        signOut={signOut}
-      />
-      <button
-        type="button"
-        aria-label="Wishlist"
-        title={user ? 'Wishlist' : 'Wishlist — items saved for 7 days while signed out'}
-        onClick={onWishlist}
-        className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-      >
-        <MaterialIcon name="favorite" size={iconSize} color={HEADER_ICON} filled />
-      </button>
+    <div className={`flex items-center ${gapClass} shrink-0 text-ink`}>
+      {showWishlist && (
+        <button
+          type="button"
+          aria-label="Wishlist"
+          title={user ? 'Wishlist' : 'Wishlist — items saved for 7 days while signed out'}
+          onClick={onWishlist}
+          className="touch-target w-11 h-11 flex items-center justify-center hover:opacity-70 transition-opacity"
+        >
+          <MaterialIcon name="favorite" size={iconSize} color={HEADER_ICON} />
+        </button>
+      )}
       <button
         type="button"
         onClick={onCart}
         aria-label="Cart"
         title={user ? 'Cart' : 'Cart — items saved for 7 days while signed out'}
-        className="relative w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
+        className="relative touch-target w-11 h-11 flex items-center justify-center hover:opacity-70 transition-opacity"
       >
-        <MaterialIcon name="shopping_bag" size={iconSize} color={HEADER_ICON} filled />
+        <MaterialIcon name="shopping_bag" size={iconSize} color={HEADER_ICON} />
         {cartCount > 0 && (
-          <span
-            className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
-            style={{ background: 'var(--color-accent)' }}
-          >
+          <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center bg-primary">
             {cartCount}
           </span>
         )}
       </button>
+      {signInPill && !user ? (
+        <button
+          type="button"
+          onClick={() => requireAuth()}
+          className="ml-1 inline-flex min-h-11 items-center rounded-full border-[1.5px] border-primary px-5 text-[13px] font-semibold text-primary hover:bg-primary-soft"
+        >
+          Sign in
+        </button>
+      ) : (
+        <HeaderAccountControl
+          wrapRef={wrapRef}
+          iconSize={iconSize}
+          open={accountOpen}
+          setOpen={setAccountOpen}
+          user={user}
+          profile={profile}
+          requireAuth={requireAuth}
+          signOut={signOut}
+        />
+      )}
     </div>
   )
 }

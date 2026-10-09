@@ -8,13 +8,19 @@ import { useCart } from '../context/CartContext'
 import { setPendingCheckout } from '../lib/guestStorage'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
-import { MaterialIcon } from './MaterialIcon'
-import { CloseCircleIcon } from './icons'
+import { LevelBadge } from './ui/Badge'
+import { Button } from './ui/Button'
+import type { Product } from '../lib/types'
 
+/**
+ * Cart drawer — DESIGN_SPEC §3.9.
+ * Right panel on md+, bottom sheet on mobile. Keeps existing checkout / auth behaviour.
+ */
 export function CartDrawer() {
   const { user } = useAuth()
   const { requireAuth } = useUI()
-  const { items, count, drawerOpen, closeDrawer, justAdded, removeFromCart, checkingOut, checkoutError, checkout } = useCart()
+  const { items, count, drawerOpen, closeDrawer, justAdded, removeFromCart, checkingOut, checkoutError, checkout } =
+    useCart()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   useBodyScrollLock(drawerOpen)
 
@@ -27,7 +33,6 @@ export function CartDrawer() {
     void checkout()
   }
 
-  // ESC to close + move focus to the drawer's close button when it opens (basic focus management)
   useEffect(() => {
     if (!drawerOpen) return
     closeButtonRef.current?.focus()
@@ -35,134 +40,120 @@ export function CartDrawer() {
       if (e.key === 'Escape' && !checkingOut) closeDrawer()
     }
     window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-    }
+    return () => window.removeEventListener('keydown', onKey)
   }, [drawerOpen, closeDrawer, checkingOut])
 
   const total = items.reduce((sum, i) => sum + (i.product?.price ?? 0), 0)
 
   return (
     <>
-      {/* Backdrop */}
       <div
         aria-hidden="true"
-        onClick={() => { if (!checkingOut) closeDrawer() }}
-        className={`fixed inset-0 z-50 bg-ink/30 transition-opacity duration-200 motion-reduce:transition-none ${drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => {
+          if (!checkingOut) closeDrawer()
+        }}
+        className={`fixed inset-0 z-50 bg-ink/40 transition-opacity duration-200 motion-reduce:transition-none ${
+          drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
       />
 
-      {/* Drawer — right-side panel on desktop, bottom sheet on mobile */}
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Cart"
+        aria-label="Your cart"
         aria-hidden={!drawerOpen}
         inert={drawerOpen ? undefined : true}
-        className={`fixed z-50 bg-canvas flex flex-col shadow-2xl transition-transform duration-300 ease-out motion-reduce:transition-none
-          inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl
+        className={`fixed z-50 bg-surface flex flex-col shadow-2xl transition-transform duration-300 ease-out motion-reduce:transition-none
+          inset-x-0 bottom-0 max-h-[90vh] rounded-t-2xl
           md:inset-y-0 md:right-0 md:left-auto md:bottom-auto md:max-h-none md:h-full md:w-[420px] md:rounded-none
           ${drawerOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full invisible'}`}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-line shrink-0">
-          <div>
-            <h2 className="font-subheading font-semibold text-lg">Your Cart</h2>
-            <p className="text-[11px] text-ink-soft mt-0.5">{count} {count === 1 ? 'item' : 'items'}</p>
-            {!user && (
-              <p className="text-[11px] text-ink-soft mt-1.5 leading-relaxed max-w-[240px]">
-                Cart items are saved for 7 days. Sign in to save them permanently.
-              </p>
-            )}
-          </div>
-          <button ref={closeButtonRef} onClick={closeDrawer} aria-label="Close cart" className="w-8 h-8 flex items-center justify-center hover:opacity-80">
-            <CloseCircleIcon size={28} />
+        <div className="flex items-center justify-between px-6 pt-5 pb-3 shrink-0">
+          <h2 className="font-heading text-2xl font-bold text-ink">Your cart ({count})</h2>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={closeDrawer}
+            aria-label="Close cart"
+            className="touch-target inline-flex items-center justify-center rounded-full hover:bg-surface-warm"
+          >
+            <CloseIcon />
           </button>
         </div>
 
         {justAdded && (
-          <div className="mx-6 mt-4 px-4 py-2.5 rounded-xl flex items-center gap-2 shrink-0 animate-[fadeIn_0.3s_ease-out]" style={{ background: '#E8F0E5' }}>
-            <CheckIcon />
-            <span className="text-[13px] font-medium" style={{ color: 'var(--color-sale-green)' }}>Added to cart</span>
+          <div className="mx-6 mb-3 px-4 py-2.5 rounded-xl flex items-center gap-2 shrink-0 bg-success-bg animate-[fadeIn_0.3s_ease-out]">
+            <CheckCircleIcon />
+            <span className="text-[13px] font-medium text-ink">Added to your cart</span>
           </div>
         )}
 
         {items.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-8">
-            <YarnBasketIcon />
-            <p className="font-subheading text-lg mb-2 mt-4">Your cart is empty</p>
-            <p className="text-[13px] text-ink-soft mb-6">Discover beautiful crochet patterns and find your next project.</p>
-            <Link
-              href="/shop"
-              onClick={closeDrawer}
-              className="px-6 py-3 rounded-full text-white text-[13px] font-semibold"
-              style={{ background: 'var(--color-cart-blue)' }}
-            >
-              Browse Patterns
-            </Link>
+          <div className="flex-1 flex flex-col items-center justify-center text-center px-8 py-10">
+            <p className="font-heading text-xl font-bold text-ink mb-2">Your cart is empty</p>
+            <p className="text-[14px] text-muted mb-6 max-w-xs leading-relaxed">
+              Pick a pattern you love and it will wait here. Saved items stay in your cart for about 7 days.
+            </p>
+            <div className="flex flex-col gap-3 w-full max-w-xs">
+              <Link
+                href="/shop"
+                onClick={closeDrawer}
+                className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover"
+              >
+                Shop all patterns
+              </Link>
+              <Link
+                href="/shop?price=free"
+                onClick={closeDrawer}
+                className="text-center text-[13px] font-semibold text-primary underline-offset-2 hover:underline"
+              >
+                Browse free patterns
+              </Link>
+            </div>
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto divide-y divide-line px-6">
+            <div className="flex-1 overflow-y-auto px-6 divide-y divide-border">
               {items.map((item) => (
-                <div key={item.product_id} className="flex gap-4 py-5">
-                  <Link
-                    href={item.product ? `/pattern/${item.product.slug}` : '#'}
-                    onClick={closeDrawer}
-                    className="w-16 h-16 shrink-0 bg-surface rounded-lg overflow-hidden"
-                  >
-                    {item.product?.images?.[0] && (
-                      <img src={deriveVariantUrl(item.product.images[0], 'micro')} alt={item.product.title} className="w-full h-full object-cover" />
-                    )}
-                  </Link>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-subheading text-[14px] font-medium leading-tight truncate">{item.product?.title}</p>
-                    <p className="text-[11px] mt-1 font-medium" style={{ color: 'var(--color-sale-green)' }}>Digital PDF Pattern</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-[13px] font-medium">
-                        {(item.product?.price ?? 0) === 0 ? 'Free' : `$${(item.product?.price ?? 0).toFixed(2)}`}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => removeFromCart(item.product_id)}
-                    aria-label="Remove item"
-                    className="shrink-0 self-start text-ink-soft hover:text-madder transition-colors"
-                  >
-                    <TrashIcon />
-                  </button>
-                </div>
+                <CartLine
+                  key={item.product_id}
+                  product={item.product}
+                  onRemove={() => removeFromCart(item.product_id)}
+                  onNavigate={closeDrawer}
+                />
               ))}
             </div>
 
-            <div className="border-t border-line px-6 py-5 shrink-0 space-y-4 mt-4">
-              <div className="flex items-center justify-between text-[14px]">
-                <span>Subtotal</span>
-                <span className="font-medium">${total.toFixed(2)}</span>
+            <div className="border-t border-border px-6 py-5 shrink-0 space-y-3">
+              <div className="flex items-baseline justify-between">
+                <span className="text-[14px] text-ink">Subtotal</span>
+                <span className="text-[18px] font-extrabold text-primary">${total.toFixed(2)}</span>
               </div>
-
-              {checkoutError && <p className="text-madder text-[12px]">{checkoutError}</p>}
-
-              <div className="space-y-2.5">
-                <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
-                  aria-busy={checkingOut}
-                  className="w-full py-3.5 text-white text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
-                  style={{ background: 'var(--color-cart-blue)' }}
-                >
-                  Checkout — ${total.toFixed(2)}
-                </button>
-                <Link
-                  href="/cart"
-                  onClick={closeDrawer}
-                  className="block text-center w-full py-3.5 border rounded-full hover:bg-surface transition-colors text-[13px] font-semibold"
-                  style={{ borderColor: 'var(--color-cart-blue)', color: 'var(--color-cart-blue)' }}
-                >
-                  View Cart
-                </Link>
-                <button onClick={closeDrawer} className="flex items-center justify-center gap-1 w-full text-center text-[12px] font-medium py-1" style={{ color: 'var(--color-cart-blue)' }}>
-                  Continue Shopping <ArrowIcon />
-                </button>
-              </div>
+              <p className="text-[12px] text-muted">Taxes, if any, are shown at checkout.</p>
+              {checkoutError && <p className="text-[12px] text-sale">{checkoutError}</p>}
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full"
+                loading={checkingOut}
+                onClick={handleCheckout}
+                iconRight={<span aria-hidden>→</span>}
+              >
+                Checkout
+              </Button>
+              <button
+                type="button"
+                onClick={closeDrawer}
+                className="block w-full text-center text-[13px] font-semibold text-primary py-2"
+              >
+                Continue shopping
+              </button>
+              <p className="flex items-start gap-2 text-[11px] text-muted leading-relaxed pt-1">
+                <ShieldIcon />
+                <span>
+                  Secure checkout by Lemon Squeezy. You will sign in or create a free account to get your downloads.
+                </span>
+              </p>
             </div>
           </>
         )}
@@ -171,25 +162,95 @@ export function CartDrawer() {
   )
 }
 
-function CheckIcon() {
-  return <MaterialIcon name="check_circle" size={16} color="var(--color-sale-green)" />
-}
-function TrashIcon() {
-  return <MaterialIcon name="delete" size={16} />
-}
-function ArrowIcon() {
-  return <MaterialIcon name="chevron_right" size={12} />
-}
-// Decorative illustration, not a semantic UI icon — no Lucide equivalent, stays custom.
-function YarnBasketIcon() {
+function CartLine({
+  product,
+  onRemove,
+  onNavigate,
+}: {
+  product?: Product | null
+  onRemove: () => void
+  onNavigate: () => void
+}) {
+  if (!product) return null
+  const onSale =
+    product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
+
   return (
-    <svg width="72" height="72" viewBox="0 0 96 96" fill="none">
-      <path d="M20 44h56l-6 34a4 4 0 0 1-4 3.4H30a4 4 0 0 1-4-3.4L20 44z" stroke="var(--color-ink-soft)" strokeWidth="2" fill="#F0EDE4" />
-      <path d="M14 44h68" stroke="var(--color-ink-soft)" strokeWidth="2" />
-      <circle cx="36" cy="30" r="12" fill="#E8F0E5" stroke="var(--color-sale-green)" strokeWidth="2" />
-      <circle cx="58" cy="24" r="9" fill="#E5EDFF" stroke="var(--color-cart-blue)" strokeWidth="2" />
-      <path d="M36 22c4 2 6 5 6 8s-2 6-6 8" stroke="var(--color-sale-green)" strokeWidth="1.4" fill="none" />
-      <path d="M58 18c3 1.5 4.5 3.8 4.5 6s-1.5 4.5-4.5 6" stroke="var(--color-cart-blue)" strokeWidth="1.2" fill="none" />
+    <div className="flex gap-3 py-5">
+      <Link
+        href={`/pattern/${product.slug}`}
+        onClick={onNavigate}
+        className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-surface-warm border border-border"
+      >
+        {product.images?.[0] && (
+          <img
+            src={deriveVariantUrl(product.images[0], 'micro')}
+            alt={product.title}
+            className="w-full h-full object-cover"
+          />
+        )}
+      </Link>
+      <div className="flex-1 min-w-0">
+        <Link
+          href={`/pattern/${product.slug}`}
+          onClick={onNavigate}
+          className="block text-[14px] font-semibold text-ink leading-snug line-clamp-2"
+        >
+          {product.title}
+        </Link>
+        {product.skill_level && (
+          <div className="mt-1.5">
+            <LevelBadge level={product.skill_level} />
+          </div>
+        )}
+        <p className="text-[12px] text-muted mt-1.5">PDF · instant download</p>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="mt-1.5 text-[12px] font-medium text-primary underline underline-offset-2"
+        >
+          Remove
+        </button>
+      </div>
+      <div className="shrink-0 text-right">
+        {onSale && product.compare_at_price != null && (
+          <p className="text-[12px] text-muted line-through">${product.compare_at_price.toFixed(2)}</p>
+        )}
+        <p className="text-[14px] font-bold text-primary">
+          {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function CheckCircleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0">
+      <circle cx="12" cy="12" r="9" stroke="var(--color-free)" strokeWidth="2" />
+      <path d="M8 12.5l2.5 2.5L16 9" stroke="var(--color-free)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0 mt-0.5">
+      <path
+        d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"
+        stroke="var(--color-free)"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M9.5 12l1.8 1.8L15 10" stroke="var(--color-free)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

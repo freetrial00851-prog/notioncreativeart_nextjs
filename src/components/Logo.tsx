@@ -3,39 +3,58 @@
 import Link from 'next/link'
 
 type LogoProps = {
-  variant?: 'full' | 'compact'
+  variant?: 'full' | 'compact' | 'footer'
   className?: string
 }
 
 /**
- * Brand lockup — full (icon tile + NotionCreativeArt) or compact (NCA + coral dot).
- * Matches LOGO/logo-full.svg and LOGO/logo-compact.svg; Baloo 2 via --font-logo.
+ * Brand lockup — orange accent circle + wordmark (DESIGN_SPEC §2).
+ * Baloo 2 via --font-logo.
  */
 export function Logo({ variant = 'full', className = '' }: LogoProps) {
+  const onDark = variant === 'footer'
   return (
     <Link
       href="/"
-      className={`shrink-0 leading-none inline-flex items-center ${className}`}
+      className={`shrink-0 leading-none inline-flex items-center gap-2 ${className}`}
       aria-label="Notion Creative Art — home"
     >
-      {variant === 'compact' ? <CompactMark /> : <FullMark />}
+      <span
+        className="shrink-0 rounded-full"
+        style={{
+          width: variant === 'compact' ? 10 : 12,
+          height: variant === 'compact' ? 10 : 12,
+          background: 'var(--color-logo-accent)',
+        }}
+        aria-hidden
+      />
+      <span
+        className={`font-bold tracking-tight leading-none ${
+          variant === 'compact' ? 'text-[18px]' : 'text-[18px] md:text-[20px]'
+        }`}
+        style={{
+          color: onDark ? '#FFFFFF' : 'var(--color-primary)',
+          fontFamily: 'var(--font-logo)',
+        }}
+      >
+        Notion Creative Art
+      </span>
     </Link>
   )
 }
 
-/** Square “N” tile used in the full logo — no link (safe inside overlays). */
+/** Square “N” tile — kept for overlays / chat that need a mark without the wordmark. */
 export function LogoIcon({
   size = 40,
   onAccent = false,
   className = '',
 }: {
   size?: number
-  /** Invert for dark/accent backgrounds (e.g. chat header). */
   onAccent?: boolean
   className?: string
 }) {
-  const tile = onAccent ? '#FCFBF8' : 'var(--color-accent)'
-  const letter = onAccent ? 'var(--color-accent)' : '#FCFBF8'
+  const tile = onAccent ? '#FCFBF8' : 'var(--color-primary)'
+  const letter = onAccent ? 'var(--color-primary)' : '#FCFBF8'
   const dot = Math.max(5, Math.round(size * 0.175))
   const inset = Math.max(3, Math.round(size * 0.1))
   return (
@@ -62,42 +81,6 @@ export function LogoIcon({
           top: inset,
           right: inset,
         }}
-      />
-    </span>
-  )
-}
-
-function FullMark() {
-  return (
-    <span className="inline-flex items-center gap-2.5">
-      <LogoIcon size={40} />
-      <span
-        className="text-[19px] desktop:text-[21px] font-bold tracking-tight leading-none"
-        style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-logo)' }}
-      >
-        NotionCreativeArt
-      </span>
-    </span>
-  )
-}
-
-function CompactMark() {
-  return (
-    <span className="relative inline-block pr-2.5">
-      <span
-        className="text-[28px] font-extrabold tracking-[0.04em] leading-none"
-        style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-logo)' }}
-      >
-        NCA
-      </span>
-      <span
-        className="absolute w-[9px] h-[9px] rounded-full"
-        style={{
-          background: 'var(--color-logo-accent)',
-          top: '1px',
-          right: '0',
-        }}
-        aria-hidden
       />
     </span>
   )

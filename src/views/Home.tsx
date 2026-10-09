@@ -1,10 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { supabase } from '../lib/supabase'
-import type { CategoryWithCount } from '../lib/categories'
 import { DEFAULT_LAYOUT } from '../lib/defaultLayout'
 import {
   clearHomeCatalogCache,
@@ -14,41 +12,34 @@ import {
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
 import type { Product, HeroContent, ChapterContent, LayoutSection, TestimonialContent } from '../lib/types'
-import { ProductCard } from '../components/ProductCard'
-import { SKILL_PILL_STYLES } from '../lib/productCardMeta'
+import { PatternCard } from '../components/PatternCard'
+import { PatternGrid } from '../components/PatternGrid'
+import { LevelBadge, StatusBadge } from '../components/ui/Badge'
+import { Button } from '../components/ui/Button'
+import { EmailSignup } from '../components/EmailSignup'
+import { FaqAccordion } from '../components/FaqAccordion'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
-import { MaterialIcon } from '../components/MaterialIcon'
-import { NewsletterBanner } from '../components/NewsletterBanner'
-import { ProductGridSkeleton, CategoryRowSkeleton, ChaptersSkeleton, SkillBrowseSkeleton, TestimonialsSkeleton } from '../components/Skeleton'
-import { SectionBand } from '../components/SectionBand'
-import { HOME_PRODUCT_GRID_CLASS, homeProductCardVisibilityClass } from '../lib/homeProductGrid'
+import { ProductGridSkeleton } from '../components/Skeleton'
 
-const SKILL_DIFFICULTY_FILLED: Record<'beginner' | 'intermediate' | 'advanced', number> = {
-  beginner: 1,
-  intermediate: 2,
-  advanced: 3,
-}
-
-function SkillDifficultyDots({ level }: { level: 'beginner' | 'intermediate' | 'advanced' }) {
-  const filled = SKILL_DIFFICULTY_FILLED[level]
-  const fillColor = SKILL_PILL_STYLES[level].color
-  const label = level.charAt(0).toUpperCase() + level.slice(1)
-  return (
-    <div
-      className="flex items-center gap-1.5"
-      role="img"
-      aria-label={`Difficulty: ${label} (${filled} of 3)`}
-    >
-      {Array.from({ length: 3 }, (_, i) => (
-        <span
-          key={i}
-          aria-hidden
-          className="block w-1.5 h-1.5 rounded-full"
-          style={{ background: i < filled ? fillColor : 'var(--color-line)' }}
-        />
-      ))}
-    </div>
-  )
+const SKILL_COPY: Record<
+  'beginner' | 'intermediate' | 'advanced',
+  { title: string; body: string; tint: string }
+> = {
+  beginner: {
+    title: 'Start simple',
+    body: 'Basic stitches and simple shaping. A gentle place to begin.',
+    tint: 'var(--color-tint-sage)',
+  },
+  intermediate: {
+    title: 'Build your skills',
+    body: 'More shaping, colour changes and finishing detail.',
+    tint: 'var(--color-tint-cream)',
+  },
+  advanced: {
+    title: 'Take on a challenge',
+    body: 'Complex construction for confident makers.',
+    tint: 'var(--color-tint-peach)',
+  },
 }
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
@@ -60,35 +51,18 @@ function applyCatalogSnapshot(
   snap: HomeCatalogSnapshot,
   setters: {
     setTrending: (v: Product[]) => void
-    setNewArrivals: (v: Product[]) => void
-    setBundles: (v: Product[]) => void
     setFreeProduct: (v: Product | null) => void
     setFreePatternCollage: (v: Product[]) => void
-    setCategories: (v: CategoryWithCount[]) => void
     setChapters: (v: ChapterContent[]) => void
     setTestimonials: (v: TestimonialContent[]) => void
     setHero: Dispatch<SetStateAction<HeroContent | null>>
-    setLayout: Dispatch<SetStateAction<LayoutSection[]>>
-    setSkillCounts: (v: Record<'beginner' | 'intermediate' | 'advanced', number>) => void
-    setActiveSkill: (v: 'beginner' | 'intermediate' | 'advanced') => void
-    setSkillProducts: (v: Product[]) => void
-    setSkillLoading: (v: boolean) => void
   },
 ) {
   setters.setTrending(snap.trending)
-  setters.setNewArrivals(snap.newArrivals)
-  setters.setBundles(snap.bundles)
   setters.setFreeProduct(snap.freeProduct)
   setters.setFreePatternCollage(snap.freePatternCollage ?? [])
-  setters.setCategories(snap.categories)
   setters.setChapters(snap.chapters)
   setters.setTestimonials(snap.testimonials)
-  setters.setSkillCounts(snap.skillCounts)
-  if (snap.skillPreviewLevel || snap.skillPreview) {
-    setters.setActiveSkill(snap.skillPreviewLevel ?? 'beginner')
-    setters.setSkillProducts(snap.skillPreview ?? [])
-    setters.setSkillLoading(false)
-  }
   if (snap.hero) {
     setters.setHero((prev) => {
       const prevUrls = (prev?.images ?? []).join('|')
@@ -96,21 +70,11 @@ function applyCatalogSnapshot(
       return prevUrls === nextUrls ? prev : snap.hero
     })
   }
-  if (snap.layout) {
-    const next = snap.layout
-    setters.setLayout((prev) => {
-      const same =
-        prev.length === next.length &&
-        prev.every((s, i) => s.id === next[i].id && s.visible === next[i].visible)
-      return same ? prev : next
-    })
-  }
 }
 
-/** Resolve hero CTAs — migrate stale `/shop` links to paid/free filters. */
 function heroPrimaryHref(link: string | undefined) {
   const raw = (link ?? '').trim()
-  if (!raw || raw === '/shop' || raw === '/shop/' || raw === '/shop/new') return '/shop?price=paid'
+  if (!raw || raw === '/shop' || raw === '/shop/' || raw === '/shop/new') return '/shop'
   return raw
 }
 
@@ -120,164 +84,96 @@ function heroSecondaryHref(link: string | undefined) {
   return raw
 }
 
-/** Start With Free — staggered photo stack; 1 / 2 / 3–4 by breakpoint. */
-function FreePatternsCollage({ products }: { products: Product[] }) {
-  const shots = products
-    .map((p) => ({ src: p.images?.[0], alt: p.title, id: p.id, slug: p.slug }))
-    .filter((s): s is { src: string; alt: string; id: string; slug: string } => !!s.src && !!s.slug)
-  if (shots.length === 0) return null
+const FAQ_ITEMS = [
+  {
+    question: 'How do I get my pattern after paying?',
+    answer:
+      'Right after payment you can download the PDF from the confirmation page. It is also emailed to you and saved in My downloads.',
+  },
+  {
+    question: 'Do I need an account?',
+    answer:
+      'Yes for paid patterns, so your files are safe and you can download them again. Free patterns can be downloaded without signing in.',
+  },
+  {
+    question: 'Can I download a pattern again later?',
+    answer:
+      'Yes. Every pattern you buy stays in your account, and you can download it as many times as you like.',
+  },
+  {
+    question: 'Which skill level should I choose?',
+    answer:
+      'Beginner patterns use basic stitches and short steps. Intermediate and Advanced add shaping and finer details. Each product page shows the level.',
+  },
+  {
+    question: 'What if something is wrong with my file?',
+    answer: (
+      <>
+        {/* TODO: real refund policy summary from owner */}
+        [REFUND POLICY SUMMARY] You can also write to{' '}
+        {/* TODO: support email from owner */}
+        <span className="text-primary underline">[SUPPORT EMAIL]</span> and we will help.
+      </>
+    ),
+  },
+]
 
-  const card =
-    'absolute rounded-xl overflow-hidden border border-line bg-surface shadow-[0_8px_24px_rgba(0,0,0,0.08)] cursor-pointer transition-shadow hover:shadow-[0_12px_28px_rgba(0,0,0,0.14)] group'
+const HERO_TINTS = [
+  'var(--color-tint-lavender)',
+  'var(--color-tint-sage)',
+  'var(--color-tint-peach)',
+] as const
 
-  return (
-    <div className="relative w-full max-w-[280px] sm:max-w-[320px] h-[160px] sm:h-[180px] md:h-[200px] shrink-0 mx-auto sm:mx-0">
-      {/* Mobile: first image only */}
-      <Link href={`/pattern/${shots[0].slug}`} className={`md:hidden ${card} inset-0`}>
-        <img
-          src={shots[0].src}
-          alt={shots[0].alt}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-        />
-      </Link>
-
-      {/* Tablet: up to 2 staggered */}
-      <div className="hidden md:block lg:hidden absolute inset-0">
-        {shots.slice(0, 2).map((s, i) => (
-          <Link
-            key={s.id}
-            href={`/pattern/${s.slug}`}
-            className={card}
-            style={{
-              width: '68%',
-              height: '88%',
-              left: i === 0 ? '0%' : '32%',
-              top: i === 0 ? '12%' : '0%',
-              zIndex: i + 1,
-              transform: i === 0 ? 'rotate(-4deg)' : 'rotate(5deg)',
-            }}
-          >
-            <img
-              src={s.src}
-              alt={s.alt}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-            />
-          </Link>
-        ))}
-      </div>
-
-      {/* Desktop: up to 4 staggered */}
-      <div className="hidden lg:block absolute inset-0">
-        {shots.slice(0, 4).map((s, i) => {
-          const layouts = [
-            { left: '0%', top: '18%', rot: '-6deg', z: 1 },
-            { left: '22%', top: '0%', rot: '3deg', z: 3 },
-            { left: '44%', top: '14%', rot: '-3deg', z: 2 },
-            { left: '58%', top: '4%', rot: '6deg', z: 4 },
-          ]
-          const n = Math.min(shots.length, 4)
-          const L = layouts.slice(0, n)
-          const pos = L[i] ?? layouts[0]
-          return (
-            <Link
-              key={s.id}
-              href={`/pattern/${s.slug}`}
-              className={card}
-              style={{
-                width: n <= 2 ? '68%' : n === 3 ? '52%' : '46%',
-                height: '86%',
-                left: pos.left,
-                top: pos.top,
-                zIndex: pos.z,
-                transform: `rotate(${pos.rot})`,
-              }}
-            >
-              <img
-                src={s.src}
-                alt={s.alt}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-              />
-            </Link>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function HeroImage({
+function HeroTile({
   src,
+  label,
+  tint,
+  className = '',
   priority = false,
   sizes,
-  className = 'object-cover',
 }: {
-  src: string
+  src: string | null
+  label: string
+  tint: string
+  className?: string
   priority?: boolean
   sizes: string
-  className?: string
 }) {
   return (
-    <Image
-      src={src}
-      alt=""
-      fill
-      sizes={sizes}
-      priority={priority}
-      quality={85}
-      className={className}
-    />
+    <div className={`relative overflow-hidden border border-border rounded-[18px] ${className}`} style={{ background: tint }}>
+      {src ? (
+        <Image src={src} alt="" fill className="object-cover" sizes={sizes} priority={priority} />
+      ) : (
+        <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">{label}</span>
+      )}
+    </div>
   )
 }
 
-function HeroCollage({
-  group,
-  className = 'h-[280px] md:h-full',
-  mobileBleed = false,
-}: {
-  group: string[]
-  className?: string
-  /** Mobile full-bleed: no tile radius / gaps so the collage can sit edge-to-edge. */
-  mobileBleed?: boolean
-}) {
-  const gap = mobileBleed ? 'gap-0' : 'gap-3'
-  const tileRadius = mobileBleed ? 'rounded-none' : 'rounded-[18px]'
-
-  if (group.length >= 3) {
-    return (
-      <div className={`grid grid-cols-[1.5fr_1fr] ${gap} ${className}`}>
-        <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
-          <HeroImage src={group[0]} priority sizes="(max-width: 768px) 60vw, 35vw" />
-        </div>
-        <div className={`grid grid-rows-2 ${gap} min-h-0`}>
-          <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
-            <HeroImage src={group[1]} sizes="(max-width: 768px) 40vw, 20vw" />
-          </div>
-          <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
-            <HeroImage src={group[2]} sizes="(max-width: 768px) 40vw, 20vw" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-  if (group.length === 2) {
-    return (
-      <div className={`grid grid-cols-2 ${gap} ${className}`}>
-        <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
-          <HeroImage src={group[0]} priority sizes="(max-width: 768px) 50vw, 28vw" />
-        </div>
-        <div className={`relative ${tileRadius} overflow-hidden bg-surface min-h-0`}>
-          <HeroImage src={group[1]} sizes="(max-width: 768px) 50vw, 28vw" />
-        </div>
-      </div>
-    )
-  }
+/** Mobile + laptop: large left + two stacked. Tablet: three equal columns. */
+function HeroCollage({ images }: { images: string[] }) {
+  const slots = [0, 1, 2].map((i) => images[i] ?? null)
   return (
-    <div className={`relative ${tileRadius} overflow-hidden bg-surface ${className}`}>
-      <HeroImage src={group[0]} priority sizes="(max-width: 768px) 100vw, 55vw" />
-    </div>
+    <>
+      {/* Mobile <768: collage */}
+      <div className="grid grid-cols-2 gap-3 h-[280px] md:hidden">
+        <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} className="row-span-2" priority sizes="50vw" />
+        <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="40vw" />
+        <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="40vw" />
+      </div>
+      {/* Tablet 768–1023: three equal tiles */}
+      <div className="hidden md:grid lg:hidden grid-cols-3 gap-4 h-[320px]">
+        <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} priority sizes="30vw" />
+        <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="30vw" />
+        <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="30vw" />
+      </div>
+      {/* Laptop: collage beside copy */}
+      <div className="hidden lg:grid grid-cols-2 gap-4 h-[420px]">
+        <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} className="row-span-2" priority sizes="320px" />
+        <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="200px" />
+        <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="200px" />
+      </div>
+    </>
   )
 }
 
@@ -287,112 +183,65 @@ export function Home({
   initialHero = null,
   initialLayout,
 }: {
-  /** Full public catalog from the Server Component — eliminates first-load skeletons. */
   initialCatalog?: HomeCatalogSnapshot | null
   initialFeaturedError?: string | null
   initialHero?: HeroContent | null
-  /** Server-prefetched layout — avoids flashing off sections as "visible" before client fetch. */
   initialLayout?: LayoutSection[]
 }) {
   const seed = readCachedCatalog() ?? initialCatalog ?? null
   const [trending, setTrending] = useState<Product[]>(() => seed?.trending ?? [])
-  const [newArrivals, setNewArrivals] = useState<Product[]>(() => seed?.newArrivals ?? [])
-  const [bundles, setBundles] = useState<Product[]>(() => seed?.bundles ?? [])
   const [freeProduct, setFreeProduct] = useState<Product | null>(() => seed?.freeProduct ?? null)
   const [freePatternCollage, setFreePatternCollage] = useState<Product[]>(
     () => seed?.freePatternCollage ?? (seed?.freeProduct ? [seed.freeProduct] : []),
   )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
-  const [heroReady, setHeroReady] = useState(() =>
-    Boolean((seed?.hero ?? initialHero)?.images?.length) || Boolean(seed),
-  )
-  const [heroSlide, setHeroSlide] = useState(0)
   const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
   const [testimonials, setTestimonials] = useState<TestimonialContent[]>(() => seed?.testimonials ?? [])
-  const [categories, setCategories] = useState<CategoryWithCount[]>(() => seed?.categories ?? [])
-  const [layout, setLayout] = useState<LayoutSection[]>(() =>
-    seed?.layout?.length
-      ? seed.layout
-      : initialLayout?.length
-        ? initialLayout
-        : DEFAULT_LAYOUT,
-  )
-  /** False until product/category/chapter data is ready (SSR, cache hit, or network). */
   const [catalogReady, setCatalogReady] = useState(() => Boolean(seed))
-  /** Featured query failed — show retry; do not treat as a real empty catalog. */
   const [featuredError, setFeaturedError] = useState<string | null>(() => initialFeaturedError ?? null)
   const [catalogReloadKey, setCatalogReloadKey] = useState(0)
-  const [skillCounts, setSkillCounts] = useState<Record<'beginner' | 'intermediate' | 'advanced', number>>(
-    () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
-  )
-  const [activeSkill, setActiveSkill] = useState<'beginner' | 'intermediate' | 'advanced'>(
-    () => seed?.skillPreviewLevel ?? 'beginner',
-  )
-  const [skillProducts, setSkillProducts] = useState<Product[]>(() => seed?.skillPreview ?? [])
-  const [skillLoading, setSkillLoading] = useState(() => !seed?.skillPreview)
-  const [testimonialPage, setTestimonialPage] = useState(0)
-  const categoryScrollRef = useRef<HTMLDivElement>(null)
-  const reviewStatsMap = useReviewStatsMapForLists([trending, newArrivals])
-  const skipSkillFetchFor = useRef<'beginner' | 'intermediate' | 'advanced' | null>(
-    seed?.skillPreview?.length ? (seed.skillPreviewLevel ?? 'beginner') : null,
-  )
+  void initialLayout
+  void DEFAULT_LAYOUT // retained for page.tsx prop compatibility / future CMS layout
 
-  const HERO_GROUP_SIZE = 3
-  const heroImages = hero?.images ?? []
-  const heroGroups = heroImages.length > 0
-    ? Array.from({ length: Math.ceil(heroImages.length / HERO_GROUP_SIZE) }, (_, i) => heroImages.slice(i * HERO_GROUP_SIZE, i * HERO_GROUP_SIZE + HERO_GROUP_SIZE))
-    : []
-  const currentHeroGroup = heroGroups[Math.min(heroSlide, Math.max(heroGroups.length - 1, 0))] ?? []
-
-  useEffect(() => {
-    if (heroGroups.length <= 1) return
-    const timer = setInterval(() => setHeroSlide((i) => (i + 1) % heroGroups.length), 5000)
-    return () => clearInterval(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heroGroups.length])
+  const reviewStatsMap = useReviewStatsMapForLists([trending])
+  const featured = trending.slice(0, 4)
+  const freeImages = (
+    freePatternCollage.length > 0
+      ? freePatternCollage
+      : freeProduct
+        ? [freeProduct]
+        : []
+  ).slice(0, 2)
 
   useEffect(() => {
     let cancelled = false
     const setters = {
       setTrending,
-      setNewArrivals,
-      setBundles,
       setFreeProduct,
       setFreePatternCollage,
-      setCategories,
       setChapters,
       setTestimonials,
       setHero,
-      setLayout,
-      setSkillCounts,
-      setActiveSkill,
-      setSkillProducts,
-      setSkillLoading,
     }
 
-    // Fresh module cache → paint instantly, skip network for this visit.
-    // Dev-only ?failFeatured=1 bypasses cache so we can simulate query failure.
-    const forceFeaturedFail =
-      process.env.NODE_ENV !== 'production' &&
-      typeof window !== 'undefined' &&
-      new URLSearchParams(window.location.search).get('failFeatured') === '1'
-    const cached = forceFeaturedFail ? null : getHomeCatalogCache()
+    const cached = getHomeCatalogCache()
     if (cached) {
       applyCatalogSnapshot(cached, setters)
       setFeaturedError(null)
-      setHeroReady(true)
       setCatalogReady(true)
-      return () => { cancelled = true }
+      return () => {
+        cancelled = true
+      }
     }
 
-    // SSR payload already on the page — warm the client cache for back-nav; no skeleton.
-    if (!forceFeaturedFail && initialCatalog && catalogReloadKey === 0) {
+    if (initialCatalog && catalogReloadKey === 0) {
       setHomeCatalogCache(initialCatalog)
       applyCatalogSnapshot(initialCatalog, setters)
       setFeaturedError(initialFeaturedError)
-      setHeroReady(true)
       setCatalogReady(true)
-      return () => { cancelled = true }
+      return () => {
+        cancelled = true
+      }
     }
 
     fetchHomeCatalog()
@@ -403,528 +252,431 @@ export function Home({
       })
       .catch((err: unknown) => {
         if (cancelled) return
-        const message = err instanceof Error ? err.message : 'Failed to load featured items'
-        setFeaturedError(message)
+        setFeaturedError(err instanceof Error ? err.message : 'Failed to load featured items')
       })
       .finally(() => {
-        if (!cancelled) {
-          setHeroReady(true)
-          setCatalogReady(true)
-        }
+        if (!cancelled) setCatalogReady(true)
       })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [catalogReloadKey, initialCatalog, initialFeaturedError])
 
-  const retryFeaturedCatalog = () => {
-    clearHomeCatalogCache()
-    setFeaturedError(null)
-    setCatalogReady(false)
-    setCatalogReloadKey((k) => k + 1)
-  }
-
-  useEffect(() => {
-    if (skipSkillFetchFor.current === activeSkill) {
-      skipSkillFetchFor.current = null
-      return
+  const skillLevels = (['beginner', 'intermediate', 'advanced'] as const).map((level) => {
+    const fromCms = chapters.find((c) => c.level === level)
+    const copy = SKILL_COPY[level]
+    return {
+      level,
+      title: fromCms?.title || copy.title,
+      body: fromCms?.copy || copy.body,
+      image: fromCms?.image || null,
+      link: fromCms?.link || `/shop?level=${level}`,
+      tint: copy.tint,
     }
-    let cancelled = false
-    setSkillLoading(true)
-    supabase.from('products').select('*').eq('active', true).eq('skill_level', activeSkill).order('created_at', { ascending: false }).limit(5)
-      .then(({ data }) => {
-        if (cancelled) return
-        setSkillProducts((data as Product[]) ?? [])
-        setSkillLoading(false)
-      })
-    return () => { cancelled = true }
-  }, [activeSkill])
-
-  const sections: Record<LayoutSection['id'], React.ReactNode> = {
-    hero: (
-      <>
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.2em] mb-4" style={{ color: 'var(--color-accent)' }}>{hero?.eyebrow || 'CROCHET PATTERNS FOR EVERY MAKER'}</p>
-            <h1 className="font-heading font-semibold text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5">
-              <span className="block text-ink">Beautiful Patterns.</span>
-              <span className="block" style={{ color: 'var(--color-accent)' }}>Made for You.</span>
-            </h1>
-            <p className="text-[14px] text-ink-soft leading-relaxed mb-7 max-w-md">
-              Instantly download easy-to-follow crochet patterns designed with love for makers around the world.
-            </p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
-              <Link
-                href={heroPrimaryHref(hero?.cta_link)}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
-                style={{ background: 'var(--color-accent)' }}
-              >
-                {(hero?.cta_text || 'Shop Patterns').replace(/\s*→\s*$/, '')} →
-              </Link>
-              <Link
-                href={heroSecondaryHref(hero?.secondary_cta_link)}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-full text-[13px] font-semibold border bg-white hover:bg-surface transition-colors"
-                style={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
-              >
-                {hero?.secondary_cta_text || 'Explore Free Patterns'}
-              </Link>
-            </div>
-
-            {/* Mobile: full-bleed collage (breaks out of SectionBand px-6); desktop column unchanged */}
-            <div className="md:hidden mb-8">
-              <div className="-mx-6">
-                {!heroReady ? (
-                  <div className="h-[280px] rounded-none bg-surface animate-pulse" aria-hidden />
-                ) : currentHeroGroup.length > 0 ? (
-                  <HeroCollage group={currentHeroGroup} mobileBleed />
-                ) : null}
-              </div>
-              {heroReady && currentHeroGroup.length > 0 && heroGroups.length > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  {heroGroups.map((_, i) => (
-                    <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Desktop: collage lives in the right column */}
-          <div className="hidden md:block">
-            {!heroReady ? (
-              <div className="h-[420px] rounded-[18px] bg-surface animate-pulse" aria-hidden />
-            ) : currentHeroGroup.length > 0 ? (
-              <>
-                <HeroCollage group={currentHeroGroup} className="h-[420px]" />
-                {heroGroups.length > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-4">
-                    {heroGroups.map((_, i) => (
-                      <button key={i} onClick={() => setHeroSlide(i)} aria-label={`Show hero image set ${i + 1}`} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === heroSlide ? 'var(--color-accent)' : '#B5AEA2' }} />
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : null}
-          </div>
-      </>
-    ),
-    trust: (
-      <div className="bg-white border border-line rounded-xl px-4 md:px-10 py-5 flex flex-nowrap items-start md:items-center justify-between md:justify-center gap-2 md:gap-x-12">
-          {[
-            { icon: 'bolt', label: 'Instant Digital Access' },
-            { icon: 'verified', label: 'Guaranteed Quality' },
-            { icon: 'lock', label: 'Secure Payment' },
-          ].map((s) => (
-            <div key={s.label} className="flex-1 md:flex-initial flex flex-col md:flex-row items-center md:items-center text-center md:text-left gap-1.5 md:gap-3">
-              <MaterialIcon name={s.icon} size={20} color="var(--color-primary)" />
-              <p className="text-[11px] md:text-[14px] font-semibold leading-tight md:whitespace-nowrap">{s.label}</p>
-            </div>
-          ))}
-      </div>
-    ),
-    categories: !catalogReady ? (
-      <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Shop by Category</h2>
-        <CategoryRowSkeleton count={6} />
-      </div>
-    ) : categories.length > 0 ? (
-      <div>
-        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <div className="relative mb-10">
-          <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl">Shop by Category</h2>
-          <Link href="/shop" className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 text-[11px] tracking-[0.12em] border-b border-ink pb-1 hover:opacity-60">
-            VIEW ALL CATEGORIES →
-          </Link>
-        </div>
-        <div className="relative">
-          {categories.length > 4 && (
-            <button
-              onClick={() => categoryScrollRef.current?.scrollBy({ left: -240, behavior: 'smooth' })}
-              aria-label="Scroll categories left"
-              className="flex absolute -left-2 md:-left-4 top-[42px] -translate-y-1/2 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-canvas border border-line items-center justify-center shadow-sm hover:bg-surface"
-            >
-              <MaterialIcon name="chevron_left" size={18} />
-            </button>
-          )}
-          <div ref={categoryScrollRef} className="flex gap-4 md:gap-6 overflow-x-auto scroll-smooth pb-2 -mx-1 px-8 md:px-10" style={{ scrollbarWidth: 'none' }}>
-            {categories.map((c) => (
-              <Link key={c.link} href={c.link} className="group flex flex-col items-center text-center shrink-0 w-[100px] md:w-[120px]">
-                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px] rounded-full overflow-hidden bg-surface mb-3 border border-line">
-                  {c.image ? (
-                    <img src={c.image} alt={c.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <MaterialIcon name="image" size={24} color="var(--color-muted)" />
-                    </div>
-                  )}
-                </div>
-                <p className="font-medium text-[13px]">{c.name}</p>
-                <p className="text-[11px] text-ink-soft mt-0.5">{c.count > 0 ? `${c.count}+ Patterns` : '0 Patterns'}</p>
-              </Link>
-            ))}
-          </div>
-          {categories.length > 4 && (
-            <button
-              onClick={() => categoryScrollRef.current?.scrollBy({ left: 240, behavior: 'smooth' })}
-              aria-label="Scroll categories right"
-              className="flex absolute -right-2 md:-right-4 top-[42px] -translate-y-1/2 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-canvas border border-line items-center justify-center shadow-sm hover:bg-surface"
-            >
-              <MaterialIcon name="chevron_right" size={18} />
-            </button>
-          )}
-        </div>
-      </div>
-    ) : null,
-    chapters: !catalogReady ? (
-      <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
-        <ChaptersSkeleton count={3} />
-      </div>
-    ) : chapters.length > 0 ? (
-      <div>
-        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Skill Level Chapters</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {chapters.map((c) => (
-              <Link
-                key={c.title}
-                href={c.link}
-                className="group flex flex-row md:flex-col bg-white rounded-2xl border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
-              >
-                <div className="relative w-28 sm:w-32 shrink-0 aspect-square md:w-full md:aspect-[4/3] bg-surface overflow-hidden">
-                  {c.image && (
-                    <img
-                      src={c.image}
-                      alt={c.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                    />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0 p-4 md:p-6 flex flex-col">
-                  <h3 className="font-display font-semibold text-lg md:text-xl mb-1.5 md:mb-2">{c.title}</h3>
-                  <div className="mb-2 md:mb-3">
-                    <SkillDifficultyDots level={c.level} />
-                  </div>
-                  <p className="text-[13px] md:text-[14px] text-ink-soft leading-relaxed mb-3 md:mb-4 line-clamp-3 md:line-clamp-none">
-                    {c.copy}
-                  </p>
-                  <span className="text-[12px] font-semibold mt-auto" style={{ color: 'var(--color-accent)' }}>
-                    Explore →
-                  </span>
-                </div>
-              </Link>
-            ))}
-        </div>
-      </div>
-    ) : null,
-    trending: !catalogReady ? (
-      <div>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <ProductGridSkeleton variant="featured" count={6} />
-      </div>
-    ) : featuredError ? (
-      <div className="text-center py-4">
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <p className="text-[14px] text-ink-soft mb-5">Couldn&apos;t load featured items. Please try again.</p>
-        <button
-          type="button"
-          onClick={retryFeaturedCatalog}
-          className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
-        >
-          Try again
-        </button>
-      </div>
-    ) : trending.length > 0 ? (
-      <div>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <div className={HOME_PRODUCT_GRID_CLASS}>
-          {trending.map((p, i) => (
-            <div key={p.id} className={`h-full ${homeProductCardVisibilityClass(i)}`.trim()}>
-              <ProductCard product={p} priority={i < 4} reviewStats={reviewStatsMap.get(p.id)} />
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-10">
-          <Link
-            href="/shop/bestsellers"
-            className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
-          >
-            View all
-          </Link>
-        </div>
-      </div>
-    ) : (
-      <div className="text-center py-6">
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">Featured Items</h2>
-        <p className="text-[14px] text-ink-soft">No featured items yet.</p>
-      </div>
-    ),
-    new_arrivals: !catalogReady ? (
-      <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
-        <ProductGridSkeleton variant="newArrivals" count={6} />
-      </div>
-    ) : newArrivals.length > 0 ? (
-      <div>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-8">New Arrivals</h2>
-        <div className={HOME_PRODUCT_GRID_CLASS}>
-          {newArrivals.map((p, i) => (
-            <div key={p.id} className={`h-full ${homeProductCardVisibilityClass(i)}`.trim()}>
-              <ProductCard product={p} reviewStats={reviewStatsMap.get(p.id)} />
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-10">
-          <Link
-            href="/shop/new"
-            className="inline-block px-7 py-3 rounded-full border text-[13px] font-semibold transition-colors border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white"
-          >
-            View all
-          </Link>
-        </div>
-      </div>
-    ) : null,
-    skill_browse: (
-      <div>
-        <div className="bg-white border border-line rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row gap-6">
-          <div className="lg:w-[200px] shrink-0">
-            <p className="font-display font-semibold text-lg mb-4">Browse by Skill Level</p>
-            <div className="grid grid-cols-3 lg:flex lg:flex-col gap-2">
-              {([
-                { level: 'beginner' as const, icon: 'eco' },
-                { level: 'intermediate' as const, icon: 'layers' },
-                { level: 'advanced' as const, icon: 'military_tech' },
-              ]).map((s) => (
-                <button
-                  key={s.level}
-                  onClick={() => setActiveSkill(s.level)}
-                  className={`flex flex-col lg:flex-row items-center lg:items-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-3 rounded-full text-center lg:text-left transition-colors ${activeSkill === s.level ? 'text-white' : 'bg-white hover:bg-canvas text-ink'}`}
-                  style={activeSkill === s.level ? { background: 'var(--color-primary)' } : undefined}
-                >
-                  <MaterialIcon name={s.icon} size={16} color={activeSkill === s.level ? '#fff' : 'var(--color-primary)'} />
-                  <span className="leading-tight">
-                    <span className="block text-[12px] lg:text-[13px] font-semibold capitalize">{s.level}</span>
-                    <span className={`block text-[10px] lg:text-[11px] whitespace-nowrap ${activeSkill === s.level ? 'text-white/80' : 'text-ink-soft'}`}>{skillCounts[s.level]} Patterns</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            {skillLoading ? (
-              <SkillBrowseSkeleton count={3} />
-            ) : skillProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-6">
-                {skillProducts.slice(0, 3).map((p) => (
-                  <Link key={p.id} href={`/pattern/${p.slug}`} className="group block">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-canvas mb-2">
-                      {p.images?.[0] && <img src={p.images[0]} alt={p.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                    </div>
-                    <p className="text-[12px] font-medium leading-tight line-clamp-1">{p.title}</p>
-                    <p className="text-[13px] font-semibold text-ink mt-0.5">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</p>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="h-40 flex items-center justify-center text-ink-soft text-[13px] text-center px-6">
-                No {activeSkill} patterns yet — check back soon.
-              </div>
-            )}
-          </div>
-
-          {layout.find((s) => s.id === 'bundles')?.visible && bundles.length > 0 && (
-            <div className="lg:w-[300px] shrink-0 rounded-xl p-6" style={{ background: 'var(--color-accent-soft)' }}>
-              <p className="font-display font-semibold text-lg mb-1.5">Pattern Bundles</p>
-              <p className="text-[14px] text-ink-soft mb-3 leading-relaxed">More patterns, more value. Save up to 40% on curated bundles.</p>
-              <Link
-                href="/shop?bundle=1"
-                className="inline-block px-4 py-2 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity mb-4"
-                style={{ background: 'var(--color-accent)' }}
-              >
-                Shop Bundles →
-              </Link>
-              <div className="grid grid-cols-2 gap-2">
-                {bundles.slice(0, 2).map((b) => {
-                  const savePct = b.compare_at_price ? Math.round((1 - b.price / b.compare_at_price) * 100) : null
-                  return (
-                    <Link key={b.id} href={`/pattern/${b.slug}`} className="group block">
-                      <div className="relative aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
-                        {b.images?.[0] && <img src={b.images[0]} alt={b.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                        {savePct !== null && savePct > 0 && (
-                          <span className="absolute top-1.5 left-1.5 text-[8px] font-semibold text-white px-1.5 py-0.5 rounded-full" style={{ background: 'var(--color-primary)' }}>
-                            SAVE {savePct}%
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] font-medium leading-tight line-clamp-1">{b.title}</p>
-                      <p className="text-[11px] text-ink-soft">{b.bundle_includes.length} Patterns</p>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <span className="text-[12px] font-semibold text-ink">${b.price.toFixed(2)}</span>
-                        {b.compare_at_price && b.compare_at_price > b.price && <span className="text-[10px] line-through text-ink-soft">${b.compare_at_price.toFixed(2)}</span>}
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    ),
-    free_patterns: !catalogReady ? (
-      <div aria-hidden>
-        <div className="bg-white border border-line rounded-2xl p-8 md:p-10 min-h-[180px] animate-pulse" />
-      </div>
-    ) : freePatternCollage.length > 0 || freeProduct ? (
-      <div>
-        <div className="bg-white border border-line rounded-2xl p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-8">
-          <div className="min-w-0">
-            <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FREE PATTERNS</p>
-            <h2 className="font-heading font-semibold text-2xl md:text-3xl mb-2">Start With Free</h2>
-            <p className="text-[14px] text-ink-soft leading-relaxed mb-6 max-w-xs">Explore our collection of beautiful free crochet patterns.</p>
-            <Link
-              href="/shop?price=free"
-              className="inline-block px-6 py-3 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
-              style={{ background: 'var(--color-accent)' }}
-            >
-              Explore free patterns
-            </Link>
-          </div>
-          <FreePatternsCollage
-            products={
-              freePatternCollage.length > 0
-                ? freePatternCollage
-                : freeProduct
-                  ? [freeProduct]
-                  : []
-            }
-          />
-        </div>
-      </div>
-    ) : null,
-    bundles: null,
-    why_us: (
-      <div>
-        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">Why Makers Love NCA</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
-          {[
-            { icon: 'checklist', title: 'Easy to Follow', copy: 'Clear instructions for every step' },
-            { icon: 'verified', title: 'Tested Patterns', copy: 'Every pattern is tested twice' },
-            { icon: 'favorite', title: 'Wishlist & Save', copy: 'Save favorite patterns for later' },
-            { icon: 'all_inclusive', title: 'Lifetime Access', copy: 'Download anytime, forever' },
-            { icon: 'picture_as_pdf', title: 'Printable PDF', copy: 'High-quality PDFs ready to print' },
-            { icon: 'redeem', title: 'Pattern Bundles', copy: 'More patterns, better value' },
-          ].map((b) => (
-            <div key={b.title} className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border" style={{ borderColor: 'var(--color-accent)' }}>
-                <MaterialIcon name={b.icon} size={20} color="var(--color-accent)" />
-              </div>
-              <div>
-                <p className="text-[14px] font-semibold">{b.title}</p>
-                <p className="text-[14px] text-ink-soft leading-relaxed">{b.copy}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-    testimonials: !catalogReady ? (
-      <div aria-hidden>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">What Our Makers Say</h2>
-        <TestimonialsSkeleton count={3} />
-      </div>
-    ) : testimonials.length > 0 ? (
-      <div>
-        <p className="text-center text-[11px] tracking-[0.2em] text-ink-soft mb-2">✦</p>
-        <h2 className="font-heading text-center font-semibold text-2xl md:text-3xl mb-10">What Our Makers Say</h2>
-        {(() => {
-          const perPage = 3
-          const pageCount = Math.ceil(testimonials.length / perPage)
-          const page = Math.min(testimonialPage, pageCount - 1)
-          const pageItems = testimonials.slice(page * perPage, page * perPage + perPage)
-          return (
-            <div className="relative">
-              {pageCount > 1 && (
-                <button
-                  onClick={() => setTestimonialPage((p) => (p - 1 + pageCount) % pageCount)}
-                  aria-label="Previous testimonials"
-                  className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-line items-center justify-center shadow-sm hover:bg-surface"
-                >
-                  <MaterialIcon name="chevron_left" size={18} />
-                </button>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {pageItems.map((t, i) => (
-                  <div key={`${page}-${i}`} className="bg-white border border-line rounded-2xl p-6">
-                    <div className="flex gap-0.5 mb-3" style={{ color: 'var(--color-accent)' }}>
-                      {Array.from({ length: 5 }).map((_, si) => <MaterialIcon key={si} name="star" size={15} />)}
-                    </div>
-                    <p className="text-[14px] leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
-                    <div className="flex items-center gap-3">
-                      {t.photo ? (
-                        <img src={t.photo} alt={t.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--color-primary-soft)' }}>
-                          <MaterialIcon name="person" size={16} color="var(--color-primary)" />
-                        </div>
-                      )}
-                      <div className="leading-tight">
-                        <p className="text-[13px] font-semibold">{t.name}</p>
-                        <p className="text-[11px] text-ink-soft">{t.role}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {pageCount > 1 && (
-                <button
-                  onClick={() => setTestimonialPage((p) => (p + 1) % pageCount)}
-                  aria-label="Next testimonials"
-                  className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-line items-center justify-center shadow-sm hover:bg-surface"
-                >
-                  <MaterialIcon name="chevron_right" size={18} />
-                </button>
-              )}
-              {pageCount > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8">
-                  {Array.from({ length: pageCount }).map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setTestimonialPage(i)}
-                      aria-label={`Go to testimonials page ${i + 1}`}
-                      className="w-2 h-2 rounded-full transition-colors"
-                      style={{ background: i === page ? 'var(--color-accent)' : '#B5AEA2' }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        })()}
-      </div>
-    ) : null,
-    newsletter: <NewsletterBanner image={hero?.images?.[0]} />,
-  }
-
-  const rendered = layout
-    .filter((s) => s.visible)
-    .map((s) => ({ id: s.id, node: sections[s.id] }))
-    .filter((s) => s.node != null)
+  })
 
   return (
-    <div>
-      {rendered.map((s, i) => (
-        <SectionBand
-          key={s.id}
-          index={i}
-          compact={s.id === 'trust'}
-          className={s.id === 'hero' ? 'md:pt-0 md:pb-5 overflow-hidden' : undefined}
-          innerClassName={s.id === 'hero' ? 'py-10 md:py-0 md:h-[520px] grid grid-cols-1 md:grid-cols-[45%_55%] gap-10 md:gap-12 items-center' : undefined}
+    <div className="bg-bg">
+      {/* Hero — DESIGN_SPEC §4.1.2 */}
+      <section className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-10 md:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+          <div>
+            <p className="inline-flex rounded-full bg-primary-soft px-3 py-1 text-[11px] font-bold tracking-[0.12em] uppercase text-primary mb-4">
+              {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
+            </p>
+            <h1 className="font-heading text-[32px] md:text-5xl lg:text-[52px] font-bold leading-[1.1] text-ink mb-4">
+              Beautiful crochet patterns, ready to download.
+            </h1>
+            <p className="text-[15px] text-muted leading-relaxed mb-7 max-w-md">
+              Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <Link href={heroPrimaryHref(hero?.cta_link)} className="sm:flex-1 lg:flex-none">
+                <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
+                  {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
+                </Button>
+              </Link>
+              <Link href={heroSecondaryHref(hero?.secondary_cta_link)} className="sm:flex-1 lg:flex-none">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                  {hero?.secondary_cta_text || 'Get a free pattern'}
+                </Button>
+              </Link>
+            </div>
+            <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] font-medium text-ink">
+              {['Instant download', 'Printable PDF', 'Secure checkout'].map((t) => (
+                <li key={t} className="flex items-center gap-1.5">
+                  <CheckTiny />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <HeroCollage images={hero?.images ?? []} />
+        </div>
+      </section>
+
+      {/* Trust strip — §4.1.3 */}
+      <section className="border-y border-border bg-surface">
+        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-8 md:py-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {[
+            { title: 'Instant download', body: 'PDF in your account in seconds' },
+            { title: 'Guaranteed quality', body: 'Clear, tested instructions' },
+            { title: 'Secure payment', body: 'Checkout by Lemon Squeezy' },
+            { title: 'Lifetime access', body: 'Re-download anytime' },
+          ].map((item) => (
+            <div key={item.title} className="flex gap-3 items-start">
+              <span className="w-10 h-10 rounded-full bg-primary-soft flex items-center justify-center shrink-0">
+                <TrustIcon title={item.title} />
+              </span>
+              <div>
+                <p className="text-[14px] font-bold text-ink">{item.title}</p>
+                <p className="text-[13px] text-muted leading-snug">{item.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured — §4.1.4 */}
+      <section className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
+        <div className="flex items-end justify-between gap-4 mb-8">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink">Featured patterns</h2>
+          <Link href="/shop" className="text-[13px] font-semibold text-primary shrink-0 hover:underline underline-offset-2">
+            <span className="md:hidden">View all</span>
+            <span className="hidden md:inline">View all patterns →</span>
+          </Link>
+        </div>
+        {!catalogReady ? (
+          <ProductGridSkeleton variant="featured" count={4} />
+        ) : featuredError ? (
+          <div className="text-center py-10">
+            <p className="text-muted text-[14px] mb-3">{featuredError}</p>
+            <button
+              type="button"
+              className="text-primary font-semibold text-[13px] underline"
+              onClick={() => {
+                clearHomeCatalogCache()
+                setFeaturedError(null)
+                setCatalogReady(false)
+                setCatalogReloadKey((k) => k + 1)
+              }}
+            >
+              Try again
+            </button>
+          </div>
+        ) : featured.length === 0 ? (
+          <p className="text-muted text-[14px]">No featured patterns yet.</p>
+        ) : (
+          <PatternGrid variant="featured">
+            {featured.map((p, i) => (
+              <PatternCard key={p.id} product={p} priority={i < 2} reviewStats={reviewStatsMap.get(p.id)} />
+            ))}
+          </PatternGrid>
+        )}
+      </section>
+
+      {/* Shop by skill — §4.1.5 */}
+      <section className="bg-surface-warm">
+        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">Shop by skill level</h2>
+          <p className="text-[14px] text-muted mb-8 max-w-lg">
+            Find patterns that match where you are right now.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {skillLevels.map((s) => (
+              <article key={s.level} className="rounded-2xl border border-border bg-surface overflow-hidden shadow-card flex flex-col">
+                {/* Image on tablet/laptop only — mobile skill cards are text-first */}
+                <div className="relative aspect-[4/3] hidden md:block" style={{ background: s.tint }}>
+                  {s.image ? (
+                    <Image src={s.image} alt="" fill className="object-cover" sizes="33vw" />
+                  ) : (
+                    <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted capitalize">
+                      {s.level} photo
+                    </span>
+                  )}
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <LevelBadge level={s.level} className="mb-3 self-start" />
+                  <h3 className="text-[17px] font-bold text-ink mb-1.5">{s.title}</h3>
+                  <p className="text-[14px] text-muted leading-relaxed mb-4 flex-1">{s.body}</p>
+                  <Link href={s.link} className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
+                    Browse {s.level} patterns →
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Free pattern band — §4.1.6 */}
+      <section className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
+        <div
+          className="rounded-[24px] p-6 md:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 lg:gap-8 items-center"
+          style={{ background: 'var(--color-tint-sage)' }}
         >
-          {s.node}
-        </SectionBand>
-      ))}
+          <div>
+            <StatusBadge status="free" className="!bg-white !text-free mb-4" />
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-3">Start with a free pattern</h2>
+            <p className="text-[14px] text-muted leading-relaxed mb-6 max-w-md">
+              Download a free PDF, no account needed. See the quality for yourself before you buy.
+            </p>
+            <Link href="/shop?price=free" className="block sm:inline-block w-full sm:w-auto">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
+                Download a free pattern
+              </Button>
+            </Link>
+          </div>
+          {/* Mobile: one photo; tablet/laptop: two */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[0, 1].map((i) => {
+              const p = freeImages[i]
+              return (
+                <div
+                  key={i}
+                  className={`relative aspect-[4/3] md:aspect-square rounded-2xl overflow-hidden border border-border bg-white ${i === 1 ? 'hidden md:block' : ''}`}
+                >
+                  {p?.images?.[0] ? (
+                    <Link href={`/pattern/${p.slug}`}>
+                      <Image src={p.images[0]} alt={p.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 160px" />
+                    </Link>
+                  ) : (
+                    <span className="absolute inset-0 flex items-center justify-center text-[12px] text-muted px-2 text-center">
+                      Free pattern photo
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* What's inside — §4.1.7 */}
+      <section className="bg-surface border-y border-border">
+        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          <div className="relative mx-auto w-full max-w-sm">
+            <div className="absolute inset-x-6 top-4 bottom-0 rounded-2xl bg-border/60 translate-y-2" aria-hidden />
+            <div className="absolute inset-x-3 top-2 bottom-0 rounded-2xl bg-border/40 translate-y-1" aria-hidden />
+            <div className="relative aspect-[3/4] rounded-2xl border border-border bg-white shadow-card flex items-center justify-center text-[13px] text-muted">
+              Sample pattern page
+            </div>
+          </div>
+          <div>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">What is inside every pattern</h2>
+            <p className="text-[14px] text-muted mb-8">Everything you need to finish the project, in one clean PDF.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 mb-8">
+              {(
+                [
+                  { t: 'Clear, round-by-round steps', d: 'Written instructions you can follow at your own pace.', icon: 'steps' as const },
+                  { t: 'Materials and size list', d: 'Yarn, hook, finished size and stitch abbreviations up front.', icon: 'list' as const },
+                  { t: 'Photos for tricky steps', d: 'Close-up pictures where a written line is not enough.', icon: 'camera' as const },
+                  { t: 'Printable PDF, yours for good', d: 'Download instantly and find it again in your account anytime.', icon: 'print' as const },
+                ] as const
+              ).map((f) => (
+                <div
+                  key={f.t}
+                  className="flex gap-3 rounded-2xl border border-border bg-surface p-4 md:border-0 md:bg-transparent md:p-0"
+                >
+                  <span className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center shrink-0">
+                    <InsideIcon name={f.icon} />
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-bold text-ink mb-1">{f.t}</p>
+                    <p className="text-[13px] text-muted leading-relaxed">{f.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Link href="/shop?price=free" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
+              Try a free pattern first →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Meet the maker — §4.1.8 TODOs */}
+      <section className="bg-surface-warm">
+        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div
+            className="relative aspect-[4/5] rounded-2xl border border-border overflow-hidden"
+            style={{ background: 'var(--color-tint-cream)' }}
+          >
+            <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
+          </div>
+          <div>
+            <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-primary mb-3">Meet the maker</p>
+            {/* TODO: story headline from owner */}
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-4">
+              [Story headline: why these patterns exist]
+            </h2>
+            {/* TODO: maker story copy from owner */}
+            <p className="text-[15px] text-muted leading-relaxed mb-8">
+              [Two or three sentences in your own voice: who designs the patterns, how each one is tested, and what a
+              buyer can trust about them.]
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+              {[
+                { n: '[N]', l: 'Patterns designed' },
+                { n: '[N]', l: 'Makers helped' },
+                { n: '[N]', l: 'Years crocheting' },
+              ].map((s) => (
+                <div key={s.l}>
+                  {/* TODO: real stats from owner */}
+                  <p className="text-2xl font-extrabold text-primary">{s.n}</p>
+                  <p className="text-[12px] text-muted">{s.l}</p>
+                </div>
+              ))}
+            </div>
+            <Link href="/about" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
+              Read our story →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials — §4.1.9 hide if empty; 2 on mobile, 3 on tablet+ */}
+      {testimonials.length > 0 && (
+        <section id="reviews" className="bg-surface-warm">
+          <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
+            <div className="text-center mb-10">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">What makers say</h2>
+              <p className="text-[14px] text-muted">Real reviews from people who made our patterns.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {testimonials.slice(0, 3).map((t, i) => (
+                <article
+                  key={`${t.name}-${i}`}
+                  className={`rounded-2xl border border-border bg-surface p-6 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
+                >
+                  <div className="flex gap-0.5 mb-3 text-gold" aria-label="5 star rating">
+                    {Array.from({ length: 5 }).map((_, si) => (
+                      <Star key={si} />
+                    ))}
+                  </div>
+                  <p className="text-[14px] text-ink leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
+                  <p className="text-[13px] font-semibold text-ink">
+                    {t.name}
+                    {t.role ? <span className="font-normal text-muted"> · {t.role}</span> : null}
+                  </p>
+                </article>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link href="/shop" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
+                Read all reviews →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ — §4.1.10 */}
+      <section className="bg-bg border-t border-border">
+        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10">
+          <div>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">Questions, answered</h2>
+            <p className="text-[14px] text-muted mb-3">The basics before you buy.</p>
+            <p className="text-[14px] text-muted">
+              Still stuck? Write to {/* TODO: support email from owner */}
+              <span className="text-primary underline">[SUPPORT EMAIL]</span>
+            </p>
+          </div>
+          <FaqAccordion items={FAQ_ITEMS} />
+        </div>
+      </section>
+
+      {/* Newsletter — §4.1.11 */}
+      <EmailSignup />
     </div>
+  )
+}
+
+function CheckTiny() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="text-free shrink-0">
+      <path d="M5 12.5l5 5L20 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function DownloadGlyph() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 4v10M8 10l4 4 4-4M5 18h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function Star() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 2.8l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 16.7 6.6 19.6l1-6.1L3.2 9.2l6.1-.9L12 2.8z" />
+    </svg>
+  )
+}
+
+function TrustIcon({ title }: { title: string }) {
+  const common = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none' as const, 'aria-hidden': true }
+  if (title.startsWith('Instant')) {
+    return (
+      <svg {...common}>
+        <path d="M12 4v10M8 10l4 4 4-4M5 18h14" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+  if (title.startsWith('Guaranteed')) {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8" stroke="var(--color-primary)" strokeWidth="2" />
+        <path d="M8.5 12.5l2.2 2.2 4.8-5" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+  if (title.startsWith('Secure')) {
+    return (
+      <svg {...common}>
+        <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+  return (
+    <svg {...common}>
+      <path d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M18 3v4h-4M6 21v-4h4" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function InsideIcon({ name }: { name: 'steps' | 'list' | 'camera' | 'print' }) {
+  const common = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none' as const, 'aria-hidden': true }
+  if (name === 'steps') {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8" stroke="var(--color-primary)" strokeWidth="2" />
+        <circle cx="12" cy="12" r="3" stroke="var(--color-primary)" strokeWidth="2" />
+      </svg>
+    )
+  }
+  if (name === 'list') {
+    return (
+      <svg {...common}>
+        <path d="M9 7h10M9 12h10M9 17h10M5 7h.01M5 12h.01M5 17h.01" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    )
+  }
+  if (name === 'camera') {
+    return (
+      <svg {...common}>
+        <path d="M4 8h3l1.5-2h7L17 8h3v11H4V8z" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" />
+        <circle cx="12" cy="13" r="3" stroke="var(--color-primary)" strokeWidth="2" />
+      </svg>
+    )
+  }
+  return (
+    <svg {...common}>
+      <path d="M7 8h10v3H7V8zM8 11h8v7H8v-7zM10 3h4v3h-4V3z" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
   )
 }

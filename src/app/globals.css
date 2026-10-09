@@ -1,33 +1,54 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Source-of-truth design tokens ──
-     Change ONLY these to re-theme the whole site (e.g. swap navy → green later).
-     Everything below this block is an alias pointing back to these. */
-  --color-primary: #111111;
-  --color-primary-hover: #000000;
-  --color-primary-soft: #EDEDED;
-  --color-accent: #1f249c;
-  --color-accent-hover: #191d7d;
-  --color-accent-soft: #e9eaf5;
+  /* ── DESIGN_SPEC.md tokens (eyedropper-refined from design-reference PNGs) ── */
+
+  --color-primary: #1F249C;
+  --color-primary-hover: #191d7d;
+  --color-primary-soft: #e9eaf5;
+  --color-primary-contrast: #FFFFFF;
+
+  /* Logo / star orange (DESIGN_SPEC "accent") — do NOT alias nav CTAs here;
+     legacy `accent` below stays mapped to primary navy so existing UI keeps working. */
   --color-logo-accent: #D68A3E;
-  --color-secondary: #6F8760;
-  --color-secondary-soft: #EEF2E8;
-  --color-text: #1F2933;
-  --color-muted: #5B6472;
-  --color-muted-light: #9AA1A9;
+  --color-brand-orange: #D68A3E;
+
   --color-background: #FCFBF8;
-  --color-surface: #F8F4ED;
+  --color-bg: #FCFBF8;
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #F7F2EC;
   --color-surface-card: #FFFFFF;
-  --color-border: #E7E1D8;
-  /* Pulse placeholders — contrasts with both --color-background and --color-surface bands */
-  --color-skeleton: #E5DFD4;
-  --color-sale: #E24B4A;
-  --color-sale-dark: #C13332;
+  --color-card: #FFFFFF;
+  --color-border: #E4DED3;
+  --color-footer: #202720;
+
+  --color-text: #16181D;
+  --color-muted: #5A6270;
+  --color-text-muted: #5A6270;
+  --color-muted-light: #9AA1A9;
+
+  --color-gold: #E0A030;
+  --color-star: #E0A030;
+  --color-sale: #B3302F;
+  --color-sale-dark: #B3302F;
+  --color-free: #2F5A1F;
+  --color-success-bg: #EEF2E8;
   --color-error: #B94A48;
   --color-error-dark: #963A38;
-  --color-gold: #D9A441;
+  --color-skeleton: #E5DFD4;
 
+  /* Pattern card placeholder tints */
+  --color-tint-sage: #EEF1E8;
+  --color-tint-lavender: #E8E8F6;
+  --color-tint-cream: #FDF1CF;
+  --color-tint-peach: #FAE3DA;
+
+  /* Legacy aliases — accent* = primary navy (historical CTA token) */
+  --color-accent: var(--color-primary);
+  --color-accent-hover: var(--color-primary-hover);
+  --color-accent-soft: var(--color-primary-soft);
+  --color-secondary: #6F8760;
+  --color-secondary-soft: #EEF2E8;
   --color-canvas: var(--color-background);
   --color-linen: var(--color-background);
   --color-ink: var(--color-text);
@@ -36,21 +57,25 @@
   --color-line: var(--color-border);
   --color-madder: var(--color-error);
   --color-madder-dark: var(--color-error-dark);
-  --color-sale-green: var(--color-accent);
-  --color-sale-green-dark: var(--color-accent-hover);
-  --color-sale-green-soft: var(--color-accent-soft);
-  --color-moss: var(--color-secondary);
-  --color-cart-blue: var(--color-accent);
+  --color-sale-green: var(--color-primary);
+  --color-sale-green-dark: var(--color-primary-hover);
+  --color-sale-green-soft: var(--color-primary-soft);
+  --color-moss: var(--color-free);
+  --color-moss-soft: var(--color-success-bg);
+  --color-cart-blue: var(--color-primary);
   --color-warning: var(--color-gold);
   --color-warning-soft: #FFF5DF;
   --color-sale-red: var(--color-sale);
-  --color-skill-beginner-soft: #C3E0A8;
-  --color-skill-beginner-ink: #2E5A1C;
-  --color-skill-intermediate-soft: #FADE8A;
-  --color-skill-intermediate-ink: #7A4E08;
-  --color-skill-advanced-soft: #F5BFA8;
-  --color-skill-advanced-ink: #96331C;
 
+  /* Skill pills — DESIGN_SPEC §2 */
+  --color-skill-beginner-soft: #C7E5A8;
+  --color-skill-beginner-ink: #2F5A1F;
+  --color-skill-intermediate-soft: #FCE08C;
+  --color-skill-intermediate-ink: #7A5200;
+  --color-skill-advanced-soft: #F6B9A6;
+  --color-skill-advanced-ink: #8A2F1B;
+
+  /* Fonts — Manrope body/UI; Playfair headings; Baloo logo */
   --font-display: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-subheading: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -58,13 +83,26 @@
   --font-heading: var(--font-playfair), Georgia, serif;
   --font-logo: var(--font-baloo-2), 'Baloo 2', system-ui, sans-serif;
 
-  /* Shared page column — Header, Home, Shop, Product, Footer, etc. use max-w-site */
-  --max-width-site: 1600px;
+  /* Content column — ~1200px laptop (DESIGN_SPEC §1) */
+  --max-width-site: 1200px;
 
-  /* Header layout tiers only — do not remap md/lg (those drive page grids).
-     Mobile: default <481px · Tablet: 481–1024px · Desktop: 1025px+ */
-  --breakpoint-tablet: 481px;
-  --breakpoint-desktop: 1025px;
+  /* Soft card shadow (DESIGN_SPEC §2) */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-image: 0 2px 8px rgba(17, 24, 39, 0.06);
+
+  /* Header layout: align with Tailwind md/lg (768 / 1024) per DESIGN_SPEC §1.
+     Keep named tablet/desktop for any remaining legacy classes. */
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+
+  --breakpoint-design-mobile: 390px;
+  --breakpoint-design-tablet: 834px;
+  --breakpoint-design-laptop: 1440px;
+  --breakpoint-design-md: 768px;
+  --breakpoint-design-lg: 1024px;
+
+  --radius-card: 20px;
+  --radius-image: 18px;
 }
 
 .mobile-nca-logo {
@@ -72,24 +110,38 @@
   font-weight: 800;
 }
 
-html { background: var(--color-canvas); overflow-x: hidden; }
+html {
+  background: var(--color-background);
+  overflow-x: hidden;
+}
 
-/* Shared content column — always centered; pages use `max-w-site` (+ optional padding). */
 @utility max-w-site {
   width: 100%;
   max-width: var(--max-width-site);
   margin-inline: auto;
 }
 
-/* Widen the shared content column on large / ultra-wide monitors */
+@utility touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@utility product-image-square {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-image {
+  box-shadow: var(--shadow-image);
+}
+
 @media (min-width: 1920px) {
   :root, html {
-    --max-width-site: 1800px;
-  }
-}
-@media (min-width: 2560px) {
-  :root, html {
-    --max-width-site: 2000px;
+    --max-width-site: 1200px;
   }
 }
 
@@ -97,17 +149,24 @@ body {
   margin: 0;
   font-family: var(--font-body);
   color: var(--color-ink);
-  background: var(--color-canvas);
+  background: var(--color-background);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   max-width: 100vw;
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 ::selection { background: var(--color-ink); color: var(--color-canvas); }
 
 button, .btn { font-weight: 600; }
 
-/* Custom navy checkmarks for Shop/Search listing filter checkboxes */
 .listing-filter-check:checked {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 12.5L10 17.5L19 7' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-size: 100% 100%;
@@ -115,7 +174,6 @@ button, .btn { font-weight: 600; }
   background-repeat: no-repeat;
 }
 
-/* Sort radios — Etsy-style solid fill + white center dot (brand navy) */
 .listing-filter-radio:checked {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4' fill='white'/%3E%3C/svg%3E");
   background-size: 100% 100%;
@@ -123,7 +181,6 @@ button, .btn { font-weight: 600; }
   background-repeat: no-repeat;
 }
 
-/* Hide native scrollbar on Sort & Filter sheet body — content still scrolls */
 .listing-sheet-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;

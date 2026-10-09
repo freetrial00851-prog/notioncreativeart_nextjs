@@ -42,3 +42,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Design mockups (local junction / copies — not for deploy)
+/design-reference/

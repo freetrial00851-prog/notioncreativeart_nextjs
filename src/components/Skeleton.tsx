@@ -7,17 +7,17 @@ function Bone({ className = '' }: { className?: string }) {
   return <div className={`bg-skeleton rounded animate-pulse ${className}`} />
 }
 
-/** Matches `ProductCard`: square image, 2-line title, price + circular action. */
+/** Matches redesigned `ProductCard`: frameless square image + 2-line title + price/circle. */
 function ProductCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg border border-line overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]" aria-hidden>
-      <Bone className="aspect-square rounded-none" />
-      <div className="p-3">
-        <Bone className="h-3.5 w-full mb-1.5" />
-        <Bone className="h-3.5 w-2/3 mb-2.5" />
-        <div className="flex items-center justify-between gap-2">
-          <Bone className="h-4 w-14" />
-          <Bone className="h-9 w-9 rounded-full shrink-0" />
+    <div className="flex h-full flex-col" aria-hidden>
+      <Bone className="aspect-square w-full rounded-[18px]" />
+      <div className="mt-1.5 flex flex-1 flex-col gap-1.5">
+        <Bone className="h-[2.6em] w-full rounded" />
+        <Bone className="h-3 w-20 rounded" />
+        <div className="mt-auto flex items-center justify-between gap-2 pt-0.5">
+          <Bone className="h-5 w-14 rounded" />
+          <Bone className="size-11 shrink-0 rounded-full" />
         </div>
       </div>
     </div>
