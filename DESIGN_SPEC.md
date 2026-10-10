@@ -168,7 +168,7 @@ Three states, one page:
 - Both: lavender banner "Your cart is saved: N patterns · SUBTOTAL" (only when cart non-empty); **Continue with Google** (white pill, Google logo); divider "or use your email"; Email, Password (create: placeholder "Create a password", helper "At least N characters"); optional checkbox "Send me news about new patterns and offers (optional)" (create only); "Forgot password?" (sign in only); primary submit; create: "By creating an account you agree to our Terms and Privacy Policy."; footer line with lock icon "Your downloads are saved to your account."
 - Use the **existing auth provider** already in the repo. If none exists, ask me before choosing one.
 
-### 4.6 Order success `/order/success`
+### 4.6 Order success `/order-success`
 - Green check circle; H1 "Thank you, your order is confirmed"; "Order #NUMBER · DATE"; "We sent your receipt and download links to EMAIL".
 - Card "Your patterns are ready — Download now, or come back anytime. Every pattern stays in My downloads." Each item: thumb, name, LevelBadge, "PDF · SIZE", **Download PDF**. Buttons: **Go to My downloads** (primary), **Continue shopping** (secondary).
 - Order summary card (items + prices, Subtotal, Tax, Total, "Paid with PAYMENT METHOD", "View receipt" link).

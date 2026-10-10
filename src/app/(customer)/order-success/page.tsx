@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
+import { isVercelProduction } from '@/lib/env'
 import { OrderSuccess } from '@/views/OrderSuccess'
 
 export const metadata = buildMetadata({
@@ -9,5 +10,5 @@ export const metadata = buildMetadata({
 })
 
 export default function OrderSuccessPage() {
-  return <OrderSuccess />
+  return <OrderSuccess hideOwnerCopyPlaceholders={isVercelProduction()} />
 }
