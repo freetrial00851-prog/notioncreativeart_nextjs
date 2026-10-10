@@ -21,7 +21,7 @@ import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, UI_ICON_S
 const HEADER_ICON = '#111111'
 
 export function Header() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, signOut, loading: authLoading } = useAuth()
   const { requireAuth } = useUI()
   const { count: cartCount, openDrawer } = useCart()
   const router = useRouter()
@@ -120,6 +120,17 @@ export function Header() {
 
   const openMobileCart = () => {
     router.push('/cart')
+  }
+
+  const signInFromMobile = () => {
+    closeMobileBrowse()
+    requireAuth()
+  }
+
+  const signOutFromDrawer = async () => {
+    closeMobileBrowse()
+    await signOut()
+    if (pathname === '/account' || pathname.startsWith('/account/')) router.push('/')
   }
 
   return (
@@ -223,6 +234,12 @@ export function Header() {
           >
             <MaterialIcon name="favorite" size={22} color={HEADER_ICON} />
           </button>
+          <HeaderAccountIcon
+            signedIn={!!user}
+            loading={authLoading}
+            onSignIn={signInFromMobile}
+            onNavigate={closeMobileBrowse}
+          />
           <button
             type="button"
             aria-label="Cart"
@@ -271,6 +288,12 @@ export function Header() {
           >
             <MaterialIcon name="search" size={22} color={HEADER_ICON} />
           </button>
+          <HeaderAccountIcon
+            signedIn={!!user}
+            loading={authLoading}
+            onSignIn={signInFromMobile}
+            onNavigate={closeMobileBrowse}
+          />
           <button
             type="button"
             aria-label="Cart"
@@ -376,6 +399,27 @@ export function Header() {
               <MaterialIcon name="close" size={22} />
             </button>
           </div>
+          {!authLoading && (
+            <div className="px-5 pt-1 pb-3">
+              {user ? (
+                <Link
+                  href="/account/downloads"
+                  onClick={closeMobileBrowse}
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary px-5 text-[14px] font-semibold text-primary hover:bg-primary-soft"
+                >
+                  <MaterialIcon name="person" size={18} /> My account
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={signInFromMobile}
+                  className="flex w-full min-h-11 items-center justify-center rounded-full bg-primary px-5 text-[14px] font-semibold text-white hover:opacity-90"
+                >
+                  Sign in
+                </button>
+              )}
+            </div>
+          )}
           <nav className="pb-3">
             <Link
               href="/shop/new"
@@ -450,6 +494,15 @@ export function Header() {
             <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug">
               Sale
             </Link>
+            {!authLoading && user && (
+              <button
+                type="button"
+                onClick={() => { void signOutFromDrawer() }}
+                className="flex w-full items-center gap-2.5 px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-t border-[#ebe8e2]"
+              >
+                <MaterialIcon name="logout" size={20} /> Sign out
+              </button>
+            )}
           </nav>
         </div>
       </>,
@@ -538,6 +591,37 @@ function HeaderActions({
         />
       )}
     </div>
+  )
+}
+
+/** Phone + tablet account entry. Same 44px box in every auth state so the row never shifts. */
+function HeaderAccountIcon({
+  signedIn,
+  loading,
+  onSignIn,
+  onNavigate,
+}: {
+  signedIn: boolean
+  loading: boolean
+  onSignIn: () => void
+  onNavigate: () => void
+}) {
+  const className = 'touch-target w-11 h-11 shrink-0 rounded-full flex items-center justify-center hover:opacity-70'
+  const icon = <MaterialIcon name="person" size={22} color={HEADER_ICON} />
+  if (loading) {
+    return <span aria-hidden="true" className={className}>{icon}</span>
+  }
+  if (signedIn) {
+    return (
+      <Link href="/account/downloads" aria-label="My account" onClick={onNavigate} className={className}>
+        {icon}
+      </Link>
+    )
+  }
+  return (
+    <button type="button" aria-label="Sign in" onClick={onSignIn} className={className}>
+      {icon}
+    </button>
   )
 }
 
