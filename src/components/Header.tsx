@@ -277,7 +277,7 @@ export function Header() {
           >
             <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
           </button>
-          <div className="flex-1 min-w-0 flex justify-center">
+          <div className="flex-1 min-w-0 flex justify-center max-[360px]:justify-start">
             <Logo variant="full" />
           </div>
           <button
