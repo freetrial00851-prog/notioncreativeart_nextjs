@@ -16,21 +16,29 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
   return (
     <Link
       href="/"
-      className={`shrink-0 leading-none inline-flex items-center gap-2 ${className}`}
+      className={`shrink-0 leading-none inline-flex items-center gap-2 ${
+        variant === 'full' ? 'max-[387px]:gap-1' : ''
+      } ${className}`}
       aria-label="Notion Creative Art — home"
     >
       <span
-        className="shrink-0 rounded-full"
-        style={{
-          width: variant === 'compact' ? 10 : 12,
-          height: variant === 'compact' ? 10 : 12,
-          background: 'var(--color-logo-accent)',
-        }}
+        className={`shrink-0 rounded-full ${
+          variant === 'compact'
+            ? 'w-2.5 h-2.5'
+            : variant === 'full'
+              ? 'w-3 h-3 max-[387px]:w-2 max-[387px]:h-2'
+              : 'w-3 h-3'
+        }`}
+        style={{ background: 'var(--color-logo-accent)' }}
         aria-hidden
       />
       <span
         className={`font-bold tracking-tight leading-none ${
-          variant === 'compact' ? 'text-[18px]' : 'text-[18px] md:text-[20px]'
+          variant === 'compact'
+            ? 'text-[18px]'
+            : variant === 'full'
+              ? 'text-[18px] max-[387px]:text-[12px] max-[360px]:text-[11px] md:text-[20px]'
+              : 'text-[18px] md:text-[20px]'
         }`}
         style={{
           color: onDark ? '#FFFFFF' : 'var(--color-primary)',
