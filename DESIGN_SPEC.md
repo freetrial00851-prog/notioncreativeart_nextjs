@@ -181,21 +181,26 @@ Three states, one page:
 - **Wishlist** `/account/wishlist`: "Patterns you saved for later.", "N saved patterns" + "Sort: Newest"; PatternCard grid (3 cols desktop, 2 mobile).
 - **Account settings** `/account/profile`: Profile card (Name — Edit, Email — Change, Password dots — Change); "Sign-in and emails" card (Google — Connected — Disconnect; checkbox "Send me news about new patterns and offers"; note "Order receipts and download links are always sent."); **Save changes** (primary, right-aligned); **Delete account** danger card (red title, text "This removes your account and access to your downloads. Patterns you bought can not be recovered afterwards.", red outline button "Delete my account" with a confirmation dialog).
 
-### 4.8 Our story `/our-story`
-- Hero: eyebrow "OUR STORY", H1 "[Headline: why Notion Creative Art exists]", 2–3 sentences, **Shop all patterns**, designer/studio photo (yellow tint, right on desktop).
+### 4.8 Our story `/about`
+- Live route is **`/about`** (not `/our-story`). Home “Read our story” already links here.
+- Hero: eyebrow "OUR STORY", **Shop all patterns**. Designer/studio photo (yellow tint, right on desktop) is preview-only until a real photo exists.
+- Production: H1 **"Our story"**; intro is the three live studio paragraphs already on the site. Hide the placeholder H1, process steps, values, stats band, and photo. No new claims.
+- Preview: H1 "[Headline: why Notion Creative Art exists]", placeholder intro, 3 process cards (Design / Test / Write), 3 values, blue stats band with `[N]`, photo box.
 - "How every pattern is made": 3 numbered cards — 1 Design, 2 Test, 3 Write (numbered lavender circles).
 - Values row: Made with care, Support that answers, Fair and clear (round sage icon each).
 - Blue stats band: three big numbers (Patterns designed, Makers helped, Five-star reviews) + **Try a free pattern** (white pill).
-- **All copy is TODO from me.** Build the layout with clearly marked placeholder text.
 
 ### 4.9 Contact `/contact`
 - H1 "Contact us", "Stuck with a file or a question before buying? Write to us and a real person will reply."
-- Form card: Name, Email, Topic (select, default "Problem with a download"), Order number (optional, "#" prefix, helper "Helps us find your purchase faster"), Message ("Tell us what happened"), primary **Send message**.
-- Side card "Other ways to reach us": Email, Reply time ("We usually reply within N hours, DAYS."), Based in (CITY, COUNTRY), links: Read the FAQ, Refund policy, Go to My downloads. Desktop: form left, side card right. Mobile: stacked.
-- Submission must reach me (email or Supabase table). Ask me which one before wiring.
+- Form card: Name, Email, Topic (select, default "Problem with a download"), Order number (optional, "#" prefix, helper "Helps us find your purchase faster"), Message ("Tell us what happened"), primary **Send message**. Topics: Problem with a download, Question before buying, Order or payment, Refund, Something else.
+- Side card "Other ways to reach us": Email, Reply time, Based in (preview only), links: Read the FAQ, Refund policy, Go to My downloads. Desktop: form left, side card right. Mobile: stacked.
+- Production email: the current live address. Production reply time: the current live “1–2 days” claim. Hide `[SUPPORT EMAIL]`, `[N]` hours, `[DAYS]`, and `[CITY, COUNTRY]` in production.
+- Submission: Edge Function `contact-message` inserts into `contact_messages` (RLS, no public policies) and emails `CONTACT_NOTIFY_EMAIL` via Resend. Honeypot + 5/IP/hour + origin check + server validation. Ship form and backend together.
 
 ### 4.10 404
-- Huge faint lavender "404" behind H1 "This page wandered off"; "The link may be old or mistyped. Search for a pattern, or start from one of these."; search input; **Shop all patterns** + **Back to home**; chips Amigurumi, Wearables, Home decor, Free patterns.
+- Huge faint lavender "404" behind H1 "This page wandered off"; "The link may be old or mistyped. Search for a pattern, or start from one of these."; search input; **Shop all patterns** + **Back to home**.
+- Chips: only categories that currently have products; **Free patterns** only if at least one free product exists.
+- Root `app/not-found.tsx` wraps `CustomerShell` so Header/Footer render (this file sits outside the customer layout).
 
 ---
 

@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
+import { isVercelProduction } from '@/lib/env'
 import { About } from '@/views/About'
 
 export const metadata = buildMetadata({
@@ -9,5 +10,5 @@ export const metadata = buildMetadata({
 })
 
 export default function AboutPage() {
-  return <About />
+  return <About hideOwnerCopyPlaceholders={isVercelProduction()} />
 }
