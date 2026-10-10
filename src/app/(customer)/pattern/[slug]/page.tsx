@@ -5,14 +5,14 @@ import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd } from '@/
 import { getCategoryById, getProductBySlug } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
+import { isVercelProduction } from '@/lib/env'
 import { getSiteSeoContext } from '@/lib/seoSettings'
 import { ProductDetail } from '@/views/ProductDetail'
 
 type Props = { params: Promise<{ slug: string }> }
 
 /** Must match ProductDetail main gallery `sizes` (SSR-stable; no useIsMobile). */
-const GALLERY_LCP_SIZES =
-  '(max-width: 768px) 100vw, (max-width: 1024px) 62vw, 52vw'
+const GALLERY_LCP_SIZES = '(max-width: 1023px) 100vw, 600px'
 
 /** Allow product pages added after the last deploy (not only build-time slugs). */
 export const dynamicParams = true
@@ -105,8 +105,11 @@ export default async function PatternPage({ params }: Props) {
       reviews,
     })
 
-    // Mirror visible breadcrumb: Home › [Category ›] Product
-    const crumbItems: { name: string; path: string }[] = [{ name: 'Home', path: '/' }]
+    // Mirror visible breadcrumb: Home › Shop › [Category ›] Product
+    const crumbItems: { name: string; path: string }[] = [
+      { name: 'Home', path: '/' },
+      { name: 'Shop', path: '/shop' },
+    ]
     if (category) {
       crumbItems.push({ name: category.name, path: `/shop/${category.slug}` })
     }
@@ -128,7 +131,11 @@ export default async function PatternPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
       )}
-      <ProductDetail initialProduct={product} />
+      <ProductDetail
+        key={slug}
+        initialProduct={product}
+        hideOwnerCopyPlaceholders={isVercelProduction()}
+      />
     </>
   )
 }
