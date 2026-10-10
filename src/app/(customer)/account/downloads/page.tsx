@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
+import { isVercelProduction } from '@/lib/env'
 import { Account } from '@/views/Account'
 
 export const metadata = buildMetadata({
@@ -9,5 +10,5 @@ export const metadata = buildMetadata({
 })
 
 export default function AccountDownloadsPage() {
-  return <Account />
+  return <Account hideOwnerCopyPlaceholders={isVercelProduction()} />
 }

@@ -224,35 +224,45 @@ export function DownloadsTableSkeleton({ rows = 4 }: { rows?: number }) {
 /** Full product detail page placeholder — mirrors gallery | info + purchase. */
 export function ProductDetailSkeleton() {
   return (
-    <div className="max-w-site w-full mx-auto px-6 md:px-16 py-8 md:py-10" aria-hidden>
-      <Bone className="h-3 w-64 mb-8" />
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)] gap-6 lg:gap-8">
+    <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 pt-5 md:pt-6 pb-10" aria-hidden>
+      <Bone className="h-4 w-16 mb-4 md:hidden" />
+      <Bone className="hidden md:block h-3 w-64 mb-6" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
         <div>
-          <Bone className="aspect-square rounded-2xl mb-3" />
-          <div className="flex gap-2 justify-center">
+          <Bone className="aspect-square w-full rounded-[18px]" />
+          <div className="mt-3 flex justify-center gap-1.5 md:hidden">
+            <Bone className="h-[7px] w-6 rounded-full" />
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Bone key={i} className="size-[7px] rounded-full" />
+            ))}
+          </div>
+          <div className="mt-3 hidden md:grid grid-cols-4 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Bone key={i} className="w-16 h-16 rounded-lg shrink-0" />
+              <Bone key={i} className="h-[86px] lg:h-[98px] rounded-[14px]" />
             ))}
           </div>
         </div>
-        <div className="space-y-4 pt-1">
-          <Bone className="h-5 w-24 rounded-full" />
-          <Bone className="h-9 w-4/5" />
-          <div className="rounded-2xl border border-line p-5 space-y-3">
-            <Bone className="h-8 w-32" />
-            <Bone className="h-12 w-full rounded-full" />
-            <Bone className="h-12 w-full rounded-full" />
-            <Bone className="h-11 w-full rounded-full" />
-            <Bone className="h-20 w-full rounded-xl" />
+        <div className="space-y-4 lg:pt-1">
+          <div className="flex gap-2">
+            <Bone className="h-7 w-20 rounded-full" />
+            <Bone className="h-7 w-24 rounded-full" />
           </div>
-          <div className="space-y-2.5 pt-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Bone key={i} className="h-4 w-3/4" />
+          <Bone className="h-10 w-4/5" />
+          <Bone className="h-4 w-40" />
+          <Bone className="h-9 w-36" />
+          <Bone className="h-4 w-full" />
+          <Bone className="h-4 w-3/4" />
+          <div className="space-y-2.5 pt-1">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Bone key={i} className="h-4 w-2/3" />
             ))}
           </div>
+          <Bone className="h-[52px] w-full rounded-full" />
+          <Bone className="h-[52px] w-full rounded-full" />
+          <Bone className="h-28 w-full rounded-[18px]" />
         </div>
       </div>
-      <div className="mt-14 flex gap-6 border-b border-line pb-3">
+      <div className="mt-14 hidden md:flex gap-6 border-b border-line pb-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <Bone key={i} className="h-3 w-20" />
         ))}

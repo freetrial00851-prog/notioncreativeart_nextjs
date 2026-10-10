@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { isPasswordValid } from '../components/PasswordStrength'
 import { waitForGuestMerge } from './guestStorage'
+import { subscribeToNewsletter } from './newsletter'
 
 type Options = {
   /** Called when signup creates an immediate session (autoconfirm on). */
@@ -32,12 +33,13 @@ export function useSignUpForm(options: Options = {}) {
   const [submitting, setSubmitting] = useState(false)
   const [attempted, setAttempted] = useState(false)
   const [emailTaken, setEmailTaken] = useState(false)
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false)
 
   const emailFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const passwordValid = isPasswordValid(password)
 
   const fieldErrors = {
-    name: name.trim() === '' ? 'Name is required.' : null,
+    name: null as string | null,
     email: email.trim() === '' ? 'Email address is required.' : (!emailFormatValid ? 'Enter a valid email address.' : null),
     password: !passwordValid ? 'Password doesn\u2019t meet the requirements above.' : null,
   }
@@ -56,6 +58,7 @@ export function useSignUpForm(options: Options = {}) {
       })
       if (duplicateEmail) { setEmailTaken(true); return }
       if (error) { setError(error); return }
+      if (newsletterOptIn) void subscribeToNewsletter(email.trim())
       if (session) {
         await waitForGuestMerge()
         showToast('Account created! Check your email to verify your address.', 'success', undefined, 8000)
@@ -83,6 +86,7 @@ export function useSignUpForm(options: Options = {}) {
     showPassword, setShowPassword,
     error, submitting,
     attempted, emailTaken, setEmailTaken,
+    newsletterOptIn, setNewsletterOptIn,
     fieldErrors,
     handleSignUp,
     inputClass,
