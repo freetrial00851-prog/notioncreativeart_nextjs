@@ -11,9 +11,6 @@ import { PasswordStrength } from '../PasswordStrength'
 
 export type AuthView = 'login' | 'signup'
 
-/** Set NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true once the Google provider is configured in Supabase. */
-export const GOOGLE_AUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
-
 const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter and a special character.'
 
 const INPUT =
@@ -147,23 +144,21 @@ export function AuthPanel({
           <VerifySent signup={signup} onSignIn={() => onViewChange('login')} />
         ) : (
           <>
-            {GOOGLE_AUTH_ENABLED && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => void login.signInWithGoogle(oauthReturnTo)}
-                  className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[16px] md:text-[17px] font-semibold text-ink hover:bg-surface-warm transition-colors"
-                >
-                  <GoogleIcon />
-                  Continue with Google
-                </button>
-                <div className="my-5 flex items-center gap-3" aria-hidden>
-                  <span className="h-px flex-1 bg-border" />
-                  <span className="text-[14px] text-muted">or use your email</span>
-                  <span className="h-px flex-1 bg-border" />
-                </div>
-              </>
-            )}
+            <button
+              type="button"
+              onClick={() =>
+                void (view === 'login' ? login : signup).signInWithGoogle(oauthReturnTo)
+              }
+              className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[16px] md:text-[17px] font-semibold text-ink hover:bg-surface-warm transition-colors"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </button>
+            <div className="my-5 flex items-center gap-3" aria-hidden>
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-[14px] text-muted">or use your email</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
             {view === 'login' ? (
               <SignInForm login={login} />
             ) : (
