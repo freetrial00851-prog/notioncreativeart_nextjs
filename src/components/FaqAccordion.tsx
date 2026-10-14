@@ -25,9 +25,11 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
                 {isOpen ? '−' : '+'}
               </span>
             </button>
-            {isOpen && (
-              <div className="px-5 pb-4 text-[14px] text-muted leading-relaxed">{item.answer}</div>
-            )}
+            <div
+              className={`px-5 pb-4 text-[14px] text-muted leading-relaxed ${isOpen ? '' : 'hidden'}`}
+            >
+              {item.answer}
+            </div>
           </div>
         )
       })}

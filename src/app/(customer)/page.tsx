@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { buildMetadata } from '@/lib/seo'
+import { buildFaqPageJsonLd, buildItemListJsonLd, buildMetadata, SITE_URL } from '@/lib/seo'
 import { Home } from '@/views/Home'
 import { getHomeCatalogServer } from '@/lib/data/home'
 import { mergeLayout } from '@/lib/defaultLayout'
 import { getSiteSeoContext } from '@/lib/seoSettings'
 import { isVercelProduction } from '@/lib/env'
+import { HOME_FAQ } from '@/lib/homeFaq'
 
 /**
  * ISR homepage — catalog is server-fetched and CDN-cached for 60s.
@@ -27,13 +28,31 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const { snapshot, featuredError } = await getHomeCatalogServer()
+  const featured = snapshot.trending.slice(0, 4)
+  const faqJsonLd = buildFaqPageJsonLd(HOME_FAQ)
+  const listJsonLd =
+    featured.length > 0
+      ? buildItemListJsonLd(
+          featured.map((p) => ({
+            name: p.title,
+            url: `${SITE_URL}/pattern/${p.slug}`,
+          })),
+        )
+      : null
+
   return (
-    <Home
-      initialCatalog={snapshot}
-      initialFeaturedError={featuredError}
-      initialHero={snapshot.hero}
-      initialLayout={snapshot.layout?.length ? snapshot.layout : mergeLayout([])}
-      hideOwnerCopyPlaceholders={isVercelProduction()}
-    />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {listJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />
+      )}
+      <Home
+        initialCatalog={snapshot}
+        initialFeaturedError={featuredError}
+        initialHero={snapshot.hero}
+        initialLayout={snapshot.layout?.length ? snapshot.layout : mergeLayout([])}
+        hideOwnerCopyPlaceholders={isVercelProduction()}
+      />
+    </>
   )
 }

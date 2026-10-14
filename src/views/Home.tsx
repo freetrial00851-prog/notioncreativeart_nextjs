@@ -21,6 +21,7 @@ import { FaqAccordion } from '../components/FaqAccordion'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { ProductGridSkeleton } from '../components/Skeleton'
 import { fetchMakerReviewsForHome, type MakerReviewCard } from '../lib/reviews'
+import { HOME_FAQ } from '../lib/homeFaq'
 
 const SKILL_COPY: Record<
   'beginner' | 'intermediate' | 'advanced',
@@ -82,29 +83,6 @@ function heroSecondaryHref(link: string | undefined) {
   if (!raw || raw === '/shop' || raw === '/shop/') return '/shop?price=free'
   return raw
 }
-
-const FAQ_ITEMS_READY = [
-  {
-    question: 'How do I get my pattern after paying?',
-    answer:
-      'Right after payment you can download the PDF from the confirmation page. It is also emailed to you and saved in My downloads.',
-  },
-  {
-    question: 'Do I need an account?',
-    answer:
-      'Yes for paid patterns, so your files are safe and you can download them again. Free patterns can be downloaded without signing in.',
-  },
-  {
-    question: 'Can I download a pattern again later?',
-    answer:
-      'Yes. Every pattern you buy stays in your account, and you can download it as many times as you like.',
-  },
-  {
-    question: 'Which skill level should I choose?',
-    answer:
-      'Beginner patterns use basic stitches and short steps. Intermediate and Advanced add shaping and finer details. Each product page shows the level.',
-  },
-]
 
 /** Preview/local only — contains owner TODO placeholders; omitted in production. */
 const FAQ_ITEM_FILE_ISSUE_PLACEHOLDER = {
@@ -288,8 +266,8 @@ export function Home({
   })
 
   const faqItems = hideOwnerCopyPlaceholders
-    ? FAQ_ITEMS_READY
-    : [...FAQ_ITEMS_READY, FAQ_ITEM_FILE_ISSUE_PLACEHOLDER]
+    ? HOME_FAQ
+    : [...HOME_FAQ, FAQ_ITEM_FILE_ISSUE_PLACEHOLDER]
 
   return (
     <div className="bg-bg">
@@ -302,10 +280,10 @@ export function Home({
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
             <h1 className="type-h1 text-ink mb-3">
-              Beautiful crochet patterns, ready to download.
+              Crochet PDF patterns, ready to download.
             </h1>
             <p className="mx-auto mb-6 max-w-sm text-[15px] leading-relaxed text-muted">
-              Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
+              Tested instant-download patterns for every skill level. Pay once, keep the file for life.
             </p>
             <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
               <Link href={heroPrimaryHref(hero?.cta_link)}>
@@ -324,12 +302,31 @@ export function Home({
         </div>
       </section>
 
+      <nav aria-label="Shop shortcuts" className="border-b border-border bg-surface">
+        <div className="mx-auto flex max-w-site flex-wrap items-center justify-center gap-2 page-gutter py-3">
+          {[
+            { href: '/shop', label: 'All patterns' },
+            { href: '/shop?price=free', label: 'Free PDFs' },
+            { href: '/shop?level=beginner', label: 'Beginner' },
+            { href: '/shop?sort=newest', label: 'New' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-flex min-h-11 items-center rounded-full border border-border bg-bg px-4 text-[13px] font-semibold text-ink hover:border-primary hover:text-primary"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
       {/* Featured */}
       <section className="max-w-site mx-auto page-gutter section-y">
         <div className="mx-auto mb-8 max-w-xl text-center">
-          <h2 className="type-h2 text-ink mb-2">Featured patterns</h2>
+          <h2 className="type-h2 text-ink mb-2">Featured crochet patterns</h2>
           <p className="text-[15px] leading-relaxed text-muted">
-            Instant download. Yours to keep. Start with one you love.
+            Instant PDF download. Yours to keep. Start with one you love.
           </p>
         </div>
         {!catalogReady ? (
@@ -373,14 +370,14 @@ export function Home({
         <div className="max-w-site mx-auto page-gutter section-y">
           <div className="mx-auto mb-8 max-w-xl text-center">
             <h2 className="type-h2 text-ink mb-2">Shop by skill level</h2>
-            <p className="text-[15px] text-muted">Find patterns that match where you are right now.</p>
+            <p className="text-[15px] text-muted">Beginner, intermediate, and advanced crochet patterns.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             {skillLevels.map((s) => (
               <Link key={s.level} href={s.link} className="group block overflow-hidden rounded-[20px] bg-surface">
                 <div className="relative aspect-[4/3]" style={{ background: s.tint }}>
                   {s.image ? (
-                    <Image src={s.image} alt="" fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+                    <Image src={s.image} alt={`${s.level} crochet patterns`} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
                   ) : null}
                 </div>
                 <div className="p-4 md:p-5">
@@ -405,9 +402,9 @@ export function Home({
         >
           <div>
             <StatusBadge status="free" className="!bg-white !text-free mb-3" />
-            <h2 className="type-h2 text-ink mb-2">Start with a free pattern</h2>
+            <h2 className="type-h2 text-ink mb-2">Start with a free crochet PDF</h2>
             <p className="text-[15px] text-muted leading-relaxed mb-5 max-w-md">
-              Download a free PDF, no account needed. See the quality for yourself before you buy.
+              Download a free pattern with no account. See the quality before you buy.
             </p>
             <Link href="/shop?price=free" className="block sm:inline-block w-full sm:w-auto">
               <Button variant="primary" size="md" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
@@ -544,8 +541,8 @@ export function Home({
               ))}
             </div>
             <div className="text-center mt-8">
-              <Link href="/shop" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
-                Read all reviews →
+              <Link href="/shop">
+                <Button variant="primary" size="md">Shop patterns</Button>
               </Link>
             </div>
           </div>
@@ -556,8 +553,8 @@ export function Home({
       <section className="bg-bg border-t border-border">
         <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-8">
           <div>
-            <h2 className="type-h2 text-ink mb-2">Questions, answered</h2>
-            <p className="text-[15px] text-muted mb-3">The basics before you buy.</p>
+            <h2 className="type-h2 text-ink mb-2">Crochet PDF pattern FAQs</h2>
+            <p className="text-[15px] text-muted mb-3">The basics before you buy a digital pattern.</p>
             {!hideOwnerCopyPlaceholders && (
               <p className="text-[14px] text-muted">
                 Still stuck? Write to {/* TODO: support email from owner */}

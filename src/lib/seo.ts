@@ -255,6 +255,36 @@ export function buildOrganizationJsonLd() {
   }
 }
 
+/** JSON-LD FAQPage — use the same Q&A shown on the homepage. */
+export function buildFaqPageJsonLd(items: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  }
+}
+
+/** JSON-LD ItemList for featured patterns on the homepage. */
+export function buildItemListJsonLd(items: { name: string; url: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      url: item.url,
+    })),
+  }
+}
+
 /** JSON-LD WebSite schema with SearchAction — enables sitelinks search box. */
 export function buildWebSiteJsonLd() {
   return {
