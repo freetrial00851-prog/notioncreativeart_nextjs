@@ -15,12 +15,9 @@ import { prefetchProduct } from '../lib/prefetchCache'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 
-const IMAGE_SHADOW = '0 2px 8px rgba(17,24,39,0.06)'
-const IMAGE_SHADOW_HOVER = '0 6px 16px rgba(17,24,39,0.12)'
-
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
       <path
         d="M12 20.15l-1.35-1.23C5.7 14.4 2.5 11.5 2.5 8.1 2.5 5.4 4.6 3.3 7.3 3.3c1.55 0 3.05.72 4.05 1.86C12.35 4.02 13.85 3.3 15.4 3.3c2.7 0 4.8 2.1 4.8 4.8 0 3.4-3.2 6.3-8.15 10.82L12 20.15z"
         fill={filled ? 'var(--color-sale)' : 'none'}
@@ -152,17 +149,8 @@ export function ProductCard({
     <article className="group/card flex h-full flex-col">
       {/* Image block */}
       <div
-        className="relative aspect-square overflow-hidden rounded-2xl bg-surface-warm transition-[transform,box-shadow] duration-200 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover/card:-translate-y-0.5 motion-reduce:[@media(hover:hover)]:group-hover/card:translate-y-0"
-        style={{ boxShadow: IMAGE_SHADOW }}
-        onMouseEnter={(e) => {
-          prefetch()
-          if (window.matchMedia('(hover: hover)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            e.currentTarget.style.boxShadow = IMAGE_SHADOW_HOVER
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = IMAGE_SHADOW
-        }}
+        className="relative aspect-square overflow-hidden rounded-2xl bg-surface-soft"
+        onMouseEnter={prefetch}
         onTouchStart={prefetch}
       >
         <Link href={href} className="absolute inset-0 z-0 block" aria-label={product.title} tabIndex={-1}>
@@ -215,7 +203,7 @@ export function ProductCard({
           onClick={toggleWishlist}
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
           aria-pressed={inWishlist}
-          className="absolute right-3 top-3 z-10 inline-flex size-11 items-center justify-center rounded-full bg-white shadow-sm transition-opacity hover:opacity-90"
+          className="absolute right-2.5 top-2.5 z-10 inline-flex size-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-[2px] transition-opacity hover:opacity-90"
         >
           <HeartIcon filled={inWishlist} />
         </button>
@@ -233,12 +221,12 @@ export function ProductCard({
 
       {/* Info block */}
       <div className="mt-1.5 flex min-h-0 flex-1 flex-col gap-1.5">
-        <h3 className="min-h-[2.6em] text-[14px] font-bold leading-snug text-ink">
+        <h3 className="text-[14px] font-semibold leading-snug text-ink md:text-[15px]">
           <Link
             href={href}
             onMouseEnter={prefetch}
             onTouchStart={prefetch}
-            className="line-clamp-2 [@media(hover:hover)]:group-hover/card:text-primary [@media(hover:hover)]:group-hover/card:underline"
+            className="line-clamp-2 [@media(hover:hover)]:group-hover/card:text-primary"
           >
             {product.title}
           </Link>

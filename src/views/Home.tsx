@@ -119,6 +119,59 @@ const FAQ_ITEM_FILE_ISSUE_PLACEHOLDER = {
 
 type HeroPhoto = { src: string; alt: string; href?: string }
 
+function HeroPhotoFrame({
+  photo,
+  sizes,
+  priority = false,
+}: {
+  photo: HeroPhoto
+  sizes: string
+  priority?: boolean
+}) {
+  const image = (
+    <Image
+      src={photo.src}
+      alt={photo.alt}
+      fill
+      className="object-cover object-center"
+      sizes={sizes}
+      priority={priority}
+    />
+  )
+  if (photo.href) {
+    return (
+      <Link href={photo.href} className="absolute inset-0" aria-label={photo.alt}>
+        {image}
+      </Link>
+    )
+  }
+  return image
+}
+
+/** One dominant square photo, optional overlapping second — editorial, not a collage. */
+function HeroArt({ photos }: { photos: HeroPhoto[] }) {
+  const main = photos[0]
+  const side = photos[1]
+  return (
+    <div className={`relative mx-auto w-full max-w-[480px] lg:max-w-[520px] ${side ? 'pb-10' : ''}`}>
+      <div
+        className="relative aspect-square overflow-hidden rounded-2xl"
+        style={{ background: HERO_FALLBACK_TINT }}
+      >
+        {main ? <HeroPhotoFrame photo={main} sizes="(max-width:1023px) 100vw, 520px" priority /> : null}
+      </div>
+      {side ? (
+        <div
+          className="absolute bottom-0 left-0 aspect-square w-[42%] max-w-[200px] overflow-hidden rounded-2xl border-[5px] border-surface-warm"
+          style={{ background: 'var(--color-tint-cream)' }}
+        >
+          <HeroPhotoFrame photo={side} sizes="200px" />
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 export function Home({
   initialCatalog = null,
   initialFeaturedError = null,
@@ -154,19 +207,25 @@ export function Home({
 
   const reviewStatsMap = useReviewStatsMapForLists([trending])
   const featured = trending.slice(0, 4)
-  const heroPhoto = ((): HeroPhoto | null => {
+  const heroPhotos = ((): HeroPhoto[] => {
+    const photos: HeroPhoto[] = []
     for (const url of hero?.images ?? []) {
       if (!url) continue
-      const match = trending.find((p) => p.images?.[0] === url)
-      return {
+      const match = trending.find((p) => p.images?.includes(url))
+      photos.push({
         src: url,
         alt: match?.title || 'Handmade crochet from Notion Creative Art',
         href: match ? `/pattern/${match.slug}` : undefined,
+      })
+      if (photos.length === 2) break
+    }
+    if (photos.length === 0) {
+      const first = trending.find((p) => p.images?.[0])
+      if (first?.images?.[0]) {
+        photos.push({ src: first.images[0], alt: first.title, href: `/pattern/${first.slug}` })
       }
     }
-    const first = trending.find((p) => p.images?.[0])
-    if (!first?.images?.[0]) return null
-    return { src: first.images[0], alt: first.title, href: `/pattern/${first.slug}` }
+    return photos
   })()
   const freeImages = (
     freePatternCollage.length > 0
@@ -265,40 +324,12 @@ export function Home({
   return (
     <div className="bg-bg">
       <section className="bg-surface-warm">
-        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-8 md:py-10 lg:grid-cols-2 lg:gap-10">
-          <div
-            className="relative order-1 mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-2xl lg:order-2 lg:max-w-none"
-            style={{ background: HERO_FALLBACK_TINT }}
-          >
-            {heroPhoto ? (
-              heroPhoto.href ? (
-                <Link href={heroPhoto.href} className="absolute inset-0" aria-label={heroPhoto.alt}>
-                  <Image
-                    src={heroPhoto.src}
-                    alt={heroPhoto.alt}
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width:1023px) 100vw, 520px"
-                    priority
-                  />
-                </Link>
-              ) : (
-                <Image
-                  src={heroPhoto.src}
-                  alt={heroPhoto.alt}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width:1023px) 100vw, 520px"
-                  priority
-                />
-              )
-            ) : null}
-          </div>
-          <div className="order-2 lg:order-1">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+        <div className="mx-auto grid max-w-site items-center gap-10 page-gutter py-10 md:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          <div>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-hero mb-4 max-w-lg text-ink">Crochet PDF patterns, ready to download.</h1>
+            <h1 className="type-hero mb-4 max-w-xl text-ink">Crochet PDF patterns, ready to download.</h1>
             <p className="mb-6 max-w-md text-[15px] leading-relaxed text-muted">
               Tested instant-download patterns for every skill level. Pay once, keep the file for life.
             </p>
@@ -315,15 +346,17 @@ export function Home({
                 {hero?.secondary_cta_text || 'Get a free pattern'}
               </Link>
             </div>
+            <p className="mt-6 text-[13px] text-muted">Instant PDF · Lifetime access · Secure checkout</p>
           </div>
+          <HeroArt photos={heroPhotos} />
         </div>
       </section>
 
       <section className="max-w-site mx-auto page-gutter section-y">
-        <div className="mb-8 flex items-end justify-between gap-4">
+        <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <h2 className="type-h2 mb-2 text-ink">Featured crochet patterns</h2>
-            <p className="max-w-xl text-[15px] leading-relaxed text-muted">
+            <h2 className="type-h2 mb-1 text-ink">Featured crochet patterns</h2>
+            <p className="max-w-xl text-[14px] leading-relaxed text-muted">
               Instant PDF download. Yours to keep.
             </p>
           </div>
@@ -411,64 +444,66 @@ export function Home({
         </section>
       ))}
 
-      <section className="border-y border-border bg-bg">
-        <div className="max-w-site mx-auto page-gutter py-8 md:py-10">
-          <h2 className="type-h2 mb-5 text-ink">Shop by skill</h2>
-          <div className="flex flex-wrap gap-3">
+      <section className="bg-surface-warm">
+        <div className="max-w-site mx-auto page-gutter section-y">
+          <h2 className="type-h2 mb-8 text-ink">Shop by skill</h2>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-5">
             {skillLevels.map((s) => (
-              <Link
-                key={s.level}
-                href={s.link}
-                className="inline-flex min-h-11 items-center gap-3 rounded-full border border-border bg-surface px-4"
-              >
-                <span className="flex items-center gap-2">
-                  <LevelBadge level={s.level} />
-                  <span className="text-[14px] font-semibold text-ink">{s.title}</span>
+              <Link key={s.level} href={s.link} className="group block">
+                <div
+                  className="relative mb-3 aspect-square overflow-hidden rounded-2xl"
+                  style={{ background: s.tint }}
+                >
+                  {s.image ? (
+                    <Image
+                      src={s.image}
+                      alt={`${s.level} crochet patterns`}
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width:768px) 100vw, 33vw"
+                    />
+                  ) : null}
+                </div>
+                <LevelBadge level={s.level} className="mb-2" />
+                <h3 className="mb-1 font-heading text-[20px] font-bold leading-tight text-ink">{s.title}</h3>
+                <p className="mb-2 text-[14px] leading-relaxed text-muted">{s.body}</p>
+                <span className="text-[13px] font-semibold text-primary group-hover:underline underline-offset-2">
+                  Browse {s.level} patterns
+                  {s.count > 0 ? ` (${s.count})` : ''}
                 </span>
-                {s.count > 0 ? (
-                  <span className="text-[13px] text-muted">
-                    {s.count}
-                  </span>
-                ) : null}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-primary text-primary-contrast">
-        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-12 lg:grid-cols-2">
+      <section style={{ background: 'var(--color-tint-sage)' }}>
+        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter section-y lg:grid-cols-2 lg:gap-12">
           <div>
             <StatusBadge status="free" className="mb-4 !bg-white !text-free" />
-            <h2 className="type-h2 mb-3">Start with a free crochet PDF</h2>
-            <p className="mb-6 max-w-md text-[15px] leading-relaxed text-white/85">
+            <h2 className="type-h2 mb-3 text-ink">Start with a free crochet PDF</h2>
+            <p className="mb-6 max-w-md text-[15px] leading-relaxed text-muted">
               Download a free pattern with no account. See the quality before you buy.
             </p>
             <Link href="/shop?price=free" className="block w-full sm:inline-block sm:w-auto">
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full border-0 bg-white text-primary hover:bg-white/95 sm:w-auto"
-                iconLeft={<DownloadGlyph />}
-              >
+              <Button variant="primary" size="md" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
                 Download a free pattern
               </Button>
             </Link>
           </div>
-          {freeImages[0]?.images?.[0] ? (
-            <Link
-              href={`/pattern/${freeImages[0].slug}`}
-              className="relative mx-auto hidden aspect-square w-full max-w-[360px] overflow-hidden rounded-2xl lg:block"
-            >
-              <Image
-                src={freeImages[0].images[0]}
-                alt={freeImages[0].title}
-                fill
-                className="object-cover object-center"
-                sizes="360px"
-              />
-            </Link>
-          ) : null}
+          <div className="relative mx-auto aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl bg-white lg:max-w-none">
+            {freeImages[0]?.images?.[0] ? (
+              <Link href={`/pattern/${freeImages[0].slug}`} className="absolute inset-0">
+                <Image
+                  src={freeImages[0].images[0]}
+                  alt={freeImages[0].title}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width:1023px) 100vw, 440px"
+                />
+              </Link>
+            ) : null}
+          </div>
         </div>
       </section>
 
@@ -530,15 +565,15 @@ export function Home({
       {makerReviews.length > 0 && (
         <section id="reviews" className="bg-surface-warm">
           <div className="max-w-site mx-auto page-gutter section-y">
-            <div className="mb-7">
-              <h2 className="type-h2 mb-2 text-ink">What makers say</h2>
-              <p className="text-[15px] text-muted">Real reviews from people who made our patterns.</p>
+            <div className="mb-6">
+              <h2 className="type-h2 mb-1 text-ink">What makers say</h2>
+              <p className="text-[14px] text-muted">Real reviews from people who made our patterns.</p>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {makerReviews.slice(0, 3).map((t, i) => (
                 <article
                   key={t.id}
-                  className={`rounded-2xl border border-border bg-surface p-5 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
+                  className={`rounded-2xl bg-surface p-5 ${i === 2 ? 'hidden md:block' : ''}`}
                 >
                   <div className="mb-3 flex gap-0.5 text-gold" aria-label={`${t.rating} out of 5 stars`}>
                     {Array.from({ length: 5 }).map((_, si) => (
@@ -560,8 +595,8 @@ export function Home({
       <section className="border-t border-border bg-bg">
         <div className="max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter section-y lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <h2 className="type-h2 mb-2 text-ink">Crochet PDF pattern FAQs</h2>
-            <p className="mb-3 text-[15px] text-muted">The basics before you buy a digital pattern.</p>
+            <h2 className="type-h2 mb-1 text-ink">Crochet PDF pattern FAQs</h2>
+            <p className="mb-3 text-[14px] text-muted">The basics before you buy a digital pattern.</p>
             {!hideOwnerCopyPlaceholders && (
               <p className="text-[14px] text-muted">
                 Still stuck? Write to {/* TODO: support email from owner */}
