@@ -37,23 +37,24 @@ export async function getCategoriesWithProducts(supabase: SupabaseClient): Promi
       const ids = [rc.id, ...(subIdsByParent.get(rc.id) ?? [])]
       const [{ count }, sampleRes] = await Promise.all([
         supabase.from('products').select('id', { count: 'exact', head: true }).in('category_id', ids).eq('active', true),
-        rc.image || card?.image
-          ? Promise.resolve({ data: null })
-          : supabase
-              .from('products')
-              .select('images')
-              .in('category_id', ids)
-              .eq('active', true)
-              .order('featured', { ascending: false })
-              .limit(1)
-              .maybeSingle(),
+        supabase
+          .from('products')
+          .select('images')
+          .in('category_id', ids)
+          .eq('active', true)
+          .order('featured', { ascending: false })
+          .limit(8),
       ])
-      const sampleImages = (sampleRes.data as { images?: string[] } | null)?.images
+      const sampleImage =
+        ((sampleRes.data as { images?: string[] }[] | null) ?? [])
+          .map((p) => (Array.isArray(p.images) ? p.images.find((u) => typeof u === 'string' && /^https?:\/\//.test(u)) : undefined))
+          .find(Boolean) ?? ''
+      const categoryImage = (rc.image ?? card?.image ?? '').trim()
       return {
         id: rc.id,
         name: rc.name,
         copy: card?.copy ?? '',
-        image: rc.image ?? card?.image ?? sampleImages?.[0] ?? '',
+        image: sampleImage || categoryImage,
         link: `/shop/${rc.slug}`,
         count: count ?? 0,
       }
