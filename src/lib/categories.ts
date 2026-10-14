@@ -35,12 +35,25 @@ export async function getCategoriesWithProducts(supabase: SupabaseClient): Promi
     realCategories.map(async (rc) => {
       const card = cardBySlug.get(rc.slug)
       const ids = [rc.id, ...(subIdsByParent.get(rc.id) ?? [])]
-      const { count } = await supabase.from('products').select('id', { count: 'exact', head: true }).in('category_id', ids).eq('active', true)
+      const [{ count }, sampleRes] = await Promise.all([
+        supabase.from('products').select('id', { count: 'exact', head: true }).in('category_id', ids).eq('active', true),
+        rc.image || card?.image
+          ? Promise.resolve({ data: null })
+          : supabase
+              .from('products')
+              .select('images')
+              .in('category_id', ids)
+              .eq('active', true)
+              .order('featured', { ascending: false })
+              .limit(1)
+              .maybeSingle(),
+      ])
+      const sampleImages = (sampleRes.data as { images?: string[] } | null)?.images
       return {
         id: rc.id,
         name: rc.name,
         copy: card?.copy ?? '',
-        image: rc.image ?? card?.image ?? '',
+        image: rc.image ?? card?.image ?? sampleImages?.[0] ?? '',
         link: `/shop/${rc.slug}`,
         count: count ?? 0,
       }

@@ -384,11 +384,11 @@ export function Home({
               Shop all
             </Link>
           </div>
-          <div className={`grid grid-cols-2 gap-3 md:gap-4 ${browseCategories.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+          <div className={`grid grid-cols-2 gap-3 md:gap-4 ${browseCategories.length >= 4 ? 'lg:grid-cols-4' : browseCategories.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
             {browseCategories.map((c) => (
               <Link key={c.id} href={c.link} className="group block overflow-hidden rounded-[20px] bg-surface">
                 <div
-                  className="relative aspect-[4/5]"
+                  className={`relative ${browseCategories.length <= 2 ? 'aspect-[16/10]' : 'aspect-[4/5]'}`}
                   style={{ background: 'var(--color-tint-lavender)' }}
                 >
                   {c.image ? (
