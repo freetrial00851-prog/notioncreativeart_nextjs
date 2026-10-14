@@ -125,56 +125,31 @@ const HERO_TINTS = [
   'var(--color-tint-peach)',
 ] as const
 
-function HeroTile({
-  src,
-  label,
-  tint,
-  className = '',
-  priority = false,
-  sizes,
-}: {
-  src: string | null
-  label: string
-  tint: string
-  className?: string
-  priority?: boolean
-  sizes: string
-}) {
+/** One dominant photo, optional overlapping second — editorial, not a 3-tile collage. */
+function HeroArt({ images }: { images: string[] }) {
+  const main = images[0] ?? null
+  const side = images[1] ?? null
   return (
-    <div className={`relative overflow-hidden border border-border rounded-[18px] ${className}`} style={{ background: tint }}>
-      {src ? (
-        <Image src={src} alt="" fill className="object-cover" sizes={sizes} priority={priority} />
-      ) : (
-        <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">{label}</span>
+    <div className={`relative ${side ? 'pb-8 md:pb-10' : ''}`}>
+      <div
+        className="relative aspect-[4/5] sm:aspect-[5/6] lg:aspect-[4/5] overflow-hidden rounded-[24px]"
+        style={{ background: HERO_TINTS[0] }}
+      >
+        {main ? (
+          <Image src={main} alt="" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 520px" priority />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Hero photo</span>
+        )}
+      </div>
+      {side && (
+        <div
+          className="absolute bottom-0 left-4 md:left-0 w-[44%] md:w-[42%] aspect-square overflow-hidden rounded-[20px] border-[5px] border-bg"
+          style={{ background: HERO_TINTS[1] }}
+        >
+          <Image src={side} alt="" fill className="object-cover" sizes="220px" />
+        </div>
       )}
     </div>
-  )
-}
-
-/** Mobile + laptop: large left + two stacked. Tablet: three equal columns. */
-function HeroCollage({ images }: { images: string[] }) {
-  const slots = [0, 1, 2].map((i) => images[i] ?? null)
-  return (
-    <>
-      {/* Mobile <768: collage */}
-      <div className="grid grid-cols-2 gap-3 h-[220px] md:hidden">
-        <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} className="row-span-2" priority sizes="50vw" />
-        <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="40vw" />
-        <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="40vw" />
-      </div>
-      {/* Tablet 768–1023: three equal tiles */}
-      <div className="hidden md:grid lg:hidden grid-cols-3 gap-4 h-[260px]">
-        <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} priority sizes="30vw" />
-        <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="30vw" />
-        <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="30vw" />
-      </div>
-      {/* Laptop: collage beside copy */}
-      <div className="hidden lg:grid grid-cols-2 gap-4 h-[360px]">
-        <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} className="row-span-2" priority sizes="320px" />
-        <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="200px" />
-        <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="200px" />
-      </div>
-    </>
   )
 }
 
@@ -301,61 +276,43 @@ export function Home({
 
   return (
     <div className="bg-bg">
-      {/* Hero — DESIGN_SPEC §4.1.2 */}
-      <section className="max-w-site mx-auto page-gutter section-y">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+      {/* Hero */}
+      <section className="max-w-site mx-auto page-gutter pt-8 md:pt-12 lg:pt-14 pb-10 md:pb-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-center">
           <div>
-            <p className="text-[12px] font-semibold text-primary mb-3">
+            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-primary mb-4">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-h1 text-ink mb-3">
+            <h1 className="type-hero text-ink mb-4 max-w-xl">
               Beautiful crochet patterns, ready to download.
             </h1>
-            <p className="text-[15px] text-muted leading-relaxed mb-5 max-w-md">
+            <p className="text-[16px] text-muted leading-relaxed mb-6 max-w-md">
               Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link href={heroPrimaryHref(hero?.cta_link)} className="sm:flex-1 lg:flex-none">
-                <Button variant="primary" size="md" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <Link href={heroPrimaryHref(hero?.cta_link)}>
+                <Button variant="primary" size="md" iconRight={<span aria-hidden>→</span>}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
                 </Button>
               </Link>
-              <Link href={heroSecondaryHref(hero?.secondary_cta_link)} className="sm:flex-1 lg:flex-none">
-                <Button variant="secondary" size="md" className="w-full sm:w-auto">
-                  {hero?.secondary_cta_text || 'Get a free pattern'}
-                </Button>
+              <Link
+                href={heroSecondaryHref(hero?.secondary_cta_link)}
+                className="inline-flex min-h-11 items-center text-[15px] font-semibold text-primary hover:underline underline-offset-2"
+              >
+                {hero?.secondary_cta_text || 'Get a free pattern'}
               </Link>
             </div>
+            <p className="mt-6 text-[13px] text-muted">
+              Instant PDF · Lifetime access · Secure checkout
+            </p>
           </div>
-          <HeroCollage images={hero?.images ?? []} />
+          <HeroArt images={hero?.images ?? []} />
         </div>
       </section>
 
-      {/* Trust strip — §4.1.3 */}
-      <section className="border-y border-border bg-surface">
-        <div className="max-w-site mx-auto page-gutter py-8 md:py-9 grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-          {[
-            { title: 'Instant download', body: 'PDF in your account in seconds' },
-            { title: 'Guaranteed quality', body: 'Clear, tested instructions' },
-            { title: 'Secure payment', body: 'Checkout by Lemon Squeezy' },
-            { title: 'Lifetime access', body: 'Re-download anytime' },
-          ].map((item) => (
-            <div key={item.title} className="flex gap-3 items-start">
-              <span className="w-10 h-10 rounded-full bg-primary-soft flex items-center justify-center shrink-0">
-                <TrustIcon title={item.title} />
-              </span>
-              <div>
-                <p className="text-[14px] font-bold text-ink">{item.title}</p>
-                <p className="text-[13px] text-muted leading-snug">{item.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured — §4.1.4 */}
-      <section className="max-w-site mx-auto page-gutter section-y">
-        <div className="flex items-end justify-between gap-4 mb-6">
+      {/* Featured */}
+      <section className="max-w-site mx-auto page-gutter pb-12 md:pb-16">
+        <div className="flex items-end justify-between gap-4 mb-8">
           <h2 className="type-h2 text-ink">Featured patterns</h2>
           <Link href="/shop" className="text-[13px] font-semibold text-primary shrink-0 hover:underline underline-offset-2">
             <span className="md:hidden">View all</span>
@@ -391,111 +348,67 @@ export function Home({
         )}
       </section>
 
-      {/* Shop by skill — §4.1.5 */}
+      {/* Shop by skill */}
       <section className="bg-surface-warm">
         <div className="max-w-site mx-auto page-gutter section-y">
           <h2 className="type-h2 text-ink mb-2">Shop by skill level</h2>
-          <p className="text-[15px] text-muted mb-6 max-w-lg">
+          <p className="text-[15px] text-muted mb-8 max-w-lg">
             Find patterns that match where you are right now.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-5">
             {skillLevels.map((s) => (
-              <article key={s.level} className="rounded-2xl border border-border bg-surface overflow-hidden shadow-card flex flex-col">
-                {/* Image on tablet/laptop only — mobile skill cards are text-first */}
-                <div className="relative aspect-[4/3] hidden md:block" style={{ background: s.tint }}>
+              <Link key={s.level} href={s.link} className="group block">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[20px]" style={{ background: s.tint }}>
                   {s.image ? (
-                    <Image src={s.image} alt="" fill className="object-cover" sizes="33vw" />
-                  ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted capitalize">
-                      {s.level} photo
-                    </span>
-                  )}
+                    <Image src={s.image} alt="" fill className="object-cover transition-transform duration-500 [@media(hover:hover)]:group-hover:scale-[1.03] motion-reduce:transform-none" sizes="(max-width:768px) 100vw, 33vw" />
+                  ) : null}
+                  <div className="absolute inset-x-0 bottom-0 p-4 pt-16 bg-gradient-to-t from-ink/55 to-transparent">
+                    <LevelBadge level={s.level} className="mb-2" />
+                    <h3 className="font-heading text-[22px] font-bold text-white leading-tight">{s.title}</h3>
+                  </div>
                 </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <LevelBadge level={s.level} className="mb-2.5 self-start" />
-                  <h3 className="text-[16px] font-bold text-ink mb-1">{s.title}</h3>
-                  <p className="text-[14px] text-muted leading-relaxed mb-3 flex-1">{s.body}</p>
-                  <Link href={s.link} className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
-                    Browse {s.level} patterns →
-                  </Link>
-                </div>
-              </article>
+                <p className="mt-3 text-[14px] text-muted leading-relaxed">{s.body}</p>
+                <span className="mt-1.5 inline-block text-[13px] font-semibold text-primary group-hover:underline underline-offset-2">
+                  Browse {s.level} patterns
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Free pattern band — §4.1.6 */}
-      <section className="max-w-site mx-auto page-gutter section-y">
-        <div
-          className="rounded-[20px] p-5 md:p-8 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-5 lg:gap-8 items-center"
-          style={{ background: 'var(--color-tint-sage)' }}
-        >
+      {/* Free pattern band */}
+      <section style={{ background: 'var(--color-tint-sage)' }}>
+        <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div>
-            <StatusBadge status="free" className="!bg-white !text-free mb-3" />
-            <h2 className="type-h2 text-ink mb-2">Start with a free pattern</h2>
-            <p className="text-[15px] text-muted leading-relaxed mb-5 max-w-md">
+            <StatusBadge status="free" className="!bg-white !text-free mb-4" />
+            <h2 className="type-h2 text-ink mb-3">Start with a free pattern</h2>
+            <p className="text-[16px] text-muted leading-relaxed mb-6 max-w-md">
               Download a free PDF, no account needed. See the quality for yourself before you buy.
             </p>
-            <Link href="/shop?price=free" className="block sm:inline-block w-full sm:w-auto">
-              <Button variant="primary" size="md" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
+            <Link href="/shop?price=free">
+              <Button variant="primary" size="md" iconLeft={<DownloadGlyph />}>
                 Download a free pattern
               </Button>
             </Link>
           </div>
-          {/* Mobile: one photo; tablet/laptop: two */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {[0, 1].map((i) => {
-              const p = freeImages[i]
-              return (
-                <div
-                  key={i}
-                  className={`relative aspect-[4/3] md:aspect-square rounded-2xl overflow-hidden border border-border bg-white ${i === 1 ? 'hidden md:block' : ''}`}
-                >
-                  {p?.images?.[0] ? (
-                    <Link href={`/pattern/${p.slug}`}>
-                      <Image src={p.images[0]} alt={p.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 160px" />
-                    </Link>
-                  ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-[12px] text-muted px-2 text-center">
-                      Free pattern photo
-                    </span>
-                  )}
-                </div>
-              )
-            })}
+          <div className="relative aspect-[4/3] lg:aspect-[5/4] overflow-hidden rounded-[24px] bg-white">
+            {freeImages[0]?.images?.[0] ? (
+              <Link href={`/pattern/${freeImages[0].slug}`} className="absolute inset-0">
+                <Image
+                  src={freeImages[0].images[0]}
+                  alt={freeImages[0].title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:1024px) 100vw, 520px"
+                />
+              </Link>
+            ) : (
+              <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">
+                Free pattern photo
+              </span>
+            )}
           </div>
-        </div>
-      </section>
-
-      {/* What's inside — §4.1.7; text only (no fake PDF preview) */}
-      <section className="bg-surface border-y border-border">
-        <div className="max-w-site mx-auto page-gutter section-y">
-          <h2 className="type-h2 text-ink mb-2">What is inside every pattern</h2>
-          <p className="text-[15px] text-muted mb-6">Everything you need to finish the project, in one clean PDF.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {(
-              [
-                { t: 'Clear, round-by-round steps', d: 'Written instructions you can follow at your own pace.', icon: 'steps' as const },
-                { t: 'Materials and size list', d: 'Yarn, hook, finished size and stitch abbreviations up front.', icon: 'list' as const },
-                { t: 'Photos for tricky steps', d: 'Close-up pictures where a written line is not enough.', icon: 'camera' as const },
-                { t: 'Printable PDF, yours for good', d: 'Download instantly and find it again in your account anytime.', icon: 'print' as const },
-              ] as const
-            ).map((f) => (
-              <div key={f.t} className="flex gap-3">
-                <span className="w-9 h-9 rounded-xl bg-primary-soft flex items-center justify-center shrink-0">
-                  <InsideIcon name={f.icon} />
-                </span>
-                <div>
-                  <p className="text-[14px] font-bold text-ink mb-0.5">{f.t}</p>
-                  <p className="text-[13px] text-muted leading-relaxed">{f.d}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Link href="/shop?price=free" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
-            Try a free pattern first →
-          </Link>
         </div>
       </section>
 
@@ -549,11 +462,11 @@ export function Home({
               <h2 className="type-h2 text-ink mb-2">What makers say</h2>
               <p className="text-[15px] text-muted">Real reviews from people who made our patterns.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {makerReviews.slice(0, 3).map((t, i) => (
                 <article
                   key={t.id}
-                  className={`rounded-2xl border border-border bg-surface p-5 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
+                  className={`rounded-[20px] bg-surface p-5 md:p-6 ${i === 2 ? 'hidden md:block' : ''}`}
                 >
                   <div
                     className="flex gap-0.5 mb-3 text-gold"
@@ -580,8 +493,8 @@ export function Home({
         </section>
       )}
 
-      {/* FAQ — §4.1.10 */}
-      <section className="bg-bg border-t border-border">
+      {/* FAQ */}
+      <section className="bg-bg">
         <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-8">
           <div>
             <h2 className="type-h2 text-ink mb-2">Questions, answered</h2>
@@ -624,70 +537,6 @@ function Star({ filled = true }: { filled?: boolean }) {
       className={filled ? undefined : 'opacity-35'}
     >
       <path d="M12 2.8l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 16.7 6.6 19.6l1-6.1L3.2 9.2l6.1-.9L12 2.8z" />
-    </svg>
-  )
-}
-
-function TrustIcon({ title }: { title: string }) {
-  const common = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none' as const, 'aria-hidden': true }
-  if (title.startsWith('Instant')) {
-    return (
-      <svg {...common}>
-        <path d="M12 4v10M8 10l4 4 4-4M5 18h14" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
-  }
-  if (title.startsWith('Guaranteed')) {
-    return (
-      <svg {...common}>
-        <circle cx="12" cy="12" r="8" stroke="var(--color-primary)" strokeWidth="2" />
-        <path d="M8.5 12.5l2.2 2.2 4.8-5" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
-  }
-  if (title.startsWith('Secure')) {
-    return (
-      <svg {...common}>
-        <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" />
-      </svg>
-    )
-  }
-  return (
-    <svg {...common}>
-      <path d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" />
-      <path d="M18 3v4h-4M6 21v-4h4" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function InsideIcon({ name }: { name: 'steps' | 'list' | 'camera' | 'print' }) {
-  const common = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none' as const, 'aria-hidden': true }
-  if (name === 'steps') {
-    return (
-      <svg {...common}>
-        <circle cx="12" cy="12" r="8" stroke="var(--color-primary)" strokeWidth="2" />
-        <circle cx="12" cy="12" r="3" stroke="var(--color-primary)" strokeWidth="2" />
-      </svg>
-    )
-  }
-  if (name === 'list') {
-    return (
-      <svg {...common}>
-        <path d="M9 7h10M9 12h10M9 17h10M5 7h.01M5 12h.01M5 17h.01" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    )
-  }
-  if (name === 'camera') {
-    return (
-      <svg {...common}>
-        <path d="M4 8h3l1.5-2h7L17 8h3v11H4V8z" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" />
-        <circle cx="12" cy="13" r="3" stroke="var(--color-primary)" strokeWidth="2" />
-      </svg>
-    )
-  }
-  return (
-    <svg {...common}>
-      <path d="M7 8h10v3H7V8zM8 11h8v7H8v-7zM10 3h4v3h-4V3z" stroke="var(--color-primary)" strokeWidth="2" strokeLinejoin="round" />
     </svg>
   )
 }
