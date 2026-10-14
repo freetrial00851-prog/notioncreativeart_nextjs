@@ -324,16 +324,6 @@ export function Home({
         </div>
       </section>
 
-      <section className="bg-primary text-primary-contrast">
-        <div className="mx-auto grid max-w-site grid-cols-1 gap-3 page-gutter py-3.5 text-center sm:grid-cols-3 sm:py-4">
-          {['Instant PDF download', 'Clear, tested instructions', 'Lifetime access in your account'].map((label) => (
-            <p key={label} className="text-[13px] font-semibold tracking-wide">
-              {label}
-            </p>
-          ))}
-        </div>
-      </section>
-
       {/* Featured */}
       <section className="max-w-site mx-auto page-gutter section-y">
         <div className="mx-auto mb-8 max-w-xl text-center">
