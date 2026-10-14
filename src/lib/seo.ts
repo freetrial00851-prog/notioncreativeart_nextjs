@@ -241,17 +241,92 @@ export function buildBreadcrumbListJsonLd(
   }
 }
 
-/** JSON-LD Organization schema for the homepage — helps brand recognition in SERPs. */
+/** JSON-LD Organization + OnlineStore — brand entity and catalog Google can crawl later. */
 export function buildOrganizationJsonLd() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': ['Organization', 'OnlineStore'],
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/favicon.svg`,
     description:
       'Considered crochet patterns, delivered as instant PDF downloads. A small studio writing and testing crochet patterns, one at a time.',
-    sameAs: [],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Crochet PDF patterns',
+      url: `${SITE_URL}/shop`,
+      itemListElement: [
+        {
+          '@type': 'OfferCatalog',
+          name: 'Amigurumi crochet patterns',
+          url: `${SITE_URL}/shop/amigurumi`,
+        },
+        {
+          '@type': 'OfferCatalog',
+          name: 'Wearable crochet patterns',
+          url: `${SITE_URL}/shop/wearables`,
+        },
+        {
+          '@type': 'OfferCatalog',
+          name: 'Home decor crochet patterns',
+          url: `${SITE_URL}/shop/home-decor`,
+        },
+        {
+          '@type': 'OfferCatalog',
+          name: 'Crochet pattern bundles',
+          url: `${SITE_URL}/shop/bundles`,
+        },
+      ],
+    },
+  }
+}
+
+/** JSON-LD WebPage for the homepage (pairs with WebSite in the root layout). */
+export function buildWebPageJsonLd(opts: {
+  name: string
+  description: string
+  path: string
+  image?: string
+}) {
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: opts.name,
+    description: opts.description,
+    url: `${SITE_URL}${opts.path}`,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    about: {
+      '@type': 'Thing',
+      name: 'Crochet PDF patterns',
+    },
+  }
+  if (opts.image) {
+    jsonLd.primaryImageOfPage = { '@type': 'ImageObject', url: opts.image }
+  }
+  return jsonLd
+}
+
+/** JSON-LD CollectionPage for Shop and category landings. */
+export function buildCollectionPageJsonLd(opts: {
+  name: string
+  description: string
+  path: string
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: opts.name,
+    description: opts.description,
+    url: `${SITE_URL}${opts.path}`,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
   }
 }
 

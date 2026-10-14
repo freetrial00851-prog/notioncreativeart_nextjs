@@ -1,5 +1,11 @@
 import type { Metadata } from 'next'
-import { buildFaqPageJsonLd, buildItemListJsonLd, buildMetadata, SITE_URL } from '@/lib/seo'
+import {
+  buildFaqPageJsonLd,
+  buildItemListJsonLd,
+  buildMetadata,
+  buildWebPageJsonLd,
+  SITE_URL,
+} from '@/lib/seo'
 import { Home } from '@/views/Home'
 import { getHomeCatalogServer } from '@/lib/data/home'
 import { mergeLayout } from '@/lib/defaultLayout'
@@ -27,8 +33,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const { snapshot, featuredError } = await getHomeCatalogServer()
+  const [{ snapshot, featuredError }, { seo, siteOgImage }] = await Promise.all([
+    getHomeCatalogServer(),
+    getSiteSeoContext(),
+  ])
   const featured = snapshot.trending.slice(0, 4)
+  const webPageJsonLd = buildWebPageJsonLd({
+    name: seo.homepage_meta_title,
+    description: seo.homepage_meta_description,
+    path: '/',
+    image: siteOgImage,
+  })
   const faqJsonLd = buildFaqPageJsonLd(HOME_FAQ)
   const listJsonLd =
     featured.length > 0
@@ -42,6 +57,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {listJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }} />

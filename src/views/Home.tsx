@@ -11,6 +11,7 @@ import {
   setHomeCatalogCache,
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
+import type { CategoryWithCount } from '../lib/categories'
 import type { Product, HeroContent, ChapterContent, LayoutSection } from '../lib/types'
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
@@ -44,6 +45,25 @@ const SKILL_COPY: Record<
   },
 }
 
+const SHOP_SHORTCUTS = [
+  { href: '/shop', label: 'All patterns' },
+  { href: '/shop?price=free', label: 'Free PDFs' },
+  { href: '/shop?level=beginner', label: 'Beginner' },
+  { href: '/shop?sort=newest', label: 'New' },
+] as const
+
+const HOW_STEPS = [
+  { n: '1', t: 'Pick a pattern', d: 'Choose by skill, style, or start with a free PDF.' },
+  { n: '2', t: 'Download instantly', d: 'Checkout takes a minute. The file lands in your account.' },
+  { n: '3', t: 'Keep it for life', d: 'Re-download anytime from My downloads. No limits.' },
+] as const
+
+const MOSAIC_TINTS = [
+  'var(--color-tint-lavender)',
+  'var(--color-tint-sage)',
+  'var(--color-tint-peach)',
+] as const
+
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
   return getHomeCatalogCache()
@@ -57,12 +77,16 @@ function applyCatalogSnapshot(
     setFreePatternCollage: (v: Product[]) => void
     setChapters: (v: ChapterContent[]) => void
     setHero: Dispatch<SetStateAction<HeroContent | null>>
+    setCategories: (v: CategoryWithCount[]) => void
+    setSkillCounts: (v: HomeCatalogSnapshot['skillCounts']) => void
   },
 ) {
   setters.setTrending(snap.trending)
   setters.setFreeProduct(snap.freeProduct)
   setters.setFreePatternCollage(snap.freePatternCollage ?? [])
   setters.setChapters(snap.chapters)
+  setters.setCategories(snap.categories ?? [])
+  setters.setSkillCounts(snap.skillCounts)
   if (snap.hero) {
     setters.setHero((prev) => {
       const prevUrls = (prev?.images ?? []).join('|')
@@ -97,42 +121,55 @@ const FAQ_ITEM_FILE_ISSUE_PLACEHOLDER = {
   ),
 }
 
-const HERO_TINTS = [
-  'var(--color-tint-lavender)',
-  'var(--color-tint-sage)',
-  'var(--color-tint-peach)',
-] as const
+type MosaicTileData = { src: string; alt: string; href?: string }
 
 function MosaicTile({
-  src,
+  tile,
   tint,
   className = '',
   priority = false,
 }: {
-  src: string | null
+  tile?: MosaicTileData | null
   tint: string
   className?: string
   priority?: boolean
 }) {
+  const media = tile?.src ? (
+    <Image
+      src={tile.src}
+      alt={tile.alt}
+      fill
+      className="object-cover transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
+      sizes="(max-width:1024px) 50vw, 28vw"
+      priority={priority}
+    />
+  ) : null
+
+  const shared = `group relative min-h-0 overflow-hidden ${className}`
+
+  if (tile?.href) {
+    return (
+      <Link href={tile.href} className={shared} style={{ background: tint }} aria-label={tile.alt}>
+        {media}
+      </Link>
+    )
+  }
+
   return (
-    <div className={`relative min-h-0 overflow-hidden ${className}`} style={{ background: tint }}>
-      {src ? (
-        <Image src={src} alt="" fill className="object-cover" sizes="40vw" priority={priority} />
-      ) : null}
+    <div className={shared} style={{ background: tint }}>
+      {media}
     </div>
   )
 }
 
-/** Full-bleed product mosaic. Not a clone of any shop’s collage — just real NCA photos. */
-function HeroMosaic({ images }: { images: string[] }) {
-  const slot = (i: number) => images[i] ?? null
+/** Product photos beside the hero copy — not covered by a card. */
+function HeroMosaic({ tiles }: { tiles: MosaicTileData[] }) {
+  const slot = (i: number) => tiles[i] ?? null
   return (
-    <div className="grid h-[min(68vh,540px)] min-h-[320px] grid-cols-2 grid-rows-2 gap-1 md:grid-cols-4">
-      <MosaicTile src={slot(0)} tint={HERO_TINTS[0]} className="row-span-2 md:col-span-2" priority />
-      <MosaicTile src={slot(1)} tint={HERO_TINTS[1]} />
-      <MosaicTile src={slot(2)} tint={HERO_TINTS[2]} className="hidden md:block" />
-      <MosaicTile src={slot(3) ?? slot(1)} tint={HERO_TINTS[1]} />
-      <MosaicTile src={slot(4) ?? slot(2)} tint={HERO_TINTS[2]} className="hidden md:block" />
+    <div className="grid h-[min(52vh,440px)] min-h-[260px] grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-[20px] md:h-[min(58vh,500px)]">
+      <MosaicTile tile={slot(0)} tint={MOSAIC_TINTS[0]} className="row-span-2" priority />
+      <MosaicTile tile={slot(1)} tint={MOSAIC_TINTS[1]} />
+      <MosaicTile tile={slot(2) ?? slot(1)} tint={MOSAIC_TINTS[2]} />
     </div>
   )
 }
@@ -159,6 +196,10 @@ export function Home({
   )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
   const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
+  const [categories, setCategories] = useState<CategoryWithCount[]>(() => seed?.categories ?? [])
+  const [skillCounts, setSkillCounts] = useState<HomeCatalogSnapshot['skillCounts']>(
+    () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
+  )
   const [makerReviews, setMakerReviews] = useState<MakerReviewCard[]>([])
   const [catalogReady, setCatalogReady] = useState(() => Boolean(seed))
   const [featuredError, setFeaturedError] = useState<string | null>(() => initialFeaturedError ?? null)
@@ -168,14 +209,24 @@ export function Home({
 
   const reviewStatsMap = useReviewStatsMapForLists([trending])
   const featured = trending.slice(0, 4)
-  const mosaicImages = (() => {
+  const mosaicTiles = ((): MosaicTileData[] => {
     const seen = new Set<string>()
-    const out: string[] = []
-    for (const url of [...(hero?.images ?? []), ...trending.map((p) => p.images?.[0] ?? '')]) {
-      if (!url || seen.has(url)) continue
-      seen.add(url)
-      out.push(url)
-      if (out.length >= 5) break
+    const out: MosaicTileData[] = []
+    const push = (src: string, alt: string, href?: string) => {
+      if (!src || seen.has(src) || out.length >= 3) return
+      seen.add(src)
+      out.push({ src, alt, href })
+    }
+    for (const url of hero?.images ?? []) {
+      const match = trending.find((p) => p.images?.[0] === url)
+      push(
+        url,
+        match?.title || 'Handmade crochet from Notion Creative Art',
+        match ? `/pattern/${match.slug}` : undefined,
+      )
+    }
+    for (const p of trending) {
+      push(p.images?.[0] ?? '', p.title, `/pattern/${p.slug}`)
     }
     return out
   })()
@@ -186,6 +237,7 @@ export function Home({
         ? [freeProduct]
         : []
   ).slice(0, 2)
+  const browseCategories = categories.slice(0, 4)
 
   useEffect(() => {
     let cancelled = false
@@ -195,6 +247,8 @@ export function Home({
       setFreePatternCollage,
       setChapters,
       setHero,
+      setCategories,
+      setSkillCounts,
     }
 
     const cached = getHomeCatalogCache()
@@ -262,6 +316,7 @@ export function Home({
       image: fromCms?.image || null,
       link: fromCms?.link || `/shop?level=${level}`,
       tint: copy.tint,
+      count: skillCounts[level],
     }
   })
 
@@ -271,21 +326,20 @@ export function Home({
 
   return (
     <div className="bg-bg">
-      {/* Hero: product photos + centered shop CTA */}
-      <section className="relative">
-        <HeroMosaic images={mosaicImages} />
-        <div className="absolute inset-0 flex items-center justify-center bg-ink/30 px-4">
-          <div className="w-full max-w-[520px] rounded-[24px] bg-bg/95 px-5 py-7 text-center shadow-card md:px-9 md:py-9">
+      <section className="bg-surface-warm">
+        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-8 md:py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-12 lg:py-12">
+          <div>
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-h1 text-ink mb-3">
-              Crochet PDF patterns, ready to download.
-            </h1>
-            <p className="mx-auto mb-6 max-w-sm text-[15px] leading-relaxed text-muted">
+            <h1 className="type-h1 mb-4 text-ink">Crochet PDF patterns, ready to download.</h1>
+            <p className="mb-4 max-w-md text-[15px] leading-relaxed text-muted">
               Tested instant-download patterns for every skill level. Pay once, keep the file for life.
             </p>
-            <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+            <p className="mb-6 text-[13px] leading-relaxed text-muted">
+              Instant PDF · Every skill level · Re-download anytime
+            </p>
+            <div className="mb-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <Link href={heroPrimaryHref(hero?.cta_link)}>
                 <Button variant="primary" size="md" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
@@ -298,45 +352,90 @@ export function Home({
                 {hero?.secondary_cta_text || 'Get a free pattern'}
               </Link>
             </div>
+            <nav aria-label="Shop shortcuts" className="flex flex-wrap gap-x-4 gap-y-2">
+              {SHOP_SHORTCUTS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-[13px] font-semibold text-ink underline-offset-2 hover:text-primary hover:underline"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
+          <HeroMosaic tiles={mosaicTiles} />
         </div>
       </section>
 
-      <nav aria-label="Shop shortcuts" className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-site flex-wrap items-center justify-center gap-2 page-gutter py-3">
-          {[
-            { href: '/shop', label: 'All patterns' },
-            { href: '/shop?price=free', label: 'Free PDFs' },
-            { href: '/shop?level=beginner', label: 'Beginner' },
-            { href: '/shop?sort=newest', label: 'New' },
-          ].map((item) => (
+      {browseCategories.length > 0 && (
+        <section className="max-w-site mx-auto page-gutter section-y">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <h2 className="type-h2 mb-2 text-ink">Shop by type</h2>
+              <p className="max-w-xl text-[15px] leading-relaxed text-muted">
+                Amigurumi, wearables, and pieces for the home — jump to the crochet PDFs you want to make.
+              </p>
+            </div>
             <Link
-              key={item.href}
-              href={item.href}
-              className="inline-flex min-h-11 items-center rounded-full border border-border bg-bg px-4 text-[13px] font-semibold text-ink hover:border-primary hover:text-primary"
+              href="/shop"
+              className="hidden shrink-0 text-[14px] font-semibold text-primary hover:underline underline-offset-2 sm:inline-flex"
             >
-              {item.label}
+              Shop all
             </Link>
-          ))}
-        </div>
-      </nav>
+          </div>
+          <div className={`grid grid-cols-2 gap-3 md:gap-4 ${browseCategories.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+            {browseCategories.map((c) => (
+              <Link key={c.id} href={c.link} className="group block overflow-hidden rounded-[20px] bg-surface">
+                <div
+                  className="relative aspect-[4/5]"
+                  style={{ background: 'var(--color-tint-lavender)' }}
+                >
+                  {c.image ? (
+                    <Image
+                      src={c.image}
+                      alt={`${c.name} crochet patterns`}
+                      fill
+                      className="object-cover transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
+                      sizes="(max-width:768px) 50vw, 25vw"
+                    />
+                  ) : null}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 to-transparent px-3 py-3 md:px-4 md:py-4">
+                    <h3 className="text-[16px] font-bold text-white md:text-[17px]">{c.name}</h3>
+                    <p className="text-[12px] text-white/85">
+                      {c.count} {c.count === 1 ? 'pattern' : 'patterns'}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* Featured */}
       <section className="max-w-site mx-auto page-gutter section-y">
-        <div className="mx-auto mb-8 max-w-xl text-center">
-          <h2 className="type-h2 text-ink mb-2">Featured crochet patterns</h2>
-          <p className="text-[15px] leading-relaxed text-muted">
-            Instant PDF download. Yours to keep. Start with one you love.
-          </p>
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="type-h2 mb-2 text-ink">Featured crochet patterns</h2>
+            <p className="max-w-xl text-[15px] leading-relaxed text-muted">
+              Instant PDF download. Yours to keep. Start with one you love.
+            </p>
+          </div>
+          <Link
+            href="/shop"
+            className="hidden shrink-0 text-[14px] font-semibold text-primary hover:underline underline-offset-2 sm:inline-flex"
+          >
+            Shop all
+          </Link>
         </div>
         {!catalogReady ? (
           <ProductGridSkeleton variant="featured" count={4} />
         ) : featuredError ? (
-          <div className="text-center py-10">
-            <p className="text-muted text-[14px] mb-3">{featuredError}</p>
+          <div className="py-10 text-center">
+            <p className="mb-3 text-[14px] text-muted">{featuredError}</p>
             <button
               type="button"
-              className="text-primary font-semibold text-[13px] underline"
+              className="text-[13px] font-semibold text-primary underline"
               onClick={() => {
                 clearHomeCatalogCache()
                 setFeaturedError(null)
@@ -348,7 +447,7 @@ export function Home({
             </button>
           </div>
         ) : featured.length === 0 ? (
-          <p className="text-muted text-[14px]">No featured patterns yet.</p>
+          <p className="text-[14px] text-muted">No featured patterns yet.</p>
         ) : (
           <>
             <PatternGrid variant="featured">
@@ -356,35 +455,47 @@ export function Home({
                 <PatternCard key={p.id} product={p} priority={i < 2} reviewStats={reviewStatsMap.get(p.id)} />
               ))}
             </PatternGrid>
-            <div className="mt-8 flex justify-center">
-              <Link href="/shop">
-                <Button variant="primary" size="md">Shop all patterns</Button>
+            <div className="mt-6 sm:hidden">
+              <Link href="/shop" className="text-[14px] font-semibold text-primary hover:underline underline-offset-2">
+                Shop all patterns
               </Link>
             </div>
           </>
         )}
       </section>
 
-      {/* Shop by skill */}
       <section className="bg-surface-warm">
         <div className="max-w-site mx-auto page-gutter section-y">
-          <div className="mx-auto mb-8 max-w-xl text-center">
-            <h2 className="type-h2 text-ink mb-2">Shop by skill level</h2>
-            <p className="text-[15px] text-muted">Beginner, intermediate, and advanced crochet patterns.</p>
+          <div className="mb-8">
+            <h2 className="type-h2 mb-2 text-ink">Shop by skill level</h2>
+            <p className="max-w-xl text-[15px] text-muted">Beginner, intermediate, and advanced crochet patterns.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {skillLevels.map((s) => (
               <Link key={s.level} href={s.link} className="group block overflow-hidden rounded-[20px] bg-surface">
                 <div className="relative aspect-[4/3]" style={{ background: s.tint }}>
                   {s.image ? (
-                    <Image src={s.image} alt={`${s.level} crochet patterns`} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+                    <Image
+                      src={s.image}
+                      alt={`${s.level} crochet patterns`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width:768px) 100vw, 33vw"
+                    />
                   ) : null}
                 </div>
                 <div className="p-4 md:p-5">
-                  <LevelBadge level={s.level} className="mb-2" />
-                  <h3 className="text-[17px] font-bold text-ink mb-1">{s.title}</h3>
-                  <p className="text-[14px] text-muted leading-relaxed mb-3">{s.body}</p>
-                  <span className="text-[14px] font-semibold text-primary group-hover:underline underline-offset-2">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <LevelBadge level={s.level} />
+                    {s.count > 0 ? (
+                      <span className="text-[12px] text-muted">
+                        {s.count} {s.count === 1 ? 'pattern' : 'patterns'}
+                      </span>
+                    ) : null}
+                  </div>
+                  <h3 className="mb-1 text-[17px] font-bold text-ink">{s.title}</h3>
+                  <p className="mb-3 text-[14px] leading-relaxed text-muted">{s.body}</p>
+                  <span className="text-[14px] font-semibold text-primary underline-offset-2 group-hover:underline">
                     Shop {s.level} patterns
                   </span>
                 </div>
@@ -394,39 +505,37 @@ export function Home({
         </div>
       </section>
 
-      {/* Free pattern band — §4.1.6 */}
       <section className="max-w-site mx-auto page-gutter section-y">
         <div
-          className="rounded-[20px] p-5 md:p-8 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-5 lg:gap-8 items-center"
+          className="grid grid-cols-1 items-center gap-5 rounded-[20px] p-5 md:p-8 lg:grid-cols-[1.2fr_1fr] lg:gap-8"
           style={{ background: 'var(--color-tint-sage)' }}
         >
           <div>
             <StatusBadge status="free" className="!bg-white !text-free mb-3" />
-            <h2 className="type-h2 text-ink mb-2">Start with a free crochet PDF</h2>
-            <p className="text-[15px] text-muted leading-relaxed mb-5 max-w-md">
+            <h2 className="type-h2 mb-2 text-ink">Start with a free crochet PDF</h2>
+            <p className="mb-5 max-w-md text-[15px] leading-relaxed text-muted">
               Download a free pattern with no account. See the quality before you buy.
             </p>
-            <Link href="/shop?price=free" className="block sm:inline-block w-full sm:w-auto">
+            <Link href="/shop?price=free" className="block w-full sm:inline-block sm:w-auto">
               <Button variant="primary" size="md" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
                 Download a free pattern
               </Button>
             </Link>
           </div>
-          {/* Mobile: one photo; tablet/laptop: two */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {[0, 1].map((i) => {
               const p = freeImages[i]
               return (
                 <div
                   key={i}
-                  className={`relative aspect-[4/3] md:aspect-square rounded-2xl overflow-hidden border border-border bg-white ${i === 1 ? 'hidden md:block' : ''}`}
+                  className={`relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-white md:aspect-square ${i === 1 ? 'hidden md:block' : ''}`}
                 >
                   {p?.images?.[0] ? (
                     <Link href={`/pattern/${p.slug}`}>
                       <Image src={p.images[0]} alt={p.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 160px" />
                     </Link>
                   ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-[12px] text-muted px-2 text-center">
+                    <span className="absolute inset-0 flex items-center justify-center px-2 text-center text-[12px] text-muted">
                       Free pattern photo
                     </span>
                   )}
@@ -437,59 +546,45 @@ export function Home({
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="bg-surface border-y border-border">
+      <section className="border-y border-border bg-surface">
         <div className="max-w-site mx-auto page-gutter section-y">
-          <div className="mx-auto mb-8 max-w-xl text-center">
-            <h2 className="type-h2 text-ink mb-2">How it works</h2>
-            <p className="text-[15px] text-muted">No shipping wait. Your PDF is ready as soon as you pay.</p>
+          <div className="mb-8">
+            <h2 className="type-h2 mb-2 text-ink">How it works</h2>
+            <p className="max-w-xl text-[15px] text-muted">No shipping wait. Your PDF is ready as soon as you pay.</p>
           </div>
-          <ol className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-            {[
-              { n: '1', t: 'Pick a pattern', d: 'Choose by skill, style, or start with a free PDF.' },
-              { n: '2', t: 'Download instantly', d: 'Checkout takes a minute. The file lands in your account.' },
-              { n: '3', t: 'Keep it for life', d: 'Re-download anytime from My downloads. No limits.' },
-            ].map((step) => (
-              <li key={step.n} className="text-center md:text-left">
-                <p className="mb-2 font-heading text-[28px] font-bold leading-none text-primary">{step.n}</p>
-                <p className="text-[16px] font-bold text-ink mb-1">{step.t}</p>
+          <ol className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+            {HOW_STEPS.map((step) => (
+              <li key={step.n} className="rounded-[20px] border border-border bg-bg p-5">
+                <p className="mb-3 inline-flex size-9 items-center justify-center rounded-full bg-primary-soft text-[15px] font-bold text-primary">
+                  {step.n}
+                </p>
+                <p className="mb-1 text-[16px] font-bold text-ink">{step.t}</p>
                 <p className="text-[14px] leading-relaxed text-muted">{step.d}</p>
               </li>
             ))}
           </ol>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/shop">
-              <Button variant="primary" size="md">Shop all patterns</Button>
-            </Link>
-            <Link href="/shop?price=free" className="inline-flex min-h-11 items-center text-[15px] font-semibold text-primary hover:underline underline-offset-2">
-              Or try a free pattern
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Meet the maker — §4.1.8; hidden in production until owner copy/stats exist */}
       {!hideOwnerCopyPlaceholders && (
         <section className="bg-surface-warm">
-          <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter section-y lg:grid-cols-2">
             <div
-              className="relative aspect-[4/5] rounded-2xl border border-border overflow-hidden"
+              className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border"
               style={{ background: 'var(--color-tint-cream)' }}
             >
               <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
             </div>
             <div>
-              <p className="text-[12px] font-semibold text-primary mb-2">Meet the maker</p>
+              <p className="mb-2 text-[12px] font-semibold text-primary">Meet the maker</p>
               {/* TODO: story headline from owner */}
-              <h2 className="type-h2 text-ink mb-3">
-                [Story headline: why these patterns exist]
-              </h2>
+              <h2 className="type-h2 mb-3 text-ink">[Story headline: why these patterns exist]</h2>
               {/* TODO: maker story copy from owner */}
-              <p className="text-[15px] text-muted leading-relaxed mb-8">
+              <p className="mb-8 text-[15px] leading-relaxed text-muted">
                 [Two or three sentences in your own voice: who designs the patterns, how each one is tested, and what a
                 buyer can trust about them.]
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+              <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3">
                 {[
                   { n: '[N]', l: 'Patterns designed' },
                   { n: '[N]', l: 'Makers helped' },
@@ -510,29 +605,25 @@ export function Home({
         </section>
       )}
 
-      {/* What makers say — §4.1.9 from reviews table; hide if none; 2 on mobile, 3 on md+ */}
       {makerReviews.length > 0 && (
         <section id="reviews" className="bg-surface-warm">
           <div className="max-w-site mx-auto page-gutter section-y">
-            <div className="text-center mb-7">
-              <h2 className="type-h2 text-ink mb-2">What makers say</h2>
+            <div className="mb-7">
+              <h2 className="type-h2 mb-2 text-ink">What makers say</h2>
               <p className="text-[15px] text-muted">Real reviews from people who made our patterns.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {makerReviews.slice(0, 3).map((t, i) => (
                 <article
                   key={t.id}
                   className={`rounded-2xl border border-border bg-surface p-5 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
                 >
-                  <div
-                    className="flex gap-0.5 mb-3 text-gold"
-                    aria-label={`${t.rating} out of 5 stars`}
-                  >
+                  <div className="mb-3 flex gap-0.5 text-gold" aria-label={`${t.rating} out of 5 stars`}>
                     {Array.from({ length: 5 }).map((_, si) => (
                       <Star key={si} filled={si < Math.round(t.rating)} />
                     ))}
                   </div>
-                  <p className="text-[14px] text-ink leading-relaxed mb-5">&ldquo;{t.body}&rdquo;</p>
+                  <p className="mb-5 text-[14px] leading-relaxed text-ink">&ldquo;{t.body}&rdquo;</p>
                   <p className="text-[13px] font-semibold text-ink">
                     {t.reviewerFirstName}
                     <span className="font-normal text-muted"> · {t.patternTitle}</span>
@@ -540,21 +631,15 @@ export function Home({
                 </article>
               ))}
             </div>
-            <div className="text-center mt-8">
-              <Link href="/shop">
-                <Button variant="primary" size="md">Shop patterns</Button>
-              </Link>
-            </div>
           </div>
         </section>
       )}
 
-      {/* FAQ — §4.1.10 */}
-      <section className="bg-bg border-t border-border">
-        <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-8">
+      <section className="border-t border-border bg-bg">
+        <div className="max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter section-y lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <h2 className="type-h2 text-ink mb-2">Crochet PDF pattern FAQs</h2>
-            <p className="text-[15px] text-muted mb-3">The basics before you buy a digital pattern.</p>
+            <h2 className="type-h2 mb-2 text-ink">Crochet PDF pattern FAQs</h2>
+            <p className="mb-3 text-[15px] text-muted">The basics before you buy a digital pattern.</p>
             {!hideOwnerCopyPlaceholders && (
               <p className="text-[14px] text-muted">
                 Still stuck? Write to {/* TODO: support email from owner */}
@@ -566,7 +651,6 @@ export function Home({
         </div>
       </section>
 
-      {/* Newsletter — §4.1.11 */}
       <EmailSignup />
     </div>
   )

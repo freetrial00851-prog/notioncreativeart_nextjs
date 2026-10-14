@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { buildMetadata } from '@/lib/seo'
+import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
 import {
   resolveShopPageTitle,
@@ -10,10 +10,12 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
+const SHOP_DESCRIPTION =
+  'Browse all crochet PDF patterns from Notion Creative Art — amigurumi, wearables, home decor, bundles, and free patterns. Instant digital download.'
+
 export const metadata = buildMetadata({
   title: 'Shop All Patterns',
-  description:
-    'Browse all crochet PDF patterns from Notion Creative Art — amigurumi, wearables, home decor, bundles, and free patterns. Instant digital download.',
+  description: SHOP_DESCRIPTION,
   path: '/shop',
 })
 
@@ -32,9 +34,22 @@ function ShopLoading({ title }: { title: string }) {
 export default async function ShopPage({ searchParams }: Props) {
   const sp = await searchParams
   const title = resolveShopPageTitle(shopTitleFiltersFromSearchParams(sp))
+  const collectionJsonLd = buildCollectionPageJsonLd({
+    name: 'Crochet PDF patterns',
+    description: SHOP_DESCRIPTION,
+    path: '/shop',
+  })
+  const breadcrumbJsonLd = buildBreadcrumbListJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Shop', path: '/shop' },
+  ])
   return (
-    <Suspense fallback={<ShopLoading title={title} />}>
-      <Shop initialTitle={title} />
-    </Suspense>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <Suspense fallback={<ShopLoading title={title} />}>
+        <Shop initialTitle={title} />
+      </Suspense>
+    </>
   )
 }

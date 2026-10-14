@@ -7,12 +7,16 @@ import { Logo } from './Logo'
 
 const SHOP_MOBILE = [
   { label: 'All patterns', to: '/shop' },
-  { label: 'New arrivals', to: '/shop/new' },
+  { label: 'Amigurumi', to: '/shop/amigurumi' },
+  { label: 'Wearables', to: '/shop/wearables' },
+  { label: 'Home decor', to: '/shop/home-decor' },
   { label: 'Free patterns', to: '/shop?price=free' },
 ]
 
 const SHOP_DESKTOP = [
   ...SHOP_MOBILE,
+  { label: 'Bundles', to: '/shop/bundles' },
+  { label: 'New arrivals', to: '/shop/new' },
   { label: 'Sale', to: '/shop/sale' },
 ]
 

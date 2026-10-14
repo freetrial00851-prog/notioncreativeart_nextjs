@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { buildMetadata } from '@/lib/seo'
+import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
 import { getCategoryBySlug } from '@/lib/data/products'
 import {
   resolveShopPageTitle,
@@ -16,6 +16,26 @@ type Props = {
 
 /** Per-slug SEO overrides when categories have no meta_* columns yet. */
 const CATEGORY_META_OVERRIDES: Record<string, { title: string; description: string }> = {
+  amigurumi: {
+    title: 'Amigurumi Crochet Patterns',
+    description:
+      'Instant-download amigurumi crochet PDF patterns from Notion Creative Art. Toys, animals, and dolls — beginner to advanced.',
+  },
+  wearables: {
+    title: 'Wearable Crochet Patterns',
+    description:
+      'Crochet PDF patterns for garments and accessories from Notion Creative Art. Instant download, tested for every skill level.',
+  },
+  'home-decor': {
+    title: 'Home Decor Crochet Patterns',
+    description:
+      'Crochet PDF patterns for the home from Notion Creative Art. Cushions, blankets, and decor — instant download.',
+  },
+  bundles: {
+    title: 'Crochet Pattern Bundles',
+    description:
+      'Save with crochet PDF pattern bundles from Notion Creative Art. Instant download, yours to keep.',
+  },
   'no-sew-amigurumi': {
     title: 'No-Sew Amigurumi Patterns',
     description:
@@ -23,28 +43,30 @@ const CATEGORY_META_OVERRIDES: Record<string, { title: string; description: stri
   },
 }
 
+function categoryListingCopy(categorySlug: string, label: string) {
+  const override = CATEGORY_META_OVERRIDES[categorySlug]
+  return {
+    title: override?.title ?? `${label} — Shop`,
+    description:
+      override?.description ??
+      `Browse ${label.toLowerCase()} crochet PDF patterns from Notion Creative Art. Instant download, beginner to advanced skill levels.`,
+  }
+}
+
 /** Dynamic SEO metadata per shop category — critical for category landing pages. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { categorySlug } = await params
-  const override = CATEGORY_META_OVERRIDES[categorySlug]
-  if (override) {
-    return buildMetadata({
-      title: override.title,
-      description: override.description,
-      path: `/shop/${categorySlug}`,
-    })
-  }
-
   const virtual = virtualShopCategoryTitle(categorySlug)
   const category = virtual ? null : await getCategoryBySlug(categorySlug)
   const label =
     virtual ??
     category?.name ??
     categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  const copy = categoryListingCopy(categorySlug, label)
 
   return buildMetadata({
-    title: `${label} — Shop`,
-    description: `Browse ${label.toLowerCase()} crochet PDF patterns from Notion Creative Art. Instant download, beginner to advanced skill levels.`,
+    title: copy.title,
+    description: copy.description,
     path: `/shop/${categorySlug}`,
   })
 }
@@ -71,10 +93,29 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
     categoryName: category?.name ?? null,
     ...shopTitleFiltersFromSearchParams(sp),
   })
+  const label =
+    virtual ??
+    category?.name ??
+    categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  const copy = categoryListingCopy(categorySlug, label)
+  const collectionJsonLd = buildCollectionPageJsonLd({
+    name: copy.title,
+    description: copy.description,
+    path: `/shop/${categorySlug}`,
+  })
+  const breadcrumbJsonLd = buildBreadcrumbListJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Shop', path: '/shop' },
+    { name: label, path: `/shop/${categorySlug}` },
+  ])
 
   return (
-    <Suspense fallback={<ShopLoading title={title} />}>
-      <Shop initialTitle={title} initialCategoryName={category?.name ?? null} />
-    </Suspense>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <Suspense fallback={<ShopLoading title={title} />}>
+        <Shop initialTitle={title} initialCategoryName={category?.name ?? null} />
+      </Suspense>
+    </>
   )
 }
