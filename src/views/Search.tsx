@@ -47,7 +47,12 @@ export function Search() {
   const [sort, setSort] = useState<ListingSort>('newest')
   const [purchaseCounts, setPurchaseCounts] = useState<Map<string, number>>(() => new Map())
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [draft, setDraft] = useState(q)
   useBodyScrollLock(mobileFiltersOpen)
+
+  useEffect(() => {
+    setDraft(q)
+  }, [q])
 
   useEffect(() => {
     let cancelled = false
@@ -176,6 +181,16 @@ export function Search() {
 
   const showListingChrome = Boolean(q.trim())
 
+  const submitPageSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const next = draft.trim()
+    setSearchParams((p) => {
+      if (next) p.set('q', next)
+      else p.delete('q')
+      return p
+    })
+  }
+
   const sortSelectDesktop = (
     <select
       value={sort}
@@ -189,33 +204,52 @@ export function Search() {
   )
 
   return (
-    <div className="max-w-site w-full mx-auto px-4 md:px-16 xl:px-24 2xl:px-32 py-10 md:py-14">
-      <div className="border-b border-line pb-4 mb-8 flex items-end justify-between gap-3 md:gap-4">
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] tracking-[0.15em] text-ink-soft">SEARCH</p>
-          <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight mt-2 break-words">
-            {q.trim() ? `Search: "${q.trim()}"` : 'Search Results'}
-          </h1>
-          {q && (
-            <p className="text-[11px] tracking-[0.08em] text-ink-soft mt-2">
-              {loading ? 'Searching…' : `${sortedResults.length} result${sortedResults.length === 1 ? '' : 's'}`}
-            </p>
-          )}
-        </div>
-        {showListingChrome && (
-          <>
-            <SortFilterTriggerButton
-              className="md:hidden mb-0.5"
-              activeFilterCount={activeFilterCount}
-              onClick={() => setMobileFiltersOpen(true)}
+    <div className="max-w-site w-full mx-auto page-gutter pt-5 md:pt-8 pb-16">
+      <div className="mb-6 md:mb-8">
+        <h1 className="type-h1 text-ink mb-4">
+          {q.trim() ? `Results for “${q.trim()}”` : 'Search patterns'}
+        </h1>
+        <form onSubmit={submitPageSearch} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <label className="relative min-w-0 flex-1">
+            <span className="sr-only">Search patterns</span>
+            <input
+              type="search"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Search by name or description"
+              autoComplete="off"
+              enterKeyHint="search"
+              className="min-h-11 w-full rounded-full border border-border bg-surface px-5 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25"
             />
-            {sortSelectDesktop}
-          </>
+          </label>
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover sm:flex-none"
+            >
+              Search
+            </button>
+            {showListingChrome && (
+              <>
+                <SortFilterTriggerButton
+                  className="md:hidden"
+                  activeFilterCount={activeFilterCount}
+                  onClick={() => setMobileFiltersOpen(true)}
+                />
+                {sortSelectDesktop}
+              </>
+            )}
+          </div>
+        </form>
+        {q && (
+          <p className="mt-3 text-[13px] text-muted">
+            {loading ? 'Searching…' : `${sortedResults.length} ${sortedResults.length === 1 ? 'pattern' : 'patterns'}`}
+          </p>
         )}
       </div>
 
       {!q && (
-        <p className="text-ink-soft text-[13px]">Type above to find patterns by name or description.</p>
+        <p className="text-[15px] text-muted">Type a name or description, then search.</p>
       )}
 
       {showListingChrome && (

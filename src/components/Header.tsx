@@ -40,8 +40,11 @@ export function Header() {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Product[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const searchWrapRef = useRef<HTMLDivElement>(null)
+  const mobileSearchWrapRef = useRef<HTMLDivElement>(null)
   const desktopSearchInputRef = useRef<HTMLInputElement>(null)
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null)
   const headerRef = useRef<HTMLElement>(null)
   const [browsePanelTop, setBrowsePanelTop] = useState(0)
 
@@ -70,7 +73,9 @@ export function Header() {
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const t = e.target as Node
-      if (!(searchWrapRef.current?.contains(t) ?? false)) setSearchFocused(false)
+      const inDesktop = searchWrapRef.current?.contains(t) ?? false
+      const inMobile = mobileSearchWrapRef.current?.contains(t) ?? false
+      if (!inDesktop && !inMobile) setSearchFocused(false)
       if (
         !(desktopAccountWrapRef.current?.contains(t) ?? false) &&
         !(tabletAccountWrapRef.current?.contains(t) ?? false)
@@ -96,12 +101,28 @@ export function Header() {
     return () => window.removeEventListener('resize', updateBrowsePanelTop)
   }, [mobileOpen])
 
+  useEffect(() => {
+    setSearchOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!searchOpen) return
+    mobileSearchInputRef.current?.focus()
+  }, [searchOpen])
+
   const submitSearch = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!query.trim()) return
     setSearchFocused(false)
+    setSearchOpen(false)
     desktopSearchInputRef.current?.blur()
+    mobileSearchInputRef.current?.blur()
     router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+  }
+
+  const openHeaderSearch = () => {
+    setMobileOpen(false)
+    setSearchOpen(true)
   }
 
   const clearSearch = () => {
@@ -221,8 +242,9 @@ export function Header() {
           <button
             type="button"
             aria-label="Search patterns"
-            onClick={() => router.push('/search')}
-            className="touch-target w-11 h-11 flex items-center justify-center hover:opacity-70"
+            aria-expanded={searchOpen}
+            onClick={openHeaderSearch}
+            className={`touch-target w-11 h-11 flex items-center justify-center hover:opacity-70 ${searchOpen ? 'rounded-full bg-surface-warm' : ''}`}
           >
             <MaterialIcon name="search" size={22} color={HEADER_ICON} />
           </button>
@@ -283,8 +305,9 @@ export function Header() {
           <button
             type="button"
             aria-label="Search patterns"
-            onClick={() => router.push('/search')}
-            className="touch-target w-11 h-11 shrink-0 flex items-center justify-center hover:opacity-70"
+            aria-expanded={searchOpen}
+            onClick={openHeaderSearch}
+            className={`touch-target w-11 h-11 shrink-0 flex items-center justify-center hover:opacity-70 ${searchOpen ? 'rounded-full bg-surface-warm' : ''}`}
           >
             <MaterialIcon name="search" size={22} color={HEADER_ICON} />
           </button>
@@ -310,6 +333,44 @@ export function Header() {
         </div>
       </div>
       </div>
+
+      {searchOpen && (
+        <div ref={mobileSearchWrapRef} className="desktop:hidden border-t border-line bg-canvas page-gutter py-2.5">
+          <div className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <SearchPill
+                inputRef={mobileSearchInputRef}
+                query={query}
+                setQuery={setQuery}
+                onFocus={() => setSearchFocused(true)}
+                onSubmit={submitSearch}
+                onClear={clearSearch}
+                placeholder="Search patterns"
+                buttonSize={40}
+                iconSize={18}
+              />
+              {searchFocused && query && (
+                <SuggestionsDropdown
+                  suggestions={suggestions}
+                  query={query}
+                  onPick={() => {
+                    setSearchFocused(false)
+                    setSearchOpen(false)
+                  }}
+                  onSeeAll={() => submitSearch()}
+                />
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setSearchOpen(false)}
+              className="shrink-0 inline-flex min-h-11 items-center px-2 text-[14px] font-semibold text-ink"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {mobileAccountOpen && (
         <div className="fixed inset-0 z-50 tablet:hidden">
@@ -658,7 +719,7 @@ function SearchPill({
         onChange={(e) => setQuery(e.target.value)}
         onFocus={onFocus}
         placeholder={placeholder}
-        className={`flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[14px] placeholder:text-ink-soft focus:outline-none ${leading ? 'pl-2' : 'pl-4'}`}
+        className={`flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[16px] md:text-[14px] placeholder:text-ink-soft focus:outline-none ${leading ? 'pl-2' : 'pl-4'}`}
       />
       {query && (
         <button type="button" onClick={onClear} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft hover:text-ink mr-1">
