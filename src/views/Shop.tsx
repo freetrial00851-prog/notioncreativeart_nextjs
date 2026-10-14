@@ -332,8 +332,8 @@ export function Shop({
 
   return (
     <div className="bg-bg min-h-[50vh]">
-      <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 py-8 md:py-10">
-        <nav className="text-[12px] text-muted mb-3 flex items-center gap-1.5 flex-wrap">
+      <div className="max-w-site w-full mx-auto page-gutter py-6 md:py-8">
+        <nav className="text-[13px] text-muted mb-2 flex items-center gap-1.5 flex-wrap">
           <Link href="/" className="hover:text-ink">
             Home
           </Link>
@@ -341,8 +341,8 @@ export function Shop({
           <span className="text-ink">Shop</span>
         </nav>
 
-        <h1 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">{displayTitle}</h1>
-        <p className="text-[13px] text-muted mb-5 md:mb-6" aria-live="polite">
+        <h1 className="type-h1 text-ink mb-2">{displayTitle}</h1>
+        <p className="text-[13px] text-muted mb-4 md:mb-5" aria-live="polite">
           {filterFetching ? 'Updating…' : showingLabel}
           {activeFilterCount > 0 && !initialLoading ? (
             <>
@@ -413,7 +413,7 @@ export function Shop({
         </div>
 
         {/* Desktop skill / offers row — laptop */}
-        <div className="hidden lg:flex flex-wrap items-center gap-2 mb-6">
+        <div className="hidden lg:flex flex-wrap items-center gap-2 mb-5">
           {(['beginner', 'intermediate', 'advanced'] as const).map((level) => {
             const active = levels.includes(level)
             return (
@@ -421,38 +421,18 @@ export function Shop({
                 key={level}
                 type="button"
                 onClick={() => onToggleLevel(level)}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-medium ${skillPillClass(level, active)}`}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium ${skillPillClass(level, active)}`}
               >
                 {active ? <CheckIcon /> : null}
                 {level.charAt(0).toUpperCase() + level.slice(1)}
               </button>
             )
           })}
-          <span className="w-px h-6 bg-border mx-1" aria-hidden />
-          <button
-            type="button"
-            onClick={toggleFreeQuick}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-medium ${
-              isFreePill ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
-            }`}
-          >
-            {isFreePill ? <CheckIcon /> : null}
-            Free
-          </button>
-          <button
-            type="button"
-            onClick={toggleSale}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-medium ${
-              isSalePill ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
-            }`}
-          >
-            {isSalePill ? <CheckIcon /> : null}
-            On sale
-          </button>
+          <span className="w-px h-5 bg-border mx-1" aria-hidden />
           <button
             type="button"
             onClick={toggleBundle}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-medium ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium ${
               bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
             }`}
           >
@@ -463,12 +443,12 @@ export function Shop({
           <button
             type="button"
             onClick={openFilters}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 text-[13px] font-medium text-ink hover:bg-surface-warm"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-warm"
           >
             <FilterGlyph />
             More filters
           </button>
-          <label className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 text-[13px] font-medium text-ink">
+          <label className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink">
             <span className="text-muted">Sort:</span>
             <select
               value={sort}
@@ -567,14 +547,14 @@ export function Shop({
           {initialLoading ? (
             <ProductGridSkeleton variant="shop" count={8} />
           ) : sortedProducts.length === 0 ? (
-            <div className="rounded-2xl border border-border bg-surface px-6 py-14 text-center max-w-xl mx-auto">
-              <div className="mx-auto w-14 h-14 rounded-full bg-primary-soft flex items-center justify-center mb-5" aria-hidden>
+            <div className="rounded-2xl border border-border bg-surface px-5 py-10 text-center max-w-xl mx-auto">
+              <div className="mx-auto w-11 h-11 rounded-full bg-primary-soft flex items-center justify-center mb-4" aria-hidden>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <circle cx="11" cy="11" r="7" stroke="var(--color-primary)" strokeWidth="2" />
                   <path d="M20 20l-3.5-3.5" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
-              <h2 className="font-heading text-2xl font-bold text-ink mb-2">No patterns match your filters</h2>
+              <h2 className="type-h2 text-ink mb-2">No patterns match your filters</h2>
               <p className="text-[14px] text-muted mb-6">
                 Try removing a filter, or browse the full collection.
               </p>

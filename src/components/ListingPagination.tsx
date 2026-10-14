@@ -64,7 +64,7 @@ export function ListingPagination({
 
   if (variant === 'simple') {
     return (
-      <div className="flex lg:hidden items-center justify-center gap-4 mt-10">
+      <div className="flex lg:hidden items-center justify-center gap-4 mt-8">
         <button
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
@@ -93,8 +93,8 @@ export function ListingPagination({
   const items = getListingPageItems(currentPage, pageCount)
   const wrapClass =
     variant === 'desktop'
-      ? 'hidden lg:flex items-center justify-center gap-2 mt-14'
-      : 'flex items-center justify-center gap-2 mt-14'
+      ? 'hidden lg:flex items-center justify-center gap-2 mt-8'
+      : 'flex items-center justify-center gap-2 mt-8'
 
   return (
     <div className={wrapClass}>

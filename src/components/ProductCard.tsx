@@ -183,27 +183,27 @@ export function ProductCard({
         {/* Top-left badges */}
         <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-1">
           {product.sold_out && (
-            <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-extrabold tracking-[0.06em] text-white">
+            <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white">
               SOLD OUT
             </span>
           )}
           {!product.sold_out && free && (
-            <span className="rounded-full bg-free px-2.5 py-1 text-[11px] font-extrabold tracking-[0.06em] text-white">
+            <span className="rounded-full bg-free px-2.5 py-1 text-[11px] font-bold text-white">
               FREE
             </span>
           )}
           {!product.sold_out && badge === 'sale' && (
-            <span className="rounded-full bg-sale px-2.5 py-1 text-[11px] font-extrabold tracking-[0.06em] text-white">
+            <span className="rounded-full bg-sale px-2.5 py-1 text-[11px] font-bold text-white">
               SALE
             </span>
           )}
           {!product.sold_out && badge === 'new' && (
-            <span className="rounded-full bg-primary px-2.5 py-1 text-[11px] font-extrabold tracking-[0.06em] text-white">
+            <span className="rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold text-white">
               NEW
             </span>
           )}
           {!product.sold_out && badge === 'featured' && (
-            <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-extrabold tracking-[0.06em] text-white">
+            <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white">
               FEATURED
             </span>
           )}
@@ -256,10 +256,10 @@ export function ProductCard({
         <div className="mt-auto flex items-center justify-between gap-2 pt-0.5">
           <div className="min-w-0">
             {free ? (
-              <p className="text-base font-extrabold text-free md:text-lg">Free</p>
+              <p className="text-[15px] font-bold text-free md:text-base">Free</p>
             ) : (
               <>
-                <p className="text-base font-extrabold text-primary md:text-lg">
+                <p className="text-[15px] font-bold text-primary md:text-base">
                   ${product.price.toFixed(2)}
                 </p>
                 {isOnSale && product.compare_at_price != null && (

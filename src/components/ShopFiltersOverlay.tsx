@@ -123,7 +123,7 @@ export function ShopFiltersOverlay({
       <button
         type="button"
         onClick={onApply}
-        className="min-h-12 px-6 rounded-full bg-primary text-white text-[14px] font-semibold hover:bg-primary-hover"
+        className="min-h-11 px-6 rounded-full bg-primary text-white text-[14px] font-semibold hover:bg-primary-hover"
       >
         Show {resultCount} pattern{resultCount === 1 ? '' : 's'}
       </button>
@@ -176,7 +176,7 @@ export function ShopFiltersOverlay({
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="px-5 py-4">
-      <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted mb-2">{title}</p>
+      <p className="text-[12px] font-semibold text-muted mb-2">{title}</p>
       <div className="space-y-0.5">{children}</div>
     </div>
   )
@@ -197,7 +197,7 @@ function RadioRow({
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-center gap-3 min-h-12 text-left text-[15px] text-ink"
+      className="w-full flex items-center gap-3 min-h-11 text-left text-[15px] text-ink"
     >
       <span
         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
@@ -230,7 +230,7 @@ function CheckRow({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full flex items-center gap-3 min-h-12 text-left text-[15px] text-ink"
+      className="w-full flex items-center gap-3 min-h-11 text-left text-[15px] text-ink"
     >
       <span
         className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center shrink-0 ${
