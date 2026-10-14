@@ -72,7 +72,7 @@ export function AdminReviews() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display font-semibold text-2xl mb-1">Reviews</h1>
+        <h1 className="font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink mb-1">Reviews</h1>
         <p className="text-[13px] text-ink-soft">Approve or reject customer reviews before they appear on product pages.</p>
       </div>
 

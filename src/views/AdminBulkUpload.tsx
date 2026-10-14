@@ -226,8 +226,7 @@ export function AdminBulkUpload() {
     <div className="max-w-[1200px]">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
         <div>
-          <p className="text-[11px] tracking-[0.14em] text-ink-soft uppercase mb-1">Products</p>
-          <h1 className="font-subheading text-2xl md:text-3xl">Bulk Upload</h1>
+          <h1 className="font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink">Bulk Upload</h1>
           <p className="text-[13px] text-ink-soft mt-2 max-w-xl">
             Import products from a CSV plus a parent folder of numbered sub-folders. Preview matches before uploading.
             All imports save as drafts ({'`active = false`'}).

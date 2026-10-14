@@ -161,8 +161,8 @@ export function HomepageAdmin() {
   if (loading) return <p className="text-ink-soft text-sm">Loading…</p>
 
   return (
-    <div className="space-y-16 max-w-3xl">
-      <h1 className="font-display font-semibold text-2xl">Homepage</h1>
+    <div className="space-y-8 max-w-3xl">
+      <h1 className="font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink">Homepage</h1>
 
       {/* SEO & SOCIAL */}
       {seo && (

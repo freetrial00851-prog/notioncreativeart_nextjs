@@ -56,15 +56,15 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
       {loading ? (
         <ProductGridSkeleton variant="wishlist" />
       ) : count === 0 ? (
-        <div className={`${ACCOUNT_CARD} px-6 py-12 md:py-14 text-center`}>
-          <span className="mx-auto mb-5 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary-soft" aria-hidden>
-            <MaterialIcon name="favorite" size={34} color="var(--color-primary)" />
+        <div className={`${ACCOUNT_CARD} px-6 py-10 md:py-12 text-center`}>
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+            <MaterialIcon name="favorite" size={28} color="var(--color-primary)" />
           </span>
-          <p className="font-heading text-[24px] font-bold text-ink">Save patterns you love</p>
-          <p className="mx-auto mt-2 max-w-[400px] text-[16px] md:text-[15px] leading-relaxed text-muted">
+          <p className="type-h2 text-ink">Save patterns you love</p>
+          <p className="mx-auto mt-2 max-w-[400px] text-[15px] leading-relaxed text-muted">
             Discover crochet patterns and save your favorites here for later.
           </p>
-          <Link href="/shop" className={`${PRIMARY_PILL} mt-6 min-h-[52px] w-full sm:w-auto sm:min-w-[220px]`}>
+          <Link href="/shop" className={`${PRIMARY_PILL} mt-6 w-full sm:w-auto sm:min-w-[220px]`}>
             Explore patterns
           </Link>
         </div>
@@ -101,5 +101,5 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
 
   if (embedded) return <div>{body}</div>
 
-  return <div className="max-w-site w-full mx-auto px-5 md:px-8 pt-5 md:pt-8 pb-16">{body}</div>
+  return <div className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-16">{body}</div>
 }

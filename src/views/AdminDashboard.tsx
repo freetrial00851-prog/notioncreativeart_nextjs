@@ -154,11 +154,11 @@ export function AdminDashboard() {
     <div className="max-w-[1100px]">
       {/* Welcome header */}
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
-        <div className="w-14 h-14 rounded-full shrink-0 flex items-center justify-center text-white text-lg font-semibold" style={{ background: '#1f249c' }}>
+        <div className="w-11 h-11 rounded-full shrink-0 flex items-center justify-center text-white text-[15px] font-semibold" style={{ background: '#1f249c' }}>
           {(shopName[0] || 'N').toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="font-heading text-[28px] md:text-[32px] leading-tight text-ink mb-1.5">
+          <h1 className="font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink mb-1.5">
             Welcome back, {shopName}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ink-soft">
@@ -193,7 +193,7 @@ export function AdminDashboard() {
       {tab === 'home' && (
         <>
           <section className="mb-8">
-            <h2 className="text-[18px] font-semibold text-ink mb-3">Top tasks</h2>
+            <h2 className="text-[15px] font-semibold text-ink mb-3">Top tasks</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <TaskCard
                 icon="inventory_2"
@@ -224,7 +224,7 @@ export function AdminDashboard() {
 
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-[18px] font-semibold text-ink">Stats</h2>
+              <h2 className="text-[15px] font-semibold text-ink">Stats</h2>
               <Link href="/admin/orders" className="text-[13px] text-ink underline underline-offset-2 hover:opacity-70">View all</Link>
             </div>
             <div className="mb-3">
@@ -369,7 +369,7 @@ function StatCell({ label, value, pct }: { label: string; value: string; pct?: n
   return (
     <div className="p-5 border-b border-r border-[#e4e1db] last:border-r-0">
       <p className="text-[12px] text-ink-soft mb-1">{label}</p>
-      <p className="text-[22px] font-semibold text-ink tracking-tight">{value}</p>
+      <p className="text-[18px] font-semibold text-ink tracking-tight">{value}</p>
       {typeof pct === 'number' && (
         <p className={`text-[12px] mt-1 ${pct < 0 ? 'text-[#b91c1c]' : pct > 0 ? 'text-[#15803d]' : 'text-ink-soft'}`}>
           {pct > 0 ? '+' : ''}{pct}% vs prior period

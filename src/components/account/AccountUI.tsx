@@ -42,7 +42,7 @@ export function OrderStatusPill({ status }: { status: string }) {
 export function AccountPageHeader({ title, subtitle }: { title: string; subtitle?: ReactNode }) {
   return (
     <div className="mb-5 md:mb-6">
-      <h1 className="font-heading text-[34px] md:text-[40px] font-bold leading-tight text-ink">{title}</h1>
+      <h1 className="type-h1 text-ink">{title}</h1>
       {subtitle && <p className="mt-1 text-[16px] md:text-[14px] text-muted">{subtitle}</p>}
     </div>
   )

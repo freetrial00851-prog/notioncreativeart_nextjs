@@ -84,7 +84,7 @@ export function EmailVerifyBanner({ variant = 'global' }: EmailVerifyBannerProps
         style={{ background: NAVY }}
         role="status"
       >
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 max-w-site w-full mx-auto">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 page-gutter py-2.5 max-w-site w-full mx-auto">
           <MaterialIcon name="mark_email_unread" size={16} color="rgba(255,255,255,0.85)" className="shrink-0" />
           <p className="flex-1 min-w-[12rem] text-white/90">{message}</p>
           <div className="flex items-center gap-2 shrink-0 ml-auto">

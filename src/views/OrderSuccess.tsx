@@ -43,9 +43,9 @@ const RECOMMENDATION_POOL = 12
 const RECOMMENDATIONS_SHOWN = 4
 
 const PRIMARY_LINK =
-  'inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary px-7 text-[15px] md:text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover'
 const SECONDARY_LINK =
-  'inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-7 text-[15px] md:text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-6 text-[15px] md:text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft'
 
 function isRecent(createdAt: string) {
   const t = new Date(createdAt).getTime()
@@ -218,7 +218,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
   const recommendationsSection = phase !== 'polling' && recommendations.length > 0 && (
     <section className="mt-16 md:mt-20" aria-labelledby="order-recommendations">
       <div className="mb-6 md:mb-8 flex items-end justify-between gap-4">
-        <h2 id="order-recommendations" className="font-heading text-3xl md:text-4xl font-bold text-ink">
+        <h2 id="order-recommendations" className="type-h2 text-ink">
           You may also like
         </h2>
         <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
@@ -234,7 +234,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
   )
 
   const shell = (children: ReactNode) => (
-    <div className="max-w-site w-full mx-auto px-5 md:px-8 pt-10 md:pt-14 pb-16">
+    <div className="max-w-site w-full mx-auto page-gutter pt-8 md:pt-10 pb-16">
       {children}
       {recommendationsSection}
     </div>
@@ -257,7 +257,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
       <StatusCard icon={<MaterialIcon name="lock" size={28} color="var(--color-primary)" />} title="Sign in to see your order" headingRef={headingRef}>
         <p>Your order and downloads are linked to the account you used at checkout.</p>
         <div className="mt-6 flex justify-center">
-          <Button variant="primary" size="lg" className="w-full sm:w-auto sm:min-w-[220px]" onClick={() => requireAuth()}>
+          <Button variant="primary" size="md" className="w-full sm:w-auto sm:min-w-[220px]" onClick={() => requireAuth()}>
             Sign in
           </Button>
         </div>
@@ -271,7 +271,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
         <StatusCard icon={<MaterialIcon name="search" size={28} color="var(--color-primary)" />} title="We couldn't find a recent order" headingRef={headingRef}>
           <p>If you just paid, it can take a minute to appear. Check again, or look in My orders.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Button variant="primary" size="lg" onClick={checkAgain}>
+            <Button variant="primary" size="md" onClick={checkAgain}>
               Check again
             </Button>
             <Link href="/account/orders" className={SECONDARY_LINK}>
@@ -304,7 +304,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
             {pending && (
-              <Button variant="primary" size="lg" onClick={checkAgain}>
+              <Button variant="primary" size="md" onClick={checkAgain}>
                 Check again
               </Button>
             )}
@@ -325,13 +325,13 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
   return shell(
     <>
       <header className="text-center">
-        <span className="mx-auto mb-5 flex h-16 w-16 md:h-[72px] md:w-[72px] items-center justify-center rounded-full border border-border bg-success-bg" aria-hidden>
-          <MaterialIcon name="check" size={32} color="var(--color-free)" />
+        <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-border bg-success-bg" aria-hidden>
+          <MaterialIcon name="check" size={28} color="var(--color-free)" />
         </span>
         <h1
           ref={headingRef}
           tabIndex={-1}
-          className="mx-auto max-w-[760px] font-heading text-[34px] md:text-[44px] font-bold leading-[1.1] text-ink outline-none"
+          className="mx-auto max-w-[760px] type-h1 text-ink outline-none"
         >
           Thank you, your order is confirmed
         </h1>
@@ -349,7 +349,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
 
       <div className="mt-8 md:mt-10 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:gap-6">
         <section aria-labelledby="ready-title" className="rounded-[20px] border border-border bg-surface p-5 md:p-6">
-          <h2 id="ready-title" className="font-heading text-[26px] md:text-[24px] font-bold text-ink">
+          <h2 id="ready-title" className="type-h2 text-ink">
             Your patterns are ready
           </h2>
           <p className="mt-1.5 text-[16px] md:text-[14px] leading-relaxed text-muted">
@@ -387,7 +387,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
                     </div>
                     <Button
                       variant="primary"
-                      className="w-full md:w-auto md:min-w-[150px] min-h-12 md:min-h-11 text-[15px] md:text-[13px]"
+                      className="w-full md:w-auto md:min-w-[150px]"
                       loading={busy}
                       disabled={!!downloadingId && !busy}
                       onClick={() => void handleDownload(p)}
@@ -417,7 +417,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-1">
           <section aria-labelledby="summary-title" className="rounded-[20px] border border-border bg-surface p-5 md:p-6 md:col-span-2 lg:col-span-1">
-            <h2 id="summary-title" className="text-[20px] md:text-[18px] font-bold text-ink">
+            <h2 id="summary-title" className="text-[17px] font-bold text-ink">
               Order summary
             </h2>
             {products && products.length > 0 && (
@@ -487,13 +487,13 @@ function StatusCard({
 }) {
   return (
     <section role={role} className="mx-auto max-w-[640px] rounded-[20px] border border-border bg-surface px-6 py-12 md:px-10 text-center">
-      <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
         {icon}
       </span>
-      <h1 ref={headingRef} tabIndex={headingRef ? -1 : undefined} className="font-heading text-[28px] md:text-[32px] font-bold leading-tight text-ink outline-none">
+      <h1 ref={headingRef} tabIndex={headingRef ? -1 : undefined} className="type-h1 text-ink outline-none">
         {title}
       </h1>
-      <div className="mx-auto mt-3 max-w-[460px] text-[16px] md:text-[15px] leading-relaxed text-muted">{children}</div>
+      <div className="mx-auto mt-3 max-w-[460px] text-[15px] leading-relaxed text-muted">{children}</div>
     </section>
   )
 }

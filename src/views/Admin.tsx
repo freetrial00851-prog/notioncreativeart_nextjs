@@ -25,6 +25,7 @@ import { clearHomeCatalogCache } from '../lib/homeCatalogCache'
 const SHELL_BG = '#f9f8f6'
 const SIDEBAR_BG = '#f3f1ec'
 const ACCENT = '#1f249c'
+const ADMIN_H1 = 'font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink'
 
 type NavItem =
   | { kind: 'link'; to: string; label: string; icon: string; end?: boolean; badgeKey?: 'reviews' }
@@ -66,9 +67,9 @@ export function Admin() {
   if (loading) return null
   if (!user || !profile?.is_admin) {
     return (
-      <div className="max-w-site w-full mx-auto px-8 py-32 text-center">
-        <p className="font-subheading text-2xl mb-4">Not authorized.</p>
-        <Link href="/" className="text-[12px] tracking-[0.12em] border-b border-ink pb-1">BACK TO HOME →</Link>
+      <div className="max-w-site w-full mx-auto page-gutter py-16 text-center">
+        <p className="type-h2 text-ink mb-4">Not authorized.</p>
+        <Link href="/" className="text-[14px] font-semibold text-primary hover:underline">Back to home</Link>
       </div>
     )
   }
@@ -86,7 +87,7 @@ export function Admin() {
                 end={item.end}
                 onClick={() => setMobileNavOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
+                  `flex min-h-11 items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
                     isActive ? 'bg-white text-ink font-medium shadow-sm' : 'text-[#444] hover:bg-white/70 hover:text-ink'
                   }`
                 }
@@ -108,7 +109,7 @@ export function Admin() {
               <button
                 type="button"
                 onClick={() => setOpenGroups((g) => ({ ...g, [item.id]: !g[item.id] }))}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
+                className={`w-full min-h-11 flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
                   childActive ? 'text-ink font-medium' : 'text-[#444] hover:bg-white/70'
                 }`}
               >
@@ -124,7 +125,7 @@ export function Admin() {
                       href={c.to}
                       onClick={() => setMobileNavOpen(false)}
                       className={({ isActive }) =>
-                        `block px-3 py-1.5 rounded-full text-[12px] ${isActive ? 'text-ink font-medium bg-white' : 'text-[#666] hover:text-ink'}`
+                        `flex min-h-10 items-center px-3 py-1.5 rounded-full text-[12px] ${isActive ? 'text-ink font-medium bg-white' : 'text-[#666] hover:text-ink'}`
                       }
                     >
                       {c.label}
@@ -200,7 +201,7 @@ export function Admin() {
         {navContent}
       </aside>
 
-      <main className="flex-1 min-w-0 px-4 py-6 md:px-8 md:py-8 overflow-x-auto">
+      <main className="flex-1 min-w-0 page-gutter py-6 md:py-8 overflow-x-auto">
         <AdminContent />
       </main>
     </div>
@@ -721,7 +722,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
 
     return (
       <div className="max-w-3xl mx-auto pb-24">
-        <div className="sticky top-0 z-20 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-6 border-b border-[#e4e1db] flex flex-wrap items-center gap-2" style={{ background: SHELL_BG }}>
+        <div className="sticky top-0 z-20 -mx-5 md:-mx-8 page-gutter py-3 mb-6 border-b border-[#e4e1db] flex flex-wrap items-center gap-2" style={{ background: SHELL_BG }}>
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-semibold text-ink truncate">{form.title || (form.id ? 'Edit listing' : 'New listing')}</p>
             {form.id && (
@@ -952,7 +953,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     <div className="flex gap-6 items-start">
       <div className="min-w-0 flex-1">
         <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-5">
-          <h1 className="text-[28px] font-semibold text-ink shrink-0">{pageTitle}</h1>
+          <h1 className={`${ADMIN_H1} shrink-0`}>{pageTitle}</h1>
           <div className="flex-1 flex justify-center">
             <div className="relative w-full max-w-md">
               <MaterialIcon name="search" size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft" />
@@ -967,7 +968,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
               )}
             </div>
           </div>
-          <button onClick={() => startEdit()} className="shrink-0 px-4 py-2.5 text-[13px] font-medium rounded-full text-white whitespace-nowrap" style={{ background: '#222' }}>
+          <button onClick={() => startEdit()} className="shrink-0 min-h-11 px-4 text-[13px] font-medium rounded-full text-white whitespace-nowrap" style={{ background: '#222' }}>
             + Add a listing
           </button>
         </div>
@@ -1294,10 +1295,10 @@ function CategoriesAdmin() {
         onReorder={() => {}}
       />
       <div className="flex gap-3">
-        <button onClick={save} disabled={saving} className="px-6 py-3 rounded-full text-white text-[12px] font-semibold tracking-[0.06em] hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-primary)' }}>
-          {saving ? 'SAVING…' : 'SAVE'}
+        <button onClick={save} disabled={saving} className="min-h-11 px-5 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-primary)' }}>
+          {saving ? 'Saving…' : 'Save'}
         </button>
-        <button onClick={() => setEditingId(null)} className="px-6 py-3 border border-line text-[11px] tracking-[0.1em] rounded-full hover:bg-surface bg-white">CANCEL</button>
+        <button onClick={() => setEditingId(null)} className="min-h-11 px-5 border border-line text-[13px] font-semibold rounded-full hover:bg-surface bg-white">Cancel</button>
       </div>
     </div>
   )
@@ -1305,8 +1306,8 @@ function CategoriesAdmin() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display font-semibold text-2xl">Categories</h1>
-        <button onClick={startNew} className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] hover:opacity-85 rounded-full">+ ADD CATEGORY</button>
+        <h1 className={ADMIN_H1}>Categories</h1>
+        <button onClick={startNew} className="min-h-11 px-4 bg-ink text-canvas text-[13px] font-semibold hover:opacity-85 rounded-full">+ Add category</button>
       </div>
       {error && <p className="text-[13px] text-madder mb-4">{error}</p>}
 
@@ -1457,7 +1458,7 @@ function OrdersAdmin() {
 
   return (
     <div>
-      <h1 className="font-display font-semibold text-2xl mb-6">Orders</h1>
+      <h1 className={`${ADMIN_H1} mb-6`}>Orders</h1>
       <div className="bg-white border border-line rounded-2xl overflow-hidden">
         {orders.length === 0 ? (
           <p className="py-12 text-center text-ink-soft text-sm">No orders yet.</p>
@@ -1575,10 +1576,10 @@ function SubscribersAdmin() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display font-semibold text-2xl">Newsletter</h1>
+        <h1 className={ADMIN_H1}>Newsletter</h1>
         {subscribers.length > 0 && (
-          <button onClick={exportCsv} disabled={exporting} className="px-5 py-2.5 border border-ink text-[11px] tracking-[0.1em] hover:bg-surface rounded-full bg-white disabled:opacity-50">
-            {exporting ? 'PREPARING…' : 'EXPORT AS CSV'}
+          <button onClick={exportCsv} disabled={exporting} className="min-h-11 px-4 border border-ink text-[13px] font-semibold hover:bg-surface rounded-full bg-white disabled:opacity-50">
+            {exporting ? 'Preparing…' : 'Export as CSV'}
           </button>
         )}
       </div>
@@ -1655,7 +1656,7 @@ function TrashAdmin() {
 
   return (
     <div>
-      <h1 className="font-display font-semibold text-2xl mb-2">Trash</h1>
+      <h1 className={`${ADMIN_H1} mb-2`}>Trash</h1>
       <p className="text-[13px] text-ink-soft mb-6">Deleted products land here first — restore them anytime, or delete them for good.</p>
       <div className="bg-white border border-line rounded-2xl overflow-hidden">
         {products.length === 0 ? (

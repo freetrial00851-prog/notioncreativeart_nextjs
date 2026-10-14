@@ -14,7 +14,7 @@ export type AuthView = 'login' | 'signup'
 const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter and a special character.'
 
 const INPUT =
-  'block w-full min-h-[52px] rounded-xl border bg-surface px-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25'
+  'block w-full min-h-11 rounded-xl border bg-surface px-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25'
 
 function inputClass(hasError: boolean) {
   return `${INPUT} ${hasError ? 'border-error focus:border-error' : 'border-border focus:border-primary'}`
@@ -93,10 +93,10 @@ export function AuthPanel({
         </button>
       )}
 
-      <p className="text-center text-[22px] md:text-[24px] font-bold leading-none text-primary" style={{ fontFamily: 'var(--font-logo)' }}>
+      <p className="text-center text-[18px] md:text-[20px] font-bold leading-none text-primary" style={{ fontFamily: 'var(--font-logo)' }}>
         Notion Creative Art
       </p>
-      <Heading id={titleId} className="mt-5 text-center font-heading text-[32px] md:text-[38px] font-bold leading-tight text-ink">
+      <Heading id={titleId} className="mt-4 text-center type-h1 text-ink">
         {title}
       </Heading>
       <p className="mx-auto mt-2 max-w-[400px] text-center text-[15px] md:text-[16px] leading-snug text-muted">{subtitle}</p>
@@ -149,7 +149,7 @@ export function AuthPanel({
               onClick={() =>
                 void (view === 'login' ? login : signup).signInWithGoogle(oauthReturnTo)
               }
-              className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[16px] md:text-[17px] font-semibold text-ink hover:bg-surface-warm transition-colors"
+              className="flex min-h-11 w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm transition-colors"
             >
               <GoogleIcon />
               Continue with Google
@@ -265,7 +265,7 @@ function SubmitButton({ busy, children, busyLabel }: { busy: boolean; children: 
       type="submit"
       disabled={busy}
       aria-busy={busy || undefined}
-      className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-primary px-6 text-[17px] font-semibold text-primary-contrast hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait transition-colors"
+      className="flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait transition-colors"
     >
       {busy ? busyLabel : children}
     </button>
@@ -490,7 +490,7 @@ function ForgotPassword({ login }: { login: ReturnType<typeof useLoginForm> }) {
 function VerifySent({ signup, onSignIn }: { signup: ReturnType<typeof useSignUpForm>; onSignIn: () => void }) {
   return (
     <div className="text-center">
-      <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
         <MaterialIcon name="mark_email_read" size={28} color="var(--color-primary)" />
       </span>
       <p className="text-[15px] text-muted">We sent a verification link to</p>
@@ -499,14 +499,14 @@ function VerifySent({ signup, onSignIn }: { signup: ReturnType<typeof useSignUpF
       <div className="mt-6 space-y-3">
         <a
           href="mailto:"
-          className="flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-6 text-[16px] font-semibold text-primary-contrast hover:bg-primary-hover"
+          className="flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover"
         >
           Open email app
         </a>
         <button
           type="button"
           onClick={() => void signup.resendVerification(signup.email)}
-          className="flex min-h-[52px] w-full items-center justify-center rounded-full border border-border bg-surface px-6 text-[16px] font-semibold text-ink hover:bg-surface-warm"
+          className="flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-surface px-6 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm"
         >
           Resend email
         </button>

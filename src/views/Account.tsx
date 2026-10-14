@@ -67,16 +67,16 @@ export function Account({ hideOwnerCopyPlaceholders = false }: { hideOwnerCopyPl
 
   if (!user) {
     return (
-      <div className="max-w-site w-full mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className={`${ACCOUNT_CARD} mx-auto max-w-[560px] px-6 py-12 text-center`}>
-          <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+      <div className="max-w-site w-full mx-auto page-gutter py-16 md:py-20">
+        <div className={`${ACCOUNT_CARD} mx-auto max-w-[560px] px-6 py-10 text-center`}>
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
             <MaterialIcon name="lock" size={28} color="var(--color-primary)" />
           </span>
-          <h1 className="font-heading text-[28px] md:text-[32px] font-bold text-ink">Sign in to see your account</h1>
-          <p className="mx-auto mt-2 max-w-[400px] text-[16px] md:text-[15px] text-muted">
+          <h1 className="type-h1 text-ink">Sign in to see your account</h1>
+          <p className="mx-auto mt-2 max-w-[400px] text-[15px] text-muted">
             Your downloads, orders and settings are saved to your account.
           </p>
-          <button type="button" onClick={() => openAuthModal()} className={`${PRIMARY_PILL} mt-6 min-h-[52px] w-full sm:w-auto sm:min-w-[220px]`}>
+          <button type="button" onClick={() => openAuthModal()} className={`${PRIMARY_PILL} mt-6 w-full sm:w-auto sm:min-w-[220px]`}>
             Sign in
           </button>
         </div>
@@ -85,7 +85,7 @@ export function Account({ hideOwnerCopyPlaceholders = false }: { hideOwnerCopyPl
   }
 
   return (
-    <div className="max-w-site w-full mx-auto px-5 md:px-8 pt-5 md:pt-8 pb-16">
+    <div className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-16">
       <div className="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-8">
         <AccountNav pathname={pathname} />
         <div className="min-w-0">
@@ -213,12 +213,12 @@ function Thumb({ src, size }: { src?: string; size: 'sm' | 'md' }) {
 
 function EmptyCard({ icon, title, text, children }: { icon: string; title: string; text: string; children: ReactNode }) {
   return (
-    <div className={`${ACCOUNT_CARD} px-6 py-12 md:py-14 text-center`}>
-      <span className="mx-auto mb-5 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary-soft" aria-hidden>
-        <MaterialIcon name={icon} size={34} color="var(--color-primary)" />
+    <div className={`${ACCOUNT_CARD} px-6 py-10 md:py-12 text-center`}>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+        <MaterialIcon name={icon} size={28} color="var(--color-primary)" />
       </span>
-      <p className="font-heading text-[24px] font-bold text-ink">{title}</p>
-      <p className="mx-auto mt-2 max-w-[400px] text-[16px] md:text-[15px] leading-relaxed text-muted">{text}</p>
+      <p className="type-h2 text-ink">{title}</p>
+      <p className="mx-auto mt-2 max-w-[400px] text-[15px] leading-relaxed text-muted">{text}</p>
       <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">{children}</div>
     </div>
   )
@@ -296,7 +296,7 @@ function MyOrders() {
         <ListRowSkeleton />
       ) : orders.length === 0 ? (
         <EmptyCard icon="receipt_long" title="No orders yet" text="Patterns you buy will show up here with their receipts.">
-          <Link href="/shop" className={`${PRIMARY_PILL} min-h-[52px] sm:min-w-[200px]`}>Shop all patterns</Link>
+          <Link href="/shop" className={`${PRIMARY_PILL} sm:min-w-[200px]`}>Shop all patterns</Link>
         </EmptyCard>
       ) : (
         <ul className="space-y-4">
@@ -440,8 +440,8 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
           title="No downloads yet"
           text="Patterns you buy will appear here, ready to download anytime. Free patterns you claim show up here too."
         >
-          <Link href="/shop" className={`${PRIMARY_PILL} min-h-[52px] sm:min-w-[220px]`}>Shop all patterns</Link>
-          <Link href="/shop?price=free" className={`${SECONDARY_PILL} min-h-[52px]`}>Browse free patterns</Link>
+          <Link href="/shop" className={`${PRIMARY_PILL} sm:min-w-[220px]`}>Shop all patterns</Link>
+          <Link href="/shop?price=free" className={SECONDARY_PILL}>Browse free patterns</Link>
         </EmptyCard>
       </>
     )
@@ -460,12 +460,12 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search your patterns"
             autoComplete="off"
-            className="min-h-12 w-full rounded-full border border-border bg-surface pl-11 pr-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light"
+            className="min-h-11 w-full rounded-full border border-border bg-surface pl-11 pr-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light"
           />
         </label>
         <label>
           <span className="sr-only">Sort downloads</span>
-          <select value={sort} onChange={(e) => setSort(e.target.value as DownloadSort)} className={`${SELECT_PILL} min-h-12 w-full md:w-auto`}>
+          <select value={sort} onChange={(e) => setSort(e.target.value as DownloadSort)} className={`${SELECT_PILL} w-full md:w-auto`}>
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
             <option value="name">Name A–Z</option>
@@ -517,7 +517,7 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
                   disabled={busy}
                   aria-busy={busy || undefined}
                   aria-label={`Download PDF of ${title}`}
-                  className={`${PRIMARY_PILL} min-h-12 w-full md:min-h-11 md:w-auto md:min-w-[160px]`}
+                  className={`${PRIMARY_PILL} w-full md:w-auto md:min-w-[160px]`}
                 >
                   {!busy && <MaterialIcon name="download" size={18} />}
                   {busy ? 'Preparing…' : 'Download PDF'}
@@ -547,7 +547,7 @@ const COUNTRIES: [string, string][] = [
 ]
 
 const INPUT =
-  'w-full min-h-12 rounded-xl border border-border bg-surface px-4 text-[16px] md:text-[15px] text-ink disabled:bg-surface-soft disabled:text-muted'
+  'w-full min-h-11 rounded-xl border border-border bg-surface px-4 text-[16px] md:text-[15px] text-ink disabled:bg-surface-soft disabled:text-muted'
 const FIELD_LABEL = 'block text-[13px] font-medium text-muted mb-1.5'
 const NAME_COOLDOWN_DAYS = 7
 
@@ -675,7 +675,7 @@ function Settings() {
 
       <div className="space-y-4">
         <section aria-labelledby="profile-title" className={`${ACCOUNT_CARD} px-5 md:px-6 pt-5 pb-1`}>
-          <h2 id="profile-title" className="text-[20px] md:text-[18px] font-bold text-ink">Profile</h2>
+          <h2 id="profile-title" className="text-[17px] font-bold text-ink">Profile</h2>
           <div className="mt-1">
             <div className={rowCls}>
               <div className="min-w-0 flex-1">
@@ -783,7 +783,7 @@ function Settings() {
         </section>
 
         <section ref={emailsRef} aria-labelledby="emails-title" className={`${ACCOUNT_CARD} scroll-mt-24 px-5 md:px-6 py-5`}>
-          <h2 id="emails-title" className="text-[20px] md:text-[18px] font-bold text-ink">Sign-in and emails</h2>
+          <h2 id="emails-title" className="text-[17px] font-bold text-ink">Sign-in and emails</h2>
           {hasGoogle && (
             <div className="mt-3 flex min-h-11 items-center gap-3 border-b border-border pb-4">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success-bg" aria-hidden>
@@ -824,7 +824,7 @@ function Settings() {
             onClick={() => void saveChanges()}
             disabled={!canSave}
             aria-busy={saving || undefined}
-            className={`${PRIMARY_PILL} min-h-[52px] md:min-w-[180px]`}
+            className={`${PRIMARY_PILL} md:min-w-[180px]`}
           >
             {saving ? 'Saving…' : 'Save changes'}
           </button>
@@ -885,7 +885,7 @@ function BillingAddressCard({ sectionRef }: { sectionRef: Ref<HTMLElement> }) {
     <section ref={sectionRef} aria-labelledby="billing-title" className={`${ACCOUNT_CARD} scroll-mt-24 px-5 md:px-6 py-5`}>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 id="billing-title" className="text-[20px] md:text-[18px] font-bold text-ink">Billing address</h2>
+          <h2 id="billing-title" className="text-[17px] font-bold text-ink">Billing address</h2>
           <p className="mt-1 text-[14px] md:text-[13px] text-muted">Saved here fills in automatically at checkout.</p>
         </div>
         {hasAddress && !editing && (
@@ -974,14 +974,14 @@ function BillingAddressCard({ sectionRef }: { sectionRef: Ref<HTMLElement> }) {
 function LogoutConfirm() {
   const { signOut } = useAuth()
   return (
-    <div className={`${ACCOUNT_CARD} mx-auto max-w-[520px] px-6 py-12 text-center`}>
-      <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+    <div className={`${ACCOUNT_CARD} mx-auto max-w-[520px] px-6 py-10 text-center`}>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
         <MaterialIcon name="logout" size={28} color="var(--color-primary)" />
       </span>
-      <h1 className="font-heading text-[28px] md:text-[32px] font-bold text-ink">Sign out</h1>
-      <p className="mt-2 text-[16px] md:text-[15px] text-muted">Are you sure you want to sign out of your Notion Creative Art account?</p>
+      <h1 className="type-h1 text-ink">Sign out</h1>
+      <p className="mt-2 text-[15px] text-muted">Are you sure you want to sign out of your Notion Creative Art account?</p>
       <div className="mt-6 flex flex-col items-center gap-2">
-        <button type="button" onClick={signOut} className={`${PRIMARY_PILL} min-h-[52px] w-full sm:w-auto sm:min-w-[220px]`}>
+        <button type="button" onClick={signOut} className={`${PRIMARY_PILL} w-full sm:w-auto sm:min-w-[220px]`}>
           Sign out
         </button>
         <Link href="/account/downloads" className={TEXT_LINK}>Cancel, stay signed in</Link>

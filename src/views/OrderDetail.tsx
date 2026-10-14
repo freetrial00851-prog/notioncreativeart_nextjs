@@ -89,13 +89,13 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
       <div>
         {backLink}
         <div className={`${ACCOUNT_CARD} px-6 py-12 text-center`}>
-          <h1 className="font-heading text-[28px] font-bold text-ink">Order not found</h1>
+          <h1 className="type-h1 text-ink">Order not found</h1>
           <p className="mt-2 text-[15px] text-muted">This order is not in your account.</p>
-          <Link href="/account/orders" className={`${PRIMARY_PILL} mt-6 min-h-[52px]`}>Back to orders</Link>
+          <Link href="/account/orders" className={`${PRIMARY_PILL} mt-6`}>Back to orders</Link>
         </div>
       </div>
     )
-    return embedded ? notFound : <div className="max-w-site w-full mx-auto px-5 md:px-8 py-10">{notFound}</div>
+    return embedded ? notFound : <div className="max-w-site w-full mx-auto page-gutter py-10">{notFound}</div>
   }
 
   const body = (
@@ -103,7 +103,7 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
       {backLink}
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-heading text-[32px] md:text-[40px] font-bold leading-tight text-ink">
+          <h1 className="type-h1 text-ink">
             Order #{order.lemon_order_id || order.id.slice(0, 8)}
           </h1>
           <p className="mt-1 text-[16px] md:text-[14px] text-muted">Placed {formatShortDate(order.created_at)}</p>
@@ -149,7 +149,7 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
                       disabled={busy}
                       aria-busy={busy || undefined}
                       aria-label={`Download PDF of ${p.title}`}
-                      className={`${PRIMARY_PILL} min-h-12 w-full md:min-h-11 md:w-auto md:min-w-[160px]`}
+                      className={`${PRIMARY_PILL} w-full md:w-auto md:min-w-[160px]`}
                     >
                       {!busy && <MaterialIcon name="download" size={18} />}
                       {busy ? 'Preparing…' : 'Download PDF'}
@@ -176,5 +176,5 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
 
   if (embedded) return body
 
-  return <div className="max-w-site w-full mx-auto px-5 md:px-8 py-10">{body}</div>
+  return <div className="max-w-site w-full mx-auto page-gutter py-10">{body}</div>
 }

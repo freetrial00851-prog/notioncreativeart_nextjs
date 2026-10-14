@@ -17,7 +17,7 @@ export function CompleteAccountBanner() {
   return (
     <Link
       href="/account/profile?tab=addresses"
-      className="block border-b border-line text-center px-4 py-2.5 text-[12px] tracking-[0.02em] hover:opacity-90 transition-opacity text-white"
+      className="block border-b border-line text-center page-gutter py-2.5 text-[12px] tracking-[0.02em] hover:opacity-90 transition-opacity text-white"
       style={{ background: '#7A1F2B' }}
     >
       <span className="font-semibold">Complete your account</span>
