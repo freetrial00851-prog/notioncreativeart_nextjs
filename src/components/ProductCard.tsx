@@ -152,7 +152,7 @@ export function ProductCard({
     <article className="group/card flex h-full flex-col">
       {/* Image block */}
       <div
-        className="relative aspect-square overflow-hidden rounded-[18px] border border-border bg-surface transition-[transform,box-shadow] duration-200 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover/card:-translate-y-0.5 motion-reduce:[@media(hover:hover)]:group-hover/card:translate-y-0"
+        className="relative aspect-square overflow-hidden rounded-2xl bg-surface-warm transition-[transform,box-shadow] duration-200 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover/card:-translate-y-0.5 motion-reduce:[@media(hover:hover)]:group-hover/card:translate-y-0"
         style={{ boxShadow: IMAGE_SHADOW }}
         onMouseEnter={(e) => {
           prefetch()

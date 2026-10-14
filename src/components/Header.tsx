@@ -161,13 +161,13 @@ export function Header() {
       {/* AnnouncementBar lives in CustomerShell (DESIGN_SPEC §3.1). */}
 
       {/* ── Desktop ≥1024: logo + text nav | search | heart, cart, Sign in ── */}
-      <div className="hidden desktop:flex items-center gap-4 lg:gap-6 page-gutter py-3 max-w-site w-full">
+      <div className="hidden desktop:flex items-center gap-4 lg:gap-6 page-gutter py-3.5 max-w-site w-full">
         <Logo variant="full" />
-        <nav className="hidden lg:flex items-center gap-5 shrink-0" aria-label="Primary">
+        <nav className="hidden lg:flex items-center gap-6 shrink-0" aria-label="Primary">
           {[
             { href: '/shop', label: 'Shop' },
-            { href: '/shop?level=beginner', label: 'Skill levels' },
-            { href: '/shop?price=free', label: 'Free patterns' },
+            { href: '/shop?price=free', label: 'Free' },
+            { href: '/shop?level=beginner', label: 'Beginner' },
             { href: '/#reviews', label: 'Reviews' },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="text-[14px] font-medium text-ink whitespace-nowrap hover:text-primary">

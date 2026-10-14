@@ -630,7 +630,7 @@ export function ProductDetail({
           {/* Gallery */}
           <div className="min-w-0">
             <div
-              className="relative aspect-square w-full overflow-hidden rounded-[18px] border border-border bg-surface-soft shadow-image select-none"
+              className="relative aspect-square w-full overflow-hidden rounded-2xl bg-surface-warm shadow-image select-none"
               style={{ touchAction: 'pan-y' }}
               role="region"
               aria-roledescription="carousel"
@@ -746,7 +746,7 @@ export function ProductDetail({
           </div>
 
           {/* Buy box */}
-          <div className="min-w-0 lg:pt-1">
+          <div className="min-w-0 lg:rounded-2xl lg:bg-surface lg:p-7 lg:shadow-card">
             <div className="flex flex-wrap gap-2 mb-3">
               {skillLabel && product.skill_level && (
                 <Chip style={SKILL_PILL_STYLES[product.skill_level]}>{skillLabel}</Chip>

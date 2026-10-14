@@ -58,11 +58,7 @@ const HOW_STEPS = [
   { n: '3', t: 'Keep it for life', d: 'Re-download anytime from My downloads. No limits.' },
 ] as const
 
-const MOSAIC_TINTS = [
-  'var(--color-tint-lavender)',
-  'var(--color-tint-sage)',
-  'var(--color-tint-peach)',
-] as const
+const HERO_FALLBACK_TINT = 'var(--color-tint-lavender)'
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
@@ -121,63 +117,7 @@ const FAQ_ITEM_FILE_ISSUE_PLACEHOLDER = {
   ),
 }
 
-type MosaicTileData = { src: string; alt: string; href?: string }
-
-function MosaicTile({
-  tile,
-  tint,
-  className = '',
-  priority = false,
-}: {
-  tile?: MosaicTileData | null
-  tint: string
-  className?: string
-  priority?: boolean
-}) {
-  const media = tile?.src ? (
-    <Image
-      src={tile.src}
-      alt={tile.alt}
-      fill
-      className="object-cover object-center transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
-      sizes="(max-width:1023px) 100vw, 28vw"
-      priority={priority}
-    />
-  ) : null
-
-  const shared = `group relative min-h-0 overflow-hidden ${className}`
-
-  if (tile?.href) {
-    return (
-      <Link href={tile.href} className={shared} style={{ background: tint }} aria-label={tile.alt}>
-        {media}
-      </Link>
-    )
-  }
-
-  return (
-    <div className={shared} style={{ background: tint }}>
-      {media}
-    </div>
-  )
-}
-
-/** Same photos on every screen — one crop on the phone, mosaic from laptop up. */
-function HeroMosaic({ tiles }: { tiles: MosaicTileData[] }) {
-  const slot = (i: number) => tiles[i] ?? null
-  return (
-    <div className="grid grid-cols-1 overflow-hidden rounded-[20px] lg:h-[min(58vh,500px)] lg:grid-cols-2 lg:grid-rows-2 lg:gap-2">
-      <MosaicTile
-        tile={slot(0)}
-        tint={MOSAIC_TINTS[0]}
-        className="aspect-[16/10] lg:aspect-auto lg:row-span-2"
-        priority
-      />
-      <MosaicTile tile={slot(1)} tint={MOSAIC_TINTS[1]} className="hidden lg:block" />
-      <MosaicTile tile={slot(2) ?? slot(1)} tint={MOSAIC_TINTS[2]} className="hidden lg:block" />
-    </div>
-  )
-}
+type HeroPhoto = { src: string; alt: string; href?: string }
 
 export function Home({
   initialCatalog = null,
@@ -214,26 +154,19 @@ export function Home({
 
   const reviewStatsMap = useReviewStatsMapForLists([trending])
   const featured = trending.slice(0, 4)
-  const mosaicTiles = ((): MosaicTileData[] => {
-    const seen = new Set<string>()
-    const out: MosaicTileData[] = []
-    const push = (src: string, alt: string, href?: string) => {
-      if (!src || seen.has(src) || out.length >= 3) return
-      seen.add(src)
-      out.push({ src, alt, href })
-    }
+  const heroPhoto = ((): HeroPhoto | null => {
     for (const url of hero?.images ?? []) {
+      if (!url) continue
       const match = trending.find((p) => p.images?.[0] === url)
-      push(
-        url,
-        match?.title || 'Handmade crochet from Notion Creative Art',
-        match ? `/pattern/${match.slug}` : undefined,
-      )
+      return {
+        src: url,
+        alt: match?.title || 'Handmade crochet from Notion Creative Art',
+        href: match ? `/pattern/${match.slug}` : undefined,
+      }
     }
-    for (const p of trending) {
-      push(p.images?.[0] ?? '', p.title, `/pattern/${p.slug}`)
-    }
-    return out
+    const first = trending.find((p) => p.images?.[0])
+    if (!first?.images?.[0]) return null
+    return { src: first.images[0], alt: first.title, href: `/pattern/${first.slug}` }
   })()
   const freeImages = (
     freePatternCollage.length > 0
@@ -242,7 +175,7 @@ export function Home({
         ? [freeProduct]
         : []
   ).slice(0, 2)
-  const browseCategories = categories.slice(0, 4)
+  const browseCategories = categories.slice(0, 3)
 
   useEffect(() => {
     let cancelled = false
@@ -332,100 +265,66 @@ export function Home({
   return (
     <div className="bg-bg">
       <section className="bg-surface-warm">
-        <div className="mx-auto grid max-w-site items-center page-gutter py-6 md:py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-12 lg:py-12">
-          <div className="order-2 lg:order-1">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+        <div className="grid lg:min-h-[min(88vh,680px)] lg:grid-cols-2">
+          <div
+            className="relative order-1 aspect-[4/5] min-h-[300px] lg:order-2 lg:aspect-auto lg:min-h-full"
+            style={{ background: HERO_FALLBACK_TINT }}
+          >
+            {heroPhoto ? (
+              heroPhoto.href ? (
+                <Link href={heroPhoto.href} className="absolute inset-0" aria-label={heroPhoto.alt}>
+                  <Image
+                    src={heroPhoto.src}
+                    alt={heroPhoto.alt}
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width:1023px) 100vw, 50vw"
+                    priority
+                  />
+                </Link>
+              ) : (
+                <Image
+                  src={heroPhoto.src}
+                  alt={heroPhoto.alt}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width:1023px) 100vw, 50vw"
+                  priority
+                />
+              )
+            ) : null}
+          </div>
+          <div className="order-2 flex flex-col justify-center page-gutter py-10 lg:order-1 lg:py-16">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-h1 mb-4 text-ink">Crochet PDF patterns, ready to download.</h1>
-            <p className="mb-4 max-w-md text-[15px] leading-relaxed text-muted">
+            <h1 className="type-hero mb-5 max-w-lg text-ink">Crochet PDF patterns, ready to download.</h1>
+            <p className="mb-8 max-w-md text-[16px] leading-relaxed text-muted">
               Tested instant-download patterns for every skill level. Pay once, keep the file for life.
             </p>
-            <p className="mb-6 text-[13px] leading-relaxed text-muted">
-              Instant PDF · Every skill level · Re-download anytime
-            </p>
-            <div className="mb-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <Link href={heroPrimaryHref(hero?.cta_link)}>
-                <Button variant="primary" size="md" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
+                <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
                 </Button>
               </Link>
               <Link
                 href={heroSecondaryHref(hero?.secondary_cta_link)}
-                className="inline-flex min-h-11 items-center justify-center text-[15px] font-semibold text-primary hover:underline underline-offset-2"
+                className="inline-flex min-h-[52px] items-center justify-center text-[15px] font-semibold text-primary hover:underline underline-offset-2"
               >
                 {hero?.secondary_cta_text || 'Get a free pattern'}
               </Link>
             </div>
-            <nav aria-label="Shop shortcuts" className="flex flex-wrap gap-x-4 gap-y-2">
-              {SHOP_SHORTCUTS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-[13px] font-semibold text-ink underline-offset-2 hover:text-primary hover:underline"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div className="order-1 mb-6 lg:order-2 lg:mb-0">
-            <HeroMosaic tiles={mosaicTiles} />
           </div>
         </div>
       </section>
-
-      {browseCategories.length > 0 && (
-        <section className="max-w-site mx-auto page-gutter section-y">
-          <div className="mb-8 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="type-h2 mb-2 text-ink">Shop by type</h2>
-              <p className="max-w-xl text-[15px] leading-relaxed text-muted">
-                Amigurumi, wearables, and pieces for the home — jump to the crochet PDFs you want to make.
-              </p>
-            </div>
-            <Link
-              href="/shop"
-              className="hidden shrink-0 text-[14px] font-semibold text-primary hover:underline underline-offset-2 sm:inline-flex"
-            >
-              Shop all
-            </Link>
-          </div>
-          <div className={`grid grid-cols-2 gap-3 md:gap-4 ${browseCategories.length >= 4 ? 'lg:grid-cols-4' : browseCategories.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
-            {browseCategories.map((c) => (
-              <Link key={c.id} href={c.link} className="group block overflow-hidden rounded-[20px] bg-surface">
-                <div
-                  className="relative aspect-[4/3] md:aspect-[16/10] lg:aspect-[4/3]"
-                  style={{ background: 'var(--color-tint-lavender)' }}
-                >
-                  {c.image ? (
-                    <Image
-                      src={c.image}
-                      alt={`${c.name} crochet patterns`}
-                      fill
-                      className="object-cover object-center transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
-                      sizes="(max-width:768px) 50vw, 25vw"
-                    />
-                  ) : null}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 to-transparent px-3 py-3 md:px-4 md:py-4">
-                    <h3 className="text-[16px] font-bold text-white md:text-[17px]">{c.name}</h3>
-                    <p className="text-[12px] text-white/85">
-                      {c.count} {c.count === 1 ? 'pattern' : 'patterns'}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
 
       <section className="max-w-site mx-auto page-gutter section-y">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <h2 className="type-h2 mb-2 text-ink">Featured crochet patterns</h2>
             <p className="max-w-xl text-[15px] leading-relaxed text-muted">
-              Instant PDF download. Yours to keep. Start with one you love.
+              Instant PDF download. Yours to keep.
             </p>
           </div>
           <Link
@@ -462,109 +361,124 @@ export function Home({
                 <PatternCard key={p.id} product={p} priority={i < 2} reviewStats={reviewStatsMap.get(p.id)} />
               ))}
             </PatternGrid>
-            <div className="mt-6 sm:hidden">
-              <Link href="/shop" className="text-[14px] font-semibold text-primary hover:underline underline-offset-2">
-                Shop all patterns
-              </Link>
-            </div>
+            <nav aria-label="Shop shortcuts" className="mt-8 flex flex-wrap gap-x-5 gap-y-2">
+              {SHOP_SHORTCUTS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-[13px] font-semibold text-ink underline-offset-2 hover:text-primary hover:underline"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </>
         )}
       </section>
 
-      <section className="bg-surface-warm">
-        <div className="max-w-site mx-auto page-gutter section-y">
-          <div className="mb-8">
-            <h2 className="type-h2 mb-2 text-ink">Shop by skill level</h2>
-            <p className="max-w-xl text-[15px] text-muted">Beginner, intermediate, and advanced crochet patterns.</p>
+      {browseCategories.map((c, i) => (
+        <section key={c.id} className={i % 2 === 0 ? 'bg-surface-warm' : 'bg-bg'}>
+          <div className="grid lg:grid-cols-2 lg:min-h-[420px]">
+            <div
+              className={`relative aspect-[4/3] lg:aspect-auto lg:min-h-full ${i % 2 === 1 ? 'lg:order-2' : ''}`}
+              style={{ background: 'var(--color-tint-lavender)' }}
+            >
+              {c.image ? (
+                <Image
+                  src={c.image}
+                  alt={`${c.name} crochet patterns`}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width:1023px) 100vw, 50vw"
+                />
+              ) : null}
+            </div>
+            <div className={`flex flex-col justify-center page-gutter py-10 lg:py-14 ${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+              <p className="mb-3 text-[13px] font-semibold text-primary">
+                {c.count} {c.count === 1 ? 'pattern' : 'patterns'}
+              </p>
+              <h2 className="type-h1 mb-3 text-ink">{c.name}</h2>
+              <p className="mb-6 max-w-md text-[15px] leading-relaxed text-muted">
+                {c.copy?.trim() || `Shop ${c.name.toLowerCase()} crochet PDF patterns. Instant download, yours to keep.`}
+              </p>
+              <Link href={c.link}>
+                <Button variant="primary" size="md">
+                  Shop {c.name}
+                </Button>
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+        </section>
+      ))}
+
+      <section className="border-y border-border bg-bg">
+        <div className="max-w-site mx-auto page-gutter py-8 md:py-10">
+          <h2 className="type-h2 mb-5 text-ink">Shop by skill</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             {skillLevels.map((s) => (
-              <Link key={s.level} href={s.link} className="group block overflow-hidden rounded-[20px] bg-surface">
-                <div className="relative aspect-[16/10] md:aspect-[4/3]" style={{ background: s.tint }}>
-                  {s.image ? (
-                    <Image
-                      src={s.image}
-                      alt={`${s.level} crochet patterns`}
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width:768px) 100vw, 33vw"
-                    />
-                  ) : null}
-                </div>
-                <div className="p-4 md:p-5">
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <LevelBadge level={s.level} />
-                    {s.count > 0 ? (
-                      <span className="text-[12px] text-muted">
-                        {s.count} {s.count === 1 ? 'pattern' : 'patterns'}
-                      </span>
-                    ) : null}
-                  </div>
-                  <h3 className="mb-1 text-[17px] font-bold text-ink">{s.title}</h3>
-                  <p className="mb-3 text-[14px] leading-relaxed text-muted">{s.body}</p>
-                  <span className="text-[14px] font-semibold text-primary underline-offset-2 group-hover:underline">
-                    Shop {s.level} patterns
+              <Link
+                key={s.level}
+                href={s.link}
+                className="flex min-h-12 flex-1 items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3 sm:min-w-[200px]"
+              >
+                <span className="flex items-center gap-2">
+                  <LevelBadge level={s.level} />
+                  <span className="text-[14px] font-semibold text-ink">{s.title}</span>
+                </span>
+                {s.count > 0 ? (
+                  <span className="text-[13px] text-muted">
+                    {s.count}
                   </span>
-                </div>
+                ) : null}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="max-w-site mx-auto page-gutter section-y">
-        <div
-          className="grid grid-cols-1 items-center gap-5 rounded-[20px] p-5 md:p-8 lg:grid-cols-[1.2fr_1fr] lg:gap-8"
-          style={{ background: 'var(--color-tint-sage)' }}
-        >
-          <div>
-            <StatusBadge status="free" className="!bg-white !text-free mb-3" />
-            <h2 className="type-h2 mb-2 text-ink">Start with a free crochet PDF</h2>
-            <p className="mb-5 max-w-md text-[15px] leading-relaxed text-muted">
+      <section className="bg-primary text-primary-contrast">
+        <div className="grid lg:grid-cols-2">
+          <div className="flex flex-col justify-center page-gutter py-10 lg:py-14">
+            <StatusBadge status="free" className="mb-4 !bg-white !text-free" />
+            <h2 className="type-h2 mb-3">Start with a free crochet PDF</h2>
+            <p className="mb-6 max-w-md text-[15px] leading-relaxed text-white/85">
               Download a free pattern with no account. See the quality before you buy.
             </p>
             <Link href="/shop?price=free" className="block w-full sm:inline-block sm:w-auto">
-              <Button variant="primary" size="md" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
+              <Button
+                variant="secondary"
+                size="md"
+                className="w-full border-0 bg-white text-primary hover:bg-white/95 sm:w-auto"
+                iconLeft={<DownloadGlyph />}
+              >
                 Download a free pattern
               </Button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {[0, 1].map((i) => {
-              const p = freeImages[i]
-              return (
-                <div
-                  key={i}
-                  className={`relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-white md:aspect-square ${i === 1 ? 'hidden md:block' : ''}`}
-                >
-                  {p?.images?.[0] ? (
-                    <Link href={`/pattern/${p.slug}`}>
-                      <Image src={p.images[0]} alt={p.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 160px" />
-                    </Link>
-                  ) : (
-                    <span className="absolute inset-0 flex items-center justify-center px-2 text-center text-[12px] text-muted">
-                      Free pattern photo
-                    </span>
-                  )}
-                </div>
-              )
-            })}
+          <div className="relative hidden min-h-[280px] lg:block">
+            {freeImages[0]?.images?.[0] ? (
+              <Link href={`/pattern/${freeImages[0].slug}`} className="absolute inset-0">
+                <Image
+                  src={freeImages[0].images[0]}
+                  alt={freeImages[0].title}
+                  fill
+                  className="object-cover object-center"
+                  sizes="50vw"
+                />
+              </Link>
+            ) : null}
           </div>
         </div>
       </section>
 
-      <section className="border-y border-border bg-surface">
+      <section className="bg-surface-warm">
         <div className="max-w-site mx-auto page-gutter section-y">
-          <div className="mb-8">
-            <h2 className="type-h2 mb-2 text-ink">How it works</h2>
-            <p className="max-w-xl text-[15px] text-muted">No shipping wait. Your PDF is ready as soon as you pay.</p>
-          </div>
-          <ol className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+          <h2 className="type-h2 mb-2 text-ink">How it works</h2>
+          <p className="mb-8 max-w-xl text-[15px] text-muted">No shipping wait. Your PDF is ready as soon as you pay.</p>
+          <ol className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
             {HOW_STEPS.map((step) => (
-              <li key={step.n} className="rounded-[20px] border border-border bg-bg p-5">
-                <p className="mb-3 inline-flex size-9 items-center justify-center rounded-full bg-primary-soft text-[15px] font-bold text-primary">
-                  {step.n}
-                </p>
+              <li key={step.n}>
+                <p className="mb-3 font-heading text-[32px] font-bold leading-none text-primary">{step.n}</p>
                 <p className="mb-1 text-[16px] font-bold text-ink">{step.t}</p>
                 <p className="text-[14px] leading-relaxed text-muted">{step.d}</p>
               </li>

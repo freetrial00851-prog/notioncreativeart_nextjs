@@ -332,7 +332,7 @@ export function Shop({
 
   return (
     <div className="bg-bg min-h-[50vh]">
-      <div className="max-w-site w-full mx-auto page-gutter py-6 md:py-8">
+      <div className="max-w-site w-full mx-auto page-gutter py-8 md:py-10">
         <nav className="text-[13px] text-muted mb-2 flex items-center gap-1.5 flex-wrap">
           <Link href="/" className="hover:text-ink">
             Home
