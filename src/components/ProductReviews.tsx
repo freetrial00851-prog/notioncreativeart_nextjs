@@ -49,7 +49,7 @@ function RatingSummary({ stats, reviews }: { stats: ReviewStats; reviews: Review
   return (
     <div className="rounded-[18px] border border-border bg-surface px-5 py-6 md:px-6">
       <p className="flex items-baseline gap-2">
-        <span className="font-heading text-[52px] font-bold leading-none text-ink tabular-nums">
+        <span className="font-heading text-[36px] font-bold leading-none text-ink tabular-nums">
           {stats.averageRating.toFixed(1)}
         </span>
         <span className="text-[14px] text-muted">out of 5</span>
@@ -163,7 +163,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
   return (
     <div>
       <div className="mb-6 md:mb-8 flex items-center justify-between gap-4">
-        <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink">Customer reviews</h2>
+        <h2 className="type-h2 text-ink">Customer reviews</h2>
         {writeButton('hidden md:inline-flex shrink-0')}
       </div>
 
@@ -188,7 +188,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
             )
           )}
 
-          {writeButton('mt-6 w-full md:hidden min-h-[52px]')}
+          {writeButton('mt-6 w-full md:hidden')}
 
           {reviews.length > INITIAL_VISIBLE && (
             <div className="mt-6 flex justify-center">
@@ -206,7 +206,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
 
           {userReview && (
             <div className="mt-6 rounded-[18px] border border-border bg-surface p-5 space-y-3">
-              <p className="text-[12px] font-bold tracking-[0.12em] text-muted">YOUR REVIEW</p>
+              <p className="text-[12px] font-semibold text-muted">Your review</p>
               <ReviewCard review={userReview} />
               {userReview.status === 'pending' && (
                 <p className="text-[13px] text-muted">Pending approval. It will appear here once moderated.</p>

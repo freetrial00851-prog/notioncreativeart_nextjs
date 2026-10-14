@@ -95,7 +95,7 @@ function DescriptionBlocks({ text }: { text: string }) {
     <div className="space-y-3">
       {formatDescription(text).map((b, i) => {
         if (b.type === 'heading') {
-          return <p key={i} className="text-[12px] tracking-[0.12em] text-muted font-bold mt-6 first:mt-0">{b.content}</p>
+          return <p key={i} className="text-[13px] font-semibold text-ink mt-5 first:mt-0">{b.content}</p>
         }
         if (b.type === 'check') {
           return <TickLine key={i}>{b.content}</TickLine>
@@ -350,14 +350,14 @@ export function ProductDetail({
 
   if (loading) return <ProductDetailSkeleton />
   if (!product) return (
-    <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 py-24 md:py-32 text-center">
+    <div className="max-w-site w-full mx-auto page-gutter py-16 md:py-20 text-center">
       {unavailable ? (
         <>
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-3">This pattern is no longer available</h1>
+          <h1 className="type-h1 text-ink mb-3">This pattern is no longer available</h1>
           <p className="text-muted text-[15px] leading-relaxed mb-8 max-w-md mx-auto">The maker has taken this listing down. If you already own it, it&apos;s still in your account under Downloads.</p>
         </>
       ) : (
-        <h1 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-8">Pattern not found</h1>
+        <h1 className="type-h1 text-ink mb-8">Pattern not found</h1>
       )}
       <Link
         href="/shop"
@@ -473,43 +473,22 @@ export function ProductDetail({
     ...(product.materials?.trim() ? ['Materials list'] : []),
   ]
 
-  const tabSideImage = images[1] || images[0] || null
-
-  const wrapTabWithImage = (body: ReactNode) => (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)] gap-8 lg:gap-12 items-start">
-      <div className="min-w-0">{body}</div>
-      {tabSideImage && (
-        <div className="relative w-full aspect-[16/9] lg:aspect-square overflow-hidden rounded-[18px] border border-border bg-tint-sage">
-          <Image
-            src={deriveVariantUrl(tabSideImage, 'large')}
-            alt={`${product.title}, lifestyle photo`}
-            fill
-            sizes="(max-width: 1023px) 100vw, 360px"
-            className="object-cover"
-          />
-        </div>
-      )}
-    </div>
-  )
-
   const renderTabContent = (tab: Tab, opts?: { includeSectionHeading?: boolean }) => {
     const includeHeading = opts?.includeSectionHeading !== false
     if (tab === 'description') {
-      return wrapTabWithImage(
-        product.description ? (
-          <div>
-            {includeHeading ? (
-              <h2 className="text-[22px] font-bold text-ink mb-4">About this pattern</h2>
-            ) : null}
-            <DescriptionBlocks text={product.description} />
-          </div>
-        ) : (
-          <p className="text-[15px] text-muted leading-relaxed">No description yet.</p>
-        )
+      return product.description ? (
+        <div>
+          {includeHeading ? (
+            <h2 className="text-[18px] font-bold text-ink mb-3">About this pattern</h2>
+          ) : null}
+          <DescriptionBlocks text={product.description} />
+        </div>
+      ) : (
+        <p className="text-[15px] text-muted leading-relaxed">No description yet.</p>
       )
     }
     if (tab === 'included') {
-      return wrapTabWithImage(
+      return (
         <TickList
           items={[
             product.pdf_filename ? `PDF pattern file: ${product.pdf_filename}` : 'PDF pattern file (instant download)',
@@ -524,18 +503,16 @@ export function ProductDetail({
       )
     }
     if (tab === 'materials') {
-      return wrapTabWithImage(
-        product.materials ? (
-          <ul className="text-[15px] text-ink space-y-2 list-disc pl-5 max-w-xl">
-            {product.materials.split('\n').filter(Boolean).map((line, i) => <li key={i}>{line}</li>)}
-          </ul>
-        ) : (
-          <p className="text-[15px] text-muted leading-relaxed">No materials list added for this pattern yet.</p>
-        )
+      return product.materials ? (
+        <ul className="text-[15px] text-ink space-y-2 list-disc pl-5 max-w-xl">
+          {product.materials.split('\n').filter(Boolean).map((line, i) => <li key={i}>{line}</li>)}
+        </ul>
+      ) : (
+        <p className="text-[15px] text-muted leading-relaxed">No materials list added for this pattern yet.</p>
       )
     }
     if (tab === 'skill') {
-      return wrapTabWithImage(
+      return (
         <div className="max-w-xl text-[15px] text-muted leading-relaxed">
           {skillLabel ? (
             <p>
@@ -560,7 +537,7 @@ export function ProductDetail({
       ...(product.pdf_pages ? [['Pages', String(product.pdf_pages)] as [string, ReactNode]] : []),
       ['Delivery', 'Instant download'],
     ]
-    return wrapTabWithImage(
+    return (
       <dl className="max-w-md rounded-[18px] border border-border bg-surface-warm divide-y divide-border text-[14px]">
         {detailRows.map(([label, value]) => (
           <div key={label} className="flex justify-between gap-6 px-5 py-3">
@@ -594,10 +571,10 @@ export function ProductDetail({
   const alsoBoughtShown = alsoBought.filter((p) => !relatedIds.has(p.id)).slice(0, 4)
 
   const priceBlock = mode === 'free' ? (
-    <p className="text-[34px] md:text-[38px] font-extrabold leading-none text-free">Free</p>
+    <p className="text-[24px] md:text-[28px] font-bold leading-none text-free">Free</p>
   ) : mode === 'paid' && product.price > 0 ? (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <p className="text-[34px] md:text-[38px] font-extrabold leading-none text-primary">${product.price.toFixed(2)}</p>
+      <p className="text-[24px] md:text-[28px] font-bold leading-none text-primary">${product.price.toFixed(2)}</p>
       {onSale && (
         <>
           <p className="text-[18px] text-muted line-through">
@@ -612,12 +589,12 @@ export function ProductDetail({
   ) : null
 
   const primaryButtonClass =
-    'inline-flex w-full min-h-[52px] items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60'
+    'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60'
   const secondaryButtonClass =
-    'inline-flex w-full min-h-[52px] items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-60'
+    'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-60'
 
   const soldOutPill = (
-    <div className="flex min-h-[52px] w-full items-center justify-center rounded-full border border-border text-[13px] font-semibold tracking-[0.12em] text-muted">
+    <div className="flex min-h-11 w-full items-center justify-center rounded-full border border-border text-[13px] font-semibold text-muted">
       SOLD OUT
     </div>
   )
@@ -625,7 +602,7 @@ export function ProductDetail({
   return (
     <div className="pb-24 md:pb-0">
       {/* Hero: gallery + buy box */}
-      <section className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 pt-5 md:pt-6 pb-10 md:pb-14">
+      <section className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-8 md:pb-10">
         <Link
           href="/shop"
           className="md:hidden -ml-2 mb-3 inline-flex min-h-11 items-center gap-1 rounded-full px-2 text-[15px] font-medium text-muted hover:text-ink"
@@ -780,13 +757,7 @@ export function ProductDetail({
             </div>
 
             <div className="flex items-start justify-between gap-4 mb-3">
-              <h1
-                className={`font-heading font-bold leading-[1.15] text-ink break-words min-w-0 ${
-                  product.title.length > 60
-                    ? 'text-[24px] md:text-[28px] lg:text-[30px]'
-                    : 'text-[30px] md:text-[38px] lg:text-[40px]'
-                }`}
-              >
+              <h1 className="type-h1 text-ink break-words min-w-0">
                 {product.title}
               </h1>
               <button
@@ -830,7 +801,7 @@ export function ProductDetail({
             {priceBlock && <div className="mb-4">{priceBlock}</div>}
 
             {shortDescription && (
-              <p className="mb-5 text-[16px] leading-relaxed text-muted">{shortDescription}</p>
+              <p className="mb-4 text-[15px] leading-relaxed text-muted">{shortDescription}</p>
             )}
 
             {mode === 'paid' && <div className="mb-6"><TickList items={paidTicks} /></div>}
@@ -977,7 +948,7 @@ export function ProductDetail({
 
       {/* Tabs (tablet + laptop) / accordion (mobile) */}
       <section className="border-t border-border bg-surface">
-        <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 py-4 md:py-12">
+        <div className="max-w-site w-full mx-auto page-gutter py-4 md:py-8">
           <div role="tablist" aria-label="Pattern information" className="hidden md:flex gap-8 border-b border-border overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
             {TABS.map((t) => {
               const selected = activeTab === t.key
@@ -1005,7 +976,7 @@ export function ProductDetail({
             role="tabpanel"
             aria-labelledby={`tab-${activeTab}`}
             tabIndex={0}
-            className="hidden md:block pt-8"
+            className="hidden md:block pt-6"
           >
             {renderTabContent(activeTab, { includeSectionHeading: true })}
           </div>
@@ -1022,7 +993,7 @@ export function ProductDetail({
                       aria-expanded={open}
                       aria-controls={`acc-panel-${t.key}`}
                       onClick={() => setOpenAccordion((s) => (s === t.key ? null : t.key))}
-                      className="flex min-h-14 w-full items-center justify-between gap-4 text-left text-[16px] font-bold text-ink"
+                      className="flex min-h-11 w-full items-center justify-between gap-4 text-left text-[15px] font-semibold text-ink"
                     >
                       {t.label}
                       <MaterialIcon
@@ -1035,7 +1006,7 @@ export function ProductDetail({
                   {open && (
                     <div id={`acc-panel-${t.key}`} role="region" aria-labelledby={`acc-${t.key}`} className="pb-6">
                       {t.key === 'description' && product.description && (
-                        <h3 className="mb-3 text-[20px] font-bold text-ink">About this pattern</h3>
+                        <h3 className="mb-3 text-[16px] font-bold text-ink">About this pattern</h3>
                       )}
                       {renderTabContent(t.key, { includeSectionHeading: false })}
                     </div>
@@ -1049,7 +1020,7 @@ export function ProductDetail({
 
       {/* Customer reviews */}
       <section id="reviews" className="scroll-mt-24 border-t border-border bg-surface-warm">
-        <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
+        <div className="max-w-site w-full mx-auto page-gutter section-y">
           <ProductReviews
             productId={product.id}
             userId={user?.id ?? null}
@@ -1063,9 +1034,9 @@ export function ProductDetail({
 
       {relatedShown.length > 0 && (
         <section className="bg-bg">
-          <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
-            <div className="mb-6 md:mb-8 flex items-end justify-between gap-4">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink">You may also like</h2>
+          <div className="max-w-site w-full mx-auto page-gutter section-y">
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <h2 className="type-h2 text-ink">You may also like</h2>
               <Link href={shopLink} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
                 View all <span aria-hidden>→</span>
               </Link>
@@ -1081,9 +1052,9 @@ export function ProductDetail({
 
       {alsoBoughtShown.length > 0 && (
         <section className="border-t border-border bg-surface">
-          <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
-            <div className="mb-6 md:mb-8 flex items-end justify-between gap-4">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink">Customers also bought</h2>
+          <div className="max-w-site w-full mx-auto page-gutter section-y">
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <h2 className="type-h2 text-ink">Customers also bought</h2>
               <Link href={shopLink} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
                 View all <span aria-hidden>→</span>
               </Link>
@@ -1116,7 +1087,7 @@ export function ProductDetail({
                   onClick={toggleWishlist}
                   aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                   aria-pressed={inWishlist}
-                  className="inline-flex size-[52px] shrink-0 items-center justify-center rounded-full border border-border bg-white text-ink"
+                  className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-white text-ink"
                 >
                   <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-sale)' : 'currentColor'} />
                 </button>
