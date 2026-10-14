@@ -75,9 +75,9 @@ export function CartDrawer() {
         </div>
 
         <div className="flex items-center justify-between gap-3 pl-6 pr-3 pt-2 pb-3 md:pt-4 shrink-0">
-          <h2 id="cart-drawer-title" className="font-heading text-[26px] font-bold text-ink leading-tight">
+          <h2 id="cart-drawer-title" className="type-h2 text-ink leading-tight">
             Your cart
-            {!empty && <span className="ml-1.5 font-body text-[17px] font-normal text-muted">({count})</span>}
+            {!empty && <span className="ml-1.5 font-body text-[15px] font-normal text-muted">({count})</span>}
           </h2>
           <button
             ref={closeButtonRef}
@@ -104,18 +104,18 @@ export function CartDrawer() {
 
         {empty ? (
           <div className="flex flex-1 flex-col items-center justify-center px-8 py-12 text-center">
-            <span className="mb-5 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
               <BagIcon />
             </span>
-            <p className="font-heading text-[24px] font-bold text-ink mb-2">Your cart is empty</p>
-            <p className="text-[15px] text-muted mb-7 max-w-xs leading-relaxed">
+            <p className="type-h2 text-ink mb-2">Your cart is empty</p>
+            <p className="text-[15px] text-muted mb-5 max-w-xs leading-relaxed">
               Pick a pattern you love and it will wait here. Saved items stay in your cart for about 7 days.
             </p>
             <div className="flex w-full max-w-[300px] flex-col items-center gap-3">
               <Link
                 href="/shop"
                 onClick={closeDrawer}
-                className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
               >
                 Shop all patterns
               </Link>
@@ -144,7 +144,7 @@ export function CartDrawer() {
             <div className="shrink-0 space-y-3 border-t border-border bg-surface px-6 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
               <div className="flex items-baseline justify-between">
                 <span className="text-[15px] font-semibold text-ink">Subtotal</span>
-                <span className="text-[22px] font-extrabold text-ink">${total.toFixed(2)}</span>
+                <span className="text-[18px] font-bold text-ink">${total.toFixed(2)}</span>
               </div>
               <p className="text-[13px] text-muted">Taxes, if any, are shown at checkout.</p>
               {checkoutError && (
@@ -154,7 +154,7 @@ export function CartDrawer() {
               )}
               <Button
                 variant="primary"
-                size="lg"
+                size="md"
                 className="w-full"
                 loading={checkingOut}
                 onClick={handleCheckout}

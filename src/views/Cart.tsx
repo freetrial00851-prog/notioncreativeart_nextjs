@@ -113,9 +113,9 @@ export function Cart() {
   }
 
   const recommendationsSection = recommendations.length > 0 && (
-    <section className="mt-16 md:mt-20" aria-labelledby="cart-recommendations">
-      <div className="mb-6 md:mb-8 flex items-end justify-between gap-4">
-        <h2 id="cart-recommendations" className="font-heading text-3xl md:text-4xl font-bold text-ink">
+    <section className="mt-10 md:mt-12" aria-labelledby="cart-recommendations">
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <h2 id="cart-recommendations" className="type-h2 text-ink">
           You may also like
         </h2>
         <Link href="/shop" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
@@ -153,21 +153,21 @@ export function Cart() {
 
   if (count === 0) {
     return (
-      <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 pt-4 md:pt-6 pb-16">
+      <div className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-12">
         {topNav}
-        <h1 className="font-heading text-[40px] md:text-[44px] font-bold text-ink leading-tight mt-3 md:mt-4">Your cart</h1>
-        <div className="mt-6 rounded-[20px] border border-border bg-surface px-6 py-14 text-center">
-          <span className="mx-auto mb-5 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-primary-soft" aria-hidden>
-            <MaterialIcon name="shopping_bag" size={34} color="var(--color-primary)" />
+        <h1 className="type-h1 text-ink mt-3 md:mt-4">Your cart</h1>
+        <div className="mt-5 rounded-[20px] border border-border bg-surface px-5 py-10 text-center">
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+            <MaterialIcon name="shopping_bag" size={28} color="var(--color-primary)" />
           </span>
-          <p className="font-heading text-[24px] font-bold text-ink mb-2">Your cart is empty</p>
-          <p className="mx-auto mb-7 max-w-sm text-[15px] leading-relaxed text-muted">
+          <p className="type-h2 text-ink mb-2">Your cart is empty</p>
+          <p className="mx-auto mb-5 max-w-sm text-[15px] leading-relaxed text-muted">
             Pick a pattern you love and it will wait here. Saved items stay in your cart for about 7 days.
           </p>
           <div className="mx-auto flex w-full max-w-[300px] flex-col items-center gap-3">
             <Link
               href="/shop"
-              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
             >
               Shop all patterns
             </Link>
@@ -185,12 +185,12 @@ export function Cart() {
   }
 
   return (
-    <div className="max-w-site w-full mx-auto px-5 md:px-10 lg:px-8 pt-4 md:pt-6 pb-28 md:pb-16">
+    <div className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-24 md:pb-12">
       {topNav}
 
-      <h1 className="mt-3 md:mt-4 flex flex-wrap items-baseline gap-x-3 font-heading text-[40px] md:text-[44px] font-bold text-ink leading-tight">
+      <h1 className="mt-3 md:mt-4 flex flex-wrap items-baseline gap-x-3 type-h1 text-ink">
         Your cart
-        <span className="font-body text-[18px] md:text-[16px] font-medium text-muted">{patternsLabel(count)}</span>
+        <span className="font-body text-[16px] md:text-[15px] font-medium text-muted">{patternsLabel(count)}</span>
       </h1>
 
       <div className="mt-6 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-6">
@@ -199,7 +199,7 @@ export function Cart() {
             const onSale = isOnSale(product)
             const busy = busyId === product_id
             const price = (
-              <span className="text-[20px] md:text-[17px] font-bold text-primary">
+              <span className="text-[17px] md:text-[16px] font-bold text-primary">
                 {onSale && <span className="sr-only">Now </span>}
                 {money(product.price)}
               </span>
@@ -281,7 +281,7 @@ export function Cart() {
           aria-labelledby="order-summary-title"
           className="rounded-[20px] border border-border bg-surface p-5 md:p-6 lg:p-5 lg:sticky lg:top-24"
         >
-          <h2 id="order-summary-title" className="text-[20px] md:text-[18px] font-bold text-ink mb-4">
+          <h2 id="order-summary-title" className="text-[17px] font-bold text-ink mb-3">
             Order summary
           </h2>
           <dl className="space-y-2.5 text-[15px] md:text-[14px] text-muted">
@@ -313,7 +313,7 @@ export function Cart() {
 
           <Button
             variant="primary"
-            size="lg"
+            size="md"
             className="mt-4 w-full"
             loading={checkingOut}
             onClick={handleCheckout}
@@ -359,7 +359,7 @@ export function Cart() {
           </div>
           <Button
             variant="primary"
-            size="lg"
+            size="md"
             className="flex-1"
             loading={checkingOut}
             onClick={handleCheckout}
