@@ -139,8 +139,8 @@ function MosaicTile({
       src={tile.src}
       alt={tile.alt}
       fill
-      className="object-cover transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
-      sizes="(max-width:1024px) 50vw, 28vw"
+      className="object-cover object-center transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
+      sizes="(max-width:1023px) 100vw, 28vw"
       priority={priority}
     />
   ) : null
@@ -162,14 +162,19 @@ function MosaicTile({
   )
 }
 
-/** Product photos beside the hero copy — not covered by a card. */
+/** Same photos on every screen — one crop on the phone, mosaic from laptop up. */
 function HeroMosaic({ tiles }: { tiles: MosaicTileData[] }) {
   const slot = (i: number) => tiles[i] ?? null
   return (
-    <div className="grid h-[min(52vh,440px)] min-h-[260px] grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-[20px] md:h-[min(58vh,500px)]">
-      <MosaicTile tile={slot(0)} tint={MOSAIC_TINTS[0]} className="row-span-2" priority />
-      <MosaicTile tile={slot(1)} tint={MOSAIC_TINTS[1]} />
-      <MosaicTile tile={slot(2) ?? slot(1)} tint={MOSAIC_TINTS[2]} />
+    <div className="grid grid-cols-1 overflow-hidden rounded-[20px] lg:h-[min(58vh,500px)] lg:grid-cols-2 lg:grid-rows-2 lg:gap-2">
+      <MosaicTile
+        tile={slot(0)}
+        tint={MOSAIC_TINTS[0]}
+        className="aspect-[16/10] lg:aspect-auto lg:row-span-2"
+        priority
+      />
+      <MosaicTile tile={slot(1)} tint={MOSAIC_TINTS[1]} className="hidden lg:block" />
+      <MosaicTile tile={slot(2) ?? slot(1)} tint={MOSAIC_TINTS[2]} className="hidden lg:block" />
     </div>
   )
 }
@@ -327,8 +332,8 @@ export function Home({
   return (
     <div className="bg-bg">
       <section className="bg-surface-warm">
-        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-8 md:py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-12 lg:py-12">
-          <div>
+        <div className="mx-auto grid max-w-site items-center page-gutter py-6 md:py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-12 lg:py-12">
+          <div className="order-2 lg:order-1">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
@@ -364,7 +369,9 @@ export function Home({
               ))}
             </nav>
           </div>
-          <HeroMosaic tiles={mosaicTiles} />
+          <div className="order-1 mb-6 lg:order-2 lg:mb-0">
+            <HeroMosaic tiles={mosaicTiles} />
+          </div>
         </div>
       </section>
 
@@ -388,7 +395,7 @@ export function Home({
             {browseCategories.map((c) => (
               <Link key={c.id} href={c.link} className="group block overflow-hidden rounded-[20px] bg-surface">
                 <div
-                  className={`relative ${browseCategories.length <= 2 ? 'aspect-[16/10]' : 'aspect-[4/5]'}`}
+                  className="relative aspect-[4/3] md:aspect-[16/10] lg:aspect-[4/3]"
                   style={{ background: 'var(--color-tint-lavender)' }}
                 >
                   {c.image ? (
@@ -396,7 +403,7 @@ export function Home({
                       src={c.image}
                       alt={`${c.name} crochet patterns`}
                       fill
-                      className="object-cover transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
+                      className="object-cover object-center transition-transform duration-500 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-[1.03]"
                       sizes="(max-width:768px) 50vw, 25vw"
                     />
                   ) : null}
@@ -473,13 +480,13 @@ export function Home({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {skillLevels.map((s) => (
               <Link key={s.level} href={s.link} className="group block overflow-hidden rounded-[20px] bg-surface">
-                <div className="relative aspect-[4/3]" style={{ background: s.tint }}>
+                <div className="relative aspect-[16/10] md:aspect-[4/3]" style={{ background: s.tint }}>
                   {s.image ? (
                     <Image
                       src={s.image}
                       alt={`${s.level} crochet patterns`}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
                       sizes="(max-width:768px) 100vw, 33vw"
                     />
                   ) : null}
