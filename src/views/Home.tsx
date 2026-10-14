@@ -157,19 +157,19 @@ function HeroCollage({ images }: { images: string[] }) {
   return (
     <>
       {/* Mobile <768: collage */}
-      <div className="grid grid-cols-2 gap-3 h-[280px] md:hidden">
+      <div className="grid grid-cols-2 gap-3 h-[220px] md:hidden">
         <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} className="row-span-2" priority sizes="50vw" />
         <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="40vw" />
         <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="40vw" />
       </div>
       {/* Tablet 768–1023: three equal tiles */}
-      <div className="hidden md:grid lg:hidden grid-cols-3 gap-4 h-[320px]">
+      <div className="hidden md:grid lg:hidden grid-cols-3 gap-4 h-[260px]">
         <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} priority sizes="30vw" />
         <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="30vw" />
         <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="30vw" />
       </div>
       {/* Laptop: collage beside copy */}
-      <div className="hidden lg:grid grid-cols-2 gap-4 h-[420px]">
+      <div className="hidden lg:grid grid-cols-2 gap-4 h-[360px]">
         <HeroTile src={slots[0]} label="Hero photo" tint={HERO_TINTS[0]} className="row-span-2" priority sizes="320px" />
         <HeroTile src={slots[1]} label="Pattern photo" tint={HERO_TINTS[1]} sizes="200px" />
         <HeroTile src={slots[2]} label="Pattern photo" tint={HERO_TINTS[2]} sizes="200px" />
@@ -302,38 +302,30 @@ export function Home({
   return (
     <div className="bg-bg">
       {/* Hero — DESIGN_SPEC §4.1.2 */}
-      <section className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-10 md:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+      <section className="max-w-site mx-auto page-gutter section-y">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
           <div>
-            <p className="inline-flex rounded-full bg-primary-soft px-3 py-1 text-[11px] font-bold tracking-[0.12em] uppercase text-primary mb-4">
+            <p className="text-[12px] font-semibold text-primary mb-3">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="font-heading text-[32px] md:text-5xl lg:text-[52px] font-bold leading-[1.1] text-ink mb-4">
+            <h1 className="type-h1 text-ink mb-3">
               Beautiful crochet patterns, ready to download.
             </h1>
-            <p className="text-[15px] text-muted leading-relaxed mb-7 max-w-md">
+            <p className="text-[15px] text-muted leading-relaxed mb-5 max-w-md">
               Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Link href={heroPrimaryHref(hero?.cta_link)} className="sm:flex-1 lg:flex-none">
-                <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
+                <Button variant="primary" size="md" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
                 </Button>
               </Link>
               <Link href={heroSecondaryHref(hero?.secondary_cta_link)} className="sm:flex-1 lg:flex-none">
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                <Button variant="secondary" size="md" className="w-full sm:w-auto">
                   {hero?.secondary_cta_text || 'Get a free pattern'}
                 </Button>
               </Link>
             </div>
-            <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] font-medium text-ink">
-              {['Instant download', 'Printable PDF', 'Secure checkout'].map((t) => (
-                <li key={t} className="flex items-center gap-1.5">
-                  <CheckTiny />
-                  {t}
-                </li>
-              ))}
-            </ul>
           </div>
           <HeroCollage images={hero?.images ?? []} />
         </div>
@@ -341,7 +333,7 @@ export function Home({
 
       {/* Trust strip — §4.1.3 */}
       <section className="border-y border-border bg-surface">
-        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-8 md:py-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="max-w-site mx-auto page-gutter py-8 md:py-9 grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {[
             { title: 'Instant download', body: 'PDF in your account in seconds' },
             { title: 'Guaranteed quality', body: 'Clear, tested instructions' },
@@ -362,9 +354,9 @@ export function Home({
       </section>
 
       {/* Featured — §4.1.4 */}
-      <section className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
-        <div className="flex items-end justify-between gap-4 mb-8">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink">Featured patterns</h2>
+      <section className="max-w-site mx-auto page-gutter section-y">
+        <div className="flex items-end justify-between gap-4 mb-6">
+          <h2 className="type-h2 text-ink">Featured patterns</h2>
           <Link href="/shop" className="text-[13px] font-semibold text-primary shrink-0 hover:underline underline-offset-2">
             <span className="md:hidden">View all</span>
             <span className="hidden md:inline">View all patterns →</span>
@@ -401,9 +393,9 @@ export function Home({
 
       {/* Shop by skill — §4.1.5 */}
       <section className="bg-surface-warm">
-        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">Shop by skill level</h2>
-          <p className="text-[14px] text-muted mb-8 max-w-lg">
+        <div className="max-w-site mx-auto page-gutter section-y">
+          <h2 className="type-h2 text-ink mb-2">Shop by skill level</h2>
+          <p className="text-[15px] text-muted mb-6 max-w-lg">
             Find patterns that match where you are right now.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -419,10 +411,10 @@ export function Home({
                     </span>
                   )}
                 </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <LevelBadge level={s.level} className="mb-3 self-start" />
-                  <h3 className="text-[17px] font-bold text-ink mb-1.5">{s.title}</h3>
-                  <p className="text-[14px] text-muted leading-relaxed mb-4 flex-1">{s.body}</p>
+                <div className="p-4 flex flex-col flex-1">
+                  <LevelBadge level={s.level} className="mb-2.5 self-start" />
+                  <h3 className="text-[16px] font-bold text-ink mb-1">{s.title}</h3>
+                  <p className="text-[14px] text-muted leading-relaxed mb-3 flex-1">{s.body}</p>
                   <Link href={s.link} className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
                     Browse {s.level} patterns →
                   </Link>
@@ -434,19 +426,19 @@ export function Home({
       </section>
 
       {/* Free pattern band — §4.1.6 */}
-      <section className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
+      <section className="max-w-site mx-auto page-gutter section-y">
         <div
-          className="rounded-[24px] p-6 md:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 lg:gap-8 items-center"
+          className="rounded-[20px] p-5 md:p-8 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-5 lg:gap-8 items-center"
           style={{ background: 'var(--color-tint-sage)' }}
         >
           <div>
-            <StatusBadge status="free" className="!bg-white !text-free mb-4" />
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-3">Start with a free pattern</h2>
-            <p className="text-[14px] text-muted leading-relaxed mb-6 max-w-md">
+            <StatusBadge status="free" className="!bg-white !text-free mb-3" />
+            <h2 className="type-h2 text-ink mb-2">Start with a free pattern</h2>
+            <p className="text-[15px] text-muted leading-relaxed mb-5 max-w-md">
               Download a free PDF, no account needed. See the quality for yourself before you buy.
             </p>
             <Link href="/shop?price=free" className="block sm:inline-block w-full sm:w-auto">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
+              <Button variant="primary" size="md" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
                 Download a free pattern
               </Button>
             </Link>
@@ -476,53 +468,41 @@ export function Home({
         </div>
       </section>
 
-      {/* What's inside — §4.1.7 */}
+      {/* What's inside — §4.1.7; text only (no fake PDF preview) */}
       <section className="bg-surface border-y border-border">
-        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="relative mx-auto w-full max-w-sm">
-            <div className="absolute inset-x-6 top-4 bottom-0 rounded-2xl bg-border/60 translate-y-2" aria-hidden />
-            <div className="absolute inset-x-3 top-2 bottom-0 rounded-2xl bg-border/40 translate-y-1" aria-hidden />
-            <div className="relative aspect-[3/4] rounded-2xl border border-border bg-white shadow-card flex items-center justify-center text-[13px] text-muted">
-              Sample pattern page
-            </div>
-          </div>
-          <div>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">What is inside every pattern</h2>
-            <p className="text-[14px] text-muted mb-8">Everything you need to finish the project, in one clean PDF.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 mb-8">
-              {(
-                [
-                  { t: 'Clear, round-by-round steps', d: 'Written instructions you can follow at your own pace.', icon: 'steps' as const },
-                  { t: 'Materials and size list', d: 'Yarn, hook, finished size and stitch abbreviations up front.', icon: 'list' as const },
-                  { t: 'Photos for tricky steps', d: 'Close-up pictures where a written line is not enough.', icon: 'camera' as const },
-                  { t: 'Printable PDF, yours for good', d: 'Download instantly and find it again in your account anytime.', icon: 'print' as const },
-                ] as const
-              ).map((f) => (
-                <div
-                  key={f.t}
-                  className="flex gap-3 rounded-2xl border border-border bg-surface p-4 md:border-0 md:bg-transparent md:p-0"
-                >
-                  <span className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center shrink-0">
-                    <InsideIcon name={f.icon} />
-                  </span>
-                  <div>
-                    <p className="text-[14px] font-bold text-ink mb-1">{f.t}</p>
-                    <p className="text-[13px] text-muted leading-relaxed">{f.d}</p>
-                  </div>
+        <div className="max-w-site mx-auto page-gutter section-y">
+          <h2 className="type-h2 text-ink mb-2">What is inside every pattern</h2>
+          <p className="text-[15px] text-muted mb-6">Everything you need to finish the project, in one clean PDF.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {(
+              [
+                { t: 'Clear, round-by-round steps', d: 'Written instructions you can follow at your own pace.', icon: 'steps' as const },
+                { t: 'Materials and size list', d: 'Yarn, hook, finished size and stitch abbreviations up front.', icon: 'list' as const },
+                { t: 'Photos for tricky steps', d: 'Close-up pictures where a written line is not enough.', icon: 'camera' as const },
+                { t: 'Printable PDF, yours for good', d: 'Download instantly and find it again in your account anytime.', icon: 'print' as const },
+              ] as const
+            ).map((f) => (
+              <div key={f.t} className="flex gap-3">
+                <span className="w-9 h-9 rounded-xl bg-primary-soft flex items-center justify-center shrink-0">
+                  <InsideIcon name={f.icon} />
+                </span>
+                <div>
+                  <p className="text-[14px] font-bold text-ink mb-0.5">{f.t}</p>
+                  <p className="text-[13px] text-muted leading-relaxed">{f.d}</p>
                 </div>
-              ))}
-            </div>
-            <Link href="/shop?price=free" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
-              Try a free pattern first →
-            </Link>
+              </div>
+            ))}
           </div>
+          <Link href="/shop?price=free" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
+            Try a free pattern first →
+          </Link>
         </div>
       </section>
 
       {/* Meet the maker — §4.1.8; hidden in production until owner copy/stats exist */}
       {!hideOwnerCopyPlaceholders && (
         <section className="bg-surface-warm">
-          <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div
               className="relative aspect-[4/5] rounded-2xl border border-border overflow-hidden"
               style={{ background: 'var(--color-tint-cream)' }}
@@ -530,9 +510,9 @@ export function Home({
               <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
             </div>
             <div>
-              <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-primary mb-3">Meet the maker</p>
+              <p className="text-[12px] font-semibold text-primary mb-2">Meet the maker</p>
               {/* TODO: story headline from owner */}
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-4">
+              <h2 className="type-h2 text-ink mb-3">
                 [Story headline: why these patterns exist]
               </h2>
               {/* TODO: maker story copy from owner */}
@@ -564,16 +544,16 @@ export function Home({
       {/* What makers say — §4.1.9 from reviews table; hide if none; 2 on mobile, 3 on md+ */}
       {makerReviews.length > 0 && (
         <section id="reviews" className="bg-surface-warm">
-          <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16">
-            <div className="text-center mb-10">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">What makers say</h2>
-              <p className="text-[14px] text-muted">Real reviews from people who made our patterns.</p>
+          <div className="max-w-site mx-auto page-gutter section-y">
+            <div className="text-center mb-7">
+              <h2 className="type-h2 text-ink mb-2">What makers say</h2>
+              <p className="text-[15px] text-muted">Real reviews from people who made our patterns.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {makerReviews.slice(0, 3).map((t, i) => (
                 <article
                   key={t.id}
-                  className={`rounded-2xl border border-border bg-surface p-6 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
+                  className={`rounded-2xl border border-border bg-surface p-5 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
                 >
                   <div
                     className="flex gap-0.5 mb-3 text-gold"
@@ -602,10 +582,10 @@ export function Home({
 
       {/* FAQ — §4.1.10 */}
       <section className="bg-bg border-t border-border">
-        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10">
+        <div className="max-w-site mx-auto page-gutter section-y grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-8">
           <div>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-ink mb-2">Questions, answered</h2>
-            <p className="text-[14px] text-muted mb-3">The basics before you buy.</p>
+            <h2 className="type-h2 text-ink mb-2">Questions, answered</h2>
+            <p className="text-[15px] text-muted mb-3">The basics before you buy.</p>
             {!hideOwnerCopyPlaceholders && (
               <p className="text-[14px] text-muted">
                 Still stuck? Write to {/* TODO: support email from owner */}
@@ -620,14 +600,6 @@ export function Home({
       {/* Newsletter — §4.1.11 */}
       <EmailSignup />
     </div>
-  )
-}
-
-function CheckTiny() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="text-free shrink-0">
-      <path d="M5 12.5l5 5L20 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   )
 }
 

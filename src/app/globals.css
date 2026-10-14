@@ -104,6 +104,14 @@
 
   --radius-card: 20px;
   --radius-image: 18px;
+
+  /* Shared type + spacing scale (Home/chrome first; reuse on later pages) */
+  --text-body: 0.9375rem;
+  --text-meta: 0.8125rem;
+  --text-h1: 1.75rem;
+  --text-h1-lg: 2.5rem;
+  --text-h2: 1.5rem;
+  --text-h2-lg: 2rem;
 }
 
 .mobile-nca-logo {
@@ -138,6 +146,42 @@ html {
 
 @utility shadow-image {
   box-shadow: var(--shadow-image);
+}
+
+@utility page-gutter {
+  padding-inline: 1.25rem;
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility section-y {
+  padding-block: 2rem;
+  @media (min-width: 768px) {
+    padding-block: 3rem;
+  }
+}
+
+@utility type-h1 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--text-h1);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  @media (min-width: 1024px) {
+    font-size: var(--text-h1-lg);
+  }
+}
+
+@utility type-h2 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--text-h2);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  @media (min-width: 768px) {
+    font-size: var(--text-h2-lg);
+  }
 }
 
 @media (min-width: 1920px) {

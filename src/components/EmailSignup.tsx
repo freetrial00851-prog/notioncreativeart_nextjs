@@ -26,10 +26,10 @@ export function EmailSignup() {
 
   return (
     <section className="bg-primary text-primary-contrast">
-      <div className="max-w-site mx-auto px-5 md:px-10 lg:px-8 py-12 md:py-14 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+      <div className="max-w-site mx-auto page-gutter section-y flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div className="min-w-0 lg:max-w-md">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-2">Get 10% off your next order</h2>
-          <p className="text-[14px] text-white/85 leading-relaxed">
+          <h2 className="type-h2 mb-2">Get 10% off your next order</h2>
+          <p className="text-[15px] text-white/85 leading-relaxed">
             Join the maker community. New patterns, straight to your inbox.
           </p>
         </div>
@@ -48,12 +48,12 @@ export function EmailSignup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
-                className="flex-1 min-h-12 rounded-full border-0 px-5 text-[14px] text-ink placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="flex-1 min-h-11 rounded-full border-0 px-5 text-[15px] text-ink placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="min-h-12 shrink-0 rounded-full bg-white px-6 text-[14px] font-semibold text-primary hover:bg-white/95 disabled:opacity-60"
+                className="min-h-11 shrink-0 rounded-full bg-white px-6 text-[14px] font-semibold text-primary hover:bg-white/95 disabled:opacity-60"
               >
                 {submitting ? 'Subscribing…' : 'Subscribe'}
               </button>

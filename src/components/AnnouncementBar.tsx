@@ -48,7 +48,7 @@ export function AnnouncementBar() {
 
   return (
     <div
-      className="w-full bg-primary text-primary-contrast text-center text-[12px] sm:text-[13px] tracking-[0.02em] py-2.5 px-4"
+      className="w-full bg-primary text-primary-contrast text-center text-[12px] sm:text-[13px] py-2 px-4"
       role="status"
       style={
         useCms && announcement
@@ -57,16 +57,16 @@ export function AnnouncementBar() {
       }
     >
       {cmsText ? (
-        <p key={messageIndex} className="max-w-site mx-auto leading-snug animate-[fadeIn_0.4s_ease-out]">
+        <p key={messageIndex} className="max-w-site mx-auto truncate leading-none animate-[fadeIn_0.4s_ease-out]">
           {cmsText}
         </p>
       ) : (
         <>
-          <p className="md:hidden max-w-site mx-auto leading-snug">{DEFAULT_BY_BREAKPOINT.mobile}</p>
-          <p className="hidden md:block lg:hidden max-w-site mx-auto leading-snug">
+          <p className="md:hidden max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.mobile}</p>
+          <p className="hidden md:block lg:hidden max-w-site mx-auto truncate leading-none">
             {DEFAULT_BY_BREAKPOINT.tablet}
           </p>
-          <p className="hidden lg:block max-w-site mx-auto leading-snug">{DEFAULT_BY_BREAKPOINT.desktop}</p>
+          <p className="hidden lg:block max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.desktop}</p>
         </>
       )}
     </div>

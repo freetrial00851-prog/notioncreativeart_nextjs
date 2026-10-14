@@ -140,7 +140,7 @@ export function Header() {
       {/* AnnouncementBar lives in CustomerShell (DESIGN_SPEC §3.1). */}
 
       {/* ── Desktop ≥1024: logo + text nav | search | heart, cart, Sign in ── */}
-      <div className="hidden desktop:flex items-center gap-4 lg:gap-6 px-6 md:px-10 lg:px-8 py-3.5 max-w-site w-full">
+      <div className="hidden desktop:flex items-center gap-4 lg:gap-6 page-gutter py-3 max-w-site w-full">
         <Logo variant="full" />
         <nav className="hidden lg:flex items-center gap-5 shrink-0" aria-label="Primary">
           {[
@@ -149,7 +149,7 @@ export function Header() {
             { href: '/shop?price=free', label: 'Free patterns' },
             { href: '/#reviews', label: 'Reviews' },
           ].map((l) => (
-            <Link key={l.href} href={l.href} className="text-[13px] font-medium text-ink whitespace-nowrap hover:text-primary">
+            <Link key={l.href} href={l.href} className="text-[14px] font-medium text-ink whitespace-nowrap hover:text-primary">
               {l.label}
             </Link>
           ))}
@@ -215,7 +215,7 @@ export function Header() {
       </div>
 
       {/* ── Tablet 768–1023: logo | search, heart, cart, hamburger (DESIGN_SPEC) ── */}
-      <div className="hidden tablet:flex desktop:hidden items-center justify-between gap-4 px-5 py-3 max-w-site w-full">
+      <div className="hidden tablet:flex desktop:hidden items-center justify-between gap-3 page-gutter py-2.5 max-w-site w-full">
         <Logo variant="full" />
         <div className="flex items-center gap-1 shrink-0">
           <button
@@ -267,7 +267,7 @@ export function Header() {
 
       {/* ── Mobile <768: hamburger, logo, search icon, cart (no heart) ── */}
       <div className="tablet:hidden relative z-50">
-        <div className="px-3 py-2 flex items-center gap-1 bg-canvas">
+        <div className="px-3 py-1.5 flex items-center gap-0.5 bg-canvas">
           <button
             type="button"
             onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
@@ -574,7 +574,7 @@ function HeaderActions({
         <button
           type="button"
           onClick={() => requireAuth()}
-          className="ml-1 inline-flex min-h-11 items-center rounded-full border-[1.5px] border-primary px-5 text-[13px] font-semibold text-primary hover:bg-primary-soft"
+          className="ml-1 inline-flex min-h-11 items-center rounded-full border-[1.5px] border-primary px-5 text-[14px] font-semibold text-primary hover:bg-primary-soft"
         >
           Sign in
         </button>

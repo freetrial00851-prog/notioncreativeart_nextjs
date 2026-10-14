@@ -33,7 +33,7 @@ export function Footer() {
 
   return (
     <footer className="bg-footer text-white">
-      <div className="max-w-site mx-auto px-5 md:px-10 lg:px-[120px] py-12 md:py-14">
+      <div className="max-w-site mx-auto page-gutter section-y">
         <div className="grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr] gap-x-6 gap-y-10">
           <div className="col-span-2 md:col-span-1 max-w-sm">
             <Logo variant="footer" className="mb-3" />
@@ -126,7 +126,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="max-w-site mx-auto px-5 md:px-10 lg:px-[120px] py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[12px] text-white/55">
+        <div className="max-w-site mx-auto page-gutter py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[12px] text-white/55">
           <p>© {year} Notion Creative Art. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link href="/privacy" className="hover:text-white">
@@ -161,7 +161,7 @@ function FooterCol({
 }) {
   return (
     <div className={className}>
-      <p className="text-[12px] font-bold tracking-wide mb-4">{title}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-normal text-white/80 mb-3">{title}</p>
       {children}
     </div>
   )

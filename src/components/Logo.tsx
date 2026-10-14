@@ -37,7 +37,7 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
           variant === 'compact'
             ? 'text-[18px]'
             : variant === 'full'
-              ? 'text-[18px] max-[387px]:text-[12px] max-[360px]:text-[11px] md:text-[20px]'
+              ? 'text-[16px] max-[387px]:text-[13px] max-[360px]:text-[12px] md:text-[18px]'
               : 'text-[18px] md:text-[20px]'
         }`}
         style={{
