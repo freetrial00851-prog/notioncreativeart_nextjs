@@ -265,9 +265,9 @@ export function Home({
   return (
     <div className="bg-bg">
       <section className="bg-surface-warm">
-        <div className="grid lg:min-h-[min(88vh,680px)] lg:grid-cols-2">
+        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-8 md:py-10 lg:grid-cols-2 lg:gap-10">
           <div
-            className="relative order-1 aspect-[4/5] min-h-[300px] lg:order-2 lg:aspect-auto lg:min-h-full"
+            className="relative order-1 mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-2xl lg:order-2 lg:max-w-none"
             style={{ background: HERO_FALLBACK_TINT }}
           >
             {heroPhoto ? (
@@ -278,7 +278,7 @@ export function Home({
                     alt={heroPhoto.alt}
                     fill
                     className="object-cover object-center"
-                    sizes="(max-width:1023px) 100vw, 50vw"
+                    sizes="(max-width:1023px) 100vw, 520px"
                     priority
                   />
                 </Link>
@@ -288,29 +288,29 @@ export function Home({
                   alt={heroPhoto.alt}
                   fill
                   className="object-cover object-center"
-                  sizes="(max-width:1023px) 100vw, 50vw"
+                  sizes="(max-width:1023px) 100vw, 520px"
                   priority
                 />
               )
             ) : null}
           </div>
-          <div className="order-2 flex flex-col justify-center page-gutter py-10 lg:order-1 lg:py-16">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+          <div className="order-2 lg:order-1">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-hero mb-5 max-w-lg text-ink">Crochet PDF patterns, ready to download.</h1>
-            <p className="mb-8 max-w-md text-[16px] leading-relaxed text-muted">
+            <h1 className="type-hero mb-4 max-w-lg text-ink">Crochet PDF patterns, ready to download.</h1>
+            <p className="mb-6 max-w-md text-[15px] leading-relaxed text-muted">
               Tested instant-download patterns for every skill level. Pay once, keep the file for life.
             </p>
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <Link href={heroPrimaryHref(hero?.cta_link)}>
-                <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
+                <Button variant="primary" size="md" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
                 </Button>
               </Link>
               <Link
                 href={heroSecondaryHref(hero?.secondary_cta_link)}
-                className="inline-flex min-h-[52px] items-center justify-center text-[15px] font-semibold text-primary hover:underline underline-offset-2"
+                className="inline-flex min-h-11 items-center justify-center text-[15px] font-semibold text-primary hover:underline underline-offset-2"
               >
                 {hero?.secondary_cta_text || 'Get a free pattern'}
               </Link>
@@ -378,9 +378,9 @@ export function Home({
 
       {browseCategories.map((c, i) => (
         <section key={c.id} className={i % 2 === 0 ? 'bg-surface-warm' : 'bg-bg'}>
-          <div className="grid lg:grid-cols-2 lg:min-h-[420px]">
+          <div className="mx-auto grid max-w-site items-center gap-6 page-gutter section-y lg:grid-cols-2 lg:gap-10">
             <div
-              className={`relative aspect-[4/3] lg:aspect-auto lg:min-h-full ${i % 2 === 1 ? 'lg:order-2' : ''}`}
+              className={`relative mx-auto aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl lg:max-w-none ${i % 2 === 1 ? 'lg:order-2' : ''}`}
               style={{ background: 'var(--color-tint-lavender)' }}
             >
               {c.image ? (
@@ -389,16 +389,16 @@ export function Home({
                   alt={`${c.name} crochet patterns`}
                   fill
                   className="object-cover object-center"
-                  sizes="(max-width:1023px) 100vw, 50vw"
+                  sizes="(max-width:1023px) 100vw, 440px"
                 />
               ) : null}
             </div>
-            <div className={`flex flex-col justify-center page-gutter py-10 lg:py-14 ${i % 2 === 1 ? 'lg:order-1' : ''}`}>
-              <p className="mb-3 text-[13px] font-semibold text-primary">
+            <div className={i % 2 === 1 ? 'lg:order-1' : undefined}>
+              <p className="mb-2 text-[13px] font-semibold text-primary">
                 {c.count} {c.count === 1 ? 'pattern' : 'patterns'}
               </p>
-              <h2 className="type-h1 mb-3 text-ink">{c.name}</h2>
-              <p className="mb-6 max-w-md text-[15px] leading-relaxed text-muted">
+              <h2 className="type-h2 mb-3 text-ink">{c.name}</h2>
+              <p className="mb-5 max-w-md text-[15px] leading-relaxed text-muted">
                 {c.copy?.trim() || `Shop ${c.name.toLowerCase()} crochet PDF patterns. Instant download, yours to keep.`}
               </p>
               <Link href={c.link}>
@@ -414,12 +414,12 @@ export function Home({
       <section className="border-y border-border bg-bg">
         <div className="max-w-site mx-auto page-gutter py-8 md:py-10">
           <h2 className="type-h2 mb-5 text-ink">Shop by skill</h2>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="flex flex-wrap gap-3">
             {skillLevels.map((s) => (
               <Link
                 key={s.level}
                 href={s.link}
-                className="flex min-h-12 flex-1 items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3 sm:min-w-[200px]"
+                className="inline-flex min-h-11 items-center gap-3 rounded-full border border-border bg-surface px-4"
               >
                 <span className="flex items-center gap-2">
                   <LevelBadge level={s.level} />
@@ -437,8 +437,8 @@ export function Home({
       </section>
 
       <section className="bg-primary text-primary-contrast">
-        <div className="grid lg:grid-cols-2">
-          <div className="flex flex-col justify-center page-gutter py-10 lg:py-14">
+        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-12 lg:grid-cols-2">
+          <div>
             <StatusBadge status="free" className="mb-4 !bg-white !text-free" />
             <h2 className="type-h2 mb-3">Start with a free crochet PDF</h2>
             <p className="mb-6 max-w-md text-[15px] leading-relaxed text-white/85">
@@ -455,19 +455,20 @@ export function Home({
               </Button>
             </Link>
           </div>
-          <div className="relative hidden min-h-[280px] lg:block">
-            {freeImages[0]?.images?.[0] ? (
-              <Link href={`/pattern/${freeImages[0].slug}`} className="absolute inset-0">
-                <Image
-                  src={freeImages[0].images[0]}
-                  alt={freeImages[0].title}
-                  fill
-                  className="object-cover object-center"
-                  sizes="50vw"
-                />
-              </Link>
-            ) : null}
-          </div>
+          {freeImages[0]?.images?.[0] ? (
+            <Link
+              href={`/pattern/${freeImages[0].slug}`}
+              className="relative mx-auto hidden aspect-square w-full max-w-[360px] overflow-hidden rounded-2xl lg:block"
+            >
+              <Image
+                src={freeImages[0].images[0]}
+                alt={freeImages[0].title}
+                fill
+                className="object-cover object-center"
+                sizes="360px"
+              />
+            </Link>
+          ) : null}
         </div>
       </section>
 
@@ -478,7 +479,7 @@ export function Home({
           <ol className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
             {HOW_STEPS.map((step) => (
               <li key={step.n}>
-                <p className="mb-3 font-heading text-[32px] font-bold leading-none text-primary">{step.n}</p>
+                <p className="mb-3 font-heading text-[24px] font-bold leading-none text-primary">{step.n}</p>
                 <p className="mb-1 text-[16px] font-bold text-ink">{step.t}</p>
                 <p className="text-[14px] leading-relaxed text-muted">{step.d}</p>
               </li>

@@ -108,12 +108,12 @@
   /* Shared type + spacing scale (Home/chrome first; reuse on later pages) */
   --text-body: 0.9375rem;
   --text-meta: 0.8125rem;
-  --text-h1: 1.875rem;
-  --text-h1-lg: 2.75rem;
-  --text-h2: 1.625rem;
-  --text-h2-lg: 2.125rem;
-  --text-hero: 2.25rem;
-  --text-hero-lg: 3.25rem;
+  --text-h1: 1.75rem;
+  --text-h1-lg: 2.5rem;
+  --text-h2: 1.5rem;
+  --text-h2-lg: 2rem;
+  --text-hero: 2rem;
+  --text-hero-lg: 2.75rem;
 }
 
 .mobile-nca-logo {
@@ -158,9 +158,9 @@ html {
 }
 
 @utility section-y {
-  padding-block: 2.5rem;
+  padding-block: 2rem;
   @media (min-width: 768px) {
-    padding-block: 4rem;
+    padding-block: 3rem;
   }
 }
 
