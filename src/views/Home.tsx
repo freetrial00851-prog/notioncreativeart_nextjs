@@ -11,7 +11,6 @@ import {
   setHomeCatalogCache,
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
-import type { CategoryWithCount } from '../lib/categories'
 import type { Product, HeroContent, ChapterContent, LayoutSection } from '../lib/types'
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
@@ -45,21 +44,6 @@ const SKILL_COPY: Record<
   },
 }
 
-const SHOP_SHORTCUTS = [
-  { href: '/shop', label: 'All patterns' },
-  { href: '/shop?price=free', label: 'Free PDFs' },
-  { href: '/shop?level=beginner', label: 'Beginner' },
-  { href: '/shop?sort=newest', label: 'New' },
-] as const
-
-const HOW_STEPS = [
-  { n: '1', t: 'Pick a pattern', d: 'Choose by skill, style, or start with a free PDF.' },
-  { n: '2', t: 'Download instantly', d: 'Checkout takes a minute. The file lands in your account.' },
-  { n: '3', t: 'Keep it for life', d: 'Re-download anytime from My downloads. No limits.' },
-] as const
-
-const HERO_FALLBACK_TINT = 'var(--color-tint-lavender)'
-
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
   return getHomeCatalogCache()
@@ -73,7 +57,6 @@ function applyCatalogSnapshot(
     setFreePatternCollage: (v: Product[]) => void
     setChapters: (v: ChapterContent[]) => void
     setHero: Dispatch<SetStateAction<HeroContent | null>>
-    setCategories: (v: CategoryWithCount[]) => void
     setSkillCounts: (v: HomeCatalogSnapshot['skillCounts']) => void
   },
 ) {
@@ -81,7 +64,6 @@ function applyCatalogSnapshot(
   setters.setFreeProduct(snap.freeProduct)
   setters.setFreePatternCollage(snap.freePatternCollage ?? [])
   setters.setChapters(snap.chapters)
-  setters.setCategories(snap.categories ?? [])
   setters.setSkillCounts(snap.skillCounts)
   if (snap.hero) {
     setters.setHero((prev) => {
@@ -141,7 +123,6 @@ export function Home({
   )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
   const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
-  const [categories, setCategories] = useState<CategoryWithCount[]>(() => seed?.categories ?? [])
   const [skillCounts, setSkillCounts] = useState<HomeCatalogSnapshot['skillCounts']>(
     () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
   )
@@ -154,19 +135,21 @@ export function Home({
 
   const reviewStatsMap = useReviewStatsMapForLists([trending])
   const featured = trending.slice(0, 4)
-  const heroPhoto = ((): HeroPhoto | null => {
-    for (const url of hero?.images ?? []) {
-      if (!url) continue
-      const match = trending.find((p) => p.images?.[0] === url)
-      return {
-        src: url,
-        alt: match?.title || 'Handmade crochet from Notion Creative Art',
-        href: match ? `/pattern/${match.slug}` : undefined,
-      }
+  const heroTiles = ((): (HeroPhoto | null)[] => {
+    const tiles: HeroPhoto[] = []
+    const seen = new Set<string>()
+    const add = (src: string | undefined, p?: Product) => {
+      if (!src || seen.has(src) || tiles.length >= 3) return
+      seen.add(src)
+      tiles.push({
+        src,
+        alt: p?.title || 'Handmade crochet from Notion Creative Art',
+        href: p ? `/pattern/${p.slug}` : undefined,
+      })
     }
-    const first = trending.find((p) => p.images?.[0])
-    if (!first?.images?.[0]) return null
-    return { src: first.images[0], alt: first.title, href: `/pattern/${first.slug}` }
+    for (const url of hero?.images ?? []) add(url, trending.find((p) => p.images?.[0] === url))
+    for (const p of trending) add(p.images?.[0], p)
+    return [tiles[0] ?? null, tiles[1] ?? null, tiles[2] ?? null]
   })()
   const freeImages = (
     freePatternCollage.length > 0
@@ -175,7 +158,6 @@ export function Home({
         ? [freeProduct]
         : []
   ).slice(0, 2)
-  const browseCategories = categories.slice(0, 3)
 
   useEffect(() => {
     let cancelled = false
@@ -185,7 +167,6 @@ export function Home({
       setFreePatternCollage,
       setChapters,
       setHero,
-      setCategories,
       setSkillCounts,
     }
 
@@ -262,76 +243,76 @@ export function Home({
     ? HOME_FAQ
     : [...HOME_FAQ, FAQ_ITEM_FILE_ISSUE_PLACEHOLDER]
 
+
   return (
     <div className="bg-bg">
-      <section className="bg-surface-warm">
-        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-8 md:py-10 lg:grid-cols-2 lg:gap-10">
-          <div
-            className="relative order-1 mx-auto aspect-square w-full max-w-[520px] overflow-hidden rounded-2xl lg:order-2 lg:max-w-none"
-            style={{ background: HERO_FALLBACK_TINT }}
-          >
-            {heroPhoto ? (
-              heroPhoto.href ? (
-                <Link href={heroPhoto.href} className="absolute inset-0" aria-label={heroPhoto.alt}>
-                  <Image
-                    src={heroPhoto.src}
-                    alt={heroPhoto.alt}
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width:1023px) 100vw, 520px"
-                    priority
-                  />
-                </Link>
-              ) : (
-                <Image
-                  src={heroPhoto.src}
-                  alt={heroPhoto.alt}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width:1023px) 100vw, 520px"
-                  priority
-                />
-              )
-            ) : null}
-          </div>
-          <div className="order-2 lg:order-1">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+      {/* 1 · Hero — DESIGN_SPEC §4.1 */}
+      <section>
+        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-8 md:py-12 lg:grid-cols-2 lg:gap-12 lg:py-16">
+          <div>
+            <p className="mb-5 inline-flex rounded-full bg-primary-soft px-3.5 py-2 text-[11px] font-bold uppercase leading-none tracking-[0.1em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-hero mb-4 max-w-lg text-ink">Crochet PDF patterns, ready to download.</h1>
-            <p className="mb-6 max-w-md text-[15px] leading-relaxed text-muted">
-              Tested instant-download patterns for every skill level. Pay once, keep the file for life.
+            <h1 className="type-hero mb-5 max-w-xl text-ink">Beautiful crochet patterns, ready to download.</h1>
+            <p className="mb-7 max-w-lg text-[16px] leading-relaxed text-muted lg:text-[18px]">
+              Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
             </p>
-            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <div className="mb-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <Link href={heroPrimaryHref(hero?.cta_link)}>
-                <Button variant="primary" size="md" className="w-full sm:w-auto" iconRight={<span aria-hidden>→</span>}>
+                <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<ArrowGlyph />}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
                 </Button>
               </Link>
-              <Link
-                href={heroSecondaryHref(hero?.secondary_cta_link)}
-                className="inline-flex min-h-11 items-center justify-center text-[15px] font-semibold text-primary hover:underline underline-offset-2"
-              >
-                {hero?.secondary_cta_text || 'Get a free pattern'}
+              <Link href={heroSecondaryHref(hero?.secondary_cta_link)}>
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                  {hero?.secondary_cta_text || 'Get a free pattern'}
+                </Button>
               </Link>
             </div>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-muted">
+              {['Instant download', 'Printable PDF', 'Secure checkout'].map((t) => (
+                <li key={t} className="inline-flex items-center gap-2">
+                  <TickGlyph />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="grid h-[320px] grid-cols-[11fr_10fr] grid-rows-2 gap-3 sm:h-[400px] md:gap-4 lg:h-[480px]">
+            <HeroTile photo={heroTiles[0]} tint="var(--color-tint-lavender)" className="row-span-2" priority />
+            <HeroTile photo={heroTiles[1]} tint="var(--color-tint-sage)" />
+            <HeroTile photo={heroTiles[2]} tint="var(--color-surface-warm)" />
           </div>
         </div>
       </section>
 
-      <section className="max-w-site mx-auto page-gutter section-y">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="type-h2 mb-2 text-ink">Featured crochet patterns</h2>
-            <p className="max-w-xl text-[15px] leading-relaxed text-muted">
-              Instant PDF download. Yours to keep.
-            </p>
-          </div>
+      {/* 2 · Trust strip */}
+      <section className="border-y border-border bg-surface">
+        <ul className="mx-auto grid max-w-site grid-cols-2 gap-x-4 gap-y-6 page-gutter py-6 lg:grid-cols-4 lg:py-7">
+          {TRUST_ITEMS.map((item) => (
+            <li key={item.title} className="flex flex-col items-start gap-3 lg:flex-row lg:items-center">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+                {item.icon}
+              </span>
+              <span>
+                <span className="block text-[14px] font-bold leading-snug text-ink">{item.title}</span>
+                <span className="block text-[13px] leading-snug text-muted">{item.body}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* 3 · Featured patterns */}
+      <section className="max-w-site mx-auto page-gutter py-10 md:py-14">
+        <div className="mb-7 flex items-end justify-between gap-4 md:mb-9">
+          <h2 className="home-h2 text-ink">Featured patterns</h2>
           <Link
             href="/shop"
-            className="hidden shrink-0 text-[14px] font-semibold text-primary hover:underline underline-offset-2 sm:inline-flex"
+            className="inline-flex shrink-0 items-center gap-2 text-[14px] font-semibold text-primary hover:underline underline-offset-2"
           >
-            Shop all
+            View all patterns <ArrowGlyph />
           </Link>
         </div>
         {!catalogReady ? (
@@ -355,158 +336,149 @@ export function Home({
         ) : featured.length === 0 ? (
           <p className="text-[14px] text-muted">No featured patterns yet.</p>
         ) : (
-          <>
-            <PatternGrid variant="featured">
-              {featured.map((p, i) => (
-                <PatternCard key={p.id} product={p} priority={i < 2} reviewStats={reviewStatsMap.get(p.id)} />
-              ))}
-            </PatternGrid>
-            <nav aria-label="Shop shortcuts" className="mt-8 flex flex-wrap gap-x-5 gap-y-2">
-              {SHOP_SHORTCUTS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-[13px] font-semibold text-ink underline-offset-2 hover:text-primary hover:underline"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </>
+          <PatternGrid variant="featured">
+            {featured.map((p, i) => (
+              <PatternCard key={p.id} product={p} priority={i < 2} reviewStats={reviewStatsMap.get(p.id)} />
+            ))}
+          </PatternGrid>
         )}
       </section>
 
-      {browseCategories.map((c, i) => (
-        <section key={c.id} className={i % 2 === 0 ? 'bg-surface-warm' : 'bg-bg'}>
-          <div className="mx-auto grid max-w-site items-center gap-6 page-gutter section-y lg:grid-cols-2 lg:gap-10">
-            <div
-              className={`relative mx-auto aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl lg:max-w-none ${i % 2 === 1 ? 'lg:order-2' : ''}`}
-              style={{ background: 'var(--color-tint-lavender)' }}
-            >
-              {c.image ? (
-                <Image
-                  src={c.image}
-                  alt={`${c.name} crochet patterns`}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width:1023px) 100vw, 440px"
-                />
-              ) : null}
-            </div>
-            <div className={i % 2 === 1 ? 'lg:order-1' : undefined}>
-              <p className="mb-2 text-[13px] font-semibold text-primary">
-                {c.count} {c.count === 1 ? 'pattern' : 'patterns'}
-              </p>
-              <h2 className="type-h2 mb-3 text-ink">{c.name}</h2>
-              <p className="mb-5 max-w-md text-[15px] leading-relaxed text-muted">
-                {c.copy?.trim() || `Shop ${c.name.toLowerCase()} crochet PDF patterns. Instant download, yours to keep.`}
-              </p>
-              <Link href={c.link}>
-                <Button variant="primary" size="md">
-                  Shop {c.name}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-      ))}
-
-      <section className="border-y border-border bg-bg">
-        <div className="max-w-site mx-auto page-gutter py-8 md:py-10">
-          <h2 className="type-h2 mb-5 text-ink">Shop by skill</h2>
-          <div className="flex flex-wrap gap-3">
+      {/* 4 · Shop by skill level */}
+      <section className="bg-surface-warm">
+        <div className="max-w-site mx-auto page-gutter py-10 md:py-14">
+          <h2 className="home-h2 mb-2 text-ink">Shop by skill level</h2>
+          <p className="mb-8 text-[15px] text-muted md:text-[16px]">Find patterns that match where you are right now.</p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
             {skillLevels.map((s) => (
               <Link
                 key={s.level}
                 href={s.link}
-                className="inline-flex min-h-11 items-center gap-3 rounded-full border border-border bg-surface px-4"
+                className="group flex flex-col rounded-3xl border border-border bg-surface p-4 shadow-card"
               >
-                <span className="flex items-center gap-2">
-                  <LevelBadge level={s.level} />
-                  <span className="text-[14px] font-semibold text-ink">{s.title}</span>
+                <div
+                  className="relative mb-5 aspect-[2/1] overflow-hidden rounded-2xl"
+                  style={{ background: s.tint }}
+                >
+                  {s.image ? (
+                    <Image
+                      src={s.image}
+                      alt={`${s.title} crochet patterns`}
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width:767px) 100vw, 360px"
+                    />
+                  ) : null}
+                </div>
+                <LevelBadge level={s.level} className="mb-3 self-start" />
+                <h3 className="mb-2 text-[20px] font-bold leading-snug text-ink">{s.title}</h3>
+                <p className="mb-5 text-[15px] leading-relaxed text-muted">{s.body}</p>
+                <span className="mt-auto inline-flex items-center gap-2 text-[14px] font-bold text-primary group-hover:underline underline-offset-2">
+                  Browse {s.level} patterns <ArrowGlyph />
                 </span>
-                {s.count > 0 ? (
-                  <span className="text-[13px] text-muted">
-                    {s.count}
-                  </span>
-                ) : null}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-primary text-primary-contrast">
-        <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-12 lg:grid-cols-2">
+      {/* 5 · Free pattern band */}
+      <section className="max-w-site mx-auto page-gutter py-8 md:py-10">
+        <div className="grid items-center gap-8 rounded-3xl border border-border bg-tint-sage p-6 md:p-10 lg:grid-cols-2">
           <div>
             <StatusBadge status="free" className="mb-4 !bg-white !text-free" />
-            <h2 className="type-h2 mb-3">Start with a free crochet PDF</h2>
-            <p className="mb-6 max-w-md text-[15px] leading-relaxed text-white/85">
-              Download a free pattern with no account. See the quality before you buy.
+            <h2 className="home-h2 mb-3 text-ink">Start with a free pattern</h2>
+            <p className="mb-7 max-w-md text-[15px] leading-relaxed text-muted md:text-[16px]">
+              Download a free PDF, no account needed. See the quality for yourself before you buy.
             </p>
             <Link href="/shop?price=free" className="block w-full sm:inline-block sm:w-auto">
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full border-0 bg-white text-primary hover:bg-white/95 sm:w-auto"
-                iconLeft={<DownloadGlyph />}
-              >
+              <Button variant="primary" size="lg" className="w-full sm:w-auto" iconLeft={<DownloadGlyph />}>
                 Download a free pattern
               </Button>
             </Link>
           </div>
-          {freeImages[0]?.images?.[0] ? (
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            {[0, 1].map((i) => {
+              const p = freeImages[i]
+              const src = p?.images?.[0]
+              return (
+                <div key={i} className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
+                  {p && src ? (
+                    <Link href={`/pattern/${p.slug}`} className="absolute inset-0" aria-label={p.title}>
+                      <Image src={src} alt={p.title} fill className="object-cover object-center" sizes="(max-width:1023px) 45vw, 260px" />
+                    </Link>
+                  ) : null}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 6 · What is inside every pattern */}
+      <section className="mt-6 border-y border-border bg-bg md:mt-10">
+        <div className="max-w-site mx-auto grid items-center gap-10 page-gutter py-10 md:py-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <div className="relative mx-auto aspect-[5/4] w-full max-w-[460px]" aria-hidden>
+            <div className="absolute inset-0 -rotate-[2deg] rounded-3xl" style={{ background: 'var(--color-tint-sage)' }} />
+            <div className="absolute inset-0 rotate-[1.5deg] rounded-3xl" style={{ background: 'var(--color-tint-lavender)' }} />
+            <div className="absolute inset-0 flex flex-col justify-center gap-3 rounded-3xl border border-border bg-white p-8 shadow-card">
+              <span className="h-3 w-1/2 rounded-full bg-tint-lavender" />
+              <span className="h-2 w-full rounded-full bg-border" />
+              <span className="h-2 w-11/12 rounded-full bg-border" />
+              <span className="h-2 w-4/5 rounded-full bg-border" />
+              <span className="mt-3 h-3 w-1/3 rounded-full bg-tint-sage" />
+              <span className="h-2 w-full rounded-full bg-border" />
+              <span className="h-2 w-3/4 rounded-full bg-border" />
+            </div>
+          </div>
+          <div>
+            <h2 className="home-h2 mb-2 text-ink">What is inside every pattern</h2>
+            <p className="mb-8 text-[15px] text-muted md:text-[16px]">
+              Everything you need to finish the project, in one clean PDF.
+            </p>
+            <ul className="mb-8 grid gap-6 sm:grid-cols-2">
+              {INSIDE_ITEMS.map((f) => (
+                <li key={f.title} className="flex gap-4">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                    {f.icon}
+                  </span>
+                  <span>
+                    <span className="block text-[15px] font-bold leading-snug text-ink">{f.title}</span>
+                    <span className="mt-1 block text-[14px] leading-relaxed text-muted">{f.body}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
             <Link
-              href={`/pattern/${freeImages[0].slug}`}
-              className="relative mx-auto hidden aspect-square w-full max-w-[360px] overflow-hidden rounded-2xl lg:block"
+              href="/shop?price=free"
+              className="inline-flex items-center gap-2 text-[14px] font-bold text-primary hover:underline underline-offset-2"
             >
-              <Image
-                src={freeImages[0].images[0]}
-                alt={freeImages[0].title}
-                fill
-                className="object-cover object-center"
-                sizes="360px"
-              />
+              Try a free pattern first <ArrowGlyph />
             </Link>
-          ) : null}
+          </div>
         </div>
       </section>
 
-      <section className="bg-surface-warm">
-        <div className="max-w-site mx-auto page-gutter section-y">
-          <h2 className="type-h2 mb-2 text-ink">How it works</h2>
-          <p className="mb-8 max-w-xl text-[15px] text-muted">No shipping wait. Your PDF is ready as soon as you pay.</p>
-          <ol className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
-            {HOW_STEPS.map((step) => (
-              <li key={step.n}>
-                <p className="mb-3 font-heading text-[24px] font-bold leading-none text-primary">{step.n}</p>
-                <p className="mb-1 text-[16px] font-bold text-ink">{step.t}</p>
-                <p className="text-[14px] leading-relaxed text-muted">{step.d}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
+      {/* 7 · Meet the maker — copy and numbers come from the owner (hidden in production until supplied) */}
       {!hideOwnerCopyPlaceholders && (
-        <section className="bg-surface-warm">
-          <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter section-y lg:grid-cols-2">
+        <section className="bg-bg">
+          <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter py-10 md:py-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
             <div
-              className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border"
+              className="relative aspect-[5/4] overflow-hidden rounded-3xl border border-border md:aspect-[6/5] lg:aspect-[6/5]"
               style={{ background: 'var(--color-tint-cream)' }}
             >
               <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
             </div>
             <div>
-              <p className="mb-2 text-[12px] font-semibold text-primary">Meet the maker</p>
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.1em] text-primary">Meet the maker</p>
               {/* TODO: story headline from owner */}
-              <h2 className="type-h2 mb-3 text-ink">[Story headline: why these patterns exist]</h2>
+              <h2 className="home-h2 mb-4 text-ink">[Story headline: why these patterns exist]</h2>
               {/* TODO: maker story copy from owner */}
-              <p className="mb-8 text-[15px] leading-relaxed text-muted">
+              <p className="mb-7 max-w-xl text-[15px] leading-relaxed text-muted md:text-[16px]">
                 [Two or three sentences in your own voice: who designs the patterns, how each one is tested, and what a
                 buyer can trust about them.]
               </p>
-              <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+              <div className="mb-7 flex flex-wrap gap-x-10 gap-y-4">
                 {[
                   { n: '[N]', l: 'Patterns designed' },
                   { n: '[N]', l: 'Makers helped' },
@@ -514,38 +486,42 @@ export function Home({
                 ].map((s) => (
                   <div key={s.l}>
                     {/* TODO: real stats from owner */}
-                    <p className="text-2xl font-extrabold text-primary">{s.n}</p>
-                    <p className="text-[12px] text-muted">{s.l}</p>
+                    <p className="text-[28px] font-extrabold leading-none text-primary">{s.n}</p>
+                    <p className="mt-1 text-[13px] text-muted">{s.l}</p>
                   </div>
                 ))}
               </div>
-              <Link href="/about" className="text-[13px] font-semibold text-primary hover:underline underline-offset-2">
-                Read our story →
+              <Link
+                href="/about"
+                className="inline-flex items-center gap-2 text-[14px] font-bold text-primary hover:underline underline-offset-2"
+              >
+                Read our story <ArrowGlyph />
               </Link>
             </div>
           </div>
         </section>
       )}
 
+      {/* 8 · What makers say — hidden when there are no reviews */}
       {makerReviews.length > 0 && (
         <section id="reviews" className="bg-surface-warm">
-          <div className="max-w-site mx-auto page-gutter section-y">
-            <div className="mb-7">
-              <h2 className="type-h2 mb-2 text-ink">What makers say</h2>
-              <p className="text-[15px] text-muted">Real reviews from people who made our patterns.</p>
+          <div className="max-w-site mx-auto page-gutter py-10 md:py-14">
+            <div className="mb-8 text-center">
+              <h2 className="home-h2 mb-2 text-ink">What makers say</h2>
+              <p className="text-[15px] text-muted md:text-[16px]">Real reviews from people who made our patterns.</p>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
               {makerReviews.slice(0, 3).map((t, i) => (
                 <article
                   key={t.id}
-                  className={`rounded-2xl border border-border bg-surface p-5 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
+                  className={`rounded-3xl border border-border bg-surface p-6 shadow-card ${i === 2 ? 'hidden md:block' : ''}`}
                 >
-                  <div className="mb-3 flex gap-0.5 text-gold" aria-label={`${t.rating} out of 5 stars`}>
+                  <div className="mb-4 flex gap-1 text-gold" aria-label={`${t.rating} out of 5 stars`}>
                     {Array.from({ length: 5 }).map((_, si) => (
                       <Star key={si} filled={si < Math.round(t.rating)} />
                     ))}
                   </div>
-                  <p className="mb-5 text-[14px] leading-relaxed text-ink">&ldquo;{t.body}&rdquo;</p>
+                  <p className="mb-5 text-[15px] leading-relaxed text-ink">&ldquo;{t.body}&rdquo;</p>
                   <p className="text-[13px] font-semibold text-ink">
                     {t.reviewerFirstName}
                     <span className="font-normal text-muted"> · {t.patternTitle}</span>
@@ -557,13 +533,14 @@ export function Home({
         </section>
       )}
 
-      <section className="border-t border-border bg-bg">
-        <div className="max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter section-y lg:grid-cols-[0.9fr_1.1fr]">
+      {/* 9 · Questions, answered */}
+      <section className="bg-bg">
+        <div className="max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter py-10 md:py-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
-            <h2 className="type-h2 mb-2 text-ink">Crochet PDF pattern FAQs</h2>
-            <p className="mb-3 text-[15px] text-muted">The basics before you buy a digital pattern.</p>
+            <h2 className="home-h2 mb-3 text-ink">Questions, answered</h2>
+            <p className="mb-3 text-[15px] text-muted md:text-[16px]">The basics before you buy.</p>
             {!hideOwnerCopyPlaceholders && (
-              <p className="text-[14px] text-muted">
+              <p className="text-[15px] text-muted">
                 Still stuck? Write to {/* TODO: support email from owner */}
                 <span className="text-primary underline">[SUPPORT EMAIL]</span>
               </p>
@@ -577,6 +554,154 @@ export function Home({
     </div>
   )
 }
+
+function HeroTile({
+  photo,
+  tint,
+  className = '',
+  priority = false,
+}: {
+  photo: HeroPhoto | null
+  tint: string
+  className?: string
+  priority?: boolean
+}) {
+  const image = photo ? (
+    <Image
+      src={photo.src}
+      alt={photo.alt}
+      fill
+      className="object-cover object-center"
+      sizes="(max-width:1023px) 50vw, 340px"
+      priority={priority}
+    />
+  ) : null
+  return (
+    <div
+      className={`relative overflow-hidden rounded-3xl border border-border ${className}`}
+      style={{ background: tint }}
+    >
+      {photo?.href ? (
+        <Link href={photo.href} className="absolute inset-0" aria-label={photo.alt}>
+          {image}
+        </Link>
+      ) : (
+        image
+      )}
+    </div>
+  )
+}
+
+function ArrowGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function TickGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="text-free">
+      <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+const ICON_PROPS = {
+  width: 20,
+  height: 20,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.8,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+  'aria-hidden': true,
+} as const
+
+const TRUST_ITEMS = [
+  {
+    title: 'Instant download',
+    body: 'PDF in your account in seconds',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M12 4v11M8 11l4 4 4-4M5 19h14" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Guaranteed quality',
+    body: 'Clear, tested instructions',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8.5 12.5l2.5 2.5 4.5-5" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Secure payment',
+    body: 'Checkout by Lemon Squeezy',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Lifetime access',
+    body: 'Re-download anytime',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+        <path d="M20 4v5h-5" />
+      </svg>
+    ),
+  },
+]
+
+const INSIDE_ITEMS = [
+  {
+    title: 'Clear, round-by-round steps',
+    body: 'Written instructions you can follow at your own pace.',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <circle cx="12" cy="12" r="8" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Materials and size list',
+    body: 'Yarn, hook, finished size and stitch abbreviations up front.',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Photos for tricky steps',
+    body: 'Close-up pictures where a written line is not enough.',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M4 8h3l1.5-2h7L17 8h3v11H4V8z" />
+        <circle cx="12" cy="13" r="3.2" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Printable PDF, yours for good',
+    body: 'Download instantly and find it again in your account anytime.',
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M7 9V4h10v5M7 17H5v-7h14v7h-2M7 14h10v6H7v-6z" />
+      </svg>
+    ),
+  },
+]
 
 function DownloadGlyph() {
   return (
