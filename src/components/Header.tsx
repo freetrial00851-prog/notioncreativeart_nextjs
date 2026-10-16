@@ -39,7 +39,7 @@ const POPULAR_SEARCHES = [
 const NAV_LABEL =
   'text-[11px] font-semibold uppercase tracking-[0.11em] text-ink transition-colors hover:text-coral'
 
-const TILE_COLORS = ['#BCECF4', '#FFB9D5', '#CBB5FF', '#FFE16A'] as const
+const TILE_COLORS = ['#F2F2F2', '#EDEDED', '#F5F5F5', '#EBEBEB'] as const
 
 export function Header() {
   const { user, profile, signOut, loading: authLoading } = useAuth()
@@ -535,7 +535,7 @@ function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]
     'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (
     <div className="absolute left-[-1rem] top-full z-50 pt-3">
-      <div className="w-[min(780px,calc(100vw-4rem))] rounded-[5px] border-2 border-ink bg-bg p-7 shadow-[6px_6px_0_0_#202044]">
+      <div className="w-[min(780px,calc(100vw-4rem))] rounded-[5px] border-2 border-ink bg-bg p-7 shadow-[6px_6px_0_0_#111111]">
         <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-9">
           <div>
             <p className={colHead}>Categories</p>
@@ -606,7 +606,7 @@ function AccountDropdown({
   const item = 'flex min-h-11 items-center px-5 text-[13px] font-medium text-ink transition-colors hover:bg-surface-warm hover:text-violet'
   return (
     <div className="absolute right-0 top-full z-50 pt-3">
-      <div className="w-[260px] overflow-hidden rounded-[5px] border-2 border-ink bg-bg shadow-[6px_6px_0_0_#202044]">
+      <div className="w-[260px] overflow-hidden rounded-[5px] border-2 border-ink bg-bg shadow-[6px_6px_0_0_#111111]">
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-[5px] bg-violet text-[15px] font-semibold text-white">
             {profileInitial(profile, email)}

@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#FFFAF2',
+  themeColor: '#FFFFFF',
 }
 
 /** Site-wide metadata defaults — child pages override title, description, canonical, and image. */

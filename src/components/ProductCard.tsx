@@ -204,7 +204,7 @@ export function ProductCard({
   )
 }
 
-const TILE_COLORS = ['#BCECF4', '#FFB9D5', '#CBB5FF', '#FFE16A'] as const
+const TILE_COLORS = ['#F2F2F2', '#EDEDED', '#F5F5F5', '#EBEBEB'] as const
 
 /** Stable colour per product (same card never changes colour between renders/pages). */
 function tileColor(id: string): string {

@@ -269,7 +269,7 @@ export function Home({
               </div>
             </div>
           ) : null}
-          <p className="absolute bottom-[26px] left-[29px] z-[3] hidden font-heading text-[19px] leading-tight text-[#2a2a52] sm:block">
+          <p className="absolute bottom-[26px] left-[29px] z-[3] hidden font-heading text-[19px] leading-tight text-ink sm:block">
             Make something amazing
             <small className="mt-[7px] block font-sans text-[9px] font-semibold uppercase tracking-[0.18em]">
               Patterns for your next project
@@ -355,7 +355,7 @@ export function Home({
       {/* 4 · Collections (navy band) */}
       <section id="collections" className="scroll-mt-20 bg-navy py-[58px] text-white md:py-20">
         <div className="mx-auto max-w-site page-gutter">
-          <p className="eyebrow text-sun">Find your kind of making</p>
+          <p className="eyebrow text-white before:bg-white">Find your kind of making</p>
           <div className="mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <h2 className="font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
               A little something
@@ -479,7 +479,7 @@ export function Home({
             )}
           </div>
           <div className="self-center p-[26px] md:p-12">
-            <p className="eyebrow text-white before:bg-sun">A little gift from us</p>
+            <p className="eyebrow text-white before:bg-white">A little gift from us</p>
             <h2 className="my-[17px] font-heading text-[clamp(34px,4vw,48px)] font-normal leading-[1.08] tracking-[-0.035em]">
               Good things start with one stitch.
             </h2>

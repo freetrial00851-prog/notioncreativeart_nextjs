@@ -23,7 +23,7 @@ export function EmailSignup() {
   return (
     <section className="bg-pink-soft text-ink">
       <div className="mx-auto max-w-site page-gutter py-14 text-center md:py-[70px]">
-        <p className="eyebrow justify-center text-[#6220C5]">Notes from our creative corner</p>
+        <p className="eyebrow justify-center text-ink">Notes from our creative corner</p>
         <h2 className="mx-auto my-4 max-w-3xl font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
           {subscribed ? "You're on the list." : 'A little inspiration in your inbox.'}
         </h2>
