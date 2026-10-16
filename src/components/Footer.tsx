@@ -44,11 +44,6 @@ export function Footer() {
             <p className="text-[13px] leading-relaxed text-white/70 mb-4">
               Instant digital crochet patterns for makers of every level. Create something wonderful.
             </p>
-            <div className="flex flex-wrap gap-2">
-              {/* Social hrefs: TODO wire from site_settings.social when present */}
-              <SocialPill label="Instagram" />
-              <SocialPill label="Pinterest" />
-            </div>
           </div>
 
           <FooterCol title="SHOP">
@@ -171,10 +166,3 @@ function FooterCol({
   )
 }
 
-function SocialPill({ label }: { label: string }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/25 px-3 py-1.5 text-[12px] text-white/80">
-      {label}
-    </span>
-  )
-}

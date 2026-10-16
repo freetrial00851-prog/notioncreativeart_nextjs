@@ -257,7 +257,7 @@ export function Home({
             <p className="mb-7 max-w-lg text-[16px] leading-relaxed text-muted lg:text-[18px]">
               Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
             </p>
-            <div className="mb-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <Link href={heroPrimaryHref(hero?.cta_link)}>
                 <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<ArrowGlyph />}>
                   {(hero?.cta_text || 'Shop all patterns').replace(/\s*→\s*$/, '')}
@@ -269,14 +269,6 @@ export function Home({
                 </Button>
               </Link>
             </div>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-muted">
-              {['Instant download', 'Printable PDF', 'Secure checkout'].map((t) => (
-                <li key={t} className="inline-flex items-center gap-2">
-                  <TickGlyph />
-                  {t}
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="grid aspect-[6/5] w-full grid-cols-[11fr_10fr] grid-rows-2 gap-3 md:aspect-[2.9/1] md:grid-cols-[13fr_10fr_10fr] md:grid-rows-1 md:gap-4 lg:aspect-[6/5] lg:grid-cols-[11fr_10fr] lg:grid-rows-2">
@@ -600,13 +592,6 @@ function ArrowGlyph() {
   )
 }
 
-function TickGlyph() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="text-free">
-      <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
 
 const ICON_PROPS = {
   width: 20,

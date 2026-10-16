@@ -316,6 +316,8 @@ export function Shop({
     goShop(q ? `${path}?${q}` : path)
   }
 
+  const hasBundlesCategory = parentCategories.some((c) => c.name.trim().toLowerCase() === 'bundles')
+
   /** Category row “All patterns” — active when not on a category / free / sale path. */
   const isAllPatterns = !categorySlug && priceFilter !== 'free' && !saleFilter && categorySlug !== 'sale'
   const isFreePill = priceFilter === 'free'
@@ -355,7 +357,13 @@ export function Shop({
         </p>
 
         {/* Desktop category pills — laptop only */}
-        <div className="hidden lg:flex flex-wrap gap-2 mb-3">
+        <div
+          className="scrollbar-none -mx-1 mb-3 hidden gap-2 overflow-x-auto px-1 pb-1 pr-12 lg:flex"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to right, #000 calc(100% - 56px), transparent)',
+            maskImage: 'linear-gradient(to right, #000 calc(100% - 56px), transparent)',
+          }}
+        >
           <FilterPill
             active={isAllPatterns}
             onClick={() => {
@@ -428,17 +436,21 @@ export function Shop({
               </button>
             )
           })}
-          <span className="w-px h-5 bg-border mx-1" aria-hidden />
-          <button
-            type="button"
-            onClick={toggleBundle}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium ${
-              bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
-            }`}
-          >
-            {bundleFilter ? <CheckIcon /> : null}
-            Bundles
-          </button>
+          {!hasBundlesCategory && (
+            <>
+            <span className="w-px h-5 bg-border mx-1" aria-hidden />
+            <button
+              type="button"
+              onClick={toggleBundle}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium ${
+                bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
+              }`}
+            >
+              {bundleFilter ? <CheckIcon /> : null}
+              Bundles
+            </button>
+            </>
+          )}
           <div className="flex-1 min-w-2" />
           <button
             type="button"
@@ -634,7 +646,7 @@ function FilterPill({
   onNavigate?: (href: string) => void
   onClick?: () => void
 }) {
-  const className = `inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-medium transition-colors ${
+  const className = `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-2 text-[13px] font-medium transition-colors ${
     active ? 'border-transparent bg-primary text-white' : 'border-border bg-surface text-ink hover:bg-surface-warm'
   }`
   if (href && onNavigate) {

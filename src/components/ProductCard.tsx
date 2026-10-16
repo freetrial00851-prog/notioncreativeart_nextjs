@@ -202,7 +202,7 @@ export function ProductCard({
         {/* Bottom-left skill */}
         {skillLabel && product.skill_level && (
           <span
-            className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold leading-none"
+            className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-full px-3 py-1.5 text-[11px] font-semibold leading-none shadow-[0_1px_3px_rgba(17,24,39,0.18)]"
             style={SKILL_PILL_STYLES[product.skill_level]}
           >
             {skillLabel}

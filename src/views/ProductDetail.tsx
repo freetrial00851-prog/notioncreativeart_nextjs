@@ -62,7 +62,7 @@ function preloadGalleryStage(cardUrl: string) {
   document.head.appendChild(link)
 }
 
-type DescriptionBlock = { type: 'heading' | 'check' | 'warning' | 'paragraph'; content: string }
+type DescriptionBlock = { type: 'heading' | 'check' | 'bullet' | 'warning' | 'paragraph'; content: string }
 
 function formatDescription(text: string): DescriptionBlock[] {
   const blocks: DescriptionBlock[] = []
@@ -78,6 +78,7 @@ function formatDescription(text: string): DescriptionBlock[] {
     if (!line) { flush(); continue }
     if (/^[_\-─—]{3,}$/.test(line)) continue
     if (/^[✓✔]\s*/.test(line)) { flush(); blocks.push({ type: 'check', content: line.replace(/^[✓✔]\s*/, '') }); continue }
+    if (/^[-•*]\s+\S/.test(line)) { flush(); blocks.push({ type: 'bullet', content: line.replace(/^[-•*]\s+/, '') }); continue }
     if (/^[⚠️!]\s*(note|warning)/i.test(line) || /^⚠/.test(line)) { flush(); blocks.push({ type: 'warning', content: line.replace(/^[⚠️!]\s*/, '') }); continue }
     if (line.length <= 40 && !/[.!?]$/.test(line) && /^[A-Z0-9][A-Z0-9\s&'.,]*$/.test(line) && line === line.toUpperCase() && /[A-Z]{2}/.test(line)) {
       flush()
@@ -92,12 +93,12 @@ function formatDescription(text: string): DescriptionBlock[] {
 
 function DescriptionBlocks({ text }: { text: string }) {
   return (
-    <div className="space-y-3">
+    <div className="max-w-[68ch] space-y-3">
       {formatDescription(text).map((b, i) => {
         if (b.type === 'heading') {
           return <p key={i} className="text-[13px] font-semibold text-ink mt-5 first:mt-0">{b.content}</p>
         }
-        if (b.type === 'check') {
+        if (b.type === 'check' || b.type === 'bullet') {
           return <TickLine key={i}>{b.content}</TickLine>
         }
         if (b.type === 'warning') {
