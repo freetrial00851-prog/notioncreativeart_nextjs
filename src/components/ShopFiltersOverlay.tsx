@@ -123,7 +123,7 @@ export function ShopFiltersOverlay({
       <button
         type="button"
         onClick={onApply}
-        className="min-h-11 px-6 rounded-full bg-primary text-white text-[14px] font-semibold hover:bg-primary-hover"
+        className="min-h-11 px-6 rounded-[3px] bg-primary text-white text-[14px] font-semibold hover:bg-primary-hover"
       >
         Show {resultCount} pattern{resultCount === 1 ? '' : 's'}
       </button>
@@ -136,7 +136,7 @@ export function ShopFiltersOverlay({
         <button type="button" className="absolute inset-0 bg-ink/40" aria-label="Close filters" onClick={onClose} />
         <div className="absolute left-0 right-0 bottom-0 bg-surface rounded-t-2xl flex flex-col max-h-[88dvh] shadow-[0_-8px_32px_rgba(0,0,0,0.12)]">
           <div className="flex justify-center pt-2.5 pb-1" aria-hidden>
-            <span className="w-10 h-1 rounded-full bg-border" />
+            <span className="w-10 h-1 rounded-[3px] bg-border" />
           </div>
           <div className="flex items-center justify-between px-5 pb-3">
             <h2 className="text-[18px] font-bold text-ink">Filters</h2>
@@ -200,12 +200,12 @@ function RadioRow({
       className="w-full flex items-center gap-3 min-h-11 text-left text-[15px] text-ink"
     >
       <span
-        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+        className={`w-5 h-5 rounded-[3px] border-2 flex items-center justify-center shrink-0 ${
           checked ? 'border-primary' : 'border-border'
         }`}
         aria-hidden
       >
-        {checked ? <span className="w-2.5 h-2.5 rounded-full bg-primary" /> : null}
+        {checked ? <span className="w-2.5 h-2.5 rounded-[3px] bg-primary" /> : null}
       </span>
       <span className="flex-1">{label}</span>
       {typeof count === 'number' ? (
@@ -258,7 +258,7 @@ function CloseBtn({ onClick }: { onClick: () => void }) {
       type="button"
       aria-label="Close"
       onClick={onClick}
-      className="w-9 h-9 rounded-full bg-surface-warm flex items-center justify-center text-ink text-lg leading-none"
+      className="w-9 h-9 rounded-[3px] bg-surface-warm flex items-center justify-center text-ink text-lg leading-none"
     >
       ×
     </button>

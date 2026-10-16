@@ -194,7 +194,7 @@ export function ProductExportModal({ categories, onClose }: Props) {
             type="button"
             onClick={onClose}
             disabled={exporting}
-            className="px-4 py-2 text-[13px] border border-line rounded-full bg-white hover:bg-surface disabled:opacity-50"
+            className="px-4 py-2 text-[13px] border border-line rounded-[3px] bg-white hover:bg-surface disabled:opacity-50"
           >
             Cancel
           </button>
@@ -202,7 +202,7 @@ export function ProductExportModal({ categories, onClose }: Props) {
             type="button"
             onClick={handleDownload}
             disabled={exporting || selectedFieldKeys.length === 0}
-            className="px-4 py-2 text-[13px] rounded-full text-white disabled:opacity-50"
+            className="px-4 py-2 text-[13px] rounded-[3px] text-white disabled:opacity-50"
             style={{ background: '#222' }}
           >
             {exporting ? 'Preparing…' : 'Download CSV'}

@@ -87,7 +87,7 @@ export function AuthPanel({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-2 top-2 md:right-4 md:top-4 touch-target inline-flex items-center justify-center rounded-full text-ink hover:bg-surface-warm"
+          className="absolute right-2 top-2 md:right-4 md:top-4 touch-target inline-flex items-center justify-center rounded-[3px] text-ink hover:bg-surface-warm"
         >
           <MaterialIcon name="close" size={24} />
         </button>
@@ -96,13 +96,13 @@ export function AuthPanel({
       <p className="text-center text-[17px] md:text-[18px] font-bold leading-none text-primary" style={{ fontFamily: 'var(--font-logo)' }}>
         Notion Creative Art
       </p>
-      <Heading id={titleId} className="mt-3 text-center font-heading text-[26px] font-bold leading-tight tracking-[-0.02em] text-ink md:text-[28px]">
+      <Heading id={titleId} className="mt-3 text-center font-heading text-[26px] font-normal leading-tight tracking-[-0.02em] text-ink md:text-[28px]">
         {title}
       </Heading>
       <p className="mx-auto mt-1.5 max-w-[360px] text-center text-[14px] md:text-[15px] leading-snug text-muted">{subtitle}</p>
 
       {main && (
-        <div role="group" aria-label="Choose sign in or create account" className="mt-5 grid grid-cols-2 gap-1 rounded-full bg-surface-warm p-1">
+        <div role="group" aria-label="Choose sign in or create account" className="mt-5 grid grid-cols-2 gap-1 rounded-[3px] bg-surface-warm p-1">
           {(['login', 'signup'] as const).map((v) => {
             const selected = view === v
             return (
@@ -111,7 +111,7 @@ export function AuthPanel({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => onViewChange(v)}
-                className={`min-h-11 rounded-full px-3 text-[14px] md:text-[15px] font-semibold transition-colors ${
+                className={`min-h-11 rounded-[3px] px-3 text-[14px] md:text-[15px] font-semibold transition-colors ${
                   selected ? 'bg-surface text-primary shadow-[0_1px_3px_rgba(22,24,29,0.12)]' : 'text-muted hover:text-ink'
                 }`}
               >
@@ -149,7 +149,7 @@ export function AuthPanel({
               onClick={() =>
                 void (view === 'login' ? login : signup).signInWithGoogle(oauthReturnTo)
               }
-              className="flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm transition-colors"
+              className="flex min-h-12 w-full items-center justify-center gap-3 rounded-[3px] border border-border bg-surface px-5 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm transition-colors"
             >
               <GoogleIcon />
               Continue with Google
@@ -257,7 +257,7 @@ function PasswordInput({
         onClick={onToggle}
         aria-label={show ? 'Hide password' : 'Show password'}
         aria-pressed={show}
-        className="absolute right-1 top-1/2 -translate-y-1/2 touch-target inline-flex items-center justify-center rounded-full text-muted hover:text-ink"
+        className="absolute right-1 top-1/2 -translate-y-1/2 touch-target inline-flex items-center justify-center rounded-[3px] text-muted hover:text-ink"
       >
         <MaterialIcon name={show ? 'visibility_off' : 'visibility'} size={20} />
       </button>
@@ -271,7 +271,7 @@ function SubmitButton({ busy, children, busyLabel }: { busy: boolean; children: 
       type="submit"
       disabled={busy}
       aria-busy={busy || undefined}
-      className="flex min-h-12 w-full items-center justify-center rounded-full bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait transition-colors"
+      className="flex min-h-12 w-full items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait transition-colors"
     >
       {busy ? busyLabel : children}
     </button>
@@ -499,7 +499,7 @@ function ForgotPassword({ login }: { login: ReturnType<typeof useLoginForm> }) {
 function VerifySent({ signup, onSignIn }: { signup: ReturnType<typeof useSignUpForm>; onSignIn: () => void }) {
   return (
     <div className="text-center">
-      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
         <MaterialIcon name="mark_email_read" size={28} color="var(--color-primary)" />
       </span>
       <p className="text-[15px] text-muted">We sent a verification link to</p>
@@ -508,14 +508,14 @@ function VerifySent({ signup, onSignIn }: { signup: ReturnType<typeof useSignUpF
       <div className="mt-6 space-y-3">
         <a
           href="mailto:"
-          className="flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover"
+          className="flex min-h-11 w-full items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover"
         >
           Open email app
         </a>
         <button
           type="button"
           onClick={() => void signup.resendVerification(signup.email)}
-          className="flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-surface px-6 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm"
+          className="flex min-h-11 w-full items-center justify-center rounded-[3px] border border-border bg-surface px-6 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm"
         >
           Resend email
         </button>

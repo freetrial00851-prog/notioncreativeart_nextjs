@@ -1,17 +1,17 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-export const ACCOUNT_CARD = 'rounded-[20px] border border-border bg-surface'
+export const ACCOUNT_CARD = 'rounded-[5px] border border-border bg-surface'
 
 export const PRIMARY_PILL =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-50'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-[3px] bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-50'
 export const SECONDARY_PILL =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-6 text-[15px] md:text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-50'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] md:text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-50'
 export const TEXT_LINK =
   'inline-flex min-h-11 items-center text-[15px] md:text-[14px] font-semibold text-primary hover:underline underline-offset-2'
 
 export const SELECT_PILL =
-  'min-h-11 rounded-full border border-border bg-surface px-4 pr-9 text-[15px] md:text-[14px] font-semibold text-ink'
+  'min-h-11 rounded-[3px] border border-border bg-surface px-4 pr-9 text-[15px] md:text-[14px] font-semibold text-ink'
 
 export function formatMoney(amount: number, currency: string) {
   try {
@@ -36,7 +36,7 @@ export function OrderStatusPill({ status }: { status: string }) {
       : status === 'refunded'
         ? ['Refunded', 'bg-sale/10 text-sale']
         : ['Pending', 'bg-surface-soft text-muted']
-  return <span className={`shrink-0 rounded-full px-3 py-1 text-[12px] font-bold ${cls}`}>{label}</span>
+  return <span className={`shrink-0 rounded-[3px] px-3 py-1 text-[12px] font-bold ${cls}`}>{label}</span>
 }
 
 export function AccountPageHeader({ title, subtitle }: { title: string; subtitle?: ReactNode }) {

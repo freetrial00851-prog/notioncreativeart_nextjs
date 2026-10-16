@@ -1,36 +1,24 @@
 import type { Metadata, Viewport } from 'next'
-import { Baloo_2, Manrope, Playfair_Display } from 'next/font/google'
+import { DM_Serif_Display, Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
 import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
-/** Manrope — body, nav, UI. Self-hosted via next/font (no layout shift). */
-const manrope = Manrope({
+/** Inter — body, nav, buttons, UI. Self-hosted via next/font (no layout shift). */
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-manrope',
+  variable: '--font-inter',
   display: 'swap',
 })
 
-/**
- * Playfair Display — homepage / marketing `font-heading` only.
- * preload: false — not used above-the-fold on PDP (titles use Manrope `font-display`);
- * still available via CSS variable when a below-fold section needs it.
- */
-const playfair = Playfair_Display({
+/** DM Serif Display — headings, wordmark and product names (`font-heading`). One weight (400) by design. */
+const dmSerif = DM_Serif_Display({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-playfair',
-  display: 'swap',
-  preload: false,
-})
-
-/** Baloo 2 — logo wordmark only (NCA / NotionCreativeArt). Preload kept: logo is ATF in Header. */
-const baloo2 = Baloo_2({
-  subsets: ['latin'],
-  weight: ['700', '800'],
-  variable: '--font-baloo-2',
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-dm-serif',
   display: 'swap',
 })
 
@@ -39,7 +27,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#FCFBF8',
+  themeColor: '#FFFAF2',
 }
 
 /** Site-wide metadata defaults — child pages override title, description, canonical, and image. */
@@ -74,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={`${manrope.variable} ${playfair.variable} ${baloo2.variable}`}>
+    <html lang="en" className={`${inter.variable} ${dmSerif.variable}`}>
       <head>
         {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -156,8 +156,8 @@ export function Cart() {
       <div className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-12">
         {topNav}
         <h1 className="type-h1 text-ink mt-3 md:mt-4">Your cart</h1>
-        <div className="mt-5 rounded-[20px] border border-border bg-surface px-5 py-10 text-center">
-          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+        <div className="mt-5 rounded-[5px] border border-border bg-surface px-5 py-10 text-center">
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
             <MaterialIcon name="shopping_bag" size={28} color="var(--color-primary)" />
           </span>
           <p className="type-h2 text-ink mb-2">Your cart is empty</p>
@@ -167,7 +167,7 @@ export function Cart() {
           <div className="mx-auto flex w-full max-w-[300px] flex-col items-center gap-3">
             <Link
               href="/shop"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-[3px] bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
             >
               Shop all patterns
             </Link>
@@ -194,7 +194,7 @@ export function Cart() {
       </h1>
 
       <div className="mt-6 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-6">
-        <ul className="rounded-[20px] border border-border bg-surface px-4 md:px-6 py-2 md:py-3">
+        <ul className="rounded-[5px] border border-border bg-surface px-4 md:px-6 py-2 md:py-3">
           {lines.map(({ product_id, product }) => {
             const onSale = isOnSale(product)
             const busy = busyId === product_id
@@ -279,7 +279,7 @@ export function Cart() {
 
         <aside
           aria-labelledby="order-summary-title"
-          className="rounded-[20px] border border-border bg-surface p-5 md:p-6 lg:p-5 lg:sticky lg:top-24"
+          className="rounded-[5px] border border-border bg-surface p-5 md:p-6 lg:p-5 lg:sticky lg:top-24"
         >
           <h2 id="order-summary-title" className="text-[17px] font-bold text-ink mb-3">
             Order summary

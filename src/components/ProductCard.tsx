@@ -10,14 +10,11 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
-import { getStatusBadge, skillLevelTagLabel, SKILL_PILL_STYLES } from '../lib/productCardMeta'
-import { StatusBadge } from './ui/Badge'
+import { getStatusBadge, skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 
-const IMAGE_SHADOW = '0 2px 8px rgba(17,24,39,0.06)'
-const IMAGE_SHADOW_HOVER = '0 6px 16px rgba(17,24,39,0.12)'
 
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
@@ -38,46 +35,6 @@ function StarIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--color-gold)" aria-hidden focusable="false">
       <path d="M12 2.8l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 16.7 6.6 19.6l1-6.1L3.2 9.2l6.1-.9L12 2.8z" />
-    </svg>
-  )
-}
-
-function BagPlusIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path
-        d="M6 8h12l-.7 11.2a2 2 0 0 1-2 1.8H8.7a2 2 0 0 1-2-1.8L6 8z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 8V6.5A3 3 0 0 1 12 3.5v0a3 3 0 0 1 3 3V8"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M12 12v4M10 14h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function DownloadArrowIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path d="M12 4v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 18h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
-      <path d="M5 12.5l5 5 9-10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -149,133 +106,123 @@ export function ProductCard({
 
   const prefetch = () => prefetchProduct(product.slug)
 
+  const tile = tileColor(product.id)
+  const addLabel = inCart ? `Remove ${product.title} from cart` : `Add ${product.title} to cart`
+  const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Download free ↓') : inCart ? 'In your bag ✓' : 'Add to bag +'
+
   return (
     <article className="group/card flex h-full flex-col">
-      {/* Image block */}
+      {/* Coloured mat with the real photo framed inside (reference tile style) */}
       <div
-        className="relative aspect-square overflow-hidden rounded-2xl bg-surface-warm transition-[transform,box-shadow] duration-200 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover/card:-translate-y-0.5 motion-reduce:[@media(hover:hover)]:group-hover/card:translate-y-0"
-        style={{ boxShadow: IMAGE_SHADOW }}
-        onMouseEnter={(e) => {
-          prefetch()
-          if (window.matchMedia('(hover: hover)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            e.currentTarget.style.boxShadow = IMAGE_SHADOW_HOVER
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = IMAGE_SHADOW
-        }}
+        className="relative aspect-[4/4.6] overflow-hidden rounded-[5px]"
+        style={{ background: tile }}
+        onMouseEnter={prefetch}
         onTouchStart={prefetch}
       >
-        <Link href={href} className="absolute inset-0 z-0 block" aria-label={product.title} tabIndex={-1}>
+        <Link href={href} className="absolute inset-0 z-0 flex items-center justify-center p-3 md:p-4" aria-label={product.title} tabIndex={-1}>
           {product.images?.[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.title}
-              fill
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              priority={priority}
-              className={`object-cover ${product.sold_out ? 'opacity-50' : ''}`}
-            />
+            <span className="relative block aspect-[4/3] w-full overflow-hidden rounded-[3px] bg-white/50 shadow-[0_10px_18px_rgba(32,32,68,0.16)]">
+              <Image
+                src={product.images[0]}
+                alt={product.title}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                priority={priority}
+                className={`object-cover transition-transform duration-500 [@media(hover:hover)]:group-hover/card:scale-[1.05] ${product.sold_out ? 'opacity-50' : ''}`}
+              />
+            </span>
           ) : (
-            <span className="flex h-full w-full items-center justify-center text-ink-soft text-xs">No image yet</span>
+            <span className="text-xs text-ink/60">No image yet</span>
           )}
         </Link>
 
-        {/* Top-left: at most one status badge (see getStatusBadge) */}
         {statusBadge && (
-          <div className="pointer-events-none absolute left-3 top-3 z-10">
-            <StatusBadge status={statusBadge} />
-          </div>
+          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-[3px] bg-white px-[9px] py-[7px] text-[9px] font-bold uppercase leading-none tracking-[0.13em] text-ink">
+            {STATUS_LABEL[statusBadge]}
+          </span>
         )}
 
-        {/* Top-right wishlist */}
         <button
           type="button"
           onClick={toggleWishlist}
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
           aria-pressed={inWishlist}
-          className="absolute right-3 top-3 z-10 inline-flex size-11 items-center justify-center rounded-full bg-white shadow-sm transition-opacity hover:opacity-90"
+          className="absolute right-1 top-1 z-10 inline-flex size-11 items-center justify-center"
         >
-          <HeartIcon filled={inWishlist} />
+          <span className="flex size-8 items-center justify-center rounded-[3px] bg-white">
+            <HeartIcon filled={inWishlist} />
+          </span>
         </button>
 
-        {/* Bottom-left skill */}
-        {skillLabel && product.skill_level && (
-          <span
-            className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-full px-3 py-1.5 text-[11px] font-semibold leading-none shadow-[0_1px_3px_rgba(17,24,39,0.18)]"
-            style={SKILL_PILL_STYLES[product.skill_level]}
+        {!product.sold_out && (
+          <button
+            type="button"
+            onClick={free ? downloadFree : toggleCart}
+            disabled={free && downloadingFree}
+            aria-label={free ? `Download ${product.title} free` : addLabel}
+            className="absolute inset-x-3 bottom-3 z-10 min-h-11 rounded-[3px] bg-navy px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:translate-y-1 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
           >
-            {skillLabel}
-          </span>
+            {quickLabel}
+          </button>
         )}
       </div>
 
-      {/* Info block */}
-      <div className="mt-1.5 flex min-h-0 flex-1 flex-col gap-1.5">
-        <h3 className="min-h-[2.6em] text-[14px] font-bold leading-snug text-ink">
+      <div className="px-px pb-1 pt-[15px]">
+        {skillLabel && (
+          <p className="mb-[7px] text-[9px] font-bold uppercase leading-none tracking-[0.13em] text-violet">{skillLabel}</p>
+        )}
+        <h3 className="mb-[9px] font-heading text-[17px] font-normal leading-[1.3] text-ink">
           <Link
             href={href}
             onMouseEnter={prefetch}
             onTouchStart={prefetch}
-            className="line-clamp-2 [@media(hover:hover)]:group-hover/card:text-primary [@media(hover:hover)]:group-hover/card:underline"
+            className="line-clamp-2 transition-colors [@media(hover:hover)]:group-hover/card:text-violet"
           >
             {product.title}
           </Link>
         </h3>
-
-        {showRating && (
-          <p className="flex items-center gap-1 text-[12px] text-muted">
-            <StarIcon />
-            <span>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[12px] font-extrabold text-ink">
+          {free ? (
+            <span className="font-extrabold text-violet">Free</span>
+          ) : (
+            <>
+              <span>${product.price.toFixed(2)}</span>
+              {isOnSale && product.compare_at_price != null && (
+                <del className="text-[10px] font-bold text-muted">${product.compare_at_price.toFixed(2)}</del>
+              )}
+            </>
+          )}
+          {showRating && (
+            <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted">
+              <StarIcon />
               {reviewStats!.averageRating.toFixed(1)} ({reviewStats!.reviewCount})
             </span>
-          </p>
-        )}
-
-        <div className="mt-auto flex items-center justify-between gap-2 pt-0.5">
-          <div className="min-w-0">
-            {free ? (
-              <p className="text-[15px] font-bold text-free md:text-base">Free</p>
-            ) : (
-              <>
-                <p className="text-[15px] font-bold text-primary md:text-base">
-                  ${product.price.toFixed(2)}
-                </p>
-                {isOnSale && product.compare_at_price != null && (
-                  <p className="text-[13px] text-muted line-through">
-                    ${product.compare_at_price.toFixed(2)}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-
-          {!product.sold_out && (
-            free ? (
-              <button
-                type="button"
-                onClick={downloadFree}
-                disabled={downloadingFree}
-                aria-label={`Download ${product.title} free`}
-                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-colors [@media(hover:hover)]:hover:bg-primary-hover active:scale-[0.96] disabled:opacity-60 motion-reduce:active:scale-100"
-              >
-                <DownloadArrowIcon />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={toggleCart}
-                aria-label={inCart ? `Remove ${product.title} from cart` : `Add ${product.title} to cart`}
-                className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full text-white transition-colors active:scale-[0.96] motion-reduce:active:scale-100 ${
-                  inCart ? 'bg-primary-hover' : 'bg-primary [@media(hover:hover)]:hover:bg-primary-hover'
-                }`}
-              >
-                {inCart ? <CheckIcon /> : <BagPlusIcon />}
-              </button>
-            )
           )}
         </div>
       </div>
     </article>
   )
+}
+
+const TILE_COLORS = ['#BCECF4', '#FFB9D5', '#CBB5FF', '#FFE16A'] as const
+
+/** Stable colour per product (same card never changes colour between renders/pages). */
+function tileColor(id: string): string {
+  // FNV-1a mix so near-identical ids (uuids sharing prefixes) still spread across all four colours.
+  let h = 2166136261
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  h ^= h >>> 15
+  h = Math.imul(h, 2246822507)
+  h ^= h >>> 13
+  return TILE_COLORS[(h >>> 0) % TILE_COLORS.length]
+}
+
+const STATUS_LABEL: Record<NonNullable<ReturnType<typeof getStatusBadge>>, string> = {
+  sold_out: 'Sold out',
+  sale: 'Sale',
+  new: 'New arrival',
+  featured: 'Bestseller',
 }

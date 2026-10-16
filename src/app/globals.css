@@ -3,53 +3,71 @@
 @theme {
   /* ── DESIGN_SPEC.md tokens (eyedropper-refined from design-reference PNGs) ── */
 
-  --color-primary: #1F249C;
-  --color-primary-hover: #191d7d;
-  --color-primary-soft: #e9eaf5;
+  /* Colourful landing page palette */
+  --color-navy: #202044;
+  --color-violet: #762BE8;
+  --color-coral: #FF5938;
+  --color-sun: #FFD84D;
+  --color-pink: #FF9BC8;
+  --color-pink-soft: #FFADD0;
+  --color-aqua: #BCECF4;
+  --color-lilac: #CBB5FF;
+  --color-butter: #FFE16A;
+
+  /* Sharp-ish geometry: 3-5px instead of pills and big radii */
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 5px;
+  --radius-2xl: 5px;
+  --radius-3xl: 5px;
+
+  --color-primary: #202044;
+  --color-primary-hover: #762BE8;
+  --color-primary-soft: #EFE7FF;
   --color-primary-contrast: #FFFFFF;
 
   /* Logo / star orange (DESIGN_SPEC "accent") — do NOT alias nav CTAs here;
      legacy `accent` below stays mapped to primary navy so existing UI keeps working. */
-  --color-logo-accent: #D68A3E;
-  --color-brand-orange: #D68A3E;
+  --color-logo-accent: #FF5938;
+  --color-brand-orange: #FF5938;
 
-  --color-background: #FCFBF8;
-  --color-bg: #FCFBF8;
+  --color-background: #FFFAF2;
+  --color-bg: #FFFAF2;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #F7F2EC;
-  --color-surface-soft: #F8F4ED;
+  --color-surface-warm: #FFF0F6;
+  --color-surface-soft: #FFF5EA;
   --color-surface-card: #FFFFFF;
   --color-card: #FFFFFF;
-  --color-border: #E4DED3;
-  --color-footer: #202720;
+  --color-border: #EADCF0;
+  --color-footer: #202044;
 
-  --color-text: #16181D;
-  --color-muted: #5A6270;
-  --color-text-muted: #5A6270;
-  --color-muted-light: #9AA1A9;
+  --color-text: #202044;
+  --color-muted: #625E78;
+  --color-text-muted: #625E78;
+  --color-muted-light: #9B96B0;
 
-  --color-gold: #E0A030;
-  --color-star: #E0A030;
-  --color-sale: #B3302F;
-  --color-sale-dark: #B3302F;
-  --color-free: #2F5A1F;
-  --color-success-bg: #EEF2E8;
+  --color-gold: #F5A300;
+  --color-star: #F5A300;
+  --color-sale: #D92D20;
+  --color-sale-dark: #D92D20;
+  --color-free: #762BE8;
+  --color-success-bg: #F3EBFF;
   --color-error: #B94A48;
   --color-error-dark: #963A38;
-  --color-skeleton: #E5DFD4;
+  --color-skeleton: #EDE3F3;
 
   /* Pattern card placeholder tints */
-  --color-tint-sage: #EEF1E8;
-  --color-tint-lavender: #E8E8F6;
-  --color-tint-cream: #FDF1CF;
-  --color-tint-peach: #FAE3DA;
+  --color-tint-sage: #BCECF4;
+  --color-tint-lavender: #CBB5FF;
+  --color-tint-cream: #FFE16A;
+  --color-tint-peach: #FFB9D5;
 
   /* Legacy aliases — accent* = primary navy (historical CTA token) */
   --color-accent: var(--color-primary);
   --color-accent-hover: var(--color-primary-hover);
   --color-accent-soft: var(--color-primary-soft);
-  --color-secondary: #6F8760;
-  --color-secondary-soft: #EEF2E8;
+  --color-secondary: #762BE8;
+  --color-secondary-soft: #F3EBFF;
   --color-canvas: var(--color-background);
   --color-linen: var(--color-background);
   --color-ink: var(--color-text);
@@ -69,27 +87,27 @@
   --color-sale-red: var(--color-sale);
 
   /* Skill pills — DESIGN_SPEC §2 */
-  --color-skill-beginner-soft: #C7E5A8;
-  --color-skill-beginner-ink: #2F5A1F;
-  --color-skill-intermediate-soft: #FCE08C;
-  --color-skill-intermediate-ink: #7A5200;
-  --color-skill-advanced-soft: #F6B9A6;
-  --color-skill-advanced-ink: #8A2F1B;
+  --color-skill-beginner-soft: #BCECF4;
+  --color-skill-beginner-ink: #0F4C5C;
+  --color-skill-intermediate-soft: #FFE16A;
+  --color-skill-intermediate-ink: #5A4300;
+  --color-skill-advanced-soft: #CBB5FF;
+  --color-skill-advanced-ink: #3B1A8A;
 
   /* Fonts — Manrope body/UI; Playfair headings; Baloo logo */
-  --font-display: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-subheading: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body: var(--font-manrope), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: var(--font-manrope), system-ui, sans-serif;
-  --font-heading: var(--font-playfair), Georgia, serif;
-  --font-logo: var(--font-baloo-2), 'Baloo 2', system-ui, sans-serif;
+  --font-display: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-subheading: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-dm-serif), Georgia, 'Times New Roman', serif;
+  --font-logo: var(--font-dm-serif), Georgia, serif;
 
   /* Content column — ~1200px laptop (DESIGN_SPEC §1) */
-  --max-width-site: 1200px;
+  --max-width-site: 1600px;
 
   /* Soft card shadow (DESIGN_SPEC §2) */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
-  --shadow-image: 0 2px 8px rgba(17, 24, 39, 0.06);
+  --shadow-card: 0 1px 2px rgba(32, 32, 68, 0.04), 0 8px 24px rgba(32, 32, 68, 0.06);
+  --shadow-image: 0 2px 8px rgba(32, 32, 68, 0.08);
 
   /* Header layout: align with Tailwind md/lg (768 / 1024) per DESIGN_SPEC §1.
      Keep named tablet/desktop for any remaining legacy classes. */
@@ -102,16 +120,16 @@
   --breakpoint-design-md: 768px;
   --breakpoint-design-lg: 1024px;
 
-  --radius-card: 20px;
-  --radius-image: 18px;
+  --radius-card: 5px;
+  --radius-image: 5px;
 
   /* Shared type + spacing scale (Home/chrome first; reuse on later pages) */
   --text-body: 0.9375rem;
   --text-meta: 0.8125rem;
-  --text-h1: 1.75rem;
-  --text-h1-lg: 2.5rem;
-  --text-h2: 1.5rem;
-  --text-h2-lg: 2rem;
+  --text-h1: 2.5rem;
+  --text-h1-lg: 3.5rem;
+  --text-h2: 2.125rem;
+  --text-h2-lg: 3.25rem;
   --text-hero: 2.125rem;
   --text-hero-lg: 3.5rem;
 }
@@ -151,10 +169,7 @@ html {
 }
 
 @utility page-gutter {
-  padding-inline: 1.25rem;
-  @media (min-width: 768px) {
-    padding-inline: 2rem;
-  }
+  padding-inline: clamp(1.25rem, 5.5vw, 5.5rem);
 }
 
 @utility section-y {
@@ -166,10 +181,10 @@ html {
 
 @utility type-h1 {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 400;
   font-size: var(--text-h1);
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   @media (min-width: 1024px) {
     font-size: var(--text-h1-lg);
   }
@@ -177,10 +192,10 @@ html {
 
 @utility type-h2 {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 400;
   font-size: var(--text-h2);
   line-height: 1.25;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   @media (min-width: 768px) {
     font-size: var(--text-h2-lg);
   }
@@ -188,10 +203,10 @@ html {
 
 @utility type-hero {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 400;
   font-size: var(--text-hero);
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   @media (min-width: 768px) {
     font-size: 3.25rem;
   }
@@ -202,20 +217,15 @@ html {
 
 @utility home-h2 {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 400;
   font-size: 1.75rem;
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   @media (min-width: 1024px) {
     font-size: 2.5rem;
   }
 }
 
-@media (min-width: 1920px) {
-  :root, html {
-    --max-width-site: 1200px;
-  }
-}
 
 body {
   margin: 0;
@@ -274,5 +284,22 @@ button, .btn { font-weight: 600; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@utility eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-violet);
+  &::before {
+    content: '';
+    width: 27px;
+    height: 3px;
+    background: var(--color-coral);
   }
 }

@@ -84,7 +84,7 @@ export function DropzoneUpload({ label, sizeHint, urls, accept, acceptLabel, mul
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(url) }}
                 aria-label="Remove image"
-                className="absolute top-1 right-1 w-5 h-5 bg-canvas border border-line rounded-full text-[11px] leading-none flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-madder hover:text-canvas hover:border-madder transition-opacity"
+                className="absolute top-1 right-1 w-5 h-5 bg-canvas border border-line rounded-[3px] text-[11px] leading-none flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-madder hover:text-canvas hover:border-madder transition-opacity"
               >
                 ✕
               </button>

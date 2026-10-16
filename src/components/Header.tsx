@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
@@ -9,16 +9,37 @@ import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { supabase } from '../lib/supabase'
 import { searchProducts } from '../lib/productSearch'
-import { getCategoriesWithProducts, getSubcategoriesWithCounts, type CategoryWithCount, type SubcategoryWithCount } from '../lib/categories'
+import {
+  getCategoriesWithProducts,
+  getSubcategoriesWithCounts,
+  type CategoryWithCount,
+  type SubcategoryWithCount,
+} from '../lib/categories'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import type { Product } from '../lib/types'
 import { profileDisplayName, profileInitial } from '../lib/profileName'
 import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
-import { SettingsIcon, DownloadCircleIcon, CloseCircleIcon, OrderIcon, UI_ICON_SIZE } from './icons'
 
-const HEADER_ICON = '#111111'
+const NAV_LINKS = [
+  { href: '/#collections', label: 'Collections' },
+  { href: '/shop?price=free', label: 'Free patterns' },
+  { href: '/about', label: 'Our story' },
+] as const
+
+const POPULAR_SEARCHES = [
+  { label: 'Free patterns', href: '/shop?price=free' },
+  { label: 'Beginner', href: '/shop?level=beginner' },
+  { label: 'Amigurumi', href: '/shop/amigurumi' },
+  { label: 'New arrivals', href: '/shop?sort=newest' },
+] as const
+
+/** Small uppercase nav label — matches the reference header. */
+const NAV_LABEL =
+  'text-[11px] font-semibold uppercase tracking-[0.11em] text-ink transition-colors hover:text-coral'
+
+const TILE_COLORS = ['#BCECF4', '#FFB9D5', '#CBB5FF', '#FFE16A'] as const
 
 export function Header() {
   const { user, profile, signOut, loading: authLoading } = useAuth()
@@ -26,857 +47,547 @@ export function Header() {
   const { count: cartCount, openDrawer } = useCart()
   const router = useRouter()
   const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [mobileAccountOpen, setMobileAccountOpen] = useState(false)
-  useBodyScrollLock(mobileOpen || mobileAccountOpen)
-  const [desktopAccountOpen, setDesktopAccountOpen] = useState(false)
-  const desktopAccountWrapRef = useRef<HTMLDivElement>(null)
-  const tabletAccountWrapRef = useRef<HTMLDivElement>(null)
-  const [categoriesOpen, setCategoriesOpen] = useState(false)
-  const categoriesWrapRef = useRef<HTMLDivElement>(null)
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [shopOpen, setShopOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
-  const [mobileExpandedCategory, setMobileExpandedCategory] = useState<string | null>(null)
-  const [mobileSubcategoriesCache, setMobileSubcategoriesCache] = useState<Record<string, SubcategoryWithCount[]>>({})
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
+  const [subcategories, setSubcategories] = useState<Record<string, SubcategoryWithCount[]>>({})
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Product[]>([])
-  const [searchFocused, setSearchFocused] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const searchWrapRef = useRef<HTMLDivElement>(null)
-  const mobileSearchWrapRef = useRef<HTMLDivElement>(null)
-  const desktopSearchInputRef = useRef<HTMLInputElement>(null)
-  const mobileSearchInputRef = useRef<HTMLInputElement>(null)
-  const headerRef = useRef<HTMLElement>(null)
-  const [browsePanelTop, setBrowsePanelTop] = useState(0)
 
-  const closeMobileBrowse = () => {
-    setMobileOpen(false)
-    setMobileExpandedCategory(null)
-  }
+  const shopWrapRef = useRef<HTMLDivElement>(null)
+  const accountWrapRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const updateBrowsePanelTop = () => {
-    if (!headerRef.current) return
-    setBrowsePanelTop(headerRef.current.getBoundingClientRect().bottom)
-  }
+  useBodyScrollLock(menuOpen)
 
   useEffect(() => {
     getCategoriesWithProducts(supabase).then(setCategories)
   }, [])
 
+  // Debounced live suggestions while the search panel is open.
   useEffect(() => {
-    if (!query.trim()) return setSuggestions([])
+    if (!searchOpen) return
+    const q = query.trim()
+    if (!q) return
     const timer = setTimeout(() => {
-      searchProducts(query, 5).then(setSuggestions)
-    }, 250)
+      searchProducts(q, 5).then(setSuggestions)
+    }, 220)
     return () => clearTimeout(timer)
-  }, [query])
+  }, [query, searchOpen])
 
+  // Close every overlay on navigation.
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const t = e.target as Node
-      const inDesktop = searchWrapRef.current?.contains(t) ?? false
-      const inMobile = mobileSearchWrapRef.current?.contains(t) ?? false
-      if (!inDesktop && !inMobile) setSearchFocused(false)
-      if (
-        !(desktopAccountWrapRef.current?.contains(t) ?? false) &&
-        !(tabletAccountWrapRef.current?.contains(t) ?? false)
-      ) {
-        setDesktopAccountOpen(false)
-      }
-      if (categoriesWrapRef.current && !categoriesWrapRef.current.contains(t)) setCategoriesOpen(false)
-    }
-    document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
-  }, [])
-
-  useEffect(() => {
-    if (pathname !== '/search') return
-    const activeQuery = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('q') ?? ''
-    setQuery(activeQuery)
-  }, [pathname, typeof window !== 'undefined' ? window.location.search : ''])
-
-  useLayoutEffect(() => {
-    if (!mobileOpen) return
-    updateBrowsePanelTop()
-    window.addEventListener('resize', updateBrowsePanelTop)
-    return () => window.removeEventListener('resize', updateBrowsePanelTop)
-  }, [mobileOpen])
-
-  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchOpen(false)
+    setMenuOpen(false)
+    setShopOpen(false)
+    setAccountOpen(false)
   }, [pathname])
 
   useEffect(() => {
-    if (!searchOpen) return
-    mobileSearchInputRef.current?.focus()
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node
+      if (shopWrapRef.current && !shopWrapRef.current.contains(t)) setShopOpen(false)
+      if (accountWrapRef.current && !accountWrapRef.current.contains(t)) setAccountOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setSearchOpen(false)
+      setShopOpen(false)
+      setAccountOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus()
   }, [searchOpen])
 
-  const submitSearch = (e?: React.FormEvent) => {
-    e?.preventDefault()
-    if (!query.trim()) return
-    setSearchFocused(false)
-    setSearchOpen(false)
-    desktopSearchInputRef.current?.blur()
-    mobileSearchInputRef.current?.blur()
-    router.push(`/search?q=${encodeURIComponent(query.trim())}`)
-  }
-
-  const openHeaderSearch = () => {
-    setMobileOpen(false)
+  const openSearch = () => {
+    setShopOpen(false)
+    setAccountOpen(false)
+    setMenuOpen(false)
     setSearchOpen(true)
   }
 
-  const clearSearch = () => {
+  const closeSearch = () => {
+    setSearchOpen(false)
     setQuery('')
     setSuggestions([])
-    if (pathname === '/search') router.push('/search')
   }
 
-  const goWishlist = () => {
-    router.push('/account/wishlist')
+  const submitSearch = (e?: React.FormEvent) => {
+    e?.preventDefault()
+    const q = query.trim()
+    if (!q) return
+    closeSearch()
+    router.push(`/search?q=${encodeURIComponent(q)}`)
   }
 
-  const openCart = () => {
-    openDrawer()
+  const toggleCategory = (id: string) => {
+    const opening = expandedCategory !== id
+    setExpandedCategory(opening ? id : null)
+    if (opening && subcategories[id] === undefined) {
+      getSubcategoriesWithCounts(supabase, id).then((list) => setSubcategories((prev) => ({ ...prev, [id]: list })))
+    }
   }
 
-  const openMobileCart = () => {
-    router.push('/cart')
+  const closeMenu = () => {
+    setMenuOpen(false)
+    setExpandedCategory(null)
   }
 
-  const signInFromMobile = () => {
-    closeMobileBrowse()
+  const goSignIn = () => {
+    closeMenu()
     requireAuth()
-  }
-
-  const signOutFromDrawer = async () => {
-    closeMobileBrowse()
-    await signOut()
-    if (pathname === '/account' || pathname.startsWith('/account/')) router.push('/')
   }
 
   return (
     <>
-    <header ref={headerRef} className="sticky top-0 z-40 bg-canvas border-b border-line">
-      <div className="relative z-[3] bg-canvas">
-      {/* AnnouncementBar lives in CustomerShell (DESIGN_SPEC §3.1). */}
+      <header className="sticky top-0 z-40 border-b border-border bg-bg">
+        <div className="mx-auto flex h-[67px] max-w-site items-center justify-between gap-6 page-gutter lg:h-[78px]">
+          <Logo variant="full" />
 
-      {/* ── Desktop ≥1024: logo + text nav | search | heart, cart, Sign in ── */}
-      <div className="hidden desktop:flex items-center gap-4 lg:gap-6 page-gutter py-3.5 max-w-site w-full">
-        <Logo variant="full" />
-        <nav className="hidden lg:flex items-center gap-6 shrink-0" aria-label="Primary">
-          {[
-            { href: '/shop', label: 'Shop' },
-            { href: '/#skill-levels', label: 'Skill levels' },
-            { href: '/shop?price=free', label: 'Free patterns' },
-            { href: '/#reviews', label: 'Reviews' },
-          ].map((l) => (
-            <Link key={l.href} href={l.href} className="text-[14px] font-medium text-ink whitespace-nowrap hover:text-primary">
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-        <div ref={categoriesWrapRef} className="relative lg:hidden shrink-0">
-          <button
-            type="button"
-            onClick={() => { setMobileOpen(false); setCategoriesOpen((v) => !v) }}
-            aria-label="Browse categories"
-            aria-expanded={categoriesOpen}
-            className="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-surface-warm transition-colors"
-          >
-            <MaterialIcon name="menu" size={20} color={HEADER_ICON} />
-            <span className="text-[13px] font-medium text-ink whitespace-nowrap">Shop</span>
-          </button>
-          {categoriesOpen && (
-            <DesktopCategoriesMenu
-              categories={categories}
-              onClose={() => setCategoriesOpen(false)}
-            />
-          )}
-        </div>
-
-        <div className="flex items-center gap-4 min-w-0 flex-1 justify-end">
-          <div ref={searchWrapRef} className="relative min-w-0 flex-1 max-w-[280px]">
-            <SearchPill
-              inputRef={desktopSearchInputRef}
-              query={query}
-              setQuery={setQuery}
-              onFocus={() => setSearchFocused(true)}
-              onSubmit={submitSearch}
-              onClear={clearSearch}
-              placeholder="Search patterns"
-              buttonSize={36}
-              iconSize={18}
-            />
-            {searchFocused && query && (
-              <SuggestionsDropdown
-                suggestions={suggestions}
-                query={query}
-                onPick={() => { setSearchFocused(false); desktopSearchInputRef.current?.blur() }}
-                onSeeAll={() => submitSearch()}
-              />
-            )}
-          </div>
-
-          <HeaderActions
-            wrapRef={desktopAccountWrapRef}
-            iconSize={22}
-            cartCount={cartCount}
-            onCart={openCart}
-            user={user}
-            profile={profile}
-            requireAuth={requireAuth}
-            signOut={signOut}
-            accountOpen={desktopAccountOpen}
-            setAccountOpen={setDesktopAccountOpen}
-            onWishlist={goWishlist}
-            showWishlist
-            signInPill
-          />
-        </div>
-      </div>
-
-      {/* ── Tablet 768–1023: logo | search, heart, cart, hamburger (DESIGN_SPEC) ── */}
-      <div className="hidden tablet:flex desktop:hidden items-center justify-between gap-3 page-gutter py-2.5 max-w-site w-full">
-        <Logo variant="full" />
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            aria-label="Search patterns"
-            aria-expanded={searchOpen}
-            onClick={openHeaderSearch}
-            className={`touch-target w-11 h-11 flex items-center justify-center hover:opacity-70 ${searchOpen ? 'rounded-full bg-surface-warm' : ''}`}
-          >
-            <MaterialIcon name="search" size={22} color={HEADER_ICON} />
-          </button>
-          <button
-            type="button"
-            aria-label="Wishlist"
-            onClick={goWishlist}
-            className="touch-target w-11 h-11 flex items-center justify-center hover:opacity-70"
-          >
-            <MaterialIcon name="favorite" size={22} color={HEADER_ICON} />
-          </button>
-          <HeaderAccountIcon
-            signedIn={!!user}
-            loading={authLoading}
-            onSignIn={signInFromMobile}
-            onNavigate={closeMobileBrowse}
-          />
-          <button
-            type="button"
-            aria-label="Cart"
-            onClick={openCart}
-            className="relative touch-target w-11 h-11 flex items-center justify-center hover:opacity-70"
-          >
-            <MaterialIcon name="shopping_bag" size={22} color={HEADER_ICON} />
-            {cartCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center bg-primary">
-                {cartCount}
-              </span>
-            )}
-          </button>
-          <button
-            type="button"
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
-            onClick={() => { setCategoriesOpen(false); setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
-            className={`touch-target w-11 h-11 flex items-center justify-center rounded-full ${mobileOpen ? 'bg-surface-warm' : ''}`}
-          >
-            <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Mobile <768: hamburger, logo, search icon, cart (no heart) ── */}
-      <div className="tablet:hidden relative z-50">
-        <div className="px-3 py-1.5 flex items-center gap-0.5 bg-canvas">
-          <button
-            type="button"
-            onClick={() => { setMobileExpandedCategory(null); setMobileOpen((v) => !v) }}
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
-            className={`touch-target w-11 h-11 shrink-0 -ml-1 flex items-center justify-center ${mobileOpen ? 'rounded-full bg-surface-warm' : ''}`}
-          >
-            <MaterialIcon name="menu" size={22} color={HEADER_ICON} />
-          </button>
-          <div className="flex-1 min-w-0 flex justify-center max-[360px]:justify-start">
-            <Logo variant="full" />
-          </div>
-          <button
-            type="button"
-            aria-label="Search patterns"
-            aria-expanded={searchOpen}
-            onClick={openHeaderSearch}
-            className={`touch-target w-11 h-11 shrink-0 flex items-center justify-center hover:opacity-70 ${searchOpen ? 'rounded-full bg-surface-warm' : ''}`}
-          >
-            <MaterialIcon name="search" size={22} color={HEADER_ICON} />
-          </button>
-          <HeaderAccountIcon
-            signedIn={!!user}
-            loading={authLoading}
-            onSignIn={signInFromMobile}
-            onNavigate={closeMobileBrowse}
-          />
-          <button
-            type="button"
-            aria-label="Cart"
-            onClick={openCart}
-            className="relative touch-target w-11 h-11 shrink-0 flex items-center justify-center hover:opacity-70"
-          >
-            <MaterialIcon name="shopping_bag" size={22} color={HEADER_ICON} />
-            {cartCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center bg-primary">
-                {cartCount}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-      </div>
-
-      {searchOpen && (
-        <div ref={mobileSearchWrapRef} className="desktop:hidden border-t border-line bg-canvas page-gutter py-2.5">
-          <div className="flex items-center gap-2">
-            <div className="relative min-w-0 flex-1">
-              <SearchPill
-                inputRef={mobileSearchInputRef}
-                query={query}
-                setQuery={setQuery}
-                onFocus={() => setSearchFocused(true)}
-                onSubmit={submitSearch}
-                onClear={clearSearch}
-                placeholder="Search patterns"
-                buttonSize={40}
-                iconSize={18}
-              />
-              {searchFocused && query && (
-                <SuggestionsDropdown
-                  suggestions={suggestions}
-                  query={query}
-                  onPick={() => {
-                    setSearchFocused(false)
-                    setSearchOpen(false)
-                  }}
-                  onSeeAll={() => submitSearch()}
-                />
-              )}
+          {/* Primary nav (desktop) */}
+          <nav className="hidden items-center gap-[29px] lg:flex" aria-label="Primary">
+            <div ref={shopWrapRef} className="relative">
+              <button
+                type="button"
+                aria-expanded={shopOpen}
+                onClick={() => {
+                  setSearchOpen(false)
+                  setShopOpen((v) => !v)
+                }}
+                className={`${NAV_LABEL} inline-flex min-h-11 items-center gap-1.5`}
+              >
+                Shop patterns
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  aria-hidden
+                  className={`transition-transform ${shopOpen ? 'rotate-180' : ''}`}
+                >
+                  <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {shopOpen && <ShopMegaMenu categories={categories} onClose={() => setShopOpen(false)} />}
             </div>
+            {NAV_LINKS.map((l) => (
+              <Link key={l.href} href={l.href} className={NAV_LABEL}>
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1 text-ink sm:gap-2">
             <button
               type="button"
-              onClick={() => setSearchOpen(false)}
-              className="shrink-0 inline-flex min-h-11 items-center px-2 text-[14px] font-semibold text-ink"
+              aria-label="Search patterns"
+              aria-expanded={searchOpen}
+              onClick={() => (searchOpen ? closeSearch() : openSearch())}
+              className="inline-flex size-11 items-center justify-center transition-colors hover:text-coral"
             >
-              Cancel
+              <MaterialIcon name="search" size={22} color="currentColor" />
             </button>
-          </div>
-        </div>
-      )}
 
-      {mobileAccountOpen && (
-        <div className="fixed inset-0 z-50 tablet:hidden">
-          <div className="absolute inset-0 bg-canvas flex flex-col">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-line">
-              <span className="font-subheading text-lg">{user ? 'My Account' : 'Account'}</span>
-              <button type="button" aria-label="Close menu" onClick={() => setMobileAccountOpen(false)} className="p-1">
-                <CloseCircleIcon size={28} />
+            <button
+              type="button"
+              aria-label="Wishlist"
+              onClick={() => router.push('/account/wishlist')}
+              className="hidden size-11 items-center justify-center transition-colors hover:text-coral lg:inline-flex"
+            >
+              <MaterialIcon name="favorite" size={21} color="currentColor" />
+            </button>
+
+            {!authLoading && !user ? (
+              <button
+                type="button"
+                onClick={() => requireAuth()}
+                className={`${NAV_LABEL} hidden min-h-11 items-center px-2 lg:inline-flex`}
+              >
+                Sign in
               </button>
-            </div>
-
-            {user ? (
-              <>
-                <div className="h-1" style={{ background: 'var(--color-accent)' }} />
-                <div className="px-6 py-5 border-b border-line flex items-center gap-3" style={{ background: 'var(--color-surface)' }}>
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-semibold" style={{ background: 'var(--color-accent)' }}>
-                    {profileInitial(profile, user.email)}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[14px] font-medium truncate">{profileDisplayName(profile, 'My Account')}</p>
-                    <p className="text-[12px] text-ink-soft truncate">{user.email}</p>
-                  </div>
-                </div>
-                <nav className="flex flex-col py-2 overflow-y-auto flex-1 pb-20">
-                  <Link href="/account/orders" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <OrderIcon size={UI_ICON_SIZE} /> Orders
-                  </Link>
-                  <Link href="/account/downloads" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
-                  </Link>
-                  <Link href="/account/wishlist" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                    <MaterialIcon name="favorite" size={18} /> Wishlist
-                  </Link>
-                  <div className="border-t border-line mt-2 pt-2">
-                    <Link href="/account/profile" onClick={() => setMobileAccountOpen(false)} className="flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                      <SettingsIcon size={UI_ICON_SIZE} /> Account settings
-                    </Link>
-                  </div>
-                  <div className="border-t border-line mt-2 pt-2">
-                    <button type="button" onClick={() => { signOut(); setMobileAccountOpen(false) }} className="w-full flex items-center gap-3 px-6 py-3.5 text-[13px] text-ink">
-                      <MaterialIcon name="logout" size={18} /> Sign out
-                    </button>
-                  </div>
-                </nav>
-              </>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
-                <MaterialIcon name="person" size={36} />
-                <p className="text-[14px] text-ink-soft">Sign in to see your orders and downloads.</p>
+              <div ref={accountWrapRef} className="relative hidden lg:block">
                 <button
                   type="button"
-                  onClick={() => { setMobileAccountOpen(false); requireAuth() }}
-                  className="px-6 py-3 rounded-full text-white text-[13px] font-semibold"
-                  style={{ background: 'var(--color-accent)' }}
+                  aria-label="Your account"
+                  aria-expanded={accountOpen}
+                  onClick={() => setAccountOpen((v) => !v)}
+                  className="inline-flex size-11 items-center justify-center transition-colors hover:text-coral"
                 >
-                  Sign In
+                  <MaterialIcon name="person" size={22} color="currentColor" />
                 </button>
+                {accountOpen && user && (
+                  <AccountDropdown
+                    profile={profile}
+                    email={user.email}
+                    onClose={() => setAccountOpen(false)}
+                    onSignOut={() => {
+                      void signOut()
+                      setAccountOpen(false)
+                    }}
+                  />
+                )}
               </div>
             )}
-          </div>
-        </div>
-      )}
-    </header>
 
-    {/* Browse panel — mobile + tablet; portaled so overlay covers full viewport (not clipped by sticky header). */}
-    {mobileOpen && typeof document !== 'undefined' && createPortal(
-      <>
-        <div
-          className="fixed inset-0 z-[45] bg-black/25 desktop:hidden"
-          onClick={closeMobileBrowse}
-          aria-hidden="true"
-        />
-        <div
-          className="fixed left-0 right-0 z-[46] bg-[#faf9f5] border-b border-[#ddd] shadow-[0_12px_28px_rgba(0,0,0,0.14)] overflow-y-auto desktop:hidden"
-          style={{ top: browsePanelTop, maxHeight: `min(78vh, calc(100vh - ${browsePanelTop}px))` }}
-        >
-          <div className="relative flex items-center justify-center px-12 pt-3.5 pb-2.5">
-            <h2 className="text-[17px] font-semibold text-black tracking-[-0.02em] leading-none">
-              Browse Categories
-            </h2>
             <button
               type="button"
-              aria-label="Close categories"
-              onClick={closeMobileBrowse}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#595959]"
+              aria-label={`Bag${cartCount > 0 ? `, ${cartCount} items` : ''}`}
+              onClick={openDrawer}
+              className="relative inline-flex min-h-11 items-center gap-1 px-2 text-[12px] font-semibold transition-colors hover:text-coral"
             >
-              <MaterialIcon name="close" size={22} />
+              <MaterialIcon name="shopping_bag" size={22} color="currentColor" className="sm:hidden" />
+              <span className="hidden sm:inline">Bag ({cartCount})</span>
+              {cartCount > 0 && (
+                <span className="absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold leading-none text-white sm:hidden">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              onClick={() => {
+                setSearchOpen(false)
+                setMenuOpen(true)
+              }}
+              className="-mr-2 inline-flex size-11 items-center justify-center lg:hidden"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
             </button>
           </div>
-          {!authLoading && (
-            <div className="px-5 pt-1 pb-3">
-              {user ? (
-                <Link
-                  href="/account/downloads"
-                  onClick={closeMobileBrowse}
-                  className="flex min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary px-5 text-[14px] font-semibold text-primary hover:bg-primary-soft"
-                >
-                  <MaterialIcon name="person" size={18} /> My account
-                </Link>
-              ) : (
+        </div>
+
+        {/* Search panel */}
+        {searchOpen && (
+          <div className="absolute inset-x-0 top-full border-b border-border bg-bg shadow-[0_24px_40px_-24px_rgba(32,32,68,0.28)]">
+            <div className="mx-auto max-w-site page-gutter py-6 lg:py-9">
+              <form onSubmit={submitSearch} role="search" className="flex items-center gap-4 border-b-2 border-ink pb-3">
+                <MaterialIcon name="search" size={26} color="currentColor" className="shrink-0 text-ink" />
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value)
+                    if (!e.target.value.trim()) setSuggestions([])
+                  }}
+                  placeholder="Search patterns"
+                  aria-label="Search patterns"
+                  autoComplete="off"
+                  className="min-w-0 flex-1 bg-transparent font-heading text-[28px] text-ink placeholder:text-muted-light !outline-none md:text-[40px] [&::-webkit-search-cancel-button]:hidden"
+                />
                 <button
                   type="button"
-                  onClick={signInFromMobile}
-                  className="flex w-full min-h-11 items-center justify-center rounded-full bg-primary px-5 text-[14px] font-semibold text-white hover:opacity-90"
+                  onClick={closeSearch}
+                  aria-label="Close search"
+                  className="inline-flex size-11 shrink-0 items-center justify-center text-ink hover:text-coral"
                 >
-                  Sign in
+                  <MaterialIcon name="close" size={24} color="currentColor" />
                 </button>
+              </form>
+
+              {query.trim() ? (
+                <div className="pt-6">
+                  {suggestions.length > 0 ? (
+                    <>
+                      <ul className="grid grid-cols-1 gap-x-8 gap-y-1 md:grid-cols-2 lg:grid-cols-5 lg:gap-x-5">
+                        {suggestions.map((p, i) => (
+                          <li key={p.id}>
+                            <Link
+                              href={`/pattern/${p.slug}`}
+                              onClick={closeSearch}
+                              className="group flex items-center gap-4 py-2 lg:flex-col lg:items-start lg:gap-3"
+                            >
+                              <span
+                                className="relative size-16 shrink-0 overflow-hidden rounded-[5px] lg:aspect-square lg:size-auto lg:w-full"
+                                style={{ background: TILE_COLORS[i % TILE_COLORS.length] }}
+                              >
+                                {p.images?.[0] && (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={deriveVariantUrl(p.images[0], 'micro')}
+                                    alt=""
+                                    loading="lazy"
+                                    className="h-full w-full object-cover"
+                                  />
+                                )}
+                              </span>
+                              <span className="min-w-0">
+                                <span className="line-clamp-2 block font-heading text-[17px] leading-snug text-ink group-hover:text-violet">
+                                  {p.title}
+                                </span>
+                                <span className="mt-0.5 block text-[12px] font-semibold text-ink">
+                                  {Number(p.price) === 0 ? 'Free' : `$${p.price.toFixed(2)}`}
+                                </span>
+                              </span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => submitSearch()}
+                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[10px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+                      >
+                        See all results for &ldquo;{query.trim()}&rdquo; ↗
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-[14px] text-muted">
+                      No patterns matched &ldquo;{query.trim()}&rdquo; yet. Press Enter to search the full catalogue.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-6">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Popular</span>
+                  {POPULAR_SEARCHES.map((s) => (
+                    <Link
+                      key={s.href}
+                      href={s.href}
+                      onClick={closeSearch}
+                      className="inline-flex min-h-11 items-center rounded-[3px] border-2 border-ink px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:bg-ink hover:text-white"
+                    >
+                      {s.label}
+                    </Link>
+                  ))}
+                </div>
               )}
             </div>
-          )}
-          <nav className="pb-3">
-            <Link
-              href="/shop/new"
-              onClick={closeMobileBrowse}
-              className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]"
-            >
-              New Arrivals
-            </Link>
-            {categories.map((c) => {
-              const expanded = mobileExpandedCategory === c.id
-              const subs = mobileSubcategoriesCache[c.id]
-              const hasSubsCached = subs !== undefined
-              return (
-                <div key={c.link} className="border-b border-[#ebe8e2]">
-                  <div className="flex items-stretch">
-                    <Link
-                      href={c.link}
-                      onClick={closeMobileBrowse}
-                      className="flex-1 px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug"
-                    >
-                      {c.name}
+          </div>
+        )}
+      </header>
+
+      {searchOpen && (
+        <button
+          type="button"
+          aria-label="Close search"
+          tabIndex={-1}
+          onClick={closeSearch}
+          className="fixed inset-0 z-30 cursor-default bg-navy/35"
+        />
+      )}
+
+      {/* Mobile / tablet menu */}
+      {menuOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+            <button type="button" aria-label="Close menu" tabIndex={-1} onClick={closeMenu} className="absolute inset-0 bg-navy/45" />
+            <div className="absolute inset-y-0 right-0 flex w-[min(92vw,420px)] flex-col bg-bg shadow-2xl">
+              <div className="flex h-[67px] shrink-0 items-center justify-between border-b border-border page-gutter">
+                <Logo variant="compact" />
+                <button
+                  type="button"
+                  aria-label="Close menu"
+                  onClick={closeMenu}
+                  className="-mr-2 inline-flex size-11 items-center justify-center text-ink"
+                >
+                  <MaterialIcon name="close" size={24} color="currentColor" />
+                </button>
+              </div>
+
+              <nav className="flex-1 overflow-y-auto page-gutter py-4" aria-label="Menu">
+                <ul className="border-b border-border pb-3">
+                  {[
+                    { href: '/shop', label: 'Shop patterns' },
+                    { href: '/shop?sort=newest', label: 'New arrivals' },
+                    { href: '/shop?price=free', label: 'Free patterns' },
+                    { href: '/#collections', label: 'Collections' },
+                    { href: '/shop/sale', label: 'Sale' },
+                    { href: '/about', label: 'Our story' },
+                  ].map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} onClick={closeMenu} className="flex min-h-14 items-center font-heading text-[30px] leading-none text-ink hover:text-violet">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="pb-1 pt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Categories</p>
+                <ul>
+                  {categories.map((c) => {
+                    const expanded = expandedCategory === c.id
+                    const subs = subcategories[c.id]
+                    return (
+                      <li key={c.link} className="border-b border-border">
+                        <div className="flex items-stretch">
+                          <Link href={c.link} onClick={closeMenu} className="flex min-h-12 flex-1 items-center text-[15px] font-semibold text-ink">
+                            {c.name}
+                          </Link>
+                          <button
+                            type="button"
+                            aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
+                            aria-expanded={expanded}
+                            onClick={() => toggleCategory(c.id)}
+                            className="inline-flex size-12 items-center justify-center text-ink"
+                          >
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                              aria-hidden
+                              className={`transition-transform ${expanded ? 'rotate-45' : ''}`}
+                            >
+                              <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                            </svg>
+                          </button>
+                        </div>
+                        {expanded && (
+                          <ul className="pb-2 pl-4">
+                            {subs === undefined ? (
+                              <li className="py-2 text-[13px] text-muted">Loading…</li>
+                            ) : subs.length === 0 ? (
+                              <li className="py-2 text-[13px] text-muted">No subcategories</li>
+                            ) : (
+                              subs.map((sub) => (
+                                <li key={sub.id}>
+                                  <Link href={`/shop/${sub.slug}`} onClick={closeMenu} className="flex min-h-11 items-center text-[14px] text-muted hover:text-ink">
+                                    {sub.name}
+                                  </Link>
+                                </li>
+                              ))
+                            )}
+                          </ul>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </nav>
+
+              <div className="shrink-0 border-t border-border bg-surface-warm page-gutter py-4">
+                {authLoading ? null : user ? (
+                  <div>
+                    <p className="mb-2 truncate text-[13px] text-muted">{user.email}</p>
+                    <div className="grid grid-cols-2 gap-x-4">
+                      <Link href="/account/downloads" onClick={closeMenu} className="flex min-h-11 items-center text-[13px] font-semibold text-ink">
+                        My downloads
+                      </Link>
+                      <Link href="/account/orders" onClick={closeMenu} className="flex min-h-11 items-center text-[13px] font-semibold text-ink">
+                        Orders
+                      </Link>
+                      <Link href="/account/wishlist" onClick={closeMenu} className="flex min-h-11 items-center text-[13px] font-semibold text-ink">
+                        Wishlist
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          closeMenu()
+                          void signOut().then(() => {
+                            if (pathname === '/account' || pathname.startsWith('/account/')) router.push('/')
+                          })
+                        }}
+                        className="flex min-h-11 items-center text-left text-[13px] font-semibold text-ink"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-4">
+                    <Link href="/account/wishlist" onClick={closeMenu} className="flex min-h-11 items-center text-[13px] font-semibold text-ink">
+                      Wishlist
                     </Link>
                     <button
                       type="button"
-                      aria-label={`${expanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
-                      aria-expanded={expanded}
-                      onClick={() => {
-                        const opening = !expanded
-                        setMobileExpandedCategory(opening ? c.id : null)
-                        if (opening && !hasSubsCached) {
-                          getSubcategoriesWithCounts(supabase, c.id).then((list) =>
-                            setMobileSubcategoriesCache((prev) => ({ ...prev, [c.id]: list }))
-                          )
-                        }
-                      }}
-                      className="px-4 text-black"
+                      onClick={goSignIn}
+                      className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-2 border-primary bg-primary px-6 text-[11px] font-semibold uppercase tracking-[0.12em] text-white hover:border-violet hover:bg-violet"
                     >
-                      <MaterialIcon
-                        name="chevron_right"
-                        size={22}
-                        style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}
-                      />
+                      Sign in
                     </button>
                   </div>
-                  {expanded && (
-                    <div className="bg-[#f0eee8] pb-1">
-                      {(subs?.length ?? 0) === 0 && hasSubsCached ? (
-                        <p className="px-8 py-2 text-[13px] text-[#666]">No subcategories</p>
-                      ) : (
-                        (subs ?? []).map((sub) => (
-                          <Link
-                            key={sub.id}
-                            href={`/shop/${sub.slug}`}
-                            onClick={closeMobileBrowse}
-                            className="block px-8 py-2.5 text-[15px] font-semibold text-black tracking-[-0.015em]"
-                          >
-                            {sub.name}
-                          </Link>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-            <Link href="/shop" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
-              All Patterns
-            </Link>
-            <Link href="/shop?price=free" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-b border-[#ebe8e2]">
-              Free Patterns
-            </Link>
-            <Link href="/shop/sale" onClick={closeMobileBrowse} className="flex items-center px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug">
-              Sale
-            </Link>
-            {!authLoading && user && (
-              <button
-                type="button"
-                onClick={() => { void signOutFromDrawer() }}
-                className="flex w-full items-center gap-2.5 px-5 py-3.5 text-[16px] font-semibold text-black tracking-[-0.02em] leading-snug border-t border-[#ebe8e2]"
-              >
-                <MaterialIcon name="logout" size={20} /> Sign out
-              </button>
-            )}
-          </nav>
-        </div>
-      </>,
-      document.body,
-    )}
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   )
 }
 
-function HeaderActions({
-  wrapRef,
-  iconSize,
-  cartCount,
-  onCart,
-  onWishlist,
-  user,
-  profile,
-  requireAuth,
-  signOut,
-  accountOpen,
-  setAccountOpen,
-  gapClass = 'gap-3',
-  showWishlist = true,
-  signInPill = false,
-}: {
-  wrapRef: React.RefObject<HTMLDivElement | null>
-  iconSize: number
-  cartCount: number
-  onCart: () => void
-  onWishlist: () => void
-  user: { email?: string } | null
-  profile: { name?: string | null } | null
-  requireAuth: () => boolean
-  signOut: () => void
-  accountOpen: boolean
-  setAccountOpen: React.Dispatch<React.SetStateAction<boolean>>
-  gapClass?: string
-  showWishlist?: boolean
-  signInPill?: boolean
-}) {
+/** Desktop "Shop patterns" panel: categories, skill levels and quick links. */
+function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]; onClose: () => void }) {
+  const colHead = 'mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-violet'
+  const row =
+    'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (
-    <div className={`flex items-center ${gapClass} shrink-0 text-ink`}>
-      {showWishlist && (
-        <button
-          type="button"
-          aria-label="Wishlist"
-          title={user ? 'Wishlist' : 'Wishlist — items saved for 7 days while signed out'}
-          onClick={onWishlist}
-          className="touch-target w-11 h-11 flex items-center justify-center hover:opacity-70 transition-opacity"
-        >
-          <MaterialIcon name="favorite" size={iconSize} color={HEADER_ICON} />
-        </button>
-      )}
-      <button
-        type="button"
-        onClick={onCart}
-        aria-label="Cart"
-        title={user ? 'Cart' : 'Cart — items saved for 7 days while signed out'}
-        className="relative touch-target w-11 h-11 flex items-center justify-center hover:opacity-70 transition-opacity"
-      >
-        <MaterialIcon name="shopping_bag" size={iconSize} color={HEADER_ICON} />
-        {cartCount > 0 && (
-          <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full text-white text-[9px] flex items-center justify-center bg-primary">
-            {cartCount}
-          </span>
-        )}
-      </button>
-      {signInPill && !user ? (
-        <button
-          type="button"
-          onClick={() => requireAuth()}
-          className="ml-1 inline-flex min-h-11 items-center rounded-full border-[1.5px] border-primary px-5 text-[14px] font-semibold text-primary hover:bg-primary-soft"
-        >
-          Sign in
-        </button>
-      ) : (
-        <HeaderAccountControl
-          wrapRef={wrapRef}
-          iconSize={iconSize}
-          open={accountOpen}
-          setOpen={setAccountOpen}
-          user={user}
-          profile={profile}
-          requireAuth={requireAuth}
-          signOut={signOut}
-        />
-      )}
-    </div>
-  )
-}
-
-/** Phone + tablet account entry. Same 44px box in every auth state so the row never shifts. */
-function HeaderAccountIcon({
-  signedIn,
-  loading,
-  onSignIn,
-  onNavigate,
-}: {
-  signedIn: boolean
-  loading: boolean
-  onSignIn: () => void
-  onNavigate: () => void
-}) {
-  const className = 'touch-target w-11 h-11 shrink-0 rounded-full flex items-center justify-center hover:opacity-70'
-  const icon = <MaterialIcon name="person" size={22} color={HEADER_ICON} />
-  if (loading) {
-    return <span aria-hidden="true" className={className}>{icon}</span>
-  }
-  if (signedIn) {
-    return (
-      <Link href="/account/downloads" aria-label="My account" onClick={onNavigate} className={className}>
-        {icon}
-      </Link>
-    )
-  }
-  return (
-    <button type="button" aria-label="Sign in" onClick={onSignIn} className={className}>
-      {icon}
-    </button>
-  )
-}
-
-function SearchPill({
-  inputRef,
-  query,
-  setQuery,
-  onFocus,
-  onSubmit,
-  onClear,
-  placeholder,
-  iconSize,
-  leading,
-}: {
-  inputRef: React.RefObject<HTMLInputElement | null>
-  query: string
-  setQuery: (v: string) => void
-  onFocus: () => void
-  onSubmit: (e?: React.FormEvent) => void
-  onClear: () => void
-  placeholder: string
-  /** Kept for existing callers; the submit control is now the leading search icon. */
-  buttonSize?: number
-  iconSize: number
-  leading?: React.ReactNode
-}) {
-  return (
-    <form
-      onSubmit={onSubmit}
-      role="search"
-      className="relative flex min-h-11 items-center rounded-full border border-border bg-surface pr-2 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
-    >
-      {leading ?? (
-        <button
-          type="submit"
-          aria-label="Search"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted hover:text-primary"
-        >
-          <MaterialIcon name="search" size={iconSize} />
-        </button>
-      )}
-      {leading && <div className="w-px self-stretch my-2.5 bg-line shrink-0" />}
-      <input
-        ref={inputRef}
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={onFocus}
-        placeholder={placeholder}
-        aria-label={placeholder}
-        className={`min-w-0 flex-1 bg-transparent py-2.5 pr-2 text-[16px] placeholder:text-muted focus:outline-none md:text-[14px] [&::-webkit-search-cancel-button]:hidden ${leading ? 'pl-2' : 'pl-0'}`}
-      />
-      {query && (
-        <button
-          type="button"
-          onClick={onClear}
-          aria-label="Clear search"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted hover:text-ink"
-        >
-          <MaterialIcon name="close" size={16} color={HEADER_ICON} />
-        </button>
-      )}
-    </form>
-  )
-}
-
-function SuggestionsDropdown({
-  suggestions,
-  query,
-  onPick,
-  onSeeAll,
-}: {
-  suggestions: Product[]
-  query: string
-  onPick: () => void
-  onSeeAll: () => void
-}) {
-  return (
-    <div className="absolute left-0 right-0 top-full mt-2 bg-canvas border border-line shadow-lg z-50 max-h-96 overflow-y-auto rounded-lg">
-      {suggestions.length > 0 ? (
-        <>
-          {suggestions.map((p) => (
-            <Link
-              key={p.id}
-              href={`/pattern/${p.slug}`}
-              onClick={onPick}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-surface"
-            >
-              <div className="w-10 h-10 shrink-0 bg-surface rounded-md overflow-hidden">
-                {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
-              </div>
-              <span className="text-[13px] truncate">{p.title}</span>
-              <span className="ml-auto text-[12px] text-ink-soft shrink-0">${p.price.toFixed(2)}</span>
-            </Link>
-          ))}
-          <button type="button" onClick={onSeeAll} className="block w-full text-left px-4 py-3 text-[12px] tracking-[0.08em] text-ink-soft hover:text-ink border-t border-line">
-            SEE ALL RESULTS FOR "{query.toUpperCase()}" →
-          </button>
-        </>
-      ) : (
-        <p className="px-4 py-4 text-[13px] text-ink-soft">No patterns matched "{query}"</p>
-      )}
-    </div>
-  )
-}
-
-function DesktopCategoriesMenu({
-  categories,
-  onClose,
-}: {
-  categories: CategoryWithCount[]
-  onClose: () => void
-}) {
-  return (
-    <div className="absolute left-0 top-full mt-2 z-50 w-[280px]">
-      <div className="bg-white border border-line rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden">
-        <div className="max-h-[min(420px,70vh)] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin' }}>
-          <Link
-            href="/shop"
-            onClick={onClose}
-            className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-ink hover:bg-surface transition-colors"
-          >
-            <MaterialIcon name="auto_awesome" size={16} color="var(--color-logo-accent)" />
-            Recommended categories
-          </Link>
-          <div className="mx-4 mb-1.5 border-b" style={{ borderColor: 'var(--color-accent)' }} />
-          {categories.map((c) => (
-            <Link
-              key={c.link}
-              href={c.link}
-              onClick={onClose}
-              className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-ink hover:bg-surface transition-colors"
-            >
-              <span className="flex-1 truncate">{c.name}</span>
-              <MaterialIcon name="chevron_right" size={16} className="text-ink-soft shrink-0" />
-            </Link>
-          ))}
+    <div className="absolute left-[-1rem] top-full z-50 pt-3">
+      <div className="w-[min(780px,calc(100vw-4rem))] rounded-[5px] border-2 border-ink bg-bg p-7 shadow-[6px_6px_0_0_#202044]">
+        <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-9">
+          <div>
+            <p className={colHead}>Categories</p>
+            <ul>
+              {categories.map((c) => (
+                <li key={c.link}>
+                  <Link href={c.link} onClick={onClose} className={row}>
+                    <span className="truncate">{c.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className={colHead}>By skill level</p>
+            <ul>
+              {[
+                { href: '/shop?level=beginner', label: 'Beginner' },
+                { href: '/shop?level=intermediate', label: 'Intermediate' },
+                { href: '/shop?level=advanced', label: 'Advanced' },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} onClick={onClose} className={row}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className={colHead}>Quick links</p>
+            <ul>
+              {[
+                { href: '/shop', label: 'All patterns' },
+                { href: '/shop?sort=newest', label: 'New arrivals' },
+                { href: '/shop?price=free', label: 'Free patterns' },
+                { href: '/shop/sale', label: 'Sale' },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    onClick={onClose}
+                    className="flex min-h-11 items-center font-heading text-[22px] leading-none text-ink transition-colors hover:text-coral"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function HeaderAccountControl({
-  wrapRef,
-  iconSize,
-  open,
-  setOpen,
-  user,
-  profile,
-  requireAuth,
-  signOut,
-}: {
-  wrapRef: React.RefObject<HTMLDivElement | null>
-  iconSize: number
-  open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  user: { email?: string } | null
-  profile: { name?: string | null } | null
-  requireAuth: () => boolean
-  signOut: () => void
-}) {
-  if (!user) {
-    return (
-      <button
-        type="button"
-        onClick={() => { requireAuth() }}
-        className="h-10 px-1 text-[13px] font-medium text-ink hover:opacity-70 transition-opacity whitespace-nowrap shrink-0"
-      >
-        Sign in
-      </button>
-    )
-  }
-
-  return (
-    <div ref={wrapRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
-        aria-label="Your account"
-        title="Your account"
-        aria-expanded={open}
-      >
-        <MaterialIcon name="person" size={iconSize} color={HEADER_ICON} />
-      </button>
-      {open && (
-        <AccountDropdown
-          profile={profile}
-          email={user.email}
-          onClose={() => setOpen(false)}
-          onSignOut={() => { signOut(); setOpen(false) }}
-        />
-      )}
     </div>
   )
 }
@@ -892,41 +603,36 @@ function AccountDropdown({
   onClose: () => void
   onSignOut: () => void
 }) {
+  const item = 'flex min-h-11 items-center px-5 text-[13px] font-medium text-ink transition-colors hover:bg-surface-warm hover:text-violet'
   return (
-    <div className="absolute right-0 top-full pt-2 z-50">
-      <div className="w-[260px] bg-white border border-line shadow-[0_8px_30px_rgba(0,0,0,0.12)] text-sm rounded-xl overflow-hidden">
-        <div className="h-1" style={{ background: 'var(--color-accent)' }} />
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-line" style={{ background: 'var(--color-surface)' }}>
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-[14px] font-semibold"
-            style={{ background: 'var(--color-accent)' }}
-          >
+    <div className="absolute right-0 top-full z-50 pt-3">
+      <div className="w-[260px] overflow-hidden rounded-[5px] border-2 border-ink bg-bg shadow-[6px_6px_0_0_#202044]">
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-[5px] bg-violet text-[15px] font-semibold text-white">
             {profileInitial(profile, email)}
-          </div>
+          </span>
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-ink truncate">
-              {profileDisplayName(profile, 'My Account')}
-            </p>
-            <p className="text-[11px] text-ink-soft truncate">{email}</p>
+            <p className="truncate text-[14px] font-semibold text-ink">{profileDisplayName(profile, 'My Account')}</p>
+            <p className="truncate text-[12px] text-muted">{email}</p>
           </div>
         </div>
         <div className="py-1.5">
-          <Link href="/account/orders" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-            <OrderIcon size={UI_ICON_SIZE} /> Orders
+          <Link href="/account/downloads" onClick={onClose} className={item}>
+            My downloads
           </Link>
-          <Link href="/account/downloads" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-            <DownloadCircleIcon size={UI_ICON_SIZE} /> Downloads
+          <Link href="/account/orders" onClick={onClose} className={item}>
+            Orders
           </Link>
-          <Link href="/account/wishlist" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-            <MaterialIcon name="favorite" size={18} /> Wishlist
+          <Link href="/account/wishlist" onClick={onClose} className={item}>
+            Wishlist
+          </Link>
+          <Link href="/account/profile" onClick={onClose} className={item}>
+            Account settings
           </Link>
         </div>
-        <div className="border-t border-line py-1.5">
-          <Link href="/account/profile" onClick={onClose} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink">
-            <SettingsIcon size={UI_ICON_SIZE} /> Account settings
-          </Link>
-          <button type="button" onClick={onSignOut} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface text-[13px] text-ink text-left">
-            <MaterialIcon name="logout" size={18} /> Sign out
+        <div className="border-t border-border py-1.5">
+          <button type="button" onClick={onSignOut} className={`${item} w-full text-left`}>
+            Sign out
           </button>
         </div>
       </div>

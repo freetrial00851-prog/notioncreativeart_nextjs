@@ -20,7 +20,7 @@ export function SortFilterTriggerButton({
       onClick={onClick}
       className={
         'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap ' +
-        'border border-line rounded-full px-3 py-2 text-[12px] font-medium ' +
+        'border border-line rounded-[3px] px-3 py-2 text-[12px] font-medium ' +
         'bg-canvas hover:bg-surface transition-colors ' +
         className
       }
@@ -29,7 +29,7 @@ export function SortFilterTriggerButton({
       Sort & Filter
       {activeFilterCount > 0 && (
         <span
-          className="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center"
+          className="w-4 h-4 rounded-[3px] text-white text-[10px] flex items-center justify-center"
           style={{ background: 'var(--color-accent)' }}
         >
           {activeFilterCount}

@@ -5,47 +5,46 @@ import Link from 'next/link'
 type LogoProps = {
   variant?: 'full' | 'compact' | 'footer'
   className?: string
+  /** Force the white wordmark (e.g. over a dark background). */
+  light?: boolean
 }
 
 /**
- * Brand lockup — orange accent circle + wordmark (DESIGN_SPEC §2).
- * Baloo 2 via --font-logo.
+ * Brand lockup — violet “N.” mark, serif wordmark and a small tagline
+ * (colourful landing page reference).
  */
-export function Logo({ variant = 'full', className = '' }: LogoProps) {
-  const onDark = variant === 'footer'
+export function Logo({ variant = 'full', className = '', light = false }: LogoProps) {
+  const compact = variant === 'compact'
+  const onDark = variant === 'footer' || light
   return (
     <Link
       href="/"
-      className={`shrink-0 leading-none inline-flex items-center gap-2 ${
-        variant === 'full' ? 'max-[387px]:gap-1' : ''
-      } ${className}`}
-      aria-label="Notion Creative Art — home"
+      className={`inline-flex shrink-0 items-center gap-[11px] leading-none ${className}`}
+      aria-label="NotionCreativeArt — home"
     >
       <span
-        className={`shrink-0 rounded-full ${
-          variant === 'compact'
-            ? 'w-2.5 h-2.5'
-            : variant === 'full'
-              ? 'w-3 h-3 max-[387px]:w-2 max-[387px]:h-2'
-              : 'w-3 h-3'
+        className={`grid shrink-0 place-items-center rounded-[12px] bg-violet font-heading font-normal text-white ${
+          compact ? 'size-8 text-[18px]' : 'size-[38px] text-[21px] max-[380px]:size-8 max-[380px]:text-[18px]'
         }`}
-        style={{ background: 'var(--color-logo-accent)' }}
         aria-hidden
-      />
-      <span
-        className={`font-bold tracking-tight leading-none ${
-          variant === 'compact'
-            ? 'text-[18px]'
-            : variant === 'full'
-              ? 'text-[16px] max-[387px]:text-[13px] max-[360px]:text-[12px] md:text-[18px]'
-              : 'text-[18px] md:text-[20px]'
-        }`}
-        style={{
-          color: onDark ? '#FFFFFF' : 'var(--color-primary)',
-          fontFamily: 'var(--font-logo)',
-        }}
       >
-        Notion Creative Art
+        N.
+      </span>
+      <span className="flex flex-col">
+        <span
+          className={`font-heading leading-none tracking-[-0.025em] ${onDark ? 'text-white' : 'text-ink'} ${
+            compact ? 'text-[18px]' : 'text-[20px] max-[380px]:text-[17px]'
+          }`}
+        >
+          NotionCreativeArt
+        </span>
+        {!compact && (
+          <span
+            className={`mt-1 text-[9px] font-semibold uppercase tracking-[0.22em] max-[420px]:hidden ${onDark ? 'text-white/70' : 'text-muted'}`}
+          >
+            Patterns for makers
+          </span>
+        )}
       </span>
     </Link>
   )
@@ -81,7 +80,7 @@ export function LogoIcon({
     >
       N
       <span
-        className="absolute rounded-full"
+        className="absolute rounded-[3px]"
         style={{
           background: 'var(--color-logo-accent)',
           width: dot,

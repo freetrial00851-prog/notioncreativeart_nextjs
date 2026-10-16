@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { subscribeToNewsletter, useNewsletterSubscribed } from '@/lib/newsletter'
 
-/** Primary newsletter band — DESIGN_SPEC §3.12 */
+/** Newsletter band — pink, centered, underline field (reference). Remembers a successful signup. */
 export function EmailSignup() {
   const [email, setEmail] = useState('')
   const subscribed = useNewsletterSubscribed()
@@ -17,65 +17,66 @@ export function EmailSignup() {
     setSubmitting(true)
     const { ok, error: err } = await subscribeToNewsletter(email)
     setSubmitting(false)
-    if (!ok) {
-      setError(err)
-      return
-    }
+    if (!ok) setError(err)
   }
 
   return (
-    <section className="bg-primary text-primary-contrast">
-      <div className="max-w-site mx-auto page-gutter section-y flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div className="min-w-0 lg:max-w-md">
-          <h2 className="type-h2 mb-2">{subscribed ? "You're on the list" : 'Get 10% off your next order'}</h2>
-          <p className="text-[15px] text-white/85 leading-relaxed">
-            {subscribed
-              ? 'Thanks for joining the maker community. New patterns will land straight in your inbox.'
-              : 'Join the maker community. New patterns, straight to your inbox.'}
+    <section className="bg-pink-soft text-ink">
+      <div className="mx-auto max-w-site page-gutter py-14 text-center md:py-[70px]">
+        <p className="eyebrow justify-center text-[#6220C5]">Notes from our creative corner</p>
+        <h2 className="mx-auto my-4 max-w-3xl font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
+          {subscribed ? "You're on the list." : 'A little inspiration in your inbox.'}
+        </h2>
+        <p className="mx-auto max-w-md text-[13px] leading-[1.8] text-muted">
+          {subscribed
+            ? 'Thanks for joining. New patterns and the occasional treat will land in your inbox.'
+            : 'New patterns, creative ideas, and occasional treats. No clutter, just the good stuff.'}
+        </p>
+
+        {subscribed ? (
+          <p role="status" className="mx-auto mt-6 inline-flex items-center gap-3 rounded-[3px] bg-ink px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
+            <span aria-hidden>✓</span> Subscribed
           </p>
-        </div>
-        <div className="w-full lg:max-w-md">
-          {subscribed ? (
-            <p role="status" className="inline-flex items-center gap-3 rounded-full bg-white/10 px-5 py-3 text-[15px] font-semibold">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary" aria-hidden>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-              Subscribed
-            </p>
-          ) : (
-            <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3">
-              <label className="sr-only" htmlFor="email-signup">
-                Email address
-              </label>
-              <input
-                id="email-signup"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email address"
-                className="flex-1 min-h-12 rounded-full border-0 bg-white px-5 text-[16px] md:text-[15px] text-ink placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              />
-              <button
-                type="submit"
-                disabled={submitting}
-                className="min-h-12 shrink-0 rounded-full bg-white px-6 text-[14px] font-semibold text-primary hover:bg-white/90 disabled:opacity-60"
-              >
-                {submitting ? 'Subscribing…' : 'Subscribe'}
-              </button>
-            </form>
-          )}
-          {error && <p className="mt-2 text-[12px] text-white/90">{error}</p>}
-          <p className={`mt-3 text-[12px] text-white/70 ${subscribed ? "hidden" : ""}`}>
+        ) : (
+          <form
+            onSubmit={onSubmit}
+            className="mx-auto mt-6 flex max-w-[470px] items-end border-b-2 border-ink focus-within:border-violet"
+          >
+            <label className="sr-only" htmlFor="email-signup">
+              Email address
+            </label>
+            <input
+              id="email-signup"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your email address"
+              className="min-h-12 min-w-0 flex-1 bg-transparent px-0.5 text-[16px] text-ink placeholder:text-muted !outline-none md:text-[13px]"
+            />
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:text-violet disabled:opacity-50"
+            >
+              {submitting ? 'Joining…' : 'Join the list ↗'}
+            </button>
+          </form>
+        )}
+        {error && (
+          <p role="alert" className="mt-3 text-[12px] font-medium text-sale">
+            {error}
+          </p>
+        )}
+        {!subscribed && (
+          <p className="mt-4 text-[11px] text-muted">
             Unsubscribe anytime. Read our{' '}
-            <Link href="/privacy" className="underline underline-offset-2">
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-ink">
               privacy policy
             </Link>
             .
           </p>
-        </div>
+        )}
       </div>
     </section>
   )

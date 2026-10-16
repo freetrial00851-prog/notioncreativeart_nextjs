@@ -48,7 +48,7 @@ export function AnnouncementBar() {
 
   return (
     <div
-      className="w-full bg-primary text-primary-contrast text-center text-[12px] sm:text-[13px] py-2 px-4"
+      className="w-full bg-coral px-4 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[0.13em] text-white"
       role="status"
       style={
         useCms && announcement

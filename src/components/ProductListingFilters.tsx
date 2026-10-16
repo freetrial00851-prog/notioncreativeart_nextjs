@@ -16,7 +16,7 @@ const CHECKBOX_CLASS_PANEL =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
 
 const RADIO_CLASS_PANEL =
-  'listing-filter-radio shrink-0 w-5 h-5 rounded-full border-2 border-ink/40 bg-white ' +
+  'listing-filter-radio shrink-0 w-5 h-5 rounded-[3px] border-2 border-ink/40 bg-white ' +
   'appearance-none cursor-pointer transition-colors ' +
   'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
@@ -29,7 +29,7 @@ const CHECKBOX_CLASS_SHEET =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
 
 const RADIO_CLASS_SHEET =
-  'listing-filter-radio shrink-0 w-6 h-6 rounded-full border-2 border-ink bg-white ' +
+  'listing-filter-radio shrink-0 w-6 h-6 rounded-[3px] border-2 border-ink bg-white ' +
   'appearance-none cursor-pointer transition-colors ' +
   'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'

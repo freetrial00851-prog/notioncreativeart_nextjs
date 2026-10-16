@@ -69,7 +69,7 @@ export function Account({ hideOwnerCopyPlaceholders = false }: { hideOwnerCopyPl
     return (
       <div className="max-w-site w-full mx-auto page-gutter py-16 md:py-20">
         <div className={`${ACCOUNT_CARD} mx-auto max-w-[560px] px-6 py-10 text-center`}>
-          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
             <MaterialIcon name="lock" size={28} color="var(--color-primary)" />
           </span>
           <h1 className="type-h1 text-ink">Sign in to see your account</h1>
@@ -150,7 +150,7 @@ function AccountNav({ pathname }: { pathname: string }) {
                 <Link
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full border px-5 text-[15px] md:text-[14px] font-semibold transition-colors ${
+                  className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-[3px] border px-5 text-[15px] md:text-[14px] font-semibold transition-colors ${
                     active ? 'border-primary bg-primary text-primary-contrast' : 'border-border bg-surface text-ink hover:border-primary'
                   }`}
                 >
@@ -214,7 +214,7 @@ function Thumb({ src, size }: { src?: string; size: 'sm' | 'md' }) {
 function EmptyCard({ icon, title, text, children }: { icon: string; title: string; text: string; children: ReactNode }) {
   return (
     <div className={`${ACCOUNT_CARD} px-6 py-10 md:py-12 text-center`}>
-      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
         <MaterialIcon name={icon} size={28} color="var(--color-primary)" />
       </span>
       <p className="type-h2 text-ink">{title}</p>
@@ -460,7 +460,7 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search your patterns"
             autoComplete="off"
-            className="min-h-11 w-full rounded-full border border-border bg-surface pl-11 pr-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light"
+            className="min-h-11 w-full rounded-[3px] border border-border bg-surface pl-11 pr-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light"
           />
         </label>
         <label>
@@ -786,7 +786,7 @@ function Settings() {
           <h2 id="emails-title" className="text-[17px] font-bold text-ink">Sign-in and emails</h2>
           {hasGoogle && (
             <div className="mt-3 flex min-h-11 items-center gap-3 border-b border-border pb-4">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success-bg" aria-hidden>
+              <span className="flex h-6 w-6 items-center justify-center rounded-[3px] bg-success-bg" aria-hidden>
                 <MaterialIcon name="check" size={14} color="var(--color-free)" />
               </span>
               <span className="text-[16px] md:text-[15px] font-medium text-ink">Google</span>
@@ -975,7 +975,7 @@ function LogoutConfirm() {
   const { signOut } = useAuth()
   return (
     <div className={`${ACCOUNT_CARD} mx-auto max-w-[520px] px-6 py-10 text-center`}>
-      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
         <MaterialIcon name="logout" size={28} color="var(--color-primary)" />
       </span>
       <h1 className="type-h1 text-ink">Sign out</h1>

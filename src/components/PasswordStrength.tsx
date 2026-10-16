@@ -25,9 +25,9 @@ export function PasswordStrength({ password }: { password: string }) {
   return (
     <div className="mt-2.5">
       <div className="flex items-center gap-2 mb-2.5">
-        <div className="flex-1 h-1.5 rounded-full bg-line overflow-hidden">
+        <div className="flex-1 h-1.5 rounded-[3px] bg-line overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-300 ease-out"
+            className="h-full rounded-[3px] transition-all duration-300 ease-out"
             style={{ width: strength.width, background: strength.color }}
           />
         </div>

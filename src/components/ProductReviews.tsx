@@ -21,7 +21,7 @@ function firstName(name: string): string {
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <article className="rounded-[18px] border border-border bg-surface px-5 py-5">
+    <article className="rounded-[5px] border border-border bg-surface px-5 py-5">
       <div className="flex items-center justify-between gap-3 mb-2">
         <StarRating value={review.rating} size={16} />
         <time dateTime={review.created_at} className="text-[13px] text-muted">
@@ -47,9 +47,9 @@ function RatingSummary({ stats, reviews }: { stats: ReviewStats; reviews: Review
   }))
   const reviewCount = stats.reviewCount || total
   return (
-    <div className="rounded-[18px] border border-border bg-surface px-5 py-6 md:px-6">
+    <div className="rounded-[5px] border border-border bg-surface px-5 py-6 md:px-6">
       <p className="flex items-baseline gap-2">
-        <span className="font-heading text-[36px] font-bold leading-none text-ink tabular-nums">
+        <span className="font-heading text-[36px] font-normal leading-none text-ink tabular-nums">
           {stats.averageRating.toFixed(1)}
         </span>
         <span className="text-[14px] text-muted">out of 5</span>
@@ -63,12 +63,12 @@ function RatingSummary({ stats, reviews }: { stats: ReviewStats; reviews: Review
           <li key={star} className="flex items-center gap-3 text-[13px] text-muted">
             <span className="w-12 shrink-0">{star} star</span>
             <span
-              className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-skeleton"
+              className="relative h-1.5 flex-1 overflow-hidden rounded-[3px] bg-skeleton"
               role="img"
               aria-label={`${count} of ${total} reviews are ${star} star`}
             >
               <span
-                className="absolute inset-y-0 left-0 rounded-full bg-gold"
+                className="absolute inset-y-0 left-0 rounded-[3px] bg-gold"
                 style={{ width: total > 0 ? `${(count / total) * 100}%` : '0%' }}
               />
             </span>
@@ -154,7 +154,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
       onClick={() => onFormOpenChange(!formOpen)}
       aria-expanded={formOpen}
       aria-controls="write-review"
-      className={`inline-flex min-h-11 items-center justify-center rounded-full border-[1.5px] border-primary bg-white px-6 text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft ${className}`}
     >
       Write a review
     </button>
@@ -205,7 +205,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
           )}
 
           {userReview && (
-            <div className="mt-6 rounded-[18px] border border-border bg-surface p-5 space-y-3">
+            <div className="mt-6 rounded-[5px] border border-border bg-surface p-5 space-y-3">
               <p className="text-[12px] font-semibold text-muted">Your review</p>
               <ReviewCard review={userReview} />
               {userReview.status === 'pending' && (
@@ -220,7 +220,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
           {formOpen && (
             <div id="write-review" className="mt-6 max-w-2xl">
               {canSubmit ? (
-                <form onSubmit={handleSubmit} className="rounded-[18px] border border-border bg-surface p-5 md:p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="rounded-[5px] border border-border bg-surface p-5 md:p-6 space-y-4">
                   <h3 className="text-[18px] font-bold text-ink">Write a review</h3>
                   <div>
                     <p id="review-rating-label" className="mb-2 text-[13px] text-muted">Your rating</p>
@@ -257,7 +257,7 @@ export function ProductReviews({ productId, userId, profile, owned, formOpen, on
                   <button
                     type="submit"
                     disabled={submitting || body.trim().length < 10}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-50"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-6 text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-50"
                   >
                     {submitting ? 'Submitting…' : 'Submit review'}
                   </button>

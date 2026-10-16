@@ -103,7 +103,7 @@ function DescriptionBlocks({ text }: { text: string }) {
         }
         if (b.type === 'warning') {
           return (
-            <p key={i} className="flex items-start gap-2 text-[14px] text-muted leading-relaxed rounded-[14px] border border-border bg-surface-warm px-4 py-3">
+            <p key={i} className="flex items-start gap-2 text-[14px] text-muted leading-relaxed rounded-[5px] border border-border bg-surface-warm px-4 py-3">
               <MaterialIcon name="info" size={18} className="mt-0.5 shrink-0" />
               <span>{b.content}</span>
             </p>
@@ -138,7 +138,7 @@ function TickList({ items }: { items: string[] }) {
 function Chip({ children, style, className = '' }: { children: ReactNode; style?: CSSProperties; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold leading-none ${className}`}
+      className={`inline-flex items-center rounded-[3px] px-3 py-1.5 text-[12px] font-semibold leading-none ${className}`}
       style={style}
     >
       {children}
@@ -159,7 +159,7 @@ const TABS: { key: Tab; label: string }[] = [
 type OwnedInfo = { purchaseDate: string | null; orderId: string | null; orderNumber: string | null }
 
 const ICON_BUTTON =
-  'inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-ink shadow-sm transition-opacity hover:opacity-90'
+  'inline-flex size-11 shrink-0 items-center justify-center rounded-[3px] bg-white text-ink shadow-sm transition-opacity hover:opacity-90'
 
 function formatPurchaseDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -362,7 +362,7 @@ export function ProductDetail({
       )}
       <Link
         href="/shop"
-        className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover transition-colors"
+        className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-6 text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover transition-colors"
       >
         Back to shop
       </Link>
@@ -539,7 +539,7 @@ export function ProductDetail({
       ['Delivery', 'Instant download'],
     ]
     return (
-      <dl className="max-w-md rounded-[18px] border border-border bg-surface-warm divide-y divide-border text-[14px]">
+      <dl className="max-w-md rounded-[5px] border border-border bg-surface-warm divide-y divide-border text-[14px]">
         {detailRows.map(([label, value]) => (
           <div key={label} className="flex justify-between gap-6 px-5 py-3">
             <dt className="text-muted shrink-0">{label}</dt>
@@ -581,7 +581,7 @@ export function ProductDetail({
           <p className="text-[18px] text-muted line-through">
             <span className="sr-only">Was </span>${product.compare_at_price!.toFixed(2)}
           </p>
-          <span className="inline-flex items-center rounded-full bg-sale/10 px-2.5 py-1 text-[12px] font-bold text-sale">
+          <span className="inline-flex items-center rounded-[3px] bg-sale/10 px-2.5 py-1 text-[12px] font-bold text-sale">
             Save {savePercent}%
           </span>
         </>
@@ -590,12 +590,12 @@ export function ProductDetail({
   ) : null
 
   const primaryButtonClass =
-    'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60'
+    'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60'
   const secondaryButtonClass =
-    'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-60'
+    'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-60'
 
   const soldOutPill = (
-    <div className="flex min-h-11 w-full items-center justify-center rounded-full border border-border text-[13px] font-semibold text-muted">
+    <div className="flex min-h-11 w-full items-center justify-center rounded-[3px] border border-border text-[13px] font-semibold text-muted">
       SOLD OUT
     </div>
   )
@@ -606,7 +606,7 @@ export function ProductDetail({
       <section className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-8 md:pb-10">
         <Link
           href="/shop"
-          className="md:hidden -ml-2 mb-3 inline-flex min-h-11 items-center gap-1 rounded-full px-2 text-[15px] font-medium text-muted hover:text-ink"
+          className="md:hidden -ml-2 mb-3 inline-flex min-h-11 items-center gap-1 rounded-[3px] px-2 text-[15px] font-medium text-muted hover:text-ink"
         >
           <MaterialIcon name="chevron_left" size={20} />
           Shop
@@ -714,7 +714,7 @@ export function ProductDetail({
                   {images.map((img, i) => (
                     <span
                       key={`${img}-${i}`}
-                      className={`h-[7px] rounded-full transition-[width,background-color] duration-150 ${i === activeImage ? 'w-6 bg-primary' : 'w-[7px] bg-border'}`}
+                      className={`h-[7px] rounded-[3px] transition-[width,background-color] duration-150 ${i === activeImage ? 'w-6 bg-primary' : 'w-[7px] bg-border'}`}
                     />
                   ))}
                 </div>
@@ -729,7 +729,7 @@ export function ProductDetail({
                       onClick={() => setActiveImage(i)}
                       aria-label={`Show image ${i + 1}`}
                       aria-current={i === activeImage ? 'true' : undefined}
-                      className={`relative h-[86px] lg:h-[98px] shrink-0 basis-[calc((100%-36px)/4)] overflow-hidden rounded-[14px] bg-surface transition-colors ${i === activeImage ? 'border-2 border-primary' : 'border border-border hover:border-muted-light'}`}
+                      className={`relative h-[86px] lg:h-[98px] shrink-0 basis-[calc((100%-36px)/4)] overflow-hidden rounded-[5px] bg-surface transition-colors ${i === activeImage ? 'border-2 border-primary' : 'border border-border hover:border-muted-light'}`}
                     >
                       <Image
                         src={deriveVariantUrl(img, 'thumb')}
@@ -763,7 +763,7 @@ export function ProductDetail({
                 type="button"
                 onClick={shareListing}
                 aria-label="Share this pattern"
-                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-white text-ink transition-colors hover:bg-surface-warm md:mt-1"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-[3px] border border-border bg-white text-ink transition-colors hover:bg-surface-warm md:mt-1"
               >
                 <ShareIcon size={18} />
               </button>
@@ -780,8 +780,8 @@ export function ProductDetail({
             )}
 
             {mode === 'owned' && (
-              <div className="mb-4 flex items-start gap-3 rounded-[18px] border border-border bg-success-bg px-4 py-4 md:px-5">
-                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-free text-white" aria-hidden>
+              <div className="mb-4 flex items-start gap-3 rounded-[5px] border border-border bg-success-bg px-4 py-4 md:px-5">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-[3px] bg-free text-white" aria-hidden>
                   <MaterialIcon name="check" size={20} />
                 </span>
                 <div className="min-w-0">
@@ -857,7 +857,7 @@ export function ProductDetail({
                     <button
                       type="button"
                       onClick={openReviewForm}
-                      className="inline-flex min-h-12 items-center justify-center rounded-full px-4 text-[15px] font-semibold text-primary hover:underline"
+                      className="inline-flex min-h-12 items-center justify-center rounded-[3px] px-4 text-[15px] font-semibold text-primary hover:underline"
                     >
                       Leave a review
                     </button>
@@ -886,7 +886,7 @@ export function ProductDetail({
             </div>
 
             {mode === 'paid' && !product.sold_out && (
-              <div className="mt-5 flex items-start gap-3 rounded-[18px] border border-border bg-surface-warm px-4 py-4 md:px-5">
+              <div className="mt-5 flex items-start gap-3 rounded-[5px] border border-border bg-surface-warm px-4 py-4 md:px-5">
                 <MaterialIcon name="verified_user" size={20} color="var(--color-primary)" className="mt-0.5 shrink-0" />
                 <div className="min-w-0 text-[14px]">
                   <p className="font-bold text-ink">Secure checkout by Lemon Squeezy</p>
@@ -913,14 +913,14 @@ export function ProductDetail({
             )}
 
             {mode === 'owned' && !hideOwnerCopyPlaceholders && (
-              <p className="mt-5 rounded-[18px] border border-border bg-surface-warm px-5 py-4 text-[14px] leading-relaxed text-muted">
+              <p className="mt-5 rounded-[5px] border border-border bg-surface-warm px-5 py-4 text-[14px] leading-relaxed text-muted">
                 {/* TODO(owner): real support email */}
                 Can not open the file? Write to <span className="text-primary underline">[SUPPORT EMAIL]</span> and we will fix it.
               </p>
             )}
 
             {mode === 'free' && (
-              <div className="mt-5 rounded-[18px] border border-border bg-surface-warm px-5 py-4">
+              <div className="mt-5 rounded-[5px] border border-border bg-surface-warm px-5 py-4">
                 <p className="text-[16px] font-bold text-ink">Like this pattern?</p>
                 <p className="mt-1 text-[14px] leading-relaxed text-muted">
                   Explore more patterns at the same level, with photos and full instructions.
@@ -1086,7 +1086,7 @@ export function ProductDetail({
                   onClick={toggleWishlist}
                   aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                   aria-pressed={inWishlist}
-                  className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-white text-ink"
+                  className="inline-flex size-11 shrink-0 items-center justify-center rounded-[3px] border border-border bg-white text-ink"
                 >
                   <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-sale)' : 'currentColor'} />
                 </button>

@@ -63,7 +63,7 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
         <button
           type="button"
           onClick={dismiss}
-          className="absolute top-4 right-4 p-1 rounded-full hover:opacity-80 transition-opacity"
+          className="absolute top-4 right-4 p-1 rounded-[3px] hover:opacity-80 transition-opacity"
           aria-label="Skip newsletter signup"
         >
           <CloseCircleIcon size={28} />
@@ -72,13 +72,13 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
         {submitted ? (
           <div className="pt-2 pr-8">
             <p className="text-[10px] tracking-[0.2em] text-ink-soft mb-2">JOIN OUR MAKER COMMUNITY</p>
-            <h2 id="newsletter-prompt-title" className="font-heading font-semibold text-xl mb-2">You're on the list!</h2>
+            <h2 id="newsletter-prompt-title" className="font-heading font-normal text-xl mb-2">You're on the list!</h2>
             <p className="text-[13px] text-ink-soft">Thanks — your download is already on its way.</p>
           </div>
         ) : (
           <>
             <p className="text-[10px] tracking-[0.2em] text-ink-soft mb-2 pr-8">JOIN OUR MAKER COMMUNITY</p>
-            <h2 id="newsletter-prompt-title" className="font-heading font-semibold text-xl mb-2 pr-8">
+            <h2 id="newsletter-prompt-title" className="font-heading font-normal text-xl mb-2 pr-8">
               Get new patterns in your inbox
             </h2>
             <p className="text-[13px] text-ink-soft mb-6">
@@ -98,7 +98,7 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full px-6 py-3 rounded-full text-[13px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+                className="w-full px-6 py-3 rounded-[3px] text-[13px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
                 style={{ background: 'var(--color-accent)', color: 'white' }}
               >
                 {submitting ? 'Subscribing…' : 'Subscribe'}

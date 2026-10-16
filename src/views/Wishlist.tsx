@@ -57,7 +57,7 @@ export function Wishlist({ embedded = false }: { embedded?: boolean }) {
         <ProductGridSkeleton variant="wishlist" />
       ) : count === 0 ? (
         <div className={`${ACCOUNT_CARD} px-6 py-10 md:py-12 text-center`}>
-          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
             <MaterialIcon name="favorite" size={28} color="var(--color-primary)" />
           </span>
           <p className="type-h2 text-ink">Save patterns you love</p>

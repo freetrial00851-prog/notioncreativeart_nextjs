@@ -1,168 +1,85 @@
-'use client'
-
 import Link from 'next/link'
-import { useAuth } from '../context/AuthContext'
-import { useUI } from '../context/UIContext'
 import { Logo } from './Logo'
 
-const SHOP_MOBILE = [
+const EXPLORE = [
   { label: 'All patterns', to: '/shop' },
-  { label: 'Amigurumi', to: '/shop/amigurumi' },
-  { label: 'Wearables', to: '/shop/wearables' },
-  { label: 'Home decor', to: '/shop/home-decor' },
-  { label: 'Free patterns', to: '/shop?price=free' },
-]
-
-const SHOP_DESKTOP = [
-  ...SHOP_MOBILE,
+  { label: 'New arrivals', to: '/shop?sort=newest' },
   { label: 'Bundles', to: '/shop/bundles' },
-  { label: 'New arrivals', to: '/shop/new' },
+  { label: 'Free patterns', to: '/shop?price=free' },
   { label: 'Sale', to: '/shop/sale' },
 ]
 
 const HELP = [
-  { label: 'FAQ', to: '/faq' },
-  { label: 'Contact', to: '/contact' },
+  { label: 'FAQs', to: '/faq' },
+  { label: 'About us', to: '/about' },
+  { label: 'Contact us', to: '/contact' },
   { label: 'Refund policy', to: '/refund-policy' },
 ]
 
-/**
- * Site footer — dark `footer` token, breakpoint columns per DESIGN_SPEC §1 / §3.3.
- * Mobile: brand + SHOP (no Sale) + HELP. Tablet/laptop: + ACCOUNT (+ Sale in SHOP).
- */
-export function Footer() {
-  const { user, signOut } = useAuth()
-  const { openAuthModal } = useUI()
-  const year = new Date().getFullYear()
+const ACCOUNT = [
+  { label: 'My account', to: '/account/downloads' },
+  { label: 'My purchases', to: '/account/orders' },
+  { label: 'Wishlist', to: '/account/wishlist' },
+  { label: 'Shopping bag', to: '/cart' },
+]
 
+const LINK =
+  'inline-flex min-h-11 items-center text-[12px] text-muted transition-colors hover:text-coral md:min-h-9'
+
+/** Light footer: brand + about, three link columns, small legal row. */
+export function Footer() {
+  const year = new Date().getFullYear()
   return (
-    <footer className="bg-footer text-white">
-      <div className="max-w-site mx-auto page-gutter section-y">
-        <div className="grid grid-cols-2 md:grid-cols-[1.3fr_1fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr] gap-x-5 lg:gap-x-6 gap-y-10">
-          <div className="col-span-2 md:col-span-1 max-w-sm">
-            <Logo variant="footer" className="mb-3" />
-            <p className="text-[13px] leading-relaxed text-white/70 mb-4">
-              Instant digital crochet patterns for makers of every level. Create something wonderful.
+    <footer className="bg-bg">
+      <div className="max-w-site mx-auto page-gutter pb-6 pt-12">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 pb-10 md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-9">
+          <div className="col-span-2 md:col-span-1">
+            <Logo variant="full" />
+            <p className="mt-[18px] max-w-[260px] text-[12px] leading-[1.8] text-muted">
+              Thoughtful digital patterns for curious makers. Find a project, make it your own, and enjoy every stitch along
+              the way.
             </p>
           </div>
-
-          <FooterCol title="SHOP">
-            {/* Mobile: no Sale */}
-            <ul className="md:hidden">
-              {SHOP_MOBILE.map((l) => (
-                <li key={l.to}>
-                  <Link href={l.to} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <ul className="hidden md:block space-y-2.5">
-              {SHOP_DESKTOP.map((l) => (
-                <li key={l.to}>
-                  <Link href={l.to} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </FooterCol>
-
-          <FooterCol title="HELP">
-            <ul className="md:space-y-2.5">
-              {HELP.map((l) => (
-                <li key={l.to}>
-                  <Link href={l.to} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </FooterCol>
-
-          <FooterCol title="ACCOUNT" className="hidden md:block">
-            <ul className="md:space-y-2.5">
-              {user ? (
-                <>
-                  <li>
-                    <Link href="/account/downloads" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                      My downloads
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/account/wishlist" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                      Wishlist
-                    </Link>
-                  </li>
-                  <li>
-                    <button type="button" onClick={() => signOut()} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                      Sign out
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li>
-                    <button type="button" onClick={() => openAuthModal()} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                      Sign in
-                    </button>
-                  </li>
-                  <li>
-                    <Link href="/account/downloads" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                      My downloads
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/account/wishlist" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
-                      Wishlist
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </FooterCol>
+          <FooterCol title="Explore" links={EXPLORE} />
+          <FooterCol title="Here to help" links={HELP} />
+          <FooterCol title="Your account" links={ACCOUNT} />
         </div>
-      </div>
 
-      <div className="border-t border-white/10">
-        <div className="max-w-site mx-auto page-gutter py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[12px] text-white/55">
-          <p>© {year} Notion Creative Art. All rights reserved.</p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Link href="/privacy" className="inline-flex max-md:min-h-11 items-center hover:text-white">
+        <div className="flex flex-col gap-3 border-t border-border pt-5 text-[11px] text-muted md:flex-row md:items-center md:justify-between">
+          <span>© {year} NotionCreativeArt. All rights reserved.</span>
+          <span className="hidden md:inline">Made for makers, with care.</span>
+          <span className="flex items-center gap-1">
+            <Link href="/privacy" className="inline-flex min-h-11 items-center px-1 hover:text-coral md:min-h-0">
               Privacy
             </Link>
-            <Link href="/terms" className="inline-flex max-md:min-h-11 items-center hover:text-white">
+            ·
+            <Link href="/terms" className="inline-flex min-h-11 items-center px-1 hover:text-coral md:min-h-0">
               Terms
             </Link>
-            <span className="flex items-center gap-1.5 flex-wrap">
-              <span>We accept</span>
-              {['Visa', 'Mastercard', 'Amex', 'PayPal'].map((p) => (
-                <span key={p} className="rounded border border-white/20 px-1.5 py-0.5 text-[10px]">
-                  {p}
-                </span>
-              ))}
-            </span>
-          </div>
+            ·
+            <Link href="/refund-policy" className="inline-flex min-h-11 items-center px-1 hover:text-coral md:min-h-0">
+              Refund policy
+            </Link>
+          </span>
         </div>
       </div>
     </footer>
   )
 }
 
-function FooterCol({
-  title,
-  children,
-  className = '',
-}: {
-  title: string
-  children: React.ReactNode
-  className?: string
-}) {
+function FooterCol({ title, links }: { title: string; links: { label: string; to: string }[] }) {
   return (
-    <div className={className}>
-      <p className="text-[11px] font-semibold uppercase tracking-normal text-white/80 mb-3">{title}</p>
-      {children}
+    <div>
+      <p className="mb-2 mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-ink">{title}</p>
+      <ul>
+        {links.map((l) => (
+          <li key={l.to}>
+            <Link href={l.to} className={LINK}>
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
-

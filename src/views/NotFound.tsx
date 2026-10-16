@@ -20,7 +20,7 @@ export function NotFound() {
       <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-5 py-16 text-center">
         <p
           aria-hidden
-          className="pointer-events-none absolute inset-0 flex select-none items-center justify-center font-heading lining-nums text-[48vw] font-bold leading-none text-primary-soft md:text-[28vw]"
+          className="pointer-events-none absolute inset-0 flex select-none items-center justify-center font-heading lining-nums text-[48vw] font-normal leading-none text-primary-soft md:text-[28vw]"
         >
           404
         </p>
@@ -38,7 +38,7 @@ export function NotFound() {
               name="q"
               type="search"
               placeholder="Search patterns"
-              className="block min-h-12 w-full rounded-full border border-border bg-surface px-5 text-[16px] text-ink placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
+              className="block min-h-12 w-full rounded-[3px] border border-border bg-surface px-5 text-[16px] text-ink placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
             />
           </form>
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -58,7 +58,7 @@ export function NotFound() {
               <li key={q.href}>
                 <Link
                   href={q.href}
-                  className="inline-flex min-h-11 items-center rounded-full border border-border bg-surface px-4 text-[13px] font-medium text-ink hover:bg-surface-warm"
+                  className="inline-flex min-h-11 items-center rounded-[3px] border border-border bg-surface px-4 text-[13px] font-medium text-ink hover:bg-surface-warm"
                 >
                   {q.label}
                 </Link>

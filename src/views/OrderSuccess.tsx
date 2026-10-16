@@ -43,9 +43,9 @@ const RECOMMENDATION_POOL = 12
 const RECOMMENDATIONS_SHOWN = 4
 
 const PRIMARY_LINK =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-[3px] bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover'
 const SECONDARY_LINK =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-6 text-[15px] md:text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] md:text-[14px] font-semibold text-primary transition-colors hover:bg-primary-soft'
 
 function isRecent(createdAt: string) {
   const t = new Date(createdAt).getTime()
@@ -325,7 +325,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
   return shell(
     <>
       <header className="text-center">
-        <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-border bg-success-bg" aria-hidden>
+        <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] border border-border bg-success-bg" aria-hidden>
           <MaterialIcon name="check" size={28} color="var(--color-free)" />
         </span>
         <h1
@@ -348,7 +348,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
       </header>
 
       <div className="mt-8 md:mt-10 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:gap-6">
-        <section aria-labelledby="ready-title" className="rounded-[20px] border border-border bg-surface p-5 md:p-6">
+        <section aria-labelledby="ready-title" className="rounded-[5px] border border-border bg-surface p-5 md:p-6">
           <h2 id="ready-title" className="type-h2 text-ink">
             Your patterns are ready
           </h2>
@@ -416,7 +416,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
         </section>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-1">
-          <section aria-labelledby="summary-title" className="rounded-[20px] border border-border bg-surface p-5 md:p-6 md:col-span-2 lg:col-span-1">
+          <section aria-labelledby="summary-title" className="rounded-[5px] border border-border bg-surface p-5 md:p-6 md:col-span-2 lg:col-span-1">
             <h2 id="summary-title" className="text-[17px] font-bold text-ink">
               Order summary
             </h2>
@@ -448,7 +448,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
           <SupportCard hidePlaceholder={hideOwnerCopyPlaceholders} />
 
           {firstProduct && (
-            <section aria-labelledby="review-title" className="rounded-[20px] border border-border bg-surface p-5 md:p-6">
+            <section aria-labelledby="review-title" className="rounded-[5px] border border-border bg-surface p-5 md:p-6">
               <div className="flex gap-3">
                 <MaterialIcon name="star_border" size={22} color="var(--color-gold)" className="mt-0.5 shrink-0" />
                 <div>
@@ -486,8 +486,8 @@ function StatusCard({
   children: ReactNode
 }) {
   return (
-    <section role={role} className="mx-auto max-w-[640px] rounded-[20px] border border-border bg-surface px-6 py-12 md:px-10 text-center">
-      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+    <section role={role} className="mx-auto max-w-[640px] rounded-[5px] border border-border bg-surface px-6 py-12 md:px-10 text-center">
+      <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
         {icon}
       </span>
       <h1 ref={headingRef} tabIndex={headingRef ? -1 : undefined} className="type-h1 text-ink outline-none">
@@ -500,7 +500,7 @@ function StatusCard({
 
 function SupportCard({ hidePlaceholder }: { hidePlaceholder: boolean }) {
   return (
-    <section aria-labelledby="support-title" className="rounded-[20px] border border-border bg-surface-warm p-5 md:p-6 text-left">
+    <section aria-labelledby="support-title" className="rounded-[5px] border border-border bg-surface-warm p-5 md:p-6 text-left">
       <div className="flex gap-3">
         <MaterialIcon name="help" size={22} color="var(--color-primary)" className="mt-0.5 shrink-0" />
         <div>

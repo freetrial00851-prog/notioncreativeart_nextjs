@@ -78,7 +78,7 @@ function AuthSheetInner() {
           inert={authSheetOpen ? undefined : true}
           tabIndex={-1}
           className={`min-h-full w-full bg-background outline-none transition-opacity duration-200 motion-reduce:transition-none
-            md:min-h-0 md:max-w-[440px] md:max-h-[calc(100dvh-3rem)] md:overflow-y-auto md:rounded-[24px] md:border md:border-border md:shadow-[0_24px_64px_rgba(22,24,29,0.22)]
+            md:min-h-0 md:max-w-[440px] md:max-h-[calc(100dvh-3rem)] md:overflow-y-auto md:rounded-[5px] md:border md:border-border md:shadow-[0_24px_64px_rgba(22,24,29,0.22)]
             ${authSheetOpen ? 'opacity-100' : 'opacity-0'}`}
         >
           <AuthPanel

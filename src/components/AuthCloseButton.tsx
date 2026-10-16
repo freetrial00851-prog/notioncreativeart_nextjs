@@ -26,7 +26,7 @@ export function AuthCloseButton({ fallbackTo = '/' }: { fallbackTo?: string }) {
       type="button"
       onClick={handleClose}
       aria-label="Close"
-      className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-9 h-9 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+      className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-9 h-9 rounded-[3px] flex items-center justify-center hover:opacity-80 transition-opacity"
     >
       <CloseCircleIcon size={32} />
     </button>

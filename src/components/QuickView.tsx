@@ -133,14 +133,14 @@ export function QuickView({
               <button
                 onClick={prev}
                 aria-label="Previous image"
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-canvas/90 flex items-center justify-center text-ink hover:bg-canvas"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-[3px] bg-canvas/90 flex items-center justify-center text-ink hover:bg-canvas"
               >
                 ‹
               </button>
               <button
                 onClick={next}
                 aria-label="Next image"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-canvas/90 flex items-center justify-center text-ink hover:bg-canvas"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-[3px] bg-canvas/90 flex items-center justify-center text-ink hover:bg-canvas"
               >
                 ›
               </button>
@@ -150,7 +150,7 @@ export function QuickView({
                     key={i}
                     aria-label={`Image ${i + 1}`}
                     onClick={() => setActiveImage(i)}
-                    className={`w-1.5 h-1.5 rounded-full transition-colors ${i === activeImage ? 'bg-ink' : 'bg-ink/25'}`}
+                    className={`w-1.5 h-1.5 rounded-[3px] transition-colors ${i === activeImage ? 'bg-ink' : 'bg-ink/25'}`}
                   />
                 ))}
               </div>
@@ -197,34 +197,34 @@ export function QuickView({
           </div>
           <div className="space-y-2 shrink-0 pt-2 border-t border-line/60">
             {product.sold_out ? (
-              <div className="w-full py-3.5 border border-line rounded-full text-center text-[12px] tracking-[0.12em] text-ink-soft">SOLD OUT</div>
+              <div className="w-full py-3.5 border border-line rounded-[3px] text-center text-[12px] tracking-[0.12em] text-ink-soft">SOLD OUT</div>
             ) : (
               <button
                 onClick={handleBuy}
                 disabled={(isFreeProduct(product) && downloadingFree) || (product.price > 0 && buying)}
-                className="w-full py-3 text-canvas text-[13px] font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-60"
+                className="w-full py-3 text-canvas text-[13px] font-semibold rounded-[3px] hover:opacity-90 transition-opacity disabled:opacity-60"
                 style={{ background: isFreeProduct(product) ? 'var(--color-sale-green)' : 'var(--color-accent)' }}
               >
                 {isFreeProduct(product) ? 'Download' : 'Buy now'}
               </button>
             )}
             <div className={product.sold_out || isFreeProduct(product) ? '' : 'grid grid-cols-2 gap-2'}>
-              <button onClick={toggleWishlist} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full w-full">
+              <button onClick={toggleWishlist} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-[3px] w-full">
                 {inWishlist ? '♥ WISHLISTED' : '♡ WISHLIST'}
               </button>
               {!product.sold_out && product.price > 0 && (
                 inCart ? (
-                  <Link href="/cart" onClick={onClose} className="flex items-center justify-center py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
+                  <Link href="/cart" onClick={onClose} className="flex items-center justify-center py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-[3px]">
                     ✓ IN CART
                   </Link>
                 ) : (
-                  <button onClick={toggleCart} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
+                  <button onClick={toggleCart} className="py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-[3px]">
                     + ADD TO CART
                   </button>
                 )
               )}
             </div>
-            <Link href={`/pattern/${product.slug}`} onClick={onClose} className="block text-center w-full py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-full">
+            <Link href={`/pattern/${product.slug}`} onClick={onClose} className="block text-center w-full py-3 border border-ink text-[12px] tracking-[0.1em] hover:bg-surface transition-colors rounded-[3px]">
               VIEW FULL DETAILS
             </Link>
           </div>

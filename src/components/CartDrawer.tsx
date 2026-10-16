@@ -66,7 +66,7 @@ export function CartDrawer() {
         inert={drawerOpen ? undefined : true}
         tabIndex={-1}
         className={`fixed z-50 bg-background flex flex-col shadow-2xl outline-none transition-transform duration-300 ease-out motion-reduce:transition-none
-          inset-x-0 bottom-0 max-h-[90dvh] rounded-t-[24px]
+          inset-x-0 bottom-0 max-h-[90dvh] rounded-t-[5px]
           md:inset-y-0 md:right-0 md:left-auto md:bottom-auto md:max-h-none md:h-full md:w-[420px] md:rounded-none
           ${drawerOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full invisible'}`}
       >
@@ -86,7 +86,7 @@ export function CartDrawer() {
               if (!checkingOut) closeDrawer()
             }}
             aria-label="Close cart"
-            className="touch-target inline-flex items-center justify-center rounded-full text-ink hover:bg-surface-warm"
+            className="touch-target inline-flex items-center justify-center rounded-[3px] text-ink hover:bg-surface-warm"
           >
             <MaterialIcon name="close" size={24} />
           </button>
@@ -104,7 +104,7 @@ export function CartDrawer() {
 
         {empty ? (
           <div className="flex flex-1 flex-col items-center justify-center px-8 py-12 text-center">
-            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft" aria-hidden>
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
               <BagIcon />
             </span>
             <p className="type-h2 text-ink mb-2">Your cart is empty</p>
@@ -115,7 +115,7 @@ export function CartDrawer() {
               <Link
                 href="/shop"
                 onClick={closeDrawer}
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-[3px] bg-primary px-7 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover"
               >
                 Shop all patterns
               </Link>
