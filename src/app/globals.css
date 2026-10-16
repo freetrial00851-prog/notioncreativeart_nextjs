@@ -192,6 +192,9 @@ html {
   font-size: var(--text-hero);
   line-height: 1.1;
   letter-spacing: -0.02em;
+  @media (min-width: 768px) {
+    font-size: 3.25rem;
+  }
   @media (min-width: 1024px) {
     font-size: var(--text-hero-lg);
   }

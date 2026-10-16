@@ -253,7 +253,7 @@ export function Home({
             <p className="mb-5 inline-flex rounded-full bg-primary-soft px-3.5 py-2 text-[11px] font-bold uppercase leading-none tracking-[0.1em] text-primary">
               {hero?.eyebrow?.trim() || 'Crochet patterns for every maker'}
             </p>
-            <h1 className="type-hero mb-5 max-w-xl text-ink">Beautiful crochet patterns, ready to download.</h1>
+            <h1 className="type-hero mb-5 max-w-xl text-ink md:max-w-none lg:max-w-xl">Beautiful crochet patterns, ready to download.</h1>
             <p className="mb-7 max-w-lg text-[16px] leading-relaxed text-muted lg:text-[18px]">
               Clear, tested PDF patterns for every skill level. Pay once, download instantly and keep them for life.
             </p>
@@ -279,8 +279,8 @@ export function Home({
             </ul>
           </div>
 
-          <div className="grid aspect-[6/5] w-full grid-cols-[11fr_10fr] grid-rows-2 gap-3 md:aspect-[2/1] md:gap-4 lg:aspect-[6/5]">
-            <HeroTile photo={heroTiles[0]} tint="var(--color-tint-lavender)" className="row-span-2" priority />
+          <div className="grid aspect-[6/5] w-full grid-cols-[11fr_10fr] grid-rows-2 gap-3 md:aspect-[2.9/1] md:grid-cols-[13fr_10fr_10fr] md:grid-rows-1 md:gap-4 lg:aspect-[6/5] lg:grid-cols-[11fr_10fr] lg:grid-rows-2">
+            <HeroTile photo={heroTiles[0]} tint="var(--color-tint-lavender)" className="row-span-2 md:row-span-1 lg:row-span-2" priority />
             <HeroTile photo={heroTiles[1]} tint="var(--color-tint-sage)" />
             <HeroTile photo={heroTiles[2]} tint="var(--color-surface-warm)" />
           </div>
@@ -291,7 +291,7 @@ export function Home({
       <section className="border-y border-border bg-surface">
         <ul className="mx-auto grid max-w-site grid-cols-2 gap-x-4 gap-y-6 page-gutter py-6 lg:grid-cols-4 lg:py-7">
           {TRUST_ITEMS.map((item) => (
-            <li key={item.title} className="flex flex-col items-start gap-3 lg:flex-row lg:items-center">
+            <li key={item.title} className="flex flex-col items-start gap-3 md:flex-row md:items-center">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
                 {item.icon}
               </span>
