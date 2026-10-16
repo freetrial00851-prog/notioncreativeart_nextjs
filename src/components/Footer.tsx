@@ -38,7 +38,7 @@ export function Footer() {
   return (
     <footer className="bg-footer text-white">
       <div className="max-w-site mx-auto page-gutter section-y">
-        <div className="grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr] gap-x-6 gap-y-10">
+        <div className="grid grid-cols-2 md:grid-cols-[1.3fr_1fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr] gap-x-5 lg:gap-x-6 gap-y-10">
           <div className="col-span-2 md:col-span-1 max-w-sm">
             <Logo variant="footer" className="mb-3" />
             <p className="text-[13px] leading-relaxed text-white/70 mb-4">

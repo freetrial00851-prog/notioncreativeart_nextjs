@@ -1,7 +1,10 @@
+import { isNewsletterSubscribed } from './newsletter'
+
 export const NEWSLETTER_PROMPT_KEY = 'nca_newsletter_prompted'
 
 export function hasBeenNewsletterPrompted(): boolean {
   if (typeof window === 'undefined') return true
+  if (isNewsletterSubscribed()) return true
   try {
     return sessionStorage.getItem(NEWSLETTER_PROMPT_KEY) === '1'
   } catch {

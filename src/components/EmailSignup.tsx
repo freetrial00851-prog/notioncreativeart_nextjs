@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { subscribeToNewsletter } from '@/lib/newsletter'
+import { subscribeToNewsletter, useNewsletterSubscribed } from '@/lib/newsletter'
 
 /** Primary newsletter band — DESIGN_SPEC §3.12 */
 export function EmailSignup() {
   const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+  const subscribed = useNewsletterSubscribed()
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -21,21 +21,29 @@ export function EmailSignup() {
       setError(err)
       return
     }
-    setSubmitted(true)
   }
 
   return (
     <section className="bg-primary text-primary-contrast">
       <div className="max-w-site mx-auto page-gutter section-y flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div className="min-w-0 lg:max-w-md">
-          <h2 className="type-h2 mb-2">Get 10% off your next order</h2>
+          <h2 className="type-h2 mb-2">{subscribed ? "You're on the list" : 'Get 10% off your next order'}</h2>
           <p className="text-[15px] text-white/85 leading-relaxed">
-            Join the maker community. New patterns, straight to your inbox.
+            {subscribed
+              ? 'Thanks for joining the maker community. New patterns will land straight in your inbox.'
+              : 'Join the maker community. New patterns, straight to your inbox.'}
           </p>
         </div>
         <div className="w-full lg:max-w-md">
-          {submitted ? (
-            <p className="text-[14px] font-medium">You&apos;re on the list — thank you!</p>
+          {subscribed ? (
+            <p role="status" className="inline-flex items-center gap-3 rounded-full bg-white/10 px-5 py-3 text-[15px] font-semibold">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary" aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              Subscribed
+            </p>
           ) : (
             <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3">
               <label className="sr-only" htmlFor="email-signup">
@@ -48,19 +56,19 @@ export function EmailSignup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
-                className="flex-1 min-h-11 rounded-full border-0 px-5 text-[15px] text-ink placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="flex-1 min-h-12 rounded-full border-0 bg-white px-5 text-[16px] md:text-[15px] text-ink placeholder:text-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="min-h-11 shrink-0 rounded-full bg-white px-6 text-[14px] font-semibold text-primary hover:bg-white/95 disabled:opacity-60"
+                className="min-h-12 shrink-0 rounded-full bg-white px-6 text-[14px] font-semibold text-primary hover:bg-white/90 disabled:opacity-60"
               >
                 {submitting ? 'Subscribing…' : 'Subscribe'}
               </button>
             </form>
           )}
           {error && <p className="mt-2 text-[12px] text-white/90">{error}</p>}
-          <p className="mt-3 text-[12px] text-white/70">
+          <p className={`mt-3 text-[12px] text-white/70 ${subscribed ? "hidden" : ""}`}>
             Unsubscribe anytime. Read our{' '}
             <Link href="/privacy" className="underline underline-offset-2">
               privacy policy
