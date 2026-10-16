@@ -36,9 +36,9 @@ export function AuthPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-background md:flex md:items-start md:justify-center md:bg-surface-warm md:px-6 md:py-12">
+    <main className="min-h-dvh bg-background md:flex md:items-center md:justify-center md:bg-surface-warm md:px-6 md:py-10">
       <SignupLoadingOverlay active={view === 'signup' && signup.submitting} />
-      <div className="w-full md:my-auto md:max-w-[560px] md:rounded-[24px] md:border md:border-border md:bg-background md:shadow-[0_12px_40px_rgba(22,24,29,0.08)]">
+      <div className="w-full md:max-w-[440px] md:rounded-[24px] md:border md:border-border md:bg-background md:shadow-[0_12px_40px_rgba(22,24,29,0.08)]">
         <AuthPanel
           view={view}
           onViewChange={setView}

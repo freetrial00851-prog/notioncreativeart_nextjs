@@ -14,7 +14,7 @@ export type AuthView = 'login' | 'signup'
 const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter and a special character.'
 
 const INPUT =
-  'block w-full min-h-11 rounded-xl border bg-surface px-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25'
+  'block w-full min-h-12 rounded-xl border bg-surface px-4 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25'
 
 function inputClass(hasError: boolean) {
   return `${INPUT} ${hasError ? 'border-error focus:border-error' : 'border-border focus:border-primary'}`
@@ -81,7 +81,7 @@ export function AuthPanel({
   const Heading = headingLevel
 
   return (
-    <div className="relative px-5 pt-8 pb-8 md:px-10 md:pt-10 md:pb-9">
+    <div className="relative px-5 pt-6 pb-6 md:px-8 md:pt-8 md:pb-7">
       {onClose && (
         <button
           type="button"
@@ -93,16 +93,16 @@ export function AuthPanel({
         </button>
       )}
 
-      <p className="text-center text-[18px] md:text-[20px] font-bold leading-none text-primary" style={{ fontFamily: 'var(--font-logo)' }}>
+      <p className="text-center text-[17px] md:text-[18px] font-bold leading-none text-primary" style={{ fontFamily: 'var(--font-logo)' }}>
         Notion Creative Art
       </p>
-      <Heading id={titleId} className="mt-4 text-center type-h1 text-ink">
+      <Heading id={titleId} className="mt-3 text-center font-heading text-[26px] font-bold leading-tight tracking-[-0.02em] text-ink md:text-[28px]">
         {title}
       </Heading>
-      <p className="mx-auto mt-2 max-w-[400px] text-center text-[15px] md:text-[16px] leading-snug text-muted">{subtitle}</p>
+      <p className="mx-auto mt-1.5 max-w-[360px] text-center text-[14px] md:text-[15px] leading-snug text-muted">{subtitle}</p>
 
       {main && (
-        <div role="group" aria-label="Choose sign in or create account" className="mt-6 grid grid-cols-2 gap-1 rounded-full bg-surface-warm p-1.5">
+        <div role="group" aria-label="Choose sign in or create account" className="mt-5 grid grid-cols-2 gap-1 rounded-full bg-surface-warm p-1">
           {(['login', 'signup'] as const).map((v) => {
             const selected = view === v
             return (
@@ -111,7 +111,7 @@ export function AuthPanel({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => onViewChange(v)}
-                className={`min-h-11 rounded-full px-3 text-[15px] md:text-[16px] font-semibold transition-colors ${
+                className={`min-h-11 rounded-full px-3 text-[14px] md:text-[15px] font-semibold transition-colors ${
                   selected ? 'bg-surface text-primary shadow-[0_1px_3px_rgba(22,24,29,0.12)]' : 'text-muted hover:text-ink'
                 }`}
               >
@@ -123,7 +123,7 @@ export function AuthPanel({
       )}
 
       {main && cartLines.length > 0 && (
-        <p className="mt-4 flex items-center gap-2.5 rounded-xl bg-primary-soft px-4 py-3 text-[14px] md:text-[15px] font-semibold text-primary">
+        <p className="mt-3 flex items-center gap-2.5 rounded-xl bg-primary-soft px-3.5 py-2.5 text-[13px] md:text-[14px] font-semibold text-primary">
           <MaterialIcon name="shopping_bag" size={18} className="shrink-0" />
           <span>
             Your cart is saved: {cartLines.length} {cartLines.length === 1 ? 'pattern' : 'patterns'} · ${cartTotal.toFixed(2)}
@@ -137,7 +137,7 @@ export function AuthPanel({
         </p>
       )}
 
-      <div className="mt-5">
+      <div className="mt-4">
         {forgot ? (
           <ForgotPassword login={login} />
         ) : verifySent ? (
@@ -149,14 +149,14 @@ export function AuthPanel({
               onClick={() =>
                 void (view === 'login' ? login : signup).signInWithGoogle(oauthReturnTo)
               }
-              className="flex min-h-11 w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm transition-colors"
+              className="flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-border bg-surface px-5 text-[15px] md:text-[14px] font-semibold text-ink hover:bg-surface-warm transition-colors"
             >
               <GoogleIcon />
               Continue with Google
             </button>
-            <div className="my-5 flex items-center gap-3" aria-hidden>
+            <div className="my-4 flex items-center gap-3" aria-hidden>
               <span className="h-px flex-1 bg-border" />
-              <span className="text-[14px] text-muted">or use your email</span>
+              <span className="text-[13px] text-muted">or use your email</span>
               <span className="h-px flex-1 bg-border" />
             </div>
             {view === 'login' ? (
@@ -168,7 +168,7 @@ export function AuthPanel({
         )}
       </div>
 
-      <p className="mt-6 flex items-center justify-center gap-2 text-center text-[14px] text-muted">
+      <p className="mt-5 flex items-center justify-center gap-2 text-center text-[13px] text-muted">
         <MaterialIcon name="lock" size={15} color="var(--color-free)" className="shrink-0" />
         Your downloads are saved to your account.
       </p>
@@ -181,22 +181,28 @@ function Field({
   label,
   error,
   hint,
+  action,
   children,
 }: {
   id: string
   label: string
   error?: ReactNode
   hint?: ReactNode
+  /** Right-aligned control on the label row (e.g. "Forgot password?"). */
+  action?: ReactNode
   children: ReactNode
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-[15px] font-semibold text-ink">
-        {label}
-      </label>
+      <div className="mb-1.5 flex items-center justify-between gap-3">
+        <label htmlFor={id} className="text-[14px] font-semibold text-ink">
+          {label}
+        </label>
+        {action}
+      </div>
       {children}
       {hint && (
-        <p id={`${id}-hint`} className="mt-2 text-[13px] font-medium text-muted">
+        <p id={`${id}-hint`} className="mt-1.5 text-[12px] leading-snug text-muted">
           {hint}
         </p>
       )}
@@ -265,7 +271,7 @@ function SubmitButton({ busy, children, busyLabel }: { busy: boolean; children: 
       type="submit"
       disabled={busy}
       aria-busy={busy || undefined}
-      className="flex min-h-11 w-full items-center justify-center rounded-full bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait transition-colors"
+      className="flex min-h-12 w-full items-center justify-center rounded-full bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait transition-colors"
     >
       {busy ? busyLabel : children}
     </button>
@@ -278,7 +284,7 @@ function SignInForm({ login }: { login: ReturnType<typeof useLoginForm> }) {
   const passwordId = `${uid}-password`
   const errorId = `${uid}-error`
   return (
-    <form onSubmit={login.handleSignIn} className="space-y-4" aria-describedby={login.error ? errorId : undefined}>
+    <form onSubmit={login.handleSignIn} className="space-y-3.5" aria-describedby={login.error ? errorId : undefined}>
       {login.error && (
         <p id={errorId} role="alert" className="rounded-xl border border-error/30 bg-error/5 px-4 py-3 text-[14px] text-error">
           {login.error}
@@ -297,7 +303,22 @@ function SignInForm({ login }: { login: ReturnType<typeof useLoginForm> }) {
           className={inputClass(false)}
         />
       </Field>
-      <Field id={passwordId} label="Password">
+      <Field
+        id={passwordId}
+        label="Password"
+        action={
+          <button
+            type="button"
+            onClick={() => {
+              login.setResetEmail(login.email)
+              login.setForgotMode(true)
+            }}
+            className="-my-2 inline-flex min-h-11 items-center px-1 text-[13px] font-semibold text-primary hover:underline underline-offset-2"
+          >
+            Forgot password?
+          </button>
+        }
+      >
         <PasswordInput
           id={passwordId}
           value={login.password}
@@ -310,18 +331,6 @@ function SignInForm({ login }: { login: ReturnType<typeof useLoginForm> }) {
           required
         />
       </Field>
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => {
-            login.setResetEmail(login.email)
-            login.setForgotMode(true)
-          }}
-          className="inline-flex min-h-11 items-center px-1 text-[15px] font-semibold text-primary hover:underline underline-offset-2"
-        >
-          Forgot password?
-        </button>
-      </div>
       <SubmitButton busy={login.submitting} busyLabel="Signing in…">
         Sign in
       </SubmitButton>
@@ -356,7 +365,7 @@ function SignUpForm({
   const passwordError = signup.attempted ? signup.fieldErrors.password : null
 
   return (
-    <form onSubmit={signup.handleSignUp} noValidate className="space-y-4" aria-describedby={signup.error ? errorId : undefined}>
+    <form onSubmit={signup.handleSignUp} noValidate className="space-y-3.5" aria-describedby={signup.error ? errorId : undefined}>
       {signup.error && (
         <p id={errorId} role="alert" className="rounded-xl border border-error/30 bg-error/5 px-4 py-3 text-[14px] text-error">
           {signup.error}
@@ -391,7 +400,7 @@ function SignUpForm({
           className={inputClass(!!emailError)}
         />
       </Field>
-      <Field id={passwordId} label="Password" hint={PASSWORD_HINT} error={passwordError}>
+      <Field id={passwordId} label="Password" hint={signup.password ? undefined : PASSWORD_HINT} error={passwordError}>
         <PasswordInput
           id={passwordId}
           value={signup.password}
@@ -401,12 +410,12 @@ function SignUpForm({
           placeholder="Create a password"
           autoComplete="new-password"
           hasError={!!passwordError}
-          describedBy={`${passwordId}-hint${passwordError ? ` ${passwordId}-error` : ''}`}
+          describedBy={[signup.password ? null : `${passwordId}-hint`, passwordError ? `${passwordId}-error` : null].filter(Boolean).join(' ') || undefined}
           required
         />
         <PasswordStrength password={signup.password} />
       </Field>
-      <label htmlFor={newsletterId} className="flex min-h-11 cursor-pointer items-start gap-3 text-[15px] leading-snug text-muted">
+      <label htmlFor={newsletterId} className="flex min-h-11 cursor-pointer items-center gap-3 text-[14px] leading-snug text-muted">
         <input
           id={newsletterId}
           type="checkbox"
@@ -419,7 +428,7 @@ function SignUpForm({
       <SubmitButton busy={signup.submitting} busyLabel="Creating account…">
         Create account
       </SubmitButton>
-      <p className="text-center text-[13px] leading-relaxed text-muted">
+      <p className="text-center text-[12px] leading-relaxed text-muted">
         By creating an account you agree to our{' '}
         <Link href="/terms" onClick={onNavigate} className="text-primary underline underline-offset-2">
           Terms

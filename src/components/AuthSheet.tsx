@@ -62,7 +62,7 @@ function AuthSheetInner() {
         }`}
       />
       <div
-        className={`fixed inset-0 z-50 overflow-y-auto overscroll-contain md:flex md:items-start md:justify-center md:px-6 md:py-10 ${
+        className={`fixed inset-0 z-50 overflow-y-auto overscroll-contain md:flex md:items-center md:justify-center md:p-6 ${
           authSheetOpen ? '' : 'invisible pointer-events-none'
         }`}
         onClick={(e) => {
@@ -78,7 +78,7 @@ function AuthSheetInner() {
           inert={authSheetOpen ? undefined : true}
           tabIndex={-1}
           className={`min-h-full w-full bg-background outline-none transition-opacity duration-200 motion-reduce:transition-none
-            md:my-auto md:min-h-0 md:max-w-[560px] md:rounded-[24px] md:border md:border-border md:shadow-[0_24px_64px_rgba(22,24,29,0.22)]
+            md:min-h-0 md:max-w-[440px] md:max-h-[calc(100dvh-3rem)] md:overflow-y-auto md:rounded-[24px] md:border md:border-border md:shadow-[0_24px_64px_rgba(22,24,29,0.22)]
             ${authSheetOpen ? 'opacity-100' : 'opacity-0'}`}
         >
           <AuthPanel
