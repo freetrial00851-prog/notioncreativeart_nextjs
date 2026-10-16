@@ -26,18 +26,18 @@ export function CookieConsent() {
       <div className="max-w-site w-full mx-auto flex flex-col md:flex-row items-center gap-4">
         <p className="text-[12px] text-ink-soft flex-1 leading-relaxed">
           We use cookies to understand how visitors use this site and improve it. See our{' '}
-          <a href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</a> for details.
+          <a href="/privacy" className="inline-block py-2 underline underline-offset-2 hover:text-ink">Privacy Policy</a> for details.
         </p>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="grid w-full grid-cols-2 gap-3 md:flex md:w-auto md:shrink-0">
           <button
             onClick={() => choose('rejected')}
-            className="px-5 py-2.5 border border-ink text-[11px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors"
+            className="min-h-11 px-6 border border-ink text-[12px] tracking-[0.1em] rounded-full hover:bg-surface transition-colors"
           >
             REJECT
           </button>
           <button
             onClick={() => choose('accepted')}
-            className="px-5 py-2.5 bg-ink text-canvas text-[11px] tracking-[0.1em] rounded-full hover:opacity-85 transition-opacity"
+            className="min-h-11 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-full hover:opacity-85 transition-opacity"
           >
             ACCEPT
           </button>

@@ -166,8 +166,8 @@ export function Header() {
         <nav className="hidden lg:flex items-center gap-6 shrink-0" aria-label="Primary">
           {[
             { href: '/shop', label: 'Shop' },
-            { href: '/shop?price=free', label: 'Free' },
-            { href: '/shop?level=beginner', label: 'Beginner' },
+            { href: '/#skill-levels', label: 'Skill levels' },
+            { href: '/shop?price=free', label: 'Free patterns' },
             { href: '/#reviews', label: 'Reviews' },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="text-[14px] font-medium text-ink whitespace-nowrap hover:text-primary">
@@ -694,7 +694,6 @@ function SearchPill({
   onSubmit,
   onClear,
   placeholder,
-  buttonSize,
   iconSize,
   leading,
 }: {
@@ -705,35 +704,47 @@ function SearchPill({
   onSubmit: (e?: React.FormEvent) => void
   onClear: () => void
   placeholder: string
-  buttonSize: number
+  /** Kept for existing callers; the submit control is now the leading search icon. */
+  buttonSize?: number
   iconSize: number
   leading?: React.ReactNode
 }) {
   return (
-    <form onSubmit={onSubmit} className="relative flex items-center border-2 border-ink rounded-full bg-white pl-0.5 pr-1.5 focus-within:ring-2 focus-within:ring-ink/20">
-      {leading}
+    <form
+      onSubmit={onSubmit}
+      role="search"
+      className="relative flex min-h-11 items-center rounded-full border border-border bg-surface pr-2 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+    >
+      {leading ?? (
+        <button
+          type="submit"
+          aria-label="Search"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted hover:text-primary"
+        >
+          <MaterialIcon name="search" size={iconSize} />
+        </button>
+      )}
       {leading && <div className="w-px self-stretch my-2.5 bg-line shrink-0" />}
       <input
         ref={inputRef}
+        type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={onFocus}
         placeholder={placeholder}
-        className={`flex-1 min-w-0 bg-transparent py-2.5 pr-2 text-[16px] md:text-[14px] placeholder:text-ink-soft focus:outline-none ${leading ? 'pl-2' : 'pl-4'}`}
+        aria-label={placeholder}
+        className={`min-w-0 flex-1 bg-transparent py-2.5 pr-2 text-[16px] placeholder:text-muted focus:outline-none md:text-[14px] [&::-webkit-search-cancel-button]:hidden ${leading ? 'pl-2' : 'pl-0'}`}
       />
       {query && (
-        <button type="button" onClick={onClear} aria-label="Clear search" className="shrink-0 w-6 h-6 flex items-center justify-center text-ink-soft hover:text-ink mr-1">
+        <button
+          type="button"
+          onClick={onClear}
+          aria-label="Clear search"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted hover:text-ink"
+        >
           <MaterialIcon name="close" size={16} color={HEADER_ICON} />
         </button>
       )}
-      <button
-        type="submit"
-        aria-label="Search"
-        className="shrink-0 rounded-full text-white flex items-center justify-center hover:opacity-90 transition-opacity"
-        style={{ width: buttonSize, height: buttonSize, background: 'var(--color-accent)' }}
-      >
-        <MaterialIcon name="search" size={iconSize} />
-      </button>
     </form>
   )
 }

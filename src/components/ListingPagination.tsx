@@ -60,7 +60,7 @@ export function ListingPagination({
   if (pageCount <= 1) return null
 
   const btn =
-    'w-9 h-9 flex items-center justify-center rounded-full border border-border hover:bg-surface-warm disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-ink'
+    'w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-full border border-border hover:bg-surface-warm disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-ink'
 
   if (variant === 'simple') {
     return (
@@ -112,7 +112,7 @@ export function ListingPagination({
           <span
             key={`ellipsis-${i}`}
             aria-hidden="true"
-            className="w-9 h-9 flex items-center justify-center text-[13px] text-muted select-none"
+            className="w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center text-[13px] text-muted select-none"
           >
             …
           </span>
@@ -123,7 +123,7 @@ export function ListingPagination({
             onClick={() => onPageChange(item)}
             aria-label={`Page ${item}`}
             aria-current={item === currentPage ? 'page' : undefined}
-            className={`w-9 h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${
+            className={`w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-full text-[13px] transition-colors ${
               item === currentPage
                 ? 'bg-primary text-white'
                 : 'border border-border hover:bg-surface-warm text-ink'

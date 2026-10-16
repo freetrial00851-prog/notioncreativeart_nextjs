@@ -53,10 +53,10 @@ export function Footer() {
 
           <FooterCol title="SHOP">
             {/* Mobile: no Sale */}
-            <ul className="space-y-2.5 md:hidden">
+            <ul className="md:hidden">
               {SHOP_MOBILE.map((l) => (
                 <li key={l.to}>
-                  <Link href={l.to} className="text-[13px] text-white/70 hover:text-white">
+                  <Link href={l.to} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                     {l.label}
                   </Link>
                 </li>
@@ -65,7 +65,7 @@ export function Footer() {
             <ul className="hidden md:block space-y-2.5">
               {SHOP_DESKTOP.map((l) => (
                 <li key={l.to}>
-                  <Link href={l.to} className="text-[13px] text-white/70 hover:text-white">
+                  <Link href={l.to} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                     {l.label}
                   </Link>
                 </li>
@@ -74,10 +74,10 @@ export function Footer() {
           </FooterCol>
 
           <FooterCol title="HELP">
-            <ul className="space-y-2.5">
+            <ul className="md:space-y-2.5">
               {HELP.map((l) => (
                 <li key={l.to}>
-                  <Link href={l.to} className="text-[13px] text-white/70 hover:text-white">
+                  <Link href={l.to} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                     {l.label}
                   </Link>
                 </li>
@@ -86,21 +86,21 @@ export function Footer() {
           </FooterCol>
 
           <FooterCol title="ACCOUNT" className="hidden md:block">
-            <ul className="space-y-2.5">
+            <ul className="md:space-y-2.5">
               {user ? (
                 <>
                   <li>
-                    <Link href="/account/downloads" className="text-[13px] text-white/70 hover:text-white">
+                    <Link href="/account/downloads" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                       My downloads
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/wishlist" className="text-[13px] text-white/70 hover:text-white">
+                    <Link href="/account/wishlist" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                       Wishlist
                     </Link>
                   </li>
                   <li>
-                    <button type="button" onClick={() => signOut()} className="text-[13px] text-white/70 hover:text-white">
+                    <button type="button" onClick={() => signOut()} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                       Sign out
                     </button>
                   </li>
@@ -108,17 +108,17 @@ export function Footer() {
               ) : (
                 <>
                   <li>
-                    <button type="button" onClick={() => openAuthModal()} className="text-[13px] text-white/70 hover:text-white">
+                    <button type="button" onClick={() => openAuthModal()} className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                       Sign in
                     </button>
                   </li>
                   <li>
-                    <Link href="/account/downloads" className="text-[13px] text-white/70 hover:text-white">
+                    <Link href="/account/downloads" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                       My downloads
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/wishlist" className="text-[13px] text-white/70 hover:text-white">
+                    <Link href="/account/wishlist" className="inline-flex max-md:min-h-11 items-center text-[13px] text-white/70 hover:text-white">
                       Wishlist
                     </Link>
                   </li>
@@ -133,10 +133,10 @@ export function Footer() {
         <div className="max-w-site mx-auto page-gutter py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[12px] text-white/55">
           <p>© {year} Notion Creative Art. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Link href="/privacy" className="hover:text-white">
+            <Link href="/privacy" className="inline-flex max-md:min-h-11 items-center hover:text-white">
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-white">
+            <Link href="/terms" className="inline-flex max-md:min-h-11 items-center hover:text-white">
               Terms
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">

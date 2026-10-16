@@ -279,7 +279,7 @@ export function Home({
             </ul>
           </div>
 
-          <div className="grid h-[320px] grid-cols-[11fr_10fr] grid-rows-2 gap-3 sm:h-[400px] md:gap-4 lg:h-[480px]">
+          <div className="grid aspect-[6/5] w-full grid-cols-[11fr_10fr] grid-rows-2 gap-3 md:aspect-[2/1] md:gap-4 lg:aspect-[6/5]">
             <HeroTile photo={heroTiles[0]} tint="var(--color-tint-lavender)" className="row-span-2" priority />
             <HeroTile photo={heroTiles[1]} tint="var(--color-tint-sage)" />
             <HeroTile photo={heroTiles[2]} tint="var(--color-surface-warm)" />
@@ -310,7 +310,7 @@ export function Home({
           <h2 className="home-h2 text-ink">Featured patterns</h2>
           <Link
             href="/shop"
-            className="inline-flex shrink-0 items-center gap-2 text-[14px] font-semibold text-primary hover:underline underline-offset-2"
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 text-[14px] font-semibold text-primary hover:underline underline-offset-2"
           >
             View all patterns <ArrowGlyph />
           </Link>
@@ -345,7 +345,7 @@ export function Home({
       </section>
 
       {/* 4 · Shop by skill level */}
-      <section className="bg-surface-warm">
+      <section id="skill-levels" className="scroll-mt-24 bg-surface-warm">
         <div className="max-w-site mx-auto page-gutter py-10 md:py-14">
           <h2 className="home-h2 mb-2 text-ink">Shop by skill level</h2>
           <p className="mb-8 text-[15px] text-muted md:text-[16px]">Find patterns that match where you are right now.</p>
@@ -357,7 +357,7 @@ export function Home({
                 className="group flex flex-col rounded-3xl border border-border bg-surface p-4 shadow-card"
               >
                 <div
-                  className="relative mb-5 aspect-[2/1] overflow-hidden rounded-2xl"
+                  className="relative mb-5 aspect-[4/3] overflow-hidden rounded-2xl"
                   style={{ background: s.tint }}
                 >
                   {s.image ? (
@@ -402,7 +402,7 @@ export function Home({
               const p = freeImages[i]
               const src = p?.images?.[0]
               return (
-                <div key={i} className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
+                <div key={i} className="relative aspect-square overflow-hidden rounded-2xl bg-white">
                   {p && src ? (
                     <Link href={`/pattern/${p.slug}`} className="absolute inset-0" aria-label={p.title}>
                       <Image src={src} alt={p.title} fill className="object-cover object-center" sizes="(max-width:1023px) 45vw, 260px" />
@@ -451,7 +451,7 @@ export function Home({
             </ul>
             <Link
               href="/shop?price=free"
-              className="inline-flex items-center gap-2 text-[14px] font-bold text-primary hover:underline underline-offset-2"
+              className="inline-flex min-h-11 items-center gap-2 text-[14px] font-bold text-primary hover:underline underline-offset-2"
             >
               Try a free pattern first <ArrowGlyph />
             </Link>
@@ -493,7 +493,7 @@ export function Home({
               </div>
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 text-[14px] font-bold text-primary hover:underline underline-offset-2"
+                className="inline-flex min-h-11 items-center gap-2 text-[14px] font-bold text-primary hover:underline underline-offset-2"
               >
                 Read our story <ArrowGlyph />
               </Link>
