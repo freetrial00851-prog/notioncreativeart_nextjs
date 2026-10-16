@@ -10,7 +10,8 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
-import { skillLevelTagLabel, SKILL_PILL_STYLES } from '../lib/productCardMeta'
+import { getStatusBadge, skillLevelTagLabel, SKILL_PILL_STYLES } from '../lib/productCardMeta'
+import { StatusBadge } from './ui/Badge'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
@@ -102,7 +103,7 @@ export function ProductCard({
   const inWishlist = isWishlisted(product.id)
   const href = `/pattern/${product.slug}`
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
-  const badge = product.card_badge
+  const statusBadge = getStatusBadge(product)
   const skillLabel = skillLevelTagLabel(product.skill_level)
   const free = isFreeProduct(product)
   const showRating = !!reviewStats && reviewStats.reviewCount >= 1
@@ -180,34 +181,12 @@ export function ProductCard({
           )}
         </Link>
 
-        {/* Top-left badges */}
-        <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-1">
-          {product.sold_out && (
-            <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white">
-              SOLD OUT
-            </span>
-          )}
-          {!product.sold_out && free && (
-            <span className="rounded-full bg-free px-2.5 py-1 text-[11px] font-bold text-white">
-              FREE
-            </span>
-          )}
-          {!product.sold_out && badge === 'sale' && (
-            <span className="rounded-full bg-sale px-2.5 py-1 text-[11px] font-bold text-white">
-              SALE
-            </span>
-          )}
-          {!product.sold_out && badge === 'new' && (
-            <span className="rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold text-white">
-              NEW
-            </span>
-          )}
-          {!product.sold_out && badge === 'featured' && (
-            <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white">
-              FEATURED
-            </span>
-          )}
-        </div>
+        {/* Top-left: at most one status badge (see getStatusBadge) */}
+        {statusBadge && (
+          <div className="pointer-events-none absolute left-3 top-3 z-10">
+            <StatusBadge status={statusBadge} />
+          </div>
+        )}
 
         {/* Top-right wishlist */}
         <button

@@ -25,7 +25,7 @@ import { MaterialIcon } from '../components/MaterialIcon'
 import { DownloadIcon, FavoriteIcon, ShareIcon } from '../components/icons'
 import { StatusBadge } from '../components/ui/Badge'
 import { ProductDetailSkeleton } from '../components/Skeleton'
-import { SKILL_PILL_STYLES, skillLevelTagLabel } from '../lib/productCardMeta'
+import { getStatusBadge, SKILL_PILL_STYLES, skillLevelTagLabel } from '../lib/productCardMeta'
 import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
 
@@ -456,7 +456,7 @@ export function ProductDetail({
   const inCart = isInCart(product.id)
   const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
   const savePercent = onSale ? Math.round((1 - product.price / product.compare_at_price!) * 100) : 0
-  const badge = product.card_badge
+  const statusBadge = getStatusBadge(product)
   const skillLabel = skillLevelTagLabel(product.skill_level)
   const shopLink = category ? `/shop/${category.slug}` : '/shop'
   const shortDescription = product.subtitle?.trim() || ''
@@ -668,12 +668,11 @@ export function ProductDetail({
                 <div className="flex h-full w-full items-center justify-center text-muted text-sm">No image yet</div>
               )}
 
-              <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-1 md:left-4 md:top-4">
-                {product.sold_out && <StatusBadge status="sold_out" />}
-                {!product.sold_out && badge === 'new' && <StatusBadge status="new" />}
-                {!product.sold_out && badge === 'sale' && <StatusBadge status="sale" />}
-                {!product.sold_out && badge === 'featured' && <StatusBadge status="featured" />}
-              </div>
+              {statusBadge && (
+                <div className="pointer-events-none absolute left-3 top-3 z-10 md:left-4 md:top-4">
+                  <StatusBadge status={statusBadge} />
+                </div>
+              )}
 
               <button
                 type="button"
@@ -753,7 +752,6 @@ export function ProductDetail({
               )}
               {category && <Chip className="border border-border bg-surface-warm text-muted">{category.name}</Chip>}
               {product.is_bundle && <Chip className="border border-border bg-surface-warm text-muted">Bundle</Chip>}
-              {mode === 'free' && <Chip className="border border-border bg-success-bg text-free">Free</Chip>}
             </div>
 
             <div className="flex items-start justify-between gap-4 mb-3">
