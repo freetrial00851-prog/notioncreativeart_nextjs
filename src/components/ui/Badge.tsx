@@ -14,7 +14,7 @@ export function LevelBadge({
   const style = SKILL_PILL_STYLES[level]
   return (
     <span
-      className={`inline-flex items-center rounded-[3px] px-2.5 py-1 text-[10px] font-semibold leading-none ${className}`}
+      className={`inline-flex items-center rounded-[3px] px-2.5 py-1 text-[11px] font-semibold leading-none ${className}`}
       style={{ background: style.background, color: style.color }}
     >
       {label}

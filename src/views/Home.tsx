@@ -271,7 +271,7 @@ export function Home({
           ) : null}
           <p className="absolute bottom-[26px] left-[29px] z-[3] hidden font-heading text-[19px] leading-tight text-ink sm:block">
             Make something amazing
-            <small className="mt-[7px] block font-sans text-[9px] font-semibold uppercase tracking-[0.18em]">
+            <small className="mt-[7px] block font-sans text-[11px] font-semibold uppercase tracking-[0.18em]">
               Patterns for your next project
             </small>
           </p>
@@ -292,7 +292,7 @@ export function Home({
 
       {/* 2 · Ticker */}
       <section className="border-y-2 border-navy bg-white">
-        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[9px] font-semibold uppercase tracking-[0.13em] text-ink">
+        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[11px] font-semibold uppercase tracking-[0.13em] text-ink">
           {['Small projects, big joy', 'Patterns to keep forever', 'Creative time, your way', 'Download and get making'].map((t) => (
             <li key={t} className="inline-flex items-center gap-2.5">
               <span className="text-coral" aria-hidden>✳</span>
@@ -317,7 +317,7 @@ export function Home({
             </p>
             <Link
               href="/shop"
-              className="inline-block whitespace-nowrap border-b-2 border-coral pb-[7px] text-[10px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+              className="inline-block whitespace-nowrap border-b-2 border-coral pb-[7px] text-[11px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
             >
               Shop all patterns ↗
             </Link>
@@ -375,9 +375,9 @@ export function Home({
               <Link
                 key={c.t}
                 href={c.href}
-                className={`relative flex min-h-[215px] flex-col justify-between overflow-hidden rounded-[5px] p-[25px] text-navy md:min-h-[260px] ${c.bg}`}
+                className={`press-card relative flex min-h-[215px] flex-col justify-between overflow-hidden rounded-[5px] p-[25px] text-navy md:min-h-[260px] ${c.bg}`}
               >
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em]">
                   {c.n}
                   {c.count > 0 ? <span className="opacity-70"> · {c.count} patterns</span> : null}
                 </span>
@@ -385,7 +385,7 @@ export function Home({
                   <h3 className="font-heading text-[30px] font-normal leading-tight tracking-[-0.02em]">{c.t}</h3>
                   <p className="mt-[9px] max-w-[220px] text-[11px] leading-[1.7]">{c.d}</p>
                 </div>
-                <span className="relative z-[2] self-start border-b border-navy pb-[7px] text-[10px] font-semibold uppercase tracking-[0.13em]">
+                <span className="relative z-[2] self-start border-b border-navy pb-[7px] text-[11px] font-semibold uppercase tracking-[0.13em]">
                   {c.go} ↗
                 </span>
                 <span aria-hidden className="absolute -right-5 top-[30px] size-[155px] rounded-full border-2 border-navy opacity-20">
@@ -488,7 +488,7 @@ export function Home({
               yourself.
             </p>
             <Link href="/shop?price=free" className="mt-3 inline-block">
-              <span className="inline-flex min-h-12 items-center justify-center rounded-[3px] border-2 border-white bg-white px-[22px] text-[10px] font-bold uppercase tracking-[0.12em] text-navy transition-colors hover:bg-navy hover:text-white">
+              <span className="inline-flex min-h-12 items-center justify-center rounded-[3px] border-2 border-white bg-white px-[22px] text-[11px] font-bold uppercase tracking-[0.12em] text-navy transition-colors hover:bg-navy hover:text-white">
                 Explore free patterns ↗
               </span>
             </Link>
@@ -530,7 +530,7 @@ export function Home({
                   </div>
                 ))}
               </div>
-              <Link href="/about" className="inline-block border-b-2 border-coral pb-[7px] text-[10px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
+              <Link href="/about" className="inline-block border-b-2 border-coral pb-[7px] text-[11px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
                 Read our story ↗
               </Link>
             </div>
@@ -557,7 +557,7 @@ export function Home({
                   ))}
                 </div>
                 <blockquote className="mb-5 font-heading text-[22px] leading-[1.25]">&ldquo;{t.body}&rdquo;</blockquote>
-                <figcaption className="text-[10px] font-bold uppercase tracking-[0.13em]">
+                <figcaption className="text-[11px] font-bold uppercase tracking-[0.13em]">
                   {t.reviewerFirstName}
                   <span className="font-medium normal-case tracking-normal opacity-75"> · {t.patternTitle}</span>
                 </figcaption>

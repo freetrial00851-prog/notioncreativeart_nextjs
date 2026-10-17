@@ -183,10 +183,12 @@ html {
   font-family: var(--font-heading);
   font-weight: 400;
   font-size: var(--text-h1);
-  line-height: 1.2;
-  letter-spacing: -0.035em;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
   @media (min-width: 1024px) {
     font-size: var(--text-h1-lg);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
   }
 }
 
@@ -194,10 +196,12 @@ html {
   font-family: var(--font-heading);
   font-weight: 400;
   font-size: var(--text-h2);
-  line-height: 1.25;
-  letter-spacing: -0.035em;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   @media (min-width: 768px) {
     font-size: var(--text-h2-lg);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
   }
 }
 
@@ -205,24 +209,30 @@ html {
   font-family: var(--font-heading);
   font-weight: 400;
   font-size: var(--text-hero);
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   @media (min-width: 768px) {
     font-size: 3.25rem;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
   }
   @media (min-width: 1024px) {
     font-size: var(--text-hero-lg);
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
 }
 
 @utility home-h2 {
   font-family: var(--font-heading);
   font-weight: 400;
-  font-size: 1.75rem;
-  line-height: 1.15;
-  letter-spacing: -0.035em;
+  font-size: 2rem;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
   @media (min-width: 1024px) {
-    font-size: 2.5rem;
+    font-size: 3rem;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
   }
 }
 
@@ -301,5 +311,58 @@ button, .btn { font-weight: 600; }
     width: 27px;
     height: 3px;
     background: var(--color-coral);
+  }
+}
+
+/* ───────────── Apple-style feel (SKILL.md: apple-design) ───────────── */
+
+/* §1 Response: feedback starts on pointer-DOWN, instantly (scale .97, 100ms). */
+button:not(:disabled),
+[role='button'],
+.press {
+  transition:
+    scale 100ms ease-out,
+    translate 200ms ease,
+    transform 200ms ease,
+    opacity 150ms ease,
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+button:not(:disabled):active,
+[role='button']:active,
+.press:active {
+  scale: 0.97;
+}
+/* Small round icon buttons would shrink too far at .97 of a big box; keep them subtle. */
+.press-card:active {
+  scale: 0.985;
+}
+.press-card {
+  transition: scale 100ms ease-out;
+}
+
+/* §12 Materials: one translucent layer, content scrolls under it. */
+.glass {
+  background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-border) 80%, transparent);
+}
+/* §14 Reduced transparency / more contrast: solid surface, defined border. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--color-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-contrast: more) {
+  .glass {
+    background: var(--color-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: inset 0 -2px 0 var(--color-ink);
   }
 }

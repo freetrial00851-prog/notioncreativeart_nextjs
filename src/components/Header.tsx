@@ -153,7 +153,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-bg">
+      <header className="glass sticky top-0 z-40 border-b border-border">
         <div className="mx-auto flex h-[67px] max-w-site items-center justify-between gap-6 page-gutter lg:h-[78px]">
           <Logo variant="full" />
 
@@ -253,7 +253,7 @@ export function Header() {
               <MaterialIcon name="shopping_bag" size={22} color="currentColor" className="sm:hidden" />
               <span className="hidden sm:inline">Bag ({cartCount})</span>
               {cartCount > 0 && (
-                <span className="absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold leading-none text-white sm:hidden">
+                <span className="absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[11px] font-bold leading-none text-white sm:hidden">
                   {cartCount}
                 </span>
               )}
@@ -346,7 +346,7 @@ export function Header() {
                       <button
                         type="button"
                         onClick={() => submitSearch()}
-                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[10px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[11px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
                       >
                         See all results for &ldquo;{query.trim()}&rdquo; ↗
                       </button>
@@ -359,7 +359,7 @@ export function Header() {
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-6">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Popular</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Popular</span>
                   {POPULAR_SEARCHES.map((s) => (
                     <Link
                       key={s.href}
@@ -424,7 +424,7 @@ export function Header() {
                   ))}
                 </ul>
 
-                <p className="pb-1 pt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Categories</p>
+                <p className="pb-1 pt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Categories</p>
                 <ul>
                   {categories.map((c) => {
                     const expanded = expandedCategory === c.id
@@ -530,7 +530,7 @@ export function Header() {
 
 /** Desktop "Shop patterns" panel: categories, skill levels and quick links. */
 function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]; onClose: () => void }) {
-  const colHead = 'mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-violet'
+  const colHead = 'mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-violet'
   const row =
     'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (

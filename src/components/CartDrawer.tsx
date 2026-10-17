@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import { useSheet } from '../lib/useSheet'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
@@ -25,7 +26,17 @@ export function CartDrawer() {
     useCart()
   const panelRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const scrimRef = useRef<HTMLDivElement>(null)
   useBodyScrollLock(drawerOpen)
+  const { dragHandlers } = useSheet({
+    open: drawerOpen,
+    onClose: () => {
+      if (!checkingOut) closeDrawer()
+    },
+    panelRef,
+    scrimRef,
+    dragDisabled: checkingOut,
+  })
   useFocusTrap(panelRef, drawerOpen, {
     initialFocusRef: closeButtonRef,
     onEscape: () => {
@@ -48,13 +59,12 @@ export function CartDrawer() {
   return (
     <>
       <div
+        ref={scrimRef}
         aria-hidden="true"
         onClick={() => {
           if (!checkingOut) closeDrawer()
         }}
-        className={`fixed inset-0 z-50 bg-ink/40 transition-opacity duration-200 motion-reduce:transition-none ${
-          drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`fixed inset-0 z-50 bg-navy/40 opacity-0 ${drawerOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
       />
 
       <div
@@ -65,11 +75,10 @@ export function CartDrawer() {
         aria-hidden={!drawerOpen}
         inert={drawerOpen ? undefined : true}
         tabIndex={-1}
-        className={`fixed z-50 bg-background flex flex-col shadow-2xl outline-none transition-transform duration-300 ease-out motion-reduce:transition-none
-          inset-x-0 bottom-0 max-h-[90dvh] rounded-t-[5px]
-          md:inset-y-0 md:right-0 md:left-auto md:bottom-auto md:max-h-none md:h-full md:w-[420px] md:rounded-none
-          ${drawerOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full invisible'}`}
+        className="fixed z-50 flex flex-col bg-background shadow-2xl outline-none will-change-transform invisible [transform:translateY(100%)] inset-x-0 bottom-0 max-h-[90dvh] rounded-t-[5px] md:inset-y-0 md:right-0 md:left-auto md:bottom-auto md:max-h-none md:h-full md:w-[420px] md:rounded-none md:[transform:translateX(100%)]"
       >
+        {/* Drag zone (mobile): handle + title bar. A real handle — it actually drags. */}
+        <div {...dragHandlers} style={{ touchAction: 'none' }} className="shrink-0 cursor-grab select-none active:cursor-grabbing md:cursor-auto">
         <div className="flex justify-center pt-3 md:hidden" aria-hidden>
           <span className="h-1 w-10 rounded-full bg-border" />
         </div>
@@ -90,6 +99,7 @@ export function CartDrawer() {
           >
             <MaterialIcon name="close" size={24} />
           </button>
+        </div>
         </div>
 
         {justAdded && !empty && (

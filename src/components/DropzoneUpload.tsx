@@ -33,7 +33,7 @@ export function DropzoneUpload({ label, sizeHint, urls, accept, acceptLabel, mul
 
   return (
     <div>
-      <span className="block text-[10px] tracking-[0.1em] text-ink-soft mb-1.5">{label}</span>
+      <span className="block text-[11px] tracking-[0.1em] text-ink-soft mb-1.5">{label}</span>
       {sizeHint && <p className="text-[11px] text-ink-soft/80 mb-2">Recommended size: {sizeHint} — any size works, this just avoids awkward cropping.</p>}
 
       <div
@@ -80,7 +80,7 @@ export function DropzoneUpload({ label, sizeHint, urls, accept, acceptLabel, mul
               title={i === 0 ? 'Primary image' : 'Drag to reorder'}
             >
               <img src={deriveVariantUrl(url, 'thumb')} className={`w-full aspect-square object-cover rounded-lg border ${i === 0 ? 'border-ink' : 'border-line'}`} />
-              {i === 0 && <span className="absolute bottom-1 left-1 bg-ink text-canvas text-[9px] tracking-wide px-1.5 py-0.5 rounded">PRIMARY</span>}
+              {i === 0 && <span className="absolute bottom-1 left-1 bg-ink text-canvas text-[11px] tracking-wide px-1.5 py-0.5 rounded">PRIMARY</span>}
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(url) }}
                 aria-label="Remove image"

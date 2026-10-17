@@ -108,7 +108,7 @@ export function ProductCard({
 
   const tile = tileColor(product.id)
   const addLabel = inCart ? `Remove ${product.title} from cart` : `Add ${product.title} to cart`
-  const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Download free ↓') : inCart ? 'In your bag ✓' : 'Add to bag +'
+  const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Get free ↓') : inCart ? 'In your bag ✓' : 'Add to bag +'
 
   return (
     <article className="group/card flex h-full flex-col">
@@ -119,7 +119,7 @@ export function ProductCard({
         onMouseEnter={prefetch}
         onTouchStart={prefetch}
       >
-        <Link href={href} className="absolute inset-0 z-0 flex items-center justify-center p-3 md:p-4" aria-label={product.title} tabIndex={-1}>
+        <Link href={href} className="press-card absolute inset-0 z-0 flex items-center justify-center p-3 md:p-4" aria-label={product.title} tabIndex={-1}>
           {product.images?.[0] ? (
             <span className="relative block aspect-[4/3] w-full overflow-hidden rounded-[3px] bg-white/50 shadow-[0_10px_18px_rgba(32,32,68,0.16)]">
               <Image
@@ -137,7 +137,7 @@ export function ProductCard({
         </Link>
 
         {statusBadge && (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-[3px] bg-white px-[9px] py-[7px] text-[9px] font-bold uppercase leading-none tracking-[0.13em] text-ink">
+          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-[3px] bg-white px-[9px] py-[7px] text-[11px] font-bold uppercase leading-none tracking-[0.13em] text-ink">
             {STATUS_LABEL[statusBadge]}
           </span>
         )}
@@ -160,7 +160,7 @@ export function ProductCard({
             onClick={free ? downloadFree : toggleCart}
             disabled={free && downloadingFree}
             aria-label={free ? `Download ${product.title} free` : addLabel}
-            className="absolute inset-x-3 bottom-3 z-10 min-h-11 rounded-[3px] bg-navy px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:translate-y-1 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
+            className="absolute inset-x-3 bottom-3 z-10 min-h-11 rounded-[3px] bg-navy px-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:translate-y-1 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
           >
             {quickLabel}
           </button>
@@ -169,7 +169,7 @@ export function ProductCard({
 
       <div className="px-px pb-1 pt-[15px]">
         {skillLabel && (
-          <p className="mb-[7px] text-[9px] font-bold uppercase leading-none tracking-[0.13em] text-violet">{skillLabel}</p>
+          <p className="mb-[7px] text-[11px] font-bold uppercase leading-none tracking-[0.13em] text-violet">{skillLabel}</p>
         )}
         <h3 className="mb-[9px] font-heading text-[17px] font-normal leading-[1.3] text-ink">
           <Link
@@ -188,7 +188,7 @@ export function ProductCard({
             <>
               <span>${product.price.toFixed(2)}</span>
               {isOnSale && product.compare_at_price != null && (
-                <del className="text-[10px] font-bold text-muted">${product.compare_at_price.toFixed(2)}</del>
+                <del className="text-[11px] font-bold text-muted">${product.compare_at_price.toFixed(2)}</del>
               )}
             </>
           )}

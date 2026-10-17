@@ -71,13 +71,13 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
 
         {submitted ? (
           <div className="pt-2 pr-8">
-            <p className="text-[10px] tracking-[0.2em] text-ink-soft mb-2">JOIN OUR MAKER COMMUNITY</p>
+            <p className="text-[11px] tracking-[0.2em] text-ink-soft mb-2">JOIN OUR MAKER COMMUNITY</p>
             <h2 id="newsletter-prompt-title" className="font-heading font-normal text-xl mb-2">You're on the list!</h2>
             <p className="text-[13px] text-ink-soft">Thanks — your download is already on its way.</p>
           </div>
         ) : (
           <>
-            <p className="text-[10px] tracking-[0.2em] text-ink-soft mb-2 pr-8">JOIN OUR MAKER COMMUNITY</p>
+            <p className="text-[11px] tracking-[0.2em] text-ink-soft mb-2 pr-8">JOIN OUR MAKER COMMUNITY</p>
             <h2 id="newsletter-prompt-title" className="font-heading font-normal text-xl mb-2 pr-8">
               Get new patterns in your inbox
             </h2>

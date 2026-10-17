@@ -57,7 +57,7 @@ export function EmailSignup() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:text-violet disabled:opacity-50"
+              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[11px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:text-violet disabled:opacity-50"
             >
               {submitting ? 'Joining…' : 'Join the list ↗'}
             </button>

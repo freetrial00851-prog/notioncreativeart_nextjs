@@ -19,7 +19,7 @@ export function Logo({ variant = 'full', className = '', light = false }: LogoPr
   return (
     <Link
       href="/"
-      className={`inline-flex shrink-0 items-center gap-[11px] leading-none ${className}`}
+      className={`press inline-flex min-h-11 shrink-0 items-center gap-[11px] leading-none ${className}`}
       aria-label="NotionCreativeArt — home"
     >
       <span
@@ -40,7 +40,7 @@ export function Logo({ variant = 'full', className = '', light = false }: LogoPr
         </span>
         {!compact && (
           <span
-            className={`mt-1 text-[9px] font-semibold uppercase tracking-[0.22em] max-[420px]:hidden ${onDark ? 'text-white/70' : 'text-muted'}`}
+            className={`mt-1 text-[11px] font-semibold uppercase tracking-[0.22em] max-[420px]:hidden ${onDark ? 'text-white/70' : 'text-muted'}`}
           >
             Patterns for makers
           </span>

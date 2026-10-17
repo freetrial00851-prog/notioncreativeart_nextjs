@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import Image, { getImageProps } from 'next/image'
+import { useSwipeCarousel } from '../lib/useSwipeCarousel'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -187,8 +188,12 @@ export function ProductDetail({
   const [categoryState, setCategoryState] = useState<{ id: string; data: { name: string; slug: string } | null } | null>(null)
   const [related, setRelated] = useState<Product[]>([])
   const [activeImage, setActiveImage] = useState(0)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
-  const [touchStartY, setTouchStartY] = useState<number | null>(null)
+  const imageCount = product?.images?.length ?? 0
+  const { containerRef: swipeContainerRef, slideRef: swipeSlideRef, go: swipeGo, handlers: swipeHandlers } = useSwipeCarousel({
+    count: imageCount,
+    onNext: () => setActiveImage((i) => (i + 1) % Math.max(imageCount, 1)),
+    onPrev: () => setActiveImage((i) => (i - 1 + Math.max(imageCount, 1)) % Math.max(imageCount, 1)),
+  })
   const [showStickyBar, setShowStickyBar] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('description')
   const [openAccordion, setOpenAccordion] = useState<Tab | null>('description')
@@ -564,8 +569,8 @@ export function ProductDetail({
     tabRefs.current[key]?.focus()
   }
 
-  const goPrev = () => setActiveImage((i) => (i - 1 + images.length) % images.length)
-  const goNext = () => setActiveImage((i) => (i + 1) % images.length)
+  const goPrev = () => swipeGo(-1)
+  const goNext = () => swipeGo(1)
 
   const relatedShown = related.slice(0, 4)
   const relatedIds = new Set(relatedShown.map((p) => p.id))
@@ -632,28 +637,14 @@ export function ProductDetail({
           <div className="min-w-0">
             <div
               className="relative aspect-square w-full overflow-hidden rounded-2xl bg-surface-warm shadow-image select-none"
+              ref={swipeContainerRef}
               style={{ touchAction: 'pan-y' }}
               role="region"
               aria-roledescription="carousel"
               aria-label={`${product.title} photos`}
-              onTouchStart={(e) => {
-                setTouchStartX(e.touches[0].clientX)
-                setTouchStartY(e.touches[0].clientY)
-              }}
-              onTouchEnd={(e) => {
-                if (touchStartX === null) return
-                const endX = e.changedTouches[0].clientX
-                const endY = e.changedTouches[0].clientY
-                const deltaX = endX - touchStartX
-                const deltaY = endY - (touchStartY ?? endY)
-                if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) && images.length > 1) {
-                  if (deltaX < 0) goNext()
-                  else goPrev()
-                }
-                setTouchStartX(null)
-                setTouchStartY(null)
-              }}
+              {...swipeHandlers}
             >
+              <div ref={swipeSlideRef} className="absolute inset-0 will-change-transform">
               {images[activeImage] ? (
                 <Image
                   src={deriveVariantUrl(images[activeImage], 'large')}
@@ -668,6 +659,7 @@ export function ProductDetail({
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-muted text-sm">No image yet</div>
               )}
+              </div>
 
               {statusBadge && (
                 <div className="pointer-events-none absolute left-3 top-3 z-10 md:left-4 md:top-4">

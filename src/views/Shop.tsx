@@ -429,7 +429,7 @@ export function Shop({
                 key={level}
                 type="button"
                 onClick={() => onToggleLevel(level)}
-                className={`inline-flex items-center gap-1.5 rounded-[3px] border px-3 py-1.5 text-[13px] font-medium ${skillPillClass(level, active)}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3 text-[13px] font-medium ${skillPillClass(level, active)}`}
               >
                 {active ? <CheckIcon /> : null}
                 {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -442,7 +442,7 @@ export function Shop({
             <button
               type="button"
               onClick={toggleBundle}
-              className={`inline-flex items-center gap-1.5 rounded-[3px] border px-3 py-1.5 text-[13px] font-medium ${
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3 text-[13px] font-medium ${
                 bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
               }`}
             >
@@ -516,7 +516,7 @@ export function Shop({
                 key={level}
                 type="button"
                 onClick={() => onToggleLevel(level)}
-                className={`shrink-0 inline-flex items-center gap-1.5 rounded-[3px] border px-3.5 py-2 text-[13px] font-medium whitespace-nowrap ${skillPillClass(level, active)}`}
+                className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${skillPillClass(level, active)}`}
               >
                 {active ? <CheckIcon /> : null}
                 {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -526,7 +526,7 @@ export function Shop({
           <button
             type="button"
             onClick={toggleFreeQuick}
-            className={`shrink-0 inline-flex items-center gap-1.5 rounded-[3px] border px-3.5 py-2 text-[13px] font-medium whitespace-nowrap ${
+            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${
               isFreePill ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
             }`}
           >
@@ -536,7 +536,7 @@ export function Shop({
           <button
             type="button"
             onClick={toggleSale}
-            className={`shrink-0 inline-flex items-center gap-1.5 rounded-[3px] border px-3.5 py-2 text-[13px] font-medium whitespace-nowrap ${
+            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${
               isSalePill ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
             }`}
           >
@@ -546,7 +546,7 @@ export function Shop({
           <button
             type="button"
             onClick={toggleBundle}
-            className={`shrink-0 inline-flex items-center gap-1.5 rounded-[3px] border px-3.5 py-2 text-[13px] font-medium whitespace-nowrap ${
+            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${
               bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
             }`}
           >
@@ -646,7 +646,7 @@ function FilterPill({
   onNavigate?: (href: string) => void
   onClick?: () => void
 }) {
-  const className = `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[3px] border px-3.5 py-2 text-[13px] font-medium transition-colors ${
+  const className = `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[3px] border min-h-11 px-3.5 text-[13px] font-medium transition-colors ${
     active ? 'border-transparent bg-primary text-white' : 'border-border bg-surface text-ink hover:bg-surface-warm'
   }`
   if (href && onNavigate) {

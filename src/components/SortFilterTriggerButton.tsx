@@ -29,7 +29,7 @@ export function SortFilterTriggerButton({
       Sort & Filter
       {activeFilterCount > 0 && (
         <span
-          className="w-4 h-4 rounded-[3px] text-white text-[10px] flex items-center justify-center"
+          className="w-4 h-4 rounded-[3px] text-white text-[11px] flex items-center justify-center"
           style={{ background: 'var(--color-accent)' }}
         >
           {activeFilterCount}

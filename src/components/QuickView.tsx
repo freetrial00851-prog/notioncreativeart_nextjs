@@ -15,6 +15,7 @@ import { useToast } from '../context/ToastContext'
 import { profileDisplayName } from '../lib/profileName'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
+import { useSwipeCarousel } from '../lib/useSwipeCarousel'
 import { ProductCardMeta } from './ProductCardMeta'
 import { ProductTagPill } from './ProductTagPill'
 import { skillLevelTagLabel } from '../lib/productCardMeta'
@@ -35,7 +36,6 @@ export function QuickView({
   const { showToast } = useToast()
   const router = useRouter()
   const [activeImage, setActiveImage] = useState(0)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [downloadingFree, setDownloadingFree] = useState(false)
   const [buying, setBuying] = useState(false)
   const images = product.images ?? []
@@ -52,8 +52,13 @@ export function QuickView({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const next = () => setActiveImage((i) => (i + 1) % images.length)
-  const prev = () => setActiveImage((i) => (i - 1 + images.length) % images.length)
+  const { containerRef: swipeContainerRef, slideRef: swipeSlideRef, go: swipeGo, handlers: swipeHandlers } = useSwipeCarousel({
+    count: images.length,
+    onNext: () => setActiveImage((i) => (i + 1) % Math.max(images.length, 1)),
+    onPrev: () => setActiveImage((i) => (i - 1 + Math.max(images.length, 1)) % Math.max(images.length, 1)),
+  })
+  const next = () => swipeGo(1)
+  const prev = () => swipeGo(-1)
 
   const handleBuy = async () => {
     if (isFreeProduct(product)) {
@@ -107,14 +112,11 @@ export function QuickView({
       <div className="w-full max-w-3xl max-h-[85vh] bg-canvas border border-line rounded-2xl shadow-xl overflow-hidden flex flex-col md:grid md:grid-cols-2 md:items-stretch">
         <div
           className="relative bg-surface flex items-center justify-center shrink-0 p-3 md:p-4 min-h-[200px] max-h-[min(42vh,360px)] md:max-h-[85vh]"
-          onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
-          onTouchEnd={(e) => {
-            if (touchStartX === null) return
-            const delta = e.changedTouches[0].clientX - touchStartX
-            if (Math.abs(delta) > 50 && hasMultiple) delta < 0 ? next() : prev()
-            setTouchStartX(null)
-          }}
+          ref={swipeContainerRef}
+          style={{ touchAction: 'pan-y' }}
+          {...swipeHandlers}
         >
+          <div ref={swipeSlideRef} className="flex h-full w-full items-center justify-center will-change-transform">
           {images[activeImage] ? (
             <img
               src={images[activeImage]}
@@ -127,6 +129,7 @@ export function QuickView({
           ) : (
             <span className="text-ink-soft text-xs">No image yet</span>
           )}
+          </div>
 
           {hasMultiple && (
             <>
