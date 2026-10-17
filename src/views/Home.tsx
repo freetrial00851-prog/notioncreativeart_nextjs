@@ -11,6 +11,7 @@ import {
   setHomeCatalogCache,
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
+import type { CategoryWithCount } from '../lib/categories'
 import type { Product, HeroContent, ChapterContent, LayoutSection } from '../lib/types'
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
@@ -35,6 +36,7 @@ function applyCatalogSnapshot(
     setFreeProduct: (v: Product | null) => void
     setFreePatternCollage: (v: Product[]) => void
     setChapters: (v: ChapterContent[]) => void
+    setCategories: (v: CategoryWithCount[]) => void
     setHero: Dispatch<SetStateAction<HeroContent | null>>
     setSkillCounts: (v: HomeCatalogSnapshot['skillCounts']) => void
   },
@@ -43,6 +45,7 @@ function applyCatalogSnapshot(
   setters.setFreeProduct(snap.freeProduct)
   setters.setFreePatternCollage(snap.freePatternCollage ?? [])
   setters.setChapters(snap.chapters)
+  setters.setCategories(snap.categories ?? [])
   setters.setSkillCounts(snap.skillCounts)
   if (snap.hero) {
     setters.setHero((prev) => {
@@ -102,6 +105,7 @@ export function Home({
   )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
   const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
+  const [categories, setCategories] = useState<CategoryWithCount[]>(() => seed?.categories ?? [])
   const [skillCounts, setSkillCounts] = useState<HomeCatalogSnapshot['skillCounts']>(
     () => seed?.skillCounts ?? { beginner: 0, intermediate: 0, advanced: 0 },
   )
@@ -110,8 +114,39 @@ export function Home({
   const [featuredError, setFeaturedError] = useState<string | null>(() => initialFeaturedError ?? null)
   const [catalogReloadKey, setCatalogReloadKey] = useState(0)
   void initialLayout
-  void chapters
   void DEFAULT_LAYOUT // retained for page.tsx prop compatibility / future CMS layout
+
+  const productPhoto = (match: (p: Product) => boolean) => trending.find((p) => match(p) && p.images?.[0])?.images?.[0]
+  const categoryBySlug = (needle: string) => categories.find((c) => `${c.name} ${c.link}`.toLowerCase().includes(needle))
+  const collections = [
+    {
+      n: '01 / Just starting',
+      t: 'Beginner-friendly',
+      d: 'Approachable projects for your first stitches and your next little win.',
+      go: 'Explore beginner patterns',
+      href: '/shop?level=beginner',
+      img: chapters.find((c) => c.level === 'beginner')?.image || productPhoto((p) => p.skill_level === 'beginner'),
+      count: skillCounts.beginner,
+    },
+    {
+      n: '02 / Make it yours',
+      t: 'Amigurumi friends',
+      d: 'Soft little characters, keepsakes, and handmade gifts full of charm.',
+      go: 'Meet the collection',
+      href: '/shop/amigurumi',
+      img: categoryBySlug('amigurumi')?.image || productPhoto(() => true),
+      count: categoryBySlug('amigurumi')?.count ?? 0,
+    },
+    {
+      n: '03 / Ready for more',
+      t: 'Wearables & more',
+      d: 'Thoughtful designs to bring texture, colour, and personality to everyday life.',
+      go: 'Find your next project',
+      href: '/shop/wearables',
+      img: categoryBySlug('wearable')?.image || chapters.find((c) => c.level === 'advanced')?.image || productPhoto((p) => p.skill_level === 'advanced'),
+      count: categoryBySlug('wearable')?.count ?? 0,
+    },
+  ]
 
   const reviewStatsMap = useReviewStatsMapForLists([trending])
   const featured = trending.slice(0, 4)
@@ -146,6 +181,7 @@ export function Home({
       setFreeProduct,
       setFreePatternCollage,
       setChapters,
+      setCategories,
       setHero,
       setSkillCounts,
     }
@@ -367,30 +403,41 @@ export function Home({
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-3 md:gap-4">
-            {[
-              { n: '01 / Just starting', t: 'Beginner-friendly', d: 'Approachable projects for your first stitches and your next little win.', go: 'Explore beginner patterns', href: '/shop?level=beginner', bg: 'bg-aqua', count: skillCounts.beginner },
-              { n: '02 / Make it yours', t: 'Amigurumi friends', d: 'Soft little characters, keepsakes, and handmade gifts full of charm.', go: 'Meet the collection', href: '/shop/amigurumi', bg: 'bg-pink', count: 0 },
-              { n: '03 / Ready for more', t: 'Wearables & more', d: 'Thoughtful designs to bring texture, colour, and personality to everyday life.', go: 'Find your next project', href: '/shop/wearables', bg: 'bg-sun', count: 0 },
-            ].map((c) => (
+            {collections.map((c) => (
               <Link
                 key={c.t}
                 href={c.href}
-                className={`press-card relative flex min-h-[215px] flex-col justify-between overflow-hidden rounded-[5px] p-[25px] text-navy md:min-h-[260px] ${c.bg}`}
+                className="press-card group relative isolate flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[5px] bg-[#222] text-white md:aspect-[4/5] md:min-h-0"
               >
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em]">
+                {c.img ? (
+                  <Image
+                    src={deriveVariantUrl(c.img, 'large')}
+                    alt=""
+                    fill
+                    sizes="(max-width: 767px) 100vw, 33vw"
+                    className="-z-20 object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.05] motion-reduce:transition-none"
+                  />
+                ) : null}
+                <span aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
+                <span className="absolute left-[22px] top-[22px] rounded-[3px] bg-white px-2.5 py-1.5 text-[11px] font-bold uppercase leading-none tracking-[0.12em] text-ink">
                   {c.n}
-                  {c.count > 0 ? <span className="opacity-70"> · {c.count} patterns</span> : null}
                 </span>
-                <div className="relative z-[2]">
-                  <h3 className="font-heading text-[30px] font-normal leading-tight tracking-[-0.02em]">{c.t}</h3>
-                  <p className="mt-[9px] max-w-[220px] text-[11px] leading-[1.7]">{c.d}</p>
+                <div className="p-[22px] md:p-6">
+                  <h3 className="font-heading text-[30px] font-normal leading-tight tracking-[-0.02em] md:text-[34px]">{c.t}</h3>
+                  <p className="mt-2 max-w-[300px] text-[13px] leading-[1.6] text-white/80">{c.d}</p>
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/25 pt-4">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.13em]">
+                      {c.go}
+                      {c.count > 0 ? <span className="font-normal text-white/70"> · {c.count} {c.count === 1 ? 'pattern' : 'patterns'}</span> : null}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-ink transition-transform group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </div>
                 </div>
-                <span className="relative z-[2] self-start border-b border-navy pb-[7px] text-[11px] font-semibold uppercase tracking-[0.13em]">
-                  {c.go} ↗
-                </span>
-                <span aria-hidden className="absolute -right-5 top-[30px] size-[155px] rounded-full border-2 border-navy opacity-20">
-                  <span className="absolute inset-3.5 rounded-full border-2 border-navy" />
-                </span>
               </Link>
             ))}
           </div>
