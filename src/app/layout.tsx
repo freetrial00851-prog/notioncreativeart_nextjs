@@ -1,24 +1,21 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Serif_Display, Inter } from 'next/font/google'
+import { Gelasio } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
 import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
-/** Inter — body, nav, buttons, UI. Self-hosted via next/font (no layout shift). */
-const inter = Inter({
+/**
+ * Gelasio — metric-compatible with Georgia, used for headings, the wordmark and
+ * product names (`font-heading`). Matches the approved reference, which rendered Georgia.
+ * Body/UI text uses the platform system font (no download, native optical sizing).
+ */
+const gelasio = Gelasio({
   subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
-/** DM Serif Display — headings, wordmark and product names (`font-heading`). One weight (400) by design. */
-const dmSerif = DM_Serif_Display({
-  subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
-  variable: '--font-dm-serif',
+  variable: '--font-gelasio',
   display: 'swap',
 })
 
@@ -62,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={`${inter.variable} ${dmSerif.variable}`}>
+    <html lang="en" className={gelasio.variable}>
       <head>
         {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

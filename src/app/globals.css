@@ -95,12 +95,12 @@
   --color-skill-advanced-ink: #FFFFFF;
 
   /* Fonts — Manrope body/UI; Playfair headings; Baloo logo */
-  --font-display: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-subheading: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: var(--font-inter), system-ui, sans-serif;
-  --font-heading: var(--font-dm-serif), Georgia, 'Times New Roman', serif;
-  --font-logo: var(--font-dm-serif), Georgia, serif;
+  --font-display: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-subheading: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-body: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-heading: var(--font-gelasio), Georgia, 'Times New Roman', serif;
+  --font-logo: var(--font-gelasio), Georgia, serif;
 
   /* Content column — ~1200px laptop (DESIGN_SPEC §1) */
   --max-width-site: 1600px;
