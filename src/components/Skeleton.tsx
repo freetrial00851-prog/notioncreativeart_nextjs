@@ -11,7 +11,7 @@ function Bone({ className = '' }: { className?: string }) {
 function ProductCardSkeleton() {
   return (
     <div className="flex h-full flex-col" aria-hidden>
-      <Bone className="aspect-square w-full rounded-[18px]" />
+      <Bone className="aspect-[4/3] w-full rounded-[5px]" />
       <div className="mt-1.5 flex flex-1 flex-col gap-1.5">
         <Bone className="h-[2.6em] w-full rounded" />
         <Bone className="h-3 w-20 rounded" />

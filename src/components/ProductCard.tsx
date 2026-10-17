@@ -112,16 +112,16 @@ export function ProductCard({
 
   return (
     <article className="group/card flex h-full flex-col">
-      {/* Coloured mat with the real photo framed inside (reference tile style) */}
+      {/* Landscape card: the photo fills the whole tile (colour only shows while loading) */}
       <div
-        className="relative aspect-[4/4.6] overflow-hidden rounded-[5px]"
+        className="relative aspect-[4/3] overflow-hidden rounded-[5px]"
         style={{ background: tile }}
         onMouseEnter={prefetch}
         onTouchStart={prefetch}
       >
-        <Link href={href} className="press-card absolute inset-0 z-0 flex items-center justify-center p-3 md:p-4" aria-label={product.title} tabIndex={-1}>
+        <Link href={href} className="press-card absolute inset-0 z-0 block" aria-label={product.title} tabIndex={-1}>
           {product.images?.[0] ? (
-            <span className="relative block aspect-[4/3] w-full overflow-hidden rounded-[3px] bg-white/50 shadow-[0_10px_18px_rgba(32,32,68,0.16)]">
+            <span className="absolute inset-0 block overflow-hidden">
               <Image
                 src={product.images[0]}
                 alt={product.title}
@@ -160,9 +160,10 @@ export function ProductCard({
             onClick={free ? downloadFree : toggleCart}
             disabled={free && downloadingFree}
             aria-label={free ? `Download ${product.title} free` : addLabel}
-            className="absolute inset-x-3 bottom-3 z-10 min-h-11 rounded-[3px] bg-navy px-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:translate-y-1 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
+            className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-[3px] bg-navy text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
           >
-            {quickLabel}
+            <span aria-hidden className="text-[18px] leading-none md:hidden">{free ? (downloadingFree ? '…' : '↓') : inCart ? '✓' : '+'}</span>
+            <span className="hidden md:inline">{quickLabel}</span>
           </button>
         )}
       </div>
