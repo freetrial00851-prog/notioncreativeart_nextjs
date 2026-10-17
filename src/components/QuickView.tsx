@@ -57,6 +57,12 @@ export function QuickView({
     onNext: () => setActiveImage((i) => (i + 1) % Math.max(images.length, 1)),
     onPrev: () => setActiveImage((i) => (i - 1 + Math.max(images.length, 1)) % Math.max(images.length, 1)),
   })
+  const slides = (() => {
+    const n = images.length
+    if (n === 0) return []
+    const offsets = n >= 3 ? [-1, 0, 1] : n === 2 ? [0, 1] : [0]
+    return offsets.map((off) => ({ off, idx: (activeImage + off + n) % n }))
+  })()
   const next = () => swipeGo(1)
   const prev = () => swipeGo(-1)
 
@@ -116,19 +122,27 @@ export function QuickView({
           style={{ touchAction: 'pan-y' }}
           {...swipeHandlers}
         >
-          <div ref={swipeSlideRef} className="flex h-full w-full items-center justify-center will-change-transform">
-          {images[activeImage] ? (
-            <img
-              src={images[activeImage]}
-              srcSet={`${images[activeImage]} 640w, ${deriveVariantUrl(images[activeImage], 'large')} 1000w`}
-              sizes="(max-width: 768px) 100vw, 480px"
-              alt={product.title}
-              loading="eager"
-              className="max-w-full max-h-full w-auto h-auto object-contain"
-            />
-          ) : (
-            <span className="text-ink-soft text-xs">No image yet</span>
-          )}
+          <div ref={swipeSlideRef} className="absolute inset-0 will-change-transform">
+            {slides.length > 0 ? (
+              slides.map(({ idx, off }) => (
+                <div key={idx} className="absolute inset-0 flex items-center justify-center p-3 md:p-4" style={{ transform: `translate3d(${off * 100}%,0,0)` }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={images[idx]}
+                    srcSet={`${images[idx]} 640w, ${deriveVariantUrl(images[idx], 'large')} 1000w`}
+                    sizes="(max-width: 768px) 100vw, 480px"
+                    alt={off === 0 ? product.title : ''}
+                    aria-hidden={off !== 0 || undefined}
+                    loading="eager"
+                    decoding="async"
+                    draggable={false}
+                    className="max-h-full max-w-full h-auto w-auto select-none object-contain"
+                  />
+                </div>
+              ))
+            ) : (
+              <span className="absolute inset-0 flex items-center justify-center text-ink-soft text-xs">No image yet</span>
+            )}
           </div>
 
           {hasMultiple && (
@@ -184,8 +198,8 @@ export function QuickView({
             <div className="flex items-center gap-3 mb-3">
               {product.compare_at_price && product.compare_at_price > product.price ? (
                 <>
-                  <span className="text-base font-semibold text-ink">${product.price.toFixed(2)}</span>
-                  <span style={{ color: 'var(--color-madder)' }} className="line-through text-sm">${product.compare_at_price.toFixed(2)}</span>
+                  <span className="text-xl font-bold text-deal">${product.price.toFixed(2)}</span>
+                  <span className="line-through text-base font-medium text-sale">${product.compare_at_price.toFixed(2)}</span>
                 </>
               ) : (
                 <span className="text-base">${product.price.toFixed(2)}</span>

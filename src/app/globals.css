@@ -49,6 +49,8 @@
   --color-gold: #F5A300;
   --color-star: #F5A300;
   --color-sale: #D92D20;
+  /* Discounted price (Etsy-style green); the struck-through old price uses --color-sale (red). */
+  --color-deal: #1B7F3A;
   --color-sale-dark: #D92D20;
   --color-free: #111111;
   --color-success-bg: #F5F5F5;

@@ -242,11 +242,11 @@ function CartLine({
           </button>
           <p className="flex items-baseline gap-2">
             {onSale && product.compare_at_price != null && (
-              <span className="text-[14px] text-muted line-through md:text-[13px]">
+              <span className="text-[15px] font-medium text-sale line-through md:text-[14px]">
                 <span className="sr-only">Was </span>${product.compare_at_price.toFixed(2)}
               </span>
             )}
-            <span className="text-[17px] font-bold text-primary md:text-[15px]">
+            <span className={`text-[18px] font-bold md:text-[16px] ${onSale ? 'text-deal' : 'text-primary'}`}>
               {onSale && <span className="sr-only">Now </span>}
               {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
             </span>

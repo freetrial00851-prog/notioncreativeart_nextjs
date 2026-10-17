@@ -571,19 +571,26 @@ export function ProductDetail({
 
   const goPrev = () => swipeGo(-1)
   const goNext = () => swipeGo(1)
+  // Current photo + its neighbours, all mounted so the next one is already decoded when it slides in.
+  const gallerySlides = (() => {
+    const n = images.length
+    if (n === 0) return []
+    const offsets = n >= 3 ? [-1, 0, 1] : n === 2 ? [0, 1] : [0]
+    return offsets.map((off) => ({ off, idx: (activeImage + off + n) % n }))
+  })()
 
   const relatedShown = related.slice(0, 4)
   const relatedIds = new Set(relatedShown.map((p) => p.id))
   const alsoBoughtShown = alsoBought.filter((p) => !relatedIds.has(p.id)).slice(0, 4)
 
   const priceBlock = mode === 'free' ? (
-    <p className="text-[24px] md:text-[28px] font-bold leading-none text-free">Free</p>
+    <p className="text-[32px] md:text-[40px] font-bold leading-none text-ink">Free</p>
   ) : mode === 'paid' && product.price > 0 ? (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <p className="text-[24px] md:text-[28px] font-bold leading-none text-primary">${product.price.toFixed(2)}</p>
+      <p className={`text-[32px] md:text-[40px] font-bold leading-none ${onSale ? 'text-deal' : 'text-primary'}`}>${product.price.toFixed(2)}</p>
       {onSale && (
         <>
-          <p className="text-[18px] text-muted line-through">
+          <p className="text-[22px] font-medium text-sale line-through">
             <span className="sr-only">Was </span>${product.compare_at_price!.toFixed(2)}
           </p>
           <span className="inline-flex items-center rounded-[3px] bg-sale/10 px-2.5 py-1 text-[12px] font-bold text-sale">
@@ -645,20 +652,27 @@ export function ProductDetail({
               {...swipeHandlers}
             >
               <div ref={swipeSlideRef} className="absolute inset-0 will-change-transform">
-              {images[activeImage] ? (
-                <Image
-                  src={deriveVariantUrl(images[activeImage], 'large')}
-                  alt={images.length > 1 ? `${product.title}, photo ${activeImage + 1} of ${images.length}` : product.title}
-                  fill
-                  priority={activeImage === 0}
-                  fetchPriority={activeImage === 0 ? 'high' : 'auto'}
-                  sizes={GALLERY_LCP_SIZES}
-                  className="object-contain pointer-events-none select-none"
-                  draggable={false}
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-muted text-sm">No image yet</div>
-              )}
+                {gallerySlides.length > 0 ? (
+                  gallerySlides.map(({ idx, off }) => (
+                    <div key={idx} className="absolute inset-0" style={{ transform: `translate3d(${off * 100}%,0,0)` }}>
+                      <Image
+                        src={deriveVariantUrl(images[idx], 'large')}
+                        alt={off === 0 ? (images.length > 1 ? `${product.title}, photo ${idx + 1} of ${images.length}` : product.title) : ''}
+                        aria-hidden={off !== 0 || undefined}
+                        fill
+                        priority={idx === 0 && off === 0}
+                        fetchPriority={idx === 0 && off === 0 ? 'high' : 'auto'}
+                        loading={idx === 0 && off === 0 ? undefined : 'eager'}
+                        decoding="async"
+                        sizes={GALLERY_LCP_SIZES}
+                        className="object-contain pointer-events-none select-none"
+                        draggable={false}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-muted text-sm">No image yet</div>
+                )}
               </div>
 
               {statusBadge && (
@@ -1066,9 +1080,9 @@ export function ProductDetail({
             {mode === 'paid' && (
               <>
                 <div className="min-w-0 shrink-0">
-                  <p className="text-[20px] font-extrabold leading-tight text-primary">${product.price.toFixed(2)}</p>
+                  <p className={`text-[24px] font-extrabold leading-tight ${onSale ? 'text-deal' : 'text-primary'}`}>${product.price.toFixed(2)}</p>
                   {onSale && (
-                    <p className="text-[13px] text-muted line-through">
+                    <p className="text-[15px] font-medium text-sale line-through">
                       <span className="sr-only">Was </span>${product.compare_at_price!.toFixed(2)}
                     </p>
                   )}

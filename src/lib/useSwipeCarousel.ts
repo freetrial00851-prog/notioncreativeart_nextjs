@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react'
+import { flushSync } from 'react-dom'
 import { SPRING_DEFAULT, SPRING_FLICK, VelocityTracker, createSpring, prefersReducedMotion, project, type Spring } from './spring'
 
 const HYSTERESIS = 10 // px before a drag commits to a direction
@@ -27,8 +28,10 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
   const drag = useRef<{ id: number; x0: number; y0: number; startPos: number; committed: boolean; locked: 'x' | 'y' | null } | null>(null)
   const tracker = useRef(new VelocityTracker())
   const cbs = useRef({ onNext, onPrev })
+  const countRef = useRef(count)
   useEffect(() => {
     cbs.current = { onNext, onPrev }
+    countRef.current = count
   })
 
   useEffect(() => {
@@ -42,10 +45,16 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
 
   const width = () => containerRef.current?.getBoundingClientRect().width ?? 320
 
-  /** Slide the current photo out, swap the index, bring the new one in from the other side. */
-  const commit = useCallback((dir: 1 | -1, velocity = 0, fromFlick = false) => {
+  /**
+   * Slide the track one photo over. The neighbours are ALREADY rendered, so the next
+   * photo is on screen the whole time (no blank frame). When the spring lands we swap
+   * the index synchronously and recentre the track in the same task, before paint.
+   */
+  const commit = useCallback((dirIn: 1 | -1, velocity = 0, fromFlick = false) => {
     const spring = springRef.current
     if (!spring) return
+    // With only two photos there is no "previous" neighbour in the DOM: always slide the same way.
+    const dir: 1 | -1 = countRef.current < 3 ? 1 : dirIn
     const w = width()
     const swap = () => (dir === 1 ? cbs.current.onNext() : cbs.current.onPrev())
     if (prefersReducedMotion()) {
@@ -57,9 +66,8 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
       velocity,
       config: fromFlick ? SPRING_FLICK : SPRING_DEFAULT,
       onComplete: () => {
-        swap()
-        spring.set(dir * w * 0.35)
-        spring.to(0, { config: SPRING_DEFAULT })
+        flushSync(() => swap())
+        spring.set(0)
       },
     })
   }, [])
@@ -115,6 +123,7 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
     let dir: 1 | -1 | 0 = 0
     if (flick) dir = v < 0 ? 1 : -1
     else if (Math.abs(pos + project(v)) > width() * 0.33) dir = pos < 0 ? 1 : -1
+    if (countRef.current < 3 && dir === -1) dir = 0
     if (dir === 0) settle(v, flick)
     else commit(dir, v, flick)
   }

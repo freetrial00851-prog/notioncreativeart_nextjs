@@ -177,19 +177,20 @@ export function ProductCard({
             href={href}
             onMouseEnter={prefetch}
             onTouchStart={prefetch}
-            className="line-clamp-2 transition-colors [@media(hover:hover)]:group-hover/card:text-violet"
+            title={product.title}
+            className="block truncate transition-colors [@media(hover:hover)]:group-hover/card:text-violet"
           >
             {product.title}
           </Link>
         </h3>
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[12px] font-extrabold text-ink">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[18px] font-extrabold leading-none text-ink">
           {free ? (
-            <span className="font-extrabold text-violet">Free</span>
+            <span className="font-extrabold text-ink">Free</span>
           ) : (
             <>
-              <span>${product.price.toFixed(2)}</span>
+              <span className={isOnSale ? 'text-deal' : undefined}>${product.price.toFixed(2)}</span>
               {isOnSale && product.compare_at_price != null && (
-                <del className="text-[11px] font-bold text-muted">${product.compare_at_price.toFixed(2)}</del>
+                <del className="text-[14px] font-semibold text-sale">${product.compare_at_price.toFixed(2)}</del>
               )}
             </>
           )}

@@ -199,13 +199,13 @@ export function Cart() {
             const onSale = isOnSale(product)
             const busy = busyId === product_id
             const price = (
-              <span className="text-[17px] md:text-[16px] font-bold text-primary">
+              <span className={`text-[18px] md:text-[17px] font-bold ${onSale ? 'text-deal' : 'text-primary'}`}>
                 {onSale && <span className="sr-only">Now </span>}
                 {money(product.price)}
               </span>
             )
             const oldPrice = onSale && product.compare_at_price != null && (
-              <span className="text-[14px] md:text-[12px] text-muted line-through">
+              <span className="text-[15px] md:text-[14px] font-medium text-sale line-through">
                 <span className="sr-only">Was </span>
                 {money(product.compare_at_price)}
               </span>
