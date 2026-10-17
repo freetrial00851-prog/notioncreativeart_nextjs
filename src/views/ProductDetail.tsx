@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import Image, { getImageProps } from 'next/image'
 import { useSwipeCarousel } from '../lib/useSwipeCarousel'
+import { track } from '../lib/track'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -332,6 +333,12 @@ export function ProductDetail({
     observer.observe(buyButtonRef.current)
     return () => observer.disconnect()
   }, [product])
+
+  // First-party analytics: one view_item per product page load.
+  const viewedId = product?.id
+  useEffect(() => {
+    if (viewedId) track('view_item', { productId: viewedId })
+  }, [viewedId])
 
   // Preload adjacent gallery stages so swipe/arrow doesn't wait on network.
   useEffect(() => {

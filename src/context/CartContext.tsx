@@ -6,6 +6,7 @@ import { useAuth } from './AuthContext'
 import { useToast } from './ToastContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { trackPinterestAddToCart } from '../lib/pinterest'
+import { track } from '../lib/track'
 import { profileDisplayName } from '../lib/profileName'
 import {
   GUEST_MERGE_DONE_EVENT,
@@ -189,6 +190,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         value: Number(product.price),
         productName: product.title ?? undefined,
       })
+      track('add_to_cart', { productId, props: { value: Number(product.price) } })
       return
     }
 
@@ -205,9 +207,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value: Number(product.price),
       productName: product.title ?? undefined,
     })
+      track('add_to_cart', { productId, props: { value: Number(product.price) } })
   }
 
   const removeFromCart = async (productId: string) => {
+    track('remove_from_cart', { productId })
     if (!user) {
       removeGuestCartItem(productId)
       await loadGuest()

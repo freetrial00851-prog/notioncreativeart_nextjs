@@ -7,6 +7,7 @@ import { useToast } from '../context/ToastContext'
 import { isPasswordValid } from '../components/PasswordStrength'
 import { waitForGuestMerge } from './guestStorage'
 import { subscribeToNewsletter } from './newsletter'
+import { track } from './track'
 
 type Options = {
   /** Called when signup creates an immediate session (autoconfirm on). */
@@ -58,6 +59,7 @@ export function useSignUpForm(options: Options = {}) {
       })
       if (duplicateEmail) { setEmailTaken(true); return }
       if (error) { setError(error); return }
+      track('sign_up')
       if (newsletterOptIn) void subscribeToNewsletter(email.trim())
       if (session) {
         await waitForGuestMerge()

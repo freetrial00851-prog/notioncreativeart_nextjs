@@ -13,6 +13,7 @@ import type { Product, Category } from '../lib/types'
 import { profileDisplayName } from '../lib/profileName'
 import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
+import { InsightsOverview, InsightsCustomers, InsightsSaved, InsightsProducts, InsightsTraffic, InsightsSetup } from './AdminInsights'
 import { AdminBulkUpload } from './AdminBulkUpload'
 import { AdminReviews } from './AdminReviews'
 import { DropzoneUpload } from '../components/DropzoneUpload'
@@ -33,6 +34,10 @@ type NavItem =
 
 const ADMIN_NAV: NavItem[] = [
   { kind: 'link', to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true },
+  { kind: 'link', to: '/admin/customers', label: 'Customers', icon: 'group' },
+  { kind: 'link', to: '/admin/saved', label: 'Wishlists & carts', icon: 'favorite' },
+  { kind: 'link', to: '/admin/products', label: 'Product insights', icon: 'insights' },
+  { kind: 'link', to: '/admin/traffic', label: 'Traffic & search', icon: 'travel_explore' },
   { kind: 'link', to: '/admin/listings', label: 'Listings', icon: 'sell' },
   { kind: 'link', to: '/admin/bulk-upload', label: 'Bulk Upload', icon: 'upload_file' },
   { kind: 'link', to: '/admin/orders', label: 'Orders', icon: 'receipt_long' },
@@ -46,6 +51,7 @@ const ADMIN_NAV: NavItem[] = [
     children: [
       { to: '/admin/homepage', label: 'Homepage' },
       { to: '/admin/subscribers', label: 'Newsletter' },
+      { to: '/admin/setup', label: 'Tracking setup' },
     ],
   },
   { kind: 'link', to: '/admin/trash', label: 'Trash', icon: 'delete' },
@@ -214,7 +220,19 @@ function AdminContent() {
   switch (pathname) {
     case '/admin':
     case '/admin/':
+      return <InsightsOverview />
+    case '/admin/classic':
       return <AdminDashboard />
+    case '/admin/customers':
+      return <InsightsCustomers />
+    case '/admin/saved':
+      return <InsightsSaved />
+    case '/admin/products':
+      return <InsightsProducts />
+    case '/admin/traffic':
+      return <InsightsTraffic />
+    case '/admin/setup':
+      return <InsightsSetup />
     case '/admin/categories':
       return <CategoriesAdmin />
     case '/admin/listings':
@@ -236,7 +254,7 @@ function AdminContent() {
     case '/admin/trash':
       return <TrashAdmin />
     default:
-      return <AdminDashboard />
+      return <InsightsOverview />
   }
 }
 

@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
+import { track } from '../lib/track'
 import { useAuth } from './AuthContext'
 import { useToast } from './ToastContext'
 import {
@@ -93,6 +94,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     async (productId: string) => {
       if (!user) {
         const { ids, added } = toggleGuestWishlistId(productId)
+        track(added ? 'add_to_wishlist' : 'remove_from_wishlist', { productId })
         setProductIds(ids)
         await loadProductsForIds(ids)
         return { added }
@@ -110,6 +112,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
           showToast('Couldn’t update wishlist — try again.', 'error')
           return { added: true }
         }
+        track('remove_from_wishlist', { productId })
         const next = productIds.filter((id) => id !== productId)
         setProductIds(next)
         await loadProductsForIds(next)
@@ -124,6 +127,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         showToast('Couldn’t update wishlist — try again.', 'error')
         return { added: false }
       }
+      track('add_to_wishlist', { productId })
       const next = [productId, ...productIds.filter((id) => id !== productId)]
       setProductIds(next)
       await loadProductsForIds(next)

@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { track } from './track'
 import { env } from './env'
 
 function triggerBrowserDownload(signedUrl: string, filename: string): void {
@@ -25,6 +26,7 @@ export async function triggerPdfDownload(productId: string, title?: string): Pro
   const { data, error } = await supabase.storage.from('patterns').createSignedUrl(`${productId}.pdf`, 60, { download: filename })
   if (error || !data) return false
   triggerBrowserDownload(data.signedUrl, filename)
+  track('download', { productId })
   return true
 }
 
@@ -41,6 +43,7 @@ export async function claimAndDownloadFreePattern(userId: string, productId: str
     console.error('Failed to record free-pattern purchase:', error)
     return false
   }
+  track('free_download', { productId })
   return triggerPdfDownload(productId, title)
 }
 
@@ -90,6 +93,7 @@ async function downloadFreePatternViaServer(productId: string, title?: string): 
   if (!data.signedUrl) return { ok: false, error: "This pattern's file isn't uploaded yet — please check back soon." }
   const filename = data.filename ?? `${(title ?? 'pattern').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`
   triggerBrowserDownload(data.signedUrl, filename)
+  track('free_download', { productId })
   return { ok: true }
 }
 

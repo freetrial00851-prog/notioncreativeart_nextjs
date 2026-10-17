@@ -15,6 +15,7 @@ const names = [
   'chat-escalate',
   'download-order-receipt',
   'admin-refund-order',
+  'track-event',
 ]
 
 for (const name of names) {

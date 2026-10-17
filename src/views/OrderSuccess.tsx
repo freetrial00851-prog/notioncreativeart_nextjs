@@ -15,6 +15,7 @@ import { PatternGrid } from '../components/PatternGrid'
 import { triggerPdfDownload } from '../lib/downloads'
 import { downloadOrderReceipt } from '../lib/orderReceipt'
 import { trackPinterestPurchase } from '../lib/pinterest'
+import { track } from '../lib/track'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import type { Product } from '../lib/types'
 
@@ -101,6 +102,15 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
           if (cancelled) return
           if (data && isRecent(data.created_at)) {
             setLookup({ kind: 'found', order: data as RecentOrder })
+            try {
+              const k = `nca_tracked_purchase_${data.id}`
+              if (!sessionStorage.getItem(k)) {
+                sessionStorage.setItem(k, '1')
+                track('purchase', { props: { order_id: data.id } })
+              }
+            } catch {
+              /* ignore */
+            }
             trackPinterestPurchase({
               orderId: data.id,
               lemonOrderId: data.lemon_order_id,

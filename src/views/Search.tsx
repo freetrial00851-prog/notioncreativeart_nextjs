@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
 import { supabase } from '../lib/supabase'
 import { searchProducts } from '../lib/productSearch'
+import { track } from '../lib/track'
 import type { Product } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
 import { ListingPagination } from '../components/ListingPagination'
@@ -68,6 +69,7 @@ export function Search() {
       .then((data) => {
         if (cancelled) return
         setResults(data)
+        track('search', { props: { q: q.trim().slice(0, 64), results: data.length } })
       })
       .catch((err) => {
         console.error('Search failed:', err)
