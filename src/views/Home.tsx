@@ -150,6 +150,12 @@ export function Home({
 
   const reviewStatsMap = useReviewStatsMapForLists([trending])
   const featured = trending.slice(0, 4)
+  // Story section: two real finished makes (not the ones already shown in "Featured").
+  const storyPhotos = trending
+    .slice(4)
+    .filter((p) => p.images?.[0])
+    .slice(0, 2)
+    .map((p) => ({ src: p.images[0], alt: p.title }))
   const heroTiles = ((): (HeroPhoto | null)[] => {
     const tiles: HeroPhoto[] = []
     const seen = new Set<string>()
@@ -446,9 +452,30 @@ export function Home({
 
       {/* 5 · Story */}
       <section className="mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
-        <div className="grid min-h-[300px] place-items-center rounded-[5px] bg-lilac md:min-h-[410px]">
-          <YarnArt className="w-4/5 max-w-[380px]" />
-        </div>
+        {storyPhotos.length > 0 ? (
+          <div className="relative mx-auto w-full max-w-[640px] pb-10 pr-8 md:pb-14 md:pr-12 lg:max-w-none">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-[5px] bg-surface-warm">
+              <Image
+                src={deriveVariantUrl(storyPhotos[0].src, 'large')}
+                alt={storyPhotos[0].alt}
+                fill
+                sizes="(max-width:1023px) 90vw, 560px"
+                className="object-cover object-[50%_20%]"
+              />
+            </div>
+            {storyPhotos[1] ? (
+              <div className="absolute bottom-0 right-0 aspect-square w-[42%] overflow-hidden rounded-[5px] border-[6px] border-bg bg-surface-warm shadow-[0_14px_28px_rgba(0,0,0,0.14)]">
+                <Image
+                  src={deriveVariantUrl(storyPhotos[1].src, 'large')}
+                  alt={storyPhotos[1].alt}
+                  fill
+                  sizes="(max-width:1023px) 40vw, 260px"
+                  className="object-cover object-center"
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         <div>
           <p className="eyebrow">A slower, lovelier way to create</p>
           <h2 className="my-[18px] font-heading text-[clamp(38px,4vw,55px)] font-normal leading-[1.08] tracking-[-0.035em] text-ink">
@@ -635,21 +662,6 @@ export function Home({
 
       <EmailSignup />
     </div>
-  )
-}
-
-function YarnArt({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 350 350" className={className} role="img" aria-label="Yarn balls and crochet hook illustration">
-      <ellipse cx="172" cy="302" rx="120" ry="14" fill="#c5c2b3" />
-      <circle cx="119" cy="171" r="77" fill="#c5cdb8" stroke="#8d9b7c" strokeWidth="2" />
-      <path d="M54 160 Q117 210 184 151 M54 177 Q117 226 184 169 M62 130 Q117 178 176 125 M76 108 Q119 150 163 106 M81 222 Q121 171 167 223 M103 96 Q151 155 105 246 M131 95 Q88 166 135 246 M152 111 Q109 172 154 226" fill="none" stroke="#8d9b7c" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="229" cy="220" r="58" fill="#d9b5a4" stroke="#b78876" strokeWidth="2" />
-      <path d="M180 210 Q228 252 278 204 M183 228 Q228 267 275 222 M199 175 Q238 220 259 169 M220 163 Q189 217 226 276 M247 165 Q213 221 250 274" fill="none" stroke="#b78876" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M194 56 L290 149 Q300 160 291 169 Q282 178 271 167 L176 72Z" fill="#c6a77c" stroke="#9d8058" strokeWidth="2" />
-      <path d="M188 62 L282 156" stroke="#f0dfc0" strokeWidth="5" />
-      <path d="M171 45 Q181 35 193 48 L201 56 L188 69 L177 59 Q166 52 171 45Z" fill="#7b8b6c" />
-    </svg>
   )
 }
 
