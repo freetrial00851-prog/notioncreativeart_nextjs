@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Gelasio } from 'next/font/google'
+import { Fraunces, Caveat } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
@@ -7,15 +7,23 @@ import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from
 import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
 /**
- * Gelasio — metric-compatible with Georgia, used for headings, the wordmark and
- * product names (`font-heading`). Matches the approved reference, which rendered Georgia.
+ * Fraunces — a soft, slightly wonky "old-style" serif (Cooper/Recoleta family feel) for
+ * headings, the wordmark and product names (`font-heading`). SOFT + WONK axes give the
+ * rounded, hand-cut character; opsz tunes it for big vs small sizes.
+ * Caveat — a neat handwritten face, used ONLY for tiny personal notes (`font-hand`).
  * Body/UI text uses the platform system font (no download, native optical sizing).
  */
-const gelasio = Gelasio({
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  axes: ['SOFT', 'WONK', 'opsz'],
   style: ['normal', 'italic'],
-  variable: '--font-gelasio',
+  variable: '--font-fraunces',
+  display: 'swap',
+})
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['500', '700'],
+  variable: '--font-caveat',
   display: 'swap',
 })
 
@@ -59,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={gelasio.variable}>
+    <html lang="en" className={`${fraunces.variable} ${caveat.variable}`}>
       <head>
         {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

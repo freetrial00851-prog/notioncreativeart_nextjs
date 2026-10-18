@@ -268,7 +268,12 @@ export function Home({
                 {i > 0 && <br />}
                 {line.split(/(\*[^*]+\*)/).map((part, j) =>
                   part.startsWith('*') && part.endsWith('*') && part.length > 2 ? (
-                    <em key={j} className="not-italic text-coral">{part.slice(1, -1)}</em>
+                    <em key={j} className="relative inline-block not-italic text-coral">
+                      {part.slice(1, -1)}
+                      <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.16em] w-full text-sun">
+                        <path d="M2 7 C 20 1, 36 11, 56 6 S 92 2, 112 7 S 150 11, 170 5 S 192 4, 198 6" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+                      </svg>
+                    </em>
                   ) : (
                     part
                   ),
@@ -300,6 +305,9 @@ export function Home({
               </li>
             ))}
           </ul>
+          <p className="mt-5 -rotate-2 font-hand text-[24px] font-bold leading-none text-coral" aria-hidden>
+            psst… it’s in your downloads in a minute ↗
+          </p>
         </div>
 
         {/* Yellow art panel — real photo framed over a pink sun */}
@@ -343,8 +351,8 @@ export function Home({
       </section>
 
       {/* 2 · Ticker */}
-      <section className="border-y-2 border-navy bg-white">
-        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[11px] font-semibold uppercase tracking-[0.13em] text-ink">
+      <section className="border-y-2 border-navy bg-sun">
+        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[11px] font-bold uppercase tracking-[0.13em] text-navy">
           {['Small projects, big joy', 'Patterns to keep forever', 'Creative time, your way', 'Download and get making'].map((t) => (
             <li key={t} className="inline-flex items-center gap-2.5">
               <span className="text-coral" aria-hidden>✳</span>
@@ -461,7 +469,8 @@ export function Home({
       </section>
 
       {/* 5 · Story */}
-      <section className="mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
+      <section className="bg-peach">
+      <div className="mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
         {storyPhotos.length > 0 ? (
           <div className="relative mx-auto w-full max-w-[640px] pb-10 pr-8 md:pb-14 md:pr-12 lg:max-w-none">
             <div className="relative aspect-[16/10] overflow-hidden rounded-[5px] bg-surface-warm">
@@ -503,6 +512,7 @@ export function Home({
             </Button>
           </Link>
         </div>
+      </div>
       </section>
 
       {/* 6 · Three steps */}
@@ -650,7 +660,7 @@ export function Home({
       )}
 
       {/* 10 · FAQ */}
-      <section className="border-t border-border">
+      <section className="bg-pink-soft">
         <div className="max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <p className="eyebrow">Questions, answered</p>
