@@ -514,7 +514,7 @@ export function InsightsSaved() {
                 {rows.map((r) => (
                   <tr key={`${r.user_id}-${r.product_id}`}>
                     <td className={TD}><span className="block font-medium">{r.name || r.email}</span>{r.name && <span className="text-[12px] text-[#777]">{r.email}</span>}</td>
-                    <td className={TD}><Link className="hover:underline" href={`/product/${r.slug}`} target="_blank">{r.title}</Link></td>
+                    <td className={TD}><Link className="hover:underline" href={`/pattern/${r.slug}`} target="_blank">{r.title}</Link></td>
                     <td className={`${TD} tabular-nums`}>{money(Number(r.price))}</td>
                     <td className={`${TD} text-[#666]`}>{timeAgo(r.added_at)}</td>
                     <td className={TD}>{r.bought ? <span className="text-deal font-medium">Bought</span> : <span className="text-[#888]">Waiting</span>}</td>
@@ -587,7 +587,7 @@ export function InsightsProducts() {
                   <tbody className="divide-y divide-[#F1F2F4]">
                     {sorted.map((r) => (
                       <tr key={r.product_id}>
-                        <td className={TD}><Link href={`/product/${r.slug}`} target="_blank" className="font-medium hover:underline">{r.title}</Link><span className="block text-[12px] text-[#888]">{money(Number(r.price))}</span></td>
+                        <td className={TD}><Link href={`/pattern/${r.slug}`} target="_blank" className="font-medium hover:underline">{r.title}</Link><span className="block text-[12px] text-[#888]">{money(Number(r.price))}</span></td>
                         {cols.map(([k]) => <td key={k} className={`${TD} tabular-nums`}>{k === 'revenue' ? money(Number(r[k])) : Number(r[k]).toLocaleString()}</td>)}
                         <td className={`${TD} tabular-nums`}>{pct(Number(r.orders), Number(r.views))}</td>
                       </tr>

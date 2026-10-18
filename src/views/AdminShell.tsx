@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { NavLink } from '@/components/NavLink'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { AdminUiProvider } from '../components/adminUi'
 
 type NavItem = { to: string; label: string; icon: string; end?: boolean; badge?: 'reviews'; hint?: string }
 type NavGroup = { title: string; items: NavItem[] }
@@ -300,7 +301,7 @@ export function AdminShell({
         </header>
 
         <main className="min-w-0 flex-1 px-4 py-5 pb-24 md:px-8 md:py-7 md:pb-10">
-          <div className="mx-auto w-full max-w-[1200px]">{children}</div>
+          <div className="mx-auto w-full max-w-[1200px]"><AdminUiProvider>{children}</AdminUiProvider></div>
         </main>
       </div>
 

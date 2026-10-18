@@ -2,6 +2,10 @@
 
 import { setAnalyticsSource } from '@/lib/adminAnalytics'
 import { mockSource } from '@/lib/adminAnalyticsMock'
+import { ProductsAdmin } from '@/views/Admin'
+import { AdminOrders } from '@/views/AdminOrders'
+import { AdminReviews } from '@/views/AdminReviews'
+import { AdminCategories, AdminSubscribers, AdminTrash } from '@/views/AdminCatalog'
 import { AdminShell } from '@/views/AdminShell'
 import { AdminToday } from '@/views/AdminToday'
 import { HomepageAdmin } from '@/views/AdminHomepage'
@@ -15,6 +19,12 @@ const PAGES: Record<string, () => React.ReactElement> = {
   traffic: () => <InsightsTraffic />,
   setup: () => <InsightsSetup />,
   homepage: () => <HomepageAdmin />,
+  listings: () => <ProductsAdmin mode="listings" />,
+  orders: () => <AdminOrders />,
+  reviews: () => <AdminReviews />,
+  categories: () => <AdminCategories />,
+  subscribers: () => <AdminSubscribers />,
+  trash: () => <AdminTrash />,
   today: () => <AdminToday name="Sufyan" />,
 }
 

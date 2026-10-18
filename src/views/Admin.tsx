@@ -1,30 +1,28 @@
 'use client'
 
-import { useEffect, useRef, useState, Fragment } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { supabase } from '../lib/supabase'
-import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, IMAGE_MAX, PRODUCT_IMAGE_CACHE_CONTROL } from '../lib/imageVariants'
+import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, PRODUCT_IMAGE_CACHE_CONTROL } from '../lib/imageVariants'
 import { validatePdfFile } from '../lib/uploadValidation'
-import { compressImage } from '../lib/imageCompress'
 import { useAuth } from '../context/AuthContext'
 import type { Product, Category } from '../lib/types'
 import { profileDisplayName } from '../lib/profileName'
 import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminShell } from './AdminShell'
+import { ProductEditor } from './AdminProductEditor'
+import { AdminOrders } from './AdminOrders'
+import { AdminCategories, AdminSubscribers, AdminTrash } from './AdminCatalog'
+import { Btn, Chip, Empty, PageHeader, SearchBox, Tabs, Toggle, useAdminUi } from '../components/adminUi'
 import { AdminToday } from './AdminToday'
 import { InsightsOverview, InsightsCustomers, InsightsSaved, InsightsProducts, InsightsTraffic, InsightsSetup } from './AdminInsights'
 import { AdminBulkUpload } from './AdminBulkUpload'
 import { AdminReviews } from './AdminReviews'
-import { DropzoneUpload } from '../components/DropzoneUpload'
 import { ProductExportModal } from '../components/ProductExportModal'
-import { MaterialIcon } from '../components/MaterialIcon'
-import { triggerPdfDownload } from '../lib/downloads'
 import { revalidateStorefront } from '../lib/actions/revalidateStorefront'
 import { clearHomeCatalogCache } from '../lib/homeCatalogCache'
-
-const ADMIN_H1 = 'font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink'
 
 export function Admin() {
   const { user, profile, loading, signOut } = useAuth()
@@ -76,7 +74,7 @@ function AdminContent({ name }: { name: string }) {
     case '/admin/setup':
       return <InsightsSetup />
     case '/admin/categories':
-      return <CategoriesAdmin />
+      return <AdminCategories />
     case '/admin/listings':
       return <ProductsAdmin mode="listings" />
     case '/admin/bulk-upload':
@@ -88,13 +86,13 @@ function AdminContent({ name }: { name: string }) {
     case '/admin/homepage':
       return <HomepageAdmin />
     case '/admin/orders':
-      return <OrdersAdmin />
+      return <AdminOrders />
     case '/admin/reviews':
       return <AdminReviews />
     case '/admin/subscribers':
-      return <SubscribersAdmin />
+      return <AdminSubscribers />
     case '/admin/trash':
-      return <TrashAdmin />
+      return <AdminTrash />
     default:
       return <AdminToday name={name} />
   }
@@ -115,18 +113,6 @@ function slugify(title: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-}
-
-/** Parents in sort_order, each immediately followed by its own subcategories
- *  (also in sort_order) — used to show real hierarchy in flat <select> lists. */
-function sortedForDropdown(categories: Category[]): Category[] {
-  const parents = categories.filter((c) => !c.parent_id)
-  const out: Category[] = []
-  for (const p of parents) {
-    out.push(p)
-    out.push(...categories.filter((c) => c.parent_id === p.id))
-  }
-  return out
 }
 
 const emptyForm = {
@@ -156,8 +142,9 @@ const emptyForm = {
   meta_description: '',
 }
 
-function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings' }) {
+export function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings' }) {
   const PAGE_SIZE = 25
+  const { confirm, toast } = useAdminUi()
   const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [hasMore, setHasMore] = useState(false)
@@ -165,7 +152,6 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
   const [categories, setCategories] = useState<Category[]>([])
   const [form, setForm] = useState(emptyForm)
   const [editing, setEditing] = useState(false)
-  const [activeTab, setActiveTab] = useState<'general' | 'media' | 'pricing' | 'seo'>('general')
   const [saving, setSaving] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
   const [uploadingPdf, setUploadingPdf] = useState(false)
@@ -181,10 +167,8 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
   const [typeFilter, setTypeFilter] = useState<'all' | 'paid' | 'free' | 'bundles'>(
     mode === 'free' ? 'free' : mode === 'bundles' ? 'bundles' : 'all'
   )
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const [statusCounts, setStatusCounts] = useState({ active: 0, draft: 0, sold_out: 0, inactive: 0 })
-  const [showStats, setShowStats] = useState(true)
   const [showExportModal, setShowExportModal] = useState(false)
 
   const pageTitle = mode === 'free' ? 'Free Patterns' : mode === 'bundles' ? 'Bundles' : 'Listings'
@@ -201,7 +185,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     for (const file of files) {
       const validation = await validateImageFile(file)
       if (!validation.ok) {
-        alert(`${file.name}: ${validation.reason}`)
+        toast(`${file.name}: ${validation.reason}`, 'error')
         continue
       }
       const basePath = `${crypto.randomUUID()}-${sanitizeFilename(file.name)}`
@@ -212,12 +196,10 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
           return supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl
         }, basePath)
         urls.push(result.url)
-        if (result.usedFallback) {
-          alert(`${file.name} uploaded, but WebP compression failed in this browser so it fell back to a single 1600px JPEG (no small/thumbnail sizes generated for this image). Reason: ${result.fallbackReason}\n\nThis is worth reporting — most browsers should not hit this path.`)
-        }
+        if (result.usedFallback) console.warn('WebP compression failed; used JPEG fallback:', result.fallbackReason)
       } catch (err) {
         console.error('Image upload failed:', err)
-        alert(`${file.name} failed to upload — please try again.`)
+        toast(`${file.name} didn’t upload. Please try again.`, 'error')
       }
     }
     setForm((f) => ({ ...f, images: [...f.images, ...urls] }))
@@ -240,7 +222,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     setUploadingPdf(true)
     const validation = await validatePdfFile(file)
     if (!validation.ok) {
-      alert(validation.reason)
+      toast(validation.reason, 'error')
       setUploadingPdf(false)
       return
     }
@@ -253,8 +235,9 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       await supabase.from('products').update({ pdf_filename: file.name }).eq('id', productId)
       setPdfUploaded(true)
       setPdfInfo({ sizeKb: Math.round(file.size / 1024), date: new Date().toLocaleString(), originalName: file.name })
+      toast('PDF uploaded')
     } else {
-      alert(`PDF upload failed: ${error.message}`)
+      toast(`PDF upload failed: ${error.message}`, 'error')
     }
     setUploadingPdf(false)
   }
@@ -369,7 +352,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
   }
 
   const bulkTrash = async () => {
-    if (!confirm(`Move ${selected.size} product${selected.size === 1 ? '' : 's'} to Trash?`)) return
+    if (!(await confirm({ title: `Move ${selected.size} pattern${selected.size === 1 ? '' : 's'} to trash?`, body: 'They disappear from the shop. You can restore them from Trash.', confirmLabel: 'Move to trash', tone: 'danger' }))) return
     setBulkWorking(true)
     await supabase.from('products').update({ deleted_at: new Date().toISOString(), active: false }).in('id', [...selected])
     setBulkWorking(false)
@@ -431,7 +414,6 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
       setPdfUploaded(false)
       setPdfInfo(null)
     }
-    setActiveTab('general')
     setEditing(true)
   }
 
@@ -471,7 +453,6 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     })
     setPdfUploaded(false)
     setPdfInfo(null)
-    setActiveTab('general')
     setEditing(true)
   }
 
@@ -553,252 +534,38 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     load()
   }
 
-  const trash = async (id: string) => {
-    if (!confirm('Move this product to Trash? It will disappear from the site, and you can restore it later.')) return
+  const trash = async (id: string): Promise<boolean> => {
     const target = products.find((p) => p.id === id)
+    if (!(await confirm({ title: `Move “${target?.title ?? form.title ?? 'this pattern'}” to trash?`, body: 'It disappears from the shop. You can restore it from Trash.', confirmLabel: 'Move to trash', tone: 'danger' }))) return false
     await supabase.from('products').update({ deleted_at: new Date().toISOString(), active: false }).eq('id', id)
-    await bustStorefrontCache(target?.slug)
+    await bustStorefrontCache(target?.slug ?? form.slug)
+    toast('Moved to trash')
     load()
+    return true
   }
 
   if (editing) {
-    const isFreeItem = form.itemType === 'free'
-    const priceNum = form.price.trim() === '' ? null : parseFloat(form.price)
-    const tabs: ('general' | 'media' | 'pricing' | 'seo')[] = isFreeItem ? ['general', 'media', 'seo'] : ['general', 'media', 'pricing', 'seo']
-    const tabLabels: Record<'general' | 'media' | 'pricing' | 'seo', string> = { general: 'Details', media: 'Photos & files', pricing: 'Pricing', seo: 'SEO' }
-    const isLastTab = activeTab === tabs[tabs.length - 1]
-    const missingFields: string[] = []
-    if (!form.title.trim()) missingFields.push('Title')
-    if (!form.description.trim()) missingFields.push('Description')
-    if (!form.category_id) missingFields.push('Category')
-    if (form.images.length === 0) missingFields.push('At least one listing image')
-    if (!pdfUploaded) missingFields.push('Deliverable PDF file')
-    if (!isFreeItem) {
-      if (!(priceNum && priceNum > 0)) missingFields.push('Price')
-      if (!form.lemon_variant_id.trim()) missingFields.push('Lemon Squeezy checkout ID')
-      if (!form.lemon_numeric_variant_id.trim()) missingFields.push('Lemon Squeezy numeric variant ID')
-    }
-    const canPublish = missingFields.length === 0
-
     return (
-      <div className="max-w-3xl mx-auto pb-24">
-        <div className="sticky top-14 z-20 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-6 border-b border-[#E5E7EB] bg-[#F6F6F7] flex flex-wrap items-center gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-semibold text-ink truncate">{form.title || (form.id ? 'Edit listing' : 'New listing')}</p>
-            {form.id && (
-              <p className="text-[12px] text-ink-soft">{form.active ? 'Published' : 'Draft'}</p>
-            )}
-          </div>
-          {form.slug && (
-            <a href={`/pattern/${form.slug}`} target="_blank" rel="noreferrer" className="px-3 py-2 text-[13px] border border-[#D1D5DB] rounded-full bg-white hover:bg-[#F1F2F4]">
-              Preview
-            </a>
-          )}
-          <button
-            onClick={async () => { const id = await save(false); if (id) setEditing(false) }}
-            disabled={saving}
-            className="px-3 py-2 text-[13px] border border-[#D1D5DB] rounded-full bg-white hover:bg-[#F1F2F4] disabled:opacity-50"
-          >
-            Save as draft
-          </button>
-          <button onClick={() => setEditing(false)} className="px-3 py-2 text-[13px] text-ink-soft hover:text-ink">Cancel</button>
-          <button
-            onClick={async () => { const id = await save(true); if (id) setEditing(false) }}
-            disabled={saving || !canPublish}
-            className="px-4 py-2 text-[13px] font-medium rounded-full text-white disabled:opacity-40"
-            style={{ background: '#222' }}
-          >
-            {saving ? 'Saving…' : 'Publish'}
-          </button>
-        </div>
-
-        <div className="flex gap-1 border-b border-[#E5E7EB] mb-6 overflow-x-auto">
-          {tabs.map((key) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`px-4 py-2.5 text-[13px] whitespace-nowrap -mb-px border-b-2 transition-colors ${activeTab === key ? 'border-[#111111] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
-            >
-              {tabLabels[key]}
-            </button>
-          ))}
-        </div>
-
-        <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
-          <div className="p-6">
-            {activeTab === 'general' && (
-              <div className="grid gap-5">
-                <h2 className="text-[16px] font-semibold">Listing details</h2>
-                <Field label="Title"><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onBlur={() => !form.slug && setForm((f) => ({ ...f, slug: slugify(f.title) }))} className="input" /></Field>
-                {!form.id && form.images.length > 0 && (
-                  <p className="text-[12px] text-ink-soft -mt-2">Duplicated from another product — images and details copied, but you&apos;ll need a new Lemon Squeezy checkout ID and PDF before publishing.</p>
-                )}
-                <Field label="Slug (URL)"><input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="input" placeholder="granny-stripe-top" /></Field>
-                <Field label={`Subtitle (${form.subtitle.length}/150)`}>
-                  <input
-                    value={form.subtitle}
-                    onChange={(e) => setForm({ ...form, subtitle: e.target.value.slice(0, 150) })}
-                    className="input"
-                    maxLength={150}
-                    placeholder="Short line under the title on the product page"
-                  />
-                  <p className="text-[12px] text-ink-soft mt-1.5">Aim for 100–150 characters, unique from your description, include a keyword.</p>
-                </Field>
-                <Field label="Description"><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input" rows={5} /></Field>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Skill level">
-                    <select value={form.skill_level} onChange={(e) => setForm({ ...form, skill_level: e.target.value as typeof form.skill_level })} className="input">
-                      <option value="beginner">Beginner</option>
-                      <option value="intermediate">Intermediate</option>
-                      <option value="advanced">Advanced</option>
-                    </select>
-                  </Field>
-                  <Field label="Category">
-                    <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="input">
-                      <option value="">—</option>
-                      {sortedForDropdown(categories).map((c) => (
-                        <option key={c.id} value={c.id}>{c.parent_id ? `— ${c.name}` : c.name}</option>
-                      ))}
-                    </select>
-                  </Field>
-                </div>
-                <Field label="Type">
-                  <div className="flex gap-4 text-[13px]">
-                    <label className="flex items-center gap-2"><input type="radio" checked={form.itemType === 'paid'} onChange={() => setForm({ ...form, itemType: 'paid', price: form.price === '0' ? '' : form.price })} /> Digital — paid</label>
-                    <label className="flex items-center gap-2"><input type="radio" checked={form.itemType === 'free'} onChange={() => setForm({ ...form, itemType: 'free', price: '0', is_bundle: false })} /> Free download</label>
-                  </div>
-                </Field>
-                <label className="flex items-center gap-2 text-[13px]">
-                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured on homepage
-                </label>
-                <Field label="Card badge">
-                  <select
-                    value={form.card_badge}
-                    onChange={(e) => setForm({ ...form, card_badge: e.target.value as typeof form.card_badge })}
-                    className="input"
-                  >
-                    <option value="">None (default)</option>
-                    <option value="sale">SALE</option>
-                    <option value="new">NEW</option>
-                    <option value="featured">FEATURED</option>
-                  </select>
-                </Field>
-                <p className="text-[12px] text-ink-soft -mt-3">Shown on shop cards and the product page. Leave as None unless you want a badge.</p>
-                <label className="flex items-center gap-2 text-[13px]">
-                  <input type="checkbox" checked={form.sold_out} onChange={(e) => setForm({ ...form, sold_out: e.target.checked })} /> Mark as sold out
-                </label>
-              </div>
-            )}
-
-            {activeTab === 'media' && (
-              <div className="grid gap-5">
-                <h2 className="text-[16px] font-semibold">Photos &amp; files</h2>
-                <DropzoneUpload
-                  label="Photos (first image is primary — drag to reorder)"
-                  sizeHint="Resized to ≤1600px long edge, saved as WebP at ~80% quality (micro→full variants)"
-                  urls={form.images}
-                  accept="image/jpeg,image/png"
-                  acceptLabel="JPEG or PNG"
-                  uploading={uploadingImages}
-                  onAdd={(files) => uploadImages(files)}
-                  onRemove={removeImage}
-                  onReorder={reorderImages}
-                />
-                <Field label="PDF pages"><input value={form.pdf_pages} onChange={(e) => setForm({ ...form, pdf_pages: e.target.value })} className="input" /></Field>
-                <Field label="Materials needed (one per line)">
-                  <textarea value={form.materials} onChange={(e) => setForm({ ...form, materials: e.target.value })} rows={4} className="input" placeholder={"5mm (US H/8) crochet hook\nDK weight yarn, approx 400 yds"} />
-                </Field>
-                <div className="pt-2 border-t border-[#E5E7EB]">
-                  <p className="text-[14px] font-semibold mb-2">Digital files</p>
-                  {form.id ? (
-                    <PdfDropzone uploading={uploadingPdf} uploaded={pdfUploaded} info={pdfInfo} productId={form.id} productTitle={form.title} onSelect={(file) => uploadPdf(file, form.id)} />
-                  ) : (
-                    <p className="text-[12px] text-ink-soft">Save the listing once first — then you can upload the PDF.</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'pricing' && (
-              <div className="grid gap-5">
-                <h2 className="text-[16px] font-semibold">Inventory and pricing</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Price (USD)"><input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="input" placeholder="6.50" /></Field>
-                  <Field label="Compare-at (optional)"><input value={form.compare_at_price} onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })} className="input" /></Field>
-                </div>
-                {form.compare_at_price && parseFloat(form.compare_at_price) <= (parseFloat(form.price) || 0) && (
-                  <p className="text-[12px] text-madder -mt-2">Compare-at should be higher than the price to show a strikethrough.</p>
-                )}
-                <p className="text-[12px] text-ink-soft -mt-2">Compare-at only affects the strikethrough price. To show a SALE badge, set Card badge under Details.</p>
-                <Field label="Lemon Squeezy checkout ID"><input value={form.lemon_variant_id} onChange={(e) => setForm({ ...form, lemon_variant_id: e.target.value })} className="input" placeholder="a208e95b-8f17-407f-b7a7-115583bed5a5" /></Field>
-                <Field label="Lemon Squeezy numeric variant ID"><input value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value })} className="input" placeholder="1255414" /></Field>
-                <div>
-                  <span className="block text-[12px] text-ink-soft mb-1.5">Checkout style</span>
-                  <div className="flex border border-[#D1D5DB] w-fit text-[12px] rounded-lg overflow-hidden bg-white">
-                    <button onClick={() => setForm({ ...form, checkout_mode: 'overlay' })} className={`px-4 py-2 ${form.checkout_mode === 'overlay' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Overlay</button>
-                    <button onClick={() => setForm({ ...form, checkout_mode: 'hosted' })} className={`px-4 py-2 border-l border-[#D1D5DB] ${form.checkout_mode === 'hosted' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Hosted</button>
-                  </div>
-                </div>
-                <div className="border-t border-[#E5E7EB] pt-4">
-                  <label className="flex items-center gap-2 text-[13px] mb-3">
-                    <input type="checkbox" checked={form.is_bundle} onChange={(e) => setForm({ ...form, is_bundle: e.target.checked })} /> This is a bundle
-                  </label>
-                  {form.is_bundle && (
-                    <div className="space-y-3">
-                      <p className="text-[12px] text-ink-soft">What&apos;s included — one line per pattern.</p>
-                      {form.bundle_includes.map((line, i) => (
-                        <div key={i} className="flex gap-2">
-                          <input value={line} onChange={(e) => { const next = [...form.bundle_includes]; next[i] = e.target.value; setForm({ ...form, bundle_includes: next }) }} className="input flex-1" placeholder="Pattern name" />
-                          <button onClick={() => setForm({ ...form, bundle_includes: form.bundle_includes.filter((_, idx) => idx !== i) })} className="px-3 text-[12px] text-ink-soft hover:text-madder">✕</button>
-                        </div>
-                      ))}
-                      <button onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })} className="text-[13px] text-[#111111] hover:underline">+ Add included pattern</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'seo' && (
-              <div className="grid gap-5">
-                <h2 className="text-[16px] font-semibold">SEO &amp; visibility</h2>
-                <p className="text-[12px] text-ink-soft -mt-2">Optional — leave blank to use the product title and description.</p>
-                <Field label={`Meta title (${form.meta_title.length}/60)`}>
-                  <input value={form.meta_title} onChange={(e) => setForm({ ...form, meta_title: e.target.value })} className="input" placeholder={form.title || 'Product title'} maxLength={70} />
-                </Field>
-                <Field label={`Meta description (${form.meta_description.length}/155)`}>
-                  <textarea value={form.meta_description} onChange={(e) => setForm({ ...form, meta_description: e.target.value })} className="input" rows={3} maxLength={200} placeholder={form.description ? form.description.slice(0, 155) : 'Product description'} />
-                </Field>
-                <div className="border border-[#E5E7EB] rounded-lg p-4 bg-[#F6F6F7]">
-                  <p className="text-[11px] text-ink-soft mb-2">Search preview</p>
-                  <p className="text-[17px] leading-tight" style={{ color: '#1a0dab' }}>{form.meta_title || form.title || 'Product title'}</p>
-                  <p className="text-[12px] text-ink-soft mt-0.5">notioncreativeart.com/pattern/{form.slug || slugify(form.title) || 'product-slug'}</p>
-                  <p className="text-[13px] mt-1 leading-snug">{(form.meta_description || form.description || 'Product description').slice(0, 155)}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="px-6 py-4 border-t border-[#E5E7EB] bg-[#F6F6F7]">
-            {saveError && <p className="text-[12px] text-madder mb-2">{saveError}</p>}
-            {!canPublish && (
-              <p className="text-[12px] text-madder mb-2">Still needed to publish: {missingFields.join(', ')}.</p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              <button onClick={async () => { const id = await save(false); if (id) setEditing(false) }} disabled={saving} className="px-4 py-2 border border-[#D1D5DB] text-[13px] rounded-full bg-white disabled:opacity-50">Save as draft</button>
-              {!isLastTab && (
-                <button onClick={async () => { const id = await save(false); if (id) setActiveTab(tabs[tabs.indexOf(activeTab) + 1]) }} disabled={saving} className="px-4 py-2 text-[13px] rounded-full text-white disabled:opacity-50" style={{ background: '#222' }}>
-                  Save &amp; continue
-                </button>
-              )}
-              {isLastTab && (
-                <button onClick={async () => { const id = await save(true); if (id) setEditing(false) }} disabled={saving || !canPublish} className="px-4 py-2 text-[13px] rounded-full text-white disabled:opacity-40" style={{ background: '#222' }}>Publish</button>
-              )}
-            </div>
-          </div>
-        </div>
-        <style>{`.input { width: 100%; border: 1px solid #D1D5DB; padding: 10px 12px; font-size: 13px; background: white; border-radius: 8px; } .input:focus { outline: none; border-color: #222; }`}</style>
-      </div>
+      <ProductEditor
+        form={form}
+        setForm={setForm}
+        categories={categories}
+        saving={saving}
+        saveError={saveError}
+        uploadingImages={uploadingImages}
+        uploadingPdf={uploadingPdf}
+        pdfUploaded={pdfUploaded}
+        pdfInfo={pdfInfo}
+        onUploadImages={uploadImages}
+        onRemoveImage={removeImage}
+        onReorderImages={reorderImages}
+        onUploadPdf={uploadPdf}
+        onSave={save}
+        onClose={() => setEditing(false)}
+        onTrash={async (id) => {
+          if (await trash(id)) setEditing(false)
+        }}
+      />
     )
   }
 
@@ -808,827 +575,138 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
     return acc
   }, {})
   const categoryById = new Map(categories.map((c) => [c.id, c.name]))
+  const allCount = statusCounts.active + statusCounts.draft + statusCounts.sold_out
 
-  return (
-    <div className="flex gap-6 items-start">
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-5">
-          <h1 className={`${ADMIN_H1} shrink-0`}>{pageTitle}</h1>
-          <div className="flex-1 flex justify-center">
-            <div className="relative w-full max-w-md">
-              <MaterialIcon name="search" size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by title…"
-                className="w-full border border-[#D1D5DB] rounded-full pl-10 pr-9 py-2.5 text-[13px] bg-white focus:outline-none focus:border-ink"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink text-[13px]">✕</button>
-              )}
-            </div>
+  const rowMenu = (p: Product) => (
+    <div className="relative">
+      <button onClick={() => setMenuOpenId(menuOpenId === p.id ? null : p.id)} className="grid h-9 w-9 place-items-center rounded-full text-[#6b7280] hover:bg-[#F1F2F4]" aria-label={`Options for ${p.title}`} aria-haspopup="menu">⋯</button>
+      {menuOpenId === p.id && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
+          <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-48 rounded-xl border border-[#E5E7EB] bg-white py-1 text-[14px] shadow-xl">
+            <a href={`/pattern/${p.slug}`} target="_blank" rel="noreferrer" className="block px-4 py-2.5 hover:bg-[#F6F6F7]">View on shop ↗</a>
+            <button onClick={() => { setMenuOpenId(null); duplicateProduct(p) }} className="block w-full px-4 py-2.5 text-left hover:bg-[#F6F6F7]">Duplicate</button>
+            <button onClick={() => { setMenuOpenId(null); setFeatured(p) }} className="block w-full px-4 py-2.5 text-left hover:bg-[#F6F6F7]">{p.featured ? 'Remove from homepage' : 'Show on homepage'}</button>
+            <button onClick={() => { setMenuOpenId(null); trash(p.id) }} className="block w-full px-4 py-2.5 text-left text-[#B42318] hover:bg-[#FEF3F2]">Move to trash</button>
           </div>
-          <button onClick={() => startEdit()} className="shrink-0 min-h-11 px-4 text-[13px] font-medium rounded-full text-white whitespace-nowrap" style={{ background: '#222' }}>
-            + Add a listing
-          </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <label className="flex items-center gap-2 px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px]">
-            <input type="checkbox" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} />
-          </label>
-          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(true)} className="px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] disabled:opacity-40">Activate</button>
-          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(false)} className="px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] disabled:opacity-40">Deactivate</button>
-          <button disabled={selected.size === 0 || bulkWorking} onClick={bulkTrash} className="px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] disabled:opacity-40">Delete</button>
-          {selected.size > 0 && (
-            <button onClick={() => setSelected(new Set())} className="text-[13px] text-ink-soft hover:text-ink ml-1">Clear ({selected.size})</button>
-          )}
-          <button
-            type="button"
-            onClick={() => setShowExportModal(true)}
-            className="ml-auto px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] hover:bg-[#F6F6F7]"
-          >
-            Export CSV
-          </button>
-        </div>
-
-        {showExportModal && (
-          <ProductExportModal categories={categories} onClose={() => setShowExportModal(false)} />
-        )}
-
-        {products.length === 0 ? (
-          <div className="bg-white border border-[#E5E7EB] rounded-xl py-16 text-center text-[14px] text-ink-soft">
-            {search ? `No listings match "${search}".` : emptyMessage}
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {products.map((p) => {
-              const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
-              const isDuplicateVariant = !!p.lemon_variant_id && variantCounts[p.lemon_variant_id] > 1
-              return (
-                <div key={p.id} className={`bg-white border rounded-xl overflow-hidden ${selected.has(p.id) ? 'border-[#111111]' : 'border-[#E5E7EB]'}`}>
-                  <div className="relative aspect-[4/3] bg-[#F1F2F4]">
-                    {p.images?.[0] ? (
-                      <img src={deriveVariantUrl(p.images[0], 'thumb')} alt="" className="w-full h-full object-cover" />
-                    ) : null}
-                    <span className="absolute bottom-2 left-2 text-[10px] font-medium px-2 py-0.5 rounded bg-white/90 border border-[#E5E7EB]">Digital</span>
-                    {p.featured && <MaterialIcon name="star" size={18} color="#B7791F" className="absolute top-2 right-2" />}
-                  </div>
-                  <div className="p-3">
-                    <p className="text-[13px] font-medium text-ink truncate mb-1">{p.title}</p>
-                    <p className="text-[12px] text-ink-soft mb-2">
-                      {p.price === 0 ? 'Free' : `USD ${p.price.toFixed(2)}`}
-                      {p.category_id ? ` · ${categoryById.get(p.category_id) ?? ''}` : ''}
-                    </p>
-                    {isDuplicateVariant && <p className="text-[11px] text-madder mb-1">Duplicate checkout ID</p>}
-                    {showStats && (
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-ink-soft border-t border-[#E5E7EB] pt-2 mb-2">
-                        <div>
-                          <p className="font-semibold text-[10px] tracking-wide text-[#888] mb-0.5">ALL TIME</p>
-                          <p>{c.sales} sales</p>
-                          <p>{c.wishlist} favourites</p>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-[10px] tracking-wide text-[#888] mb-0.5">STATUS</p>
-                          <p>{p.active ? 'Active' : 'Draft'}{p.sold_out ? ' · Sold out' : ''}</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 relative">
-                      <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} className="accent-ink" />
-                      <button onClick={() => setFeatured(p)} className="p-1 text-ink-soft hover:text-ink" aria-label="Toggle featured">
-                        <MaterialIcon name={p.featured ? 'star' : 'star_border'} size={18} color={p.featured ? '#B7791F' : undefined} />
-                      </button>
-                      <div className="ml-auto relative">
-                        <button onClick={() => setMenuOpenId(menuOpenId === p.id ? null : p.id)} className="p-1.5 rounded-full hover:bg-[#F1F2F4]" aria-label="Listing options">
-                          <MaterialIcon name="settings" size={18} />
-                        </button>
-                        {menuOpenId === p.id && (
-                          <>
-                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
-                            <div className="absolute right-0 bottom-full mb-1 z-20 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg py-1 text-[13px]">
-                              <a href={`/pattern/${p.slug}`} target="_blank" rel="noreferrer" className="block px-3 py-2 hover:bg-[#F1F2F4]">View on shop</a>
-                              <button onClick={() => { setMenuOpenId(null); startEdit(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4]">Edit</button>
-                              <button onClick={() => { setMenuOpenId(null); duplicateProduct(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4]">Copy</button>
-                              <button onClick={() => { setMenuOpenId(null); setActive(p, !p.active) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4]">{p.active ? 'Deactivate' : 'Activate'}</button>
-                              <button onClick={() => { setMenuOpenId(null); trash(p.id) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4] text-madder">Delete</button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        ) : (
-          <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
-            <table className="w-full text-[13px]">
-              <thead>
-                <tr className="border-b border-[#E5E7EB] text-left text-[11px] text-ink-soft">
-                  <th className="px-4 py-3 w-10"><input type="checkbox" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} /></th>
-                  <th className="px-4 py-3 font-medium">Listing</th>
-                  <th className="px-4 py-3 font-medium">Price</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Sales</th>
-                  <th className="px-4 py-3 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E5E7EB]">
-                {products.map((p) => {
-                  const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
-                  return (
-                    <tr key={p.id} className={selected.has(p.id) ? 'bg-[#F1F2F4]/70' : 'hover:bg-[#F6F6F7]'}>
-                      <td className="px-4 py-3"><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} /></td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#F1F2F4] shrink-0">
-                            {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt="" className="w-full h-full object-cover" />}
-                          </div>
-                          <p className="font-medium truncate">{p.title}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</td>
-                      <td className="px-4 py-3">{p.active ? 'Active' : 'Draft'}</td>
-                      <td className="px-4 py-3 text-ink-soft">{c.sales} · {c.wishlist} fav</td>
-                      <td className="px-4 py-3 text-right">
-                        <button onClick={() => startEdit(p)} className="text-[#111111] hover:underline">Edit</button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {hasMore && (
-          <div className="text-center mt-6">
-            <button onClick={loadMore} disabled={loadingMore} className="px-5 py-2 border border-[#D1D5DB] text-[13px] rounded-full hover:bg-white bg-white disabled:opacity-50">
-              {loadingMore ? 'Loading…' : 'Load more'}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Right filter panel */}
-      <aside className="hidden lg:block w-[220px] shrink-0 sticky top-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <span className="text-[13px] text-ink">Stats</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={showStats}
-            onClick={() => setShowStats((v) => !v)}
-            className={`w-9 h-5 rounded-full transition-colors relative ${showStats ? 'bg-[#222]' : 'bg-[#D1D5DB]'}`}
-          >
-            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${showStats ? 'left-4' : 'left-0.5'}`} />
-          </button>
-        </div>
-        <div className="flex gap-1">
-          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-full border ${viewMode === 'grid' ? 'border-ink bg-white' : 'border-[#D1D5DB] bg-white'}`} aria-label="Grid view">
-            <MaterialIcon name="grid_view" size={18} />
-          </button>
-          <button onClick={() => setViewMode('list')} className={`p-2 rounded-full border ${viewMode === 'list' ? 'border-ink bg-white' : 'border-[#D1D5DB] bg-white'}`} aria-label="List view">
-            <MaterialIcon name="view_list" size={18} />
-          </button>
-        </div>
-
-        <div>
-          <p className="text-[13px] font-semibold text-ink mb-2">Listing status</p>
-          <div className="space-y-1.5 text-[13px]">
-            {([
-              { id: 'active' as const, label: 'Active', count: statusCounts.active },
-              { id: 'draft' as const, label: 'Draft', count: statusCounts.draft },
-              { id: 'sold_out' as const, label: 'Sold out', count: statusCounts.sold_out },
-              { id: 'all' as const, label: 'All', count: statusCounts.active + statusCounts.draft },
-            ]).map((s) => (
-              <label key={s.id} className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="status" checked={statusFilter === s.id} onChange={() => setStatusFilter(s.id)} />
-                <span className="flex-1">{s.label}</span>
-                <span className="text-ink-soft">({s.count})</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="text-[13px] font-semibold text-ink mb-2">Type</p>
-          <div className="space-y-1.5 text-[13px]">
-            {([
-              { id: 'all' as const, label: 'All listings' },
-              { id: 'paid' as const, label: 'Paid' },
-              { id: 'free' as const, label: 'Free patterns' },
-              { id: 'bundles' as const, label: 'Bundles' },
-            ]).map((t) => (
-              <label key={t.id} className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="type" checked={typeFilter === t.id} onChange={() => setTypeFilter(t.id)} />
-                {t.label}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[13px] font-semibold text-ink">Sections</p>
-            <Link href="/admin/categories" className="text-[12px] text-[#111111] hover:underline">Manage</Link>
-          </div>
-          <p className="text-[12px] text-ink-soft">Filter by category from the listing editor, or manage shop sections in Categories.</p>
-        </div>
-      </aside>
+        </>
+      )}
     </div>
   )
-}
 
-function CategoriesAdmin() {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState<{ name: string; slug: string; parent_id: string; image: string }>({ name: '', slug: '', parent_id: '', image: '' })
-  const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const statusChip = (p: Product) =>
+    p.sold_out ? <Chip tone="amber">Sold out</Chip> : p.active ? <Chip tone="green">Live</Chip> : <Chip>Draft</Chip>
 
-  const load = () => {
-    supabase.from('categories').select('*').order('sort_order').then(({ data }) => {
-      setCategories((data as Category[]) ?? [])
-      setLoading(false)
-    })
-  }
-
-  useEffect(load, [])
-
-  const startNew = () => {
-    setError(null)
-    setEditingId('new')
-    setForm({ name: '', slug: '', parent_id: '', image: '' })
-  }
-
-  const startEdit = (c: Category) => {
-    setError(null)
-    setEditingId(c.id)
-    setForm({ name: c.name, slug: c.slug, parent_id: c.parent_id ?? '', image: c.image ?? '' })
-  }
-
-  const uploadImage = async (file: File) => {
-    setUploading(true)
-    const validation = await validateImageFile(file)
-    if (!validation.ok) {
-      alert(validation.reason)
-      setUploading(false)
-      return
-    }
-    const compressed = await compressImage(file, IMAGE_MAX.category, 0.8)
-    const path = `categories/${crypto.randomUUID()}-${compressed.name}`
-    const { error: err } = await supabase.storage.from('product-images').upload(path, compressed, {
-      cacheControl: PRODUCT_IMAGE_CACHE_CONTROL,
-      contentType: compressed.type || 'image/webp',
-    })
-    if (!err) {
-      const { data } = supabase.storage.from('product-images').getPublicUrl(path)
-      setForm((f) => ({ ...f, image: data.publicUrl }))
-    } else {
-      alert(`Image upload failed: ${err.message}`)
-    }
-    setUploading(false)
-  }
-
-  const save = async () => {
-    if (!form.name.trim() || !form.slug.trim()) { setError('Name and slug are required.'); return }
-    setSaving(true)
-    setError(null)
-    const payload = { name: form.name.trim(), slug: form.slug.trim(), parent_id: form.parent_id || null, image: form.image || null }
-    const { error: err } = editingId === 'new'
-      ? await supabase.from('categories').insert({ ...payload, sort_order: categories.length + 1 })
-      : await supabase.from('categories').update(payload).eq('id', editingId)
-    setSaving(false)
-    if (err) { setError(err.message); return }
-    setEditingId(null)
-    load()
-  }
-
-  const remove = async (c: Category) => {
-    const hasSubcategories = categories.some((sub) => sub.parent_id === c.id)
-    if (hasSubcategories) { setError(`Can't delete "${c.name}" — it still has subcategories. Move or delete those first.`); return }
-    const { count } = await supabase.from('products').select('id', { count: 'exact', head: true }).eq('category_id', c.id)
-    if ((count ?? 0) > 0) { setError(`Can't delete "${c.name}" — ${count} product${count === 1 ? '' : 's'} still assigned to it. Reassign them first.`); return }
-    if (!confirm(`Delete "${c.name}"?`)) return
-    setError(null)
-    await supabase.from('categories').delete().eq('id', c.id)
-    load()
-  }
-
-  if (loading) return null
-
-  const mains = categories.filter((c) => !c.parent_id)
-
-  const editForm = (
-    <div className="bg-surface/60 border-t border-b border-line p-6 space-y-4">
-      <Field label="NAME">
-        <input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value, slug: editingId === 'new' ? slugify(e.target.value) : form.slug })}
-          className="input"
-        />
-      </Field>
-      <Field label="SLUG (used in the URL)">
-        <input value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="input" />
-      </Field>
-      <Field label="PARENT CATEGORY (leave blank for a top-level/main category)">
-        <select value={form.parent_id} onChange={(e) => setForm({ ...form, parent_id: e.target.value })} className="input">
-          <option value="">— Top-level —</option>
-          {mains.filter((m) => m.id !== editingId).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-        </select>
-      </Field>
-      <DropzoneUpload
-        label="Thumbnail image (optional — shown in the header's mega-menu, mainly useful for subcategories)"
-        sizeHint="200×200px, square"
-        urls={form.image ? [form.image] : []}
-        accept="image/jpeg,image/png"
-        acceptLabel="JPEG or PNG"
-        multiple={false}
-        uploading={uploading}
-        onAdd={(files) => uploadImage(files[0])}
-        onRemove={() => setForm((f) => ({ ...f, image: '' }))}
-        onReorder={() => {}}
+  return (
+    <div>
+      <PageHeader
+        title={pageTitle}
+        desc="Your patterns. Click one to edit it, or flip the switch to take it off the shop."
+        actions={
+          <>
+            <Btn onClick={() => setShowExportModal(true)}>Export CSV</Btn>
+            <Link href="/admin/bulk-upload" className="inline-flex min-h-11 items-center rounded-full border border-[#D1D5DB] bg-white px-5 text-[14px] font-medium hover:bg-[#F6F6F7]">Bulk upload</Link>
+            <Btn variant="primary" onClick={() => startEdit()}>+ Add listing</Btn>
+          </>
+        }
       />
-      <div className="flex gap-3">
-        <button onClick={save} disabled={saving} className="min-h-11 px-5 rounded-full text-white text-[13px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-50" style={{ background: 'var(--color-primary)' }}>
-          {saving ? 'Saving…' : 'Save'}
-        </button>
-        <button onClick={() => setEditingId(null)} className="min-h-11 px-5 border border-line text-[13px] font-semibold rounded-full hover:bg-surface bg-white">Cancel</button>
+
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <Tabs
+          value={statusFilter}
+          onChange={(v) => setStatusFilter(v)}
+          items={[
+            { id: 'active', label: 'Live', count: statusCounts.active },
+            { id: 'draft', label: 'Drafts', count: statusCounts.draft },
+            { id: 'sold_out', label: 'Sold out', count: statusCounts.sold_out },
+            { id: 'all', label: 'All', count: allCount },
+          ]}
+        />
+        <div className="flex-1" />
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)} aria-label="Type" className="h-11 rounded-full border border-[#D1D5DB] bg-white px-4 text-[14px]">
+          <option value="all">All types</option>
+          <option value="paid">Paid</option>
+          <option value="free">Free</option>
+          <option value="bundles">Bundles</option>
+        </select>
+        <SearchBox value={search} onChange={setSearch} placeholder="Search patterns" />
       </div>
-    </div>
-  )
 
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className={ADMIN_H1}>Categories</h1>
-        <button onClick={startNew} className="min-h-11 px-4 bg-ink text-canvas text-[13px] font-semibold hover:opacity-85 rounded-full">+ Add category</button>
-      </div>
-      {error && <p className="text-[13px] text-madder mb-4">{error}</p>}
-
-      {editingId === 'new' && (
-        <div className="bg-white border border-line rounded-2xl overflow-hidden mb-6">{editForm}</div>
-      )}
-
-      <div className="bg-white border border-line rounded-2xl overflow-hidden">
-        {mains.length === 0 ? (
-          <p className="py-12 text-center text-ink-soft text-sm">No categories yet.</p>
-        ) : (
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-line text-left text-[10px] tracking-[0.1em] text-ink-soft">
-                <th className="px-5 py-3 font-medium">NAME</th>
-                <th className="px-5 py-3 font-medium text-right">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {mains.map((m) => (
-                <Fragment key={m.id}>
-                  <tr className="hover:bg-surface/50">
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        {m.image ? <img src={m.image} alt="" className="w-8 h-8 rounded-full object-cover" /> : <div className="w-8 h-8 rounded-full bg-surface" />}
-                        <p className="font-medium">{m.name}</p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex gap-4 text-[11px] tracking-[0.08em] justify-end">
-                        <button onClick={() => (editingId === m.id ? setEditingId(null) : startEdit(m))} className="text-ink hover:opacity-70">{editingId === m.id ? 'CLOSE' : 'EDIT'}</button>
-                        <button onClick={() => remove(m)} className="text-ink-soft hover:text-madder">DELETE</button>
-                      </div>
-                    </td>
-                  </tr>
-                  {editingId === m.id && (
-                    <tr><td colSpan={2}>{editForm}</td></tr>
-                  )}
-                  {categories.filter((c) => c.parent_id === m.id).map((sub) => (
-                    <Fragment key={sub.id}>
-                      <tr className="hover:bg-surface/50">
-                        <td className="px-5 py-3 pl-12">
-                          <div className="flex items-center gap-3">
-                            {sub.image ? <img src={sub.image} alt="" className="w-7 h-7 rounded-full object-cover" /> : <div className="w-7 h-7 rounded-full bg-surface" />}
-                            <p className="text-ink-soft">— {sub.name}</p>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="flex gap-4 text-[11px] tracking-[0.08em] justify-end">
-                            <button onClick={() => (editingId === sub.id ? setEditingId(null) : startEdit(sub))} className="text-ink hover:opacity-70">{editingId === sub.id ? 'CLOSE' : 'EDIT'}</button>
-                            <button onClick={() => remove(sub)} className="text-ink-soft hover:text-madder">DELETE</button>
-                          </div>
-                        </td>
-                      </tr>
-                      {editingId === sub.id && (
-                        <tr><td colSpan={2}>{editForm}</td></tr>
-                      )}
-                    </Fragment>
-                  ))}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function OrdersAdmin() {
-  const PAGE_SIZE = 25
-  const [orders, setOrders] = useState<Array<{ id: string; lemon_order_id: string; customer_email: string; amount: number; currency: string; status: string; created_at: string; product_ids: string[] }>>([])
-  const [hasMore, setHasMore] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [productTitles, setProductTitles] = useState<Record<string, string>>({})
-  const [working, setWorking] = useState<string | null>(null)
-
-  const [ordersWithAccess, setOrdersWithAccess] = useState<Set<string>>(new Set())
-
-  useEffect(() => {
-    supabase.from('orders').select('*').order('created_at', { ascending: false }).range(0, PAGE_SIZE - 1).then(({ data }) => {
-      setOrders(data ?? [])
-      setHasMore((data?.length ?? 0) === PAGE_SIZE)
-      const ids = (data ?? []).map((o) => o.id)
-      if (ids.length > 0) {
-        supabase.from('purchases').select('order_id').in('order_id', ids).then(({ data: purchases }) => {
-          setOrdersWithAccess(new Set((purchases ?? []).map((p) => p.order_id)))
-        })
-      }
-    })
-  }, [])
-
-  const markRefunded = async (o: (typeof orders)[number]) => {
-    if (!confirm(`Refund order #${o.lemon_order_id} for $${o.amount.toFixed(2)} ${o.currency}?\n\nThis issues a real refund through Lemon Squeezy — the customer's payment method will be credited. This can't be undone from here.`)) return
-    const revokeAccess = ordersWithAccess.has(o.id) && confirm(`Also revoke this customer's download access to the pattern(s) in this order?\n\nChoose Cancel to let them keep their downloads even though they've been refunded.`)
-    setWorking(o.id)
-    const { data, error } = await supabase.functions.invoke('admin-refund-order', { body: { orderId: o.id, revokeAccess } })
-    setWorking(null)
-    if (error || data?.error) {
-      alert(data?.error ?? "Couldn't process the refund — please try again, or check the order directly in Lemon Squeezy.")
-      return
-    }
-    setOrders((prev) => prev.map((x) => (x.id === o.id ? { ...x, status: 'refunded' } : x)))
-    if (revokeAccess) {
-      setOrdersWithAccess((prev) => {
-        const next = new Set(prev)
-        next.delete(o.id)
-        return next
-      })
-    }
-  }
-
-  const revokeAccess = async (o: (typeof orders)[number]) => {
-    if (!confirm(`Revoke this customer's access to the pattern(s) in order #${o.lemon_order_id}?\n\nThey'll lose the ability to download these from their account. This doesn't refund their payment.`)) return
-    setWorking(o.id)
-    await supabase.from('purchases').delete().eq('order_id', o.id)
-    setOrdersWithAccess((prev) => {
-      const next = new Set(prev)
-      next.delete(o.id)
-      return next
-    })
-    setWorking(null)
-  }
-
-  const loadMore = async () => {
-    setLoadingMore(true)
-    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).range(orders.length, orders.length + PAGE_SIZE - 1)
-    setOrders((prev) => [...prev, ...(data ?? [])])
-    setHasMore((data?.length ?? 0) === PAGE_SIZE)
-    setLoadingMore(false)
-    const ids = (data ?? []).map((o) => o.id)
-    if (ids.length > 0) {
-      const { data: purchases } = await supabase.from('purchases').select('order_id').in('order_id', ids)
-      setOrdersWithAccess((prev) => new Set([...prev, ...(purchases ?? []).map((p) => p.order_id)]))
-    }
-  }
-
-  const toggleExpand = async (o: (typeof orders)[number]) => {
-    if (expandedId === o.id) { setExpandedId(null); return }
-    setExpandedId(o.id)
-    const missing = o.product_ids.filter((id) => !productTitles[id])
-    if (missing.length > 0) {
-      const { data } = await supabase.from('products').select('id, title').in('id', missing)
-      if (data) setProductTitles((prev) => ({ ...prev, ...Object.fromEntries(data.map((p) => [p.id, p.title])) }))
-    }
-  }
-
-  return (
-    <div>
-      <h1 className={`${ADMIN_H1} mb-6`}>Orders</h1>
-      <div className="bg-white border border-line rounded-2xl overflow-hidden">
-        {orders.length === 0 ? (
-          <p className="py-12 text-center text-ink-soft text-sm">No orders yet.</p>
-        ) : (
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-line text-left text-[10px] tracking-[0.1em] text-ink-soft">
-                <th className="px-5 py-3 font-medium">CUSTOMER</th>
-                <th className="px-5 py-3 font-medium">ORDER</th>
-                <th className="px-5 py-3 font-medium">DATE & TIME</th>
-                <th className="px-5 py-3 font-medium">STATUS</th>
-                <th className="px-5 py-3 font-medium">AMOUNT</th>
-                <th className="px-5 py-3 font-medium text-right"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {orders.map((o) => (
-                <Fragment key={o.id}>
-                  <tr className="hover:bg-surface/50">
-                    <td className="px-5 py-3">{o.customer_email}</td>
-                    <td className="px-5 py-3 text-ink-soft">{o.lemon_order_id}</td>
-                    <td className="px-5 py-3 text-ink-soft">{new Date(o.created_at).toLocaleString()}</td>
-                    <td className="px-5 py-3">
-                      <span className="uppercase text-ink-soft">{o.status}</span>
-                      {o.status !== 'refunded' && !ordersWithAccess.has(o.id) && o.product_ids.length > 0 && (
-                        <span className="block text-[10px] tracking-[0.05em] text-madder mt-0.5">ACCESS REVOKED</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3 font-medium">${o.amount.toFixed(2)} {o.currency}</td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex gap-3 justify-end items-center text-[11px] tracking-[0.08em]">
-                        {o.status === 'paid' && (
-                          <button onClick={() => markRefunded(o)} disabled={working === o.id} className="text-ink-soft hover:text-madder disabled:opacity-50">
-                            {working === o.id ? 'REFUNDING…' : 'REFUND'}
-                          </button>
-                        )}
-                        {ordersWithAccess.has(o.id) && (
-                          <button onClick={() => revokeAccess(o)} disabled={working === o.id} className="text-ink-soft hover:text-madder disabled:opacity-50">REVOKE ACCESS</button>
-                        )}
-                        <button onClick={() => toggleExpand(o)} className="text-ink hover:opacity-70">
-                          {expandedId === o.id ? 'HIDE' : 'VIEW'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  {expandedId === o.id && (
-                    <tr>
-                      <td colSpan={6} className="px-5 py-4 bg-surface/50">
-                        <p className="text-[10px] tracking-[0.1em] text-ink-soft mb-2">PATTERNS IN THIS ORDER</p>
-                        {o.product_ids.length === 0 ? (
-                          <p className="text-ink-soft">No products recorded on this order.</p>
-                        ) : (
-                          <ul className="space-y-1">
-                            {o.product_ids.map((id) => (
-                              <li key={id}>{productTitles[id] ?? '…'}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-      {hasMore && (
-        <div className="text-center mt-6">
-          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-full hover:bg-surface bg-white disabled:opacity-50">
-            {loadingMore ? 'LOADING…' : 'LOAD MORE'}
-          </button>
+      {selected.size > 0 && (
+        <div className="sticky top-16 z-20 mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[#E5E7EB] bg-ink px-4 py-2.5 text-white shadow-lg">
+          <span className="text-[14px] font-medium">{selected.size} selected</span>
+          <div className="flex-1" />
+          <button disabled={bulkWorking} onClick={() => bulkSetActive(true)} className="min-h-9 rounded-full bg-white/15 px-4 text-[13px] hover:bg-white/25 disabled:opacity-50">Make live</button>
+          <button disabled={bulkWorking} onClick={() => bulkSetActive(false)} className="min-h-9 rounded-full bg-white/15 px-4 text-[13px] hover:bg-white/25 disabled:opacity-50">Make draft</button>
+          <button disabled={bulkWorking} onClick={bulkTrash} className="min-h-9 rounded-full bg-[#B42318] px-4 text-[13px] hover:opacity-90 disabled:opacity-50">Move to trash</button>
+          <button onClick={() => setSelected(new Set())} className="min-h-9 px-3 text-[13px] text-white/70 hover:text-white">Clear</button>
         </div>
       )}
-    </div>
-  )
-}
 
-function SubscribersAdmin() {
-  const PAGE_SIZE = 50
-  const [subscribers, setSubscribers] = useState<Array<{ email: string; subscribed_at: string }>>([])
-  const [hasMore, setHasMore] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [exporting, setExporting] = useState(false)
+      {showExportModal && <ProductExportModal categories={categories} onClose={() => setShowExportModal(false)} />}
 
-  useEffect(() => {
-    supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false }).range(0, PAGE_SIZE - 1).then(({ data }) => {
-      setSubscribers(data ?? [])
-      setHasMore((data?.length ?? 0) === PAGE_SIZE)
-    })
-  }, [])
-
-  const loadMore = async () => {
-    setLoadingMore(true)
-    const { data } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false }).range(subscribers.length, subscribers.length + PAGE_SIZE - 1)
-    setSubscribers((prev) => [...prev, ...(data ?? [])])
-    setHasMore((data?.length ?? 0) === PAGE_SIZE)
-    setLoadingMore(false)
-  }
-
-  const exportCsv = async () => {
-    // Exports the FULL list, not just whatever page is currently loaded on screen.
-    setExporting(true)
-    const { data } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false })
-    setExporting(false)
-    const all = data ?? []
-    const csv = ['email,subscribed_at', ...all.map((s) => `${s.email},${s.subscribed_at}`)].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = 'newsletter-subscribers.csv'
-    a.click()
-  }
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className={ADMIN_H1}>Newsletter</h1>
-        {subscribers.length > 0 && (
-          <button onClick={exportCsv} disabled={exporting} className="min-h-11 px-4 border border-ink text-[13px] font-semibold hover:bg-surface rounded-full bg-white disabled:opacity-50">
-            {exporting ? 'Preparing…' : 'Export as CSV'}
-          </button>
-        )}
-      </div>
-      <div className="bg-white border border-line rounded-2xl overflow-hidden">
-        {subscribers.length === 0 ? (
-          <p className="py-12 text-center text-ink-soft text-sm">No subscribers yet.</p>
-        ) : (
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-line text-left text-[10px] tracking-[0.1em] text-ink-soft">
-                <th className="px-5 py-3 font-medium">EMAIL</th>
-                <th className="px-5 py-3 font-medium text-right">SUBSCRIBED</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {subscribers.map((s) => (
-                <tr key={s.email} className="hover:bg-surface/50">
-                  <td className="px-5 py-3">{s.email}</td>
-                  <td className="px-5 py-3 text-right text-ink-soft">{new Date(s.subscribed_at).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-      {hasMore && (
-        <div className="text-center mt-6">
-          <button onClick={loadMore} disabled={loadingMore} className="px-6 py-2.5 border border-line text-[11px] tracking-[0.1em] rounded-full hover:bg-surface bg-white disabled:opacity-50">
-            {loadingMore ? 'LOADING…' : 'LOAD MORE'}
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function TrashAdmin() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const load = () => {
-    supabase.from('products').select('*').not('deleted_at', 'is', null).order('deleted_at', { ascending: false }).then(({ data }) => {
-      setProducts((data as Product[]) ?? [])
-      setLoading(false)
-    })
-  }
-
-  useEffect(load, [])
-
-  const restore = async (p: Product) => {
-    await supabase.from('products').update({ deleted_at: null }).eq('id', p.id)
-    clearHomeCatalogCache()
-    try {
-      await revalidateStorefront(p.slug)
-    } catch (err) {
-      console.warn('Storefront revalidation failed:', err)
-    }
-    load()
-  }
-
-  const deleteForever = async (p: Product) => {
-    if (!confirm(`Permanently delete "${p.title}"? This can't be undone.`)) return
-    await supabase.from('products').delete().eq('id', p.id)
-    clearHomeCatalogCache()
-    try {
-      await revalidateStorefront(p.slug)
-    } catch (err) {
-      console.warn('Storefront revalidation failed:', err)
-    }
-    load()
-  }
-
-  if (loading) return null
-
-  return (
-    <div>
-      <h1 className={`${ADMIN_H1} mb-2`}>Trash</h1>
-      <p className="text-[13px] text-ink-soft mb-6">Deleted products land here first — restore them anytime, or delete them for good.</p>
-      <div className="bg-white border border-line rounded-2xl overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white">
         {products.length === 0 ? (
-          <p className="py-12 text-center text-ink-soft text-sm">Trash is empty.</p>
+          search ? (
+            <Empty icon="search" title={`No patterns match “${search}”`} action={<Btn onClick={() => setSearch('')}>Clear search</Btn>} />
+          ) : statusFilter === 'active' && allCount === 0 ? (
+            <Empty icon="sell" title="Add your first pattern" body="Upload a photo and the PDF, set a price, and it’s on the shop." action={<Btn variant="primary" onClick={() => startEdit()}>+ Add listing</Btn>} />
+          ) : (
+            <Empty icon="sell" title={`No ${statusFilter === 'all' ? '' : statusFilter === 'active' ? 'live ' : statusFilter === 'draft' ? 'draft ' : 'sold-out '}patterns`} body={emptyMessage} />
+          )
         ) : (
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-line text-left text-[10px] tracking-[0.1em] text-ink-soft">
-                <th className="px-5 py-3 font-medium">PRODUCT</th>
-                <th className="px-5 py-3 font-medium">DELETED</th>
-                <th className="px-5 py-3 font-medium text-right">ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {products.map((p) => (
-                <tr key={p.id} className="hover:bg-surface/50">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 shrink-0 bg-surface overflow-hidden rounded-lg">
-                        {p.images?.[0] ? <img src={deriveVariantUrl(p.images[0], 'micro')} alt="" className="w-full h-full object-cover" /> : null}
-                      </div>
-                      <p className="font-medium">{p.title}</p>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 text-ink-soft">{p.deleted_at ? new Date(p.deleted_at).toLocaleString() : '—'}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex gap-4 text-[11px] tracking-[0.08em] justify-end">
-                      <button onClick={() => restore(p)} className="text-ink hover:opacity-70">RESTORE</button>
-                      <button onClick={() => deleteForever(p)} className="text-ink-soft hover:text-madder">DELETE FOREVER</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <>
+            <div className="hidden items-center gap-3 border-b border-[#EEF0F2] px-4 py-2.5 text-[12px] font-semibold text-[#6b7280] md:flex">
+              <input type="checkbox" aria-label="Select all" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} className="h-4 w-4" />
+              <span className="flex-1">Pattern</span>
+              <span className="w-24">Status</span>
+              <span className="w-20 text-right">Price</span>
+              <span className="w-28 text-right">Sales · Saved</span>
+              <span className="w-20 text-center">Live</span>
+              <span className="w-[116px]" />
+            </div>
+            <ul className="divide-y divide-[#EEF0F2]">
+              {products.map((p) => {
+                const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
+                const dup = !!p.lemon_variant_id && variantCounts[p.lemon_variant_id] > 1
+                return (
+                  <li key={p.id} className={`flex flex-wrap items-center gap-3 px-4 py-3 md:flex-nowrap ${selected.has(p.id) ? 'bg-[#F6F6F7]' : ''}`}>
+                    <input type="checkbox" aria-label={`Select ${p.title}`} checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} className="h-4 w-4 shrink-0" />
+                    <button onClick={() => startEdit(p)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+                      <span className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-[#F1F2F4]">
+                        {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt="" className="h-full w-full object-cover" />}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-[14px] font-medium">{p.title}</span>
+                        <span className="block truncate text-[12px] text-[#6b7280]">
+                          {p.category_id ? categoryById.get(p.category_id) ?? 'No category' : 'No category'}
+                          {p.is_bundle ? ' · Bundle' : ''}
+                          {p.featured ? ' · On homepage' : ''}
+                        </span>
+                        {dup && <span className="block text-[12px] text-[#B42318]">Same checkout ID as another listing</span>}
+                      </span>
+                    </button>
+                    <span className="w-24">{statusChip(p)}</span>
+                    <span className="w-20 text-right text-[14px] font-medium tabular-nums">{p.price === 0 ? 'Free' : `$${p.price.toFixed(2)}`}</span>
+                    <span className="w-28 text-right text-[13px] text-[#6b7280] tabular-nums">{c.sales} · {c.wishlist}</span>
+                    <span className="flex w-20 justify-center"><Toggle label={`${p.title} is live`} checked={p.active} onChange={(v) => setActive(p, v)} /></span>
+                    <span className="flex w-[116px] items-center justify-end gap-1">
+                      <Btn size="sm" onClick={() => startEdit(p)}>Edit</Btn>
+                      {rowMenu(p)}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </>
         )}
       </div>
-    </div>
-  )
-}
 
-function PdfDropzone({ uploading, uploaded, info, productId, productTitle, onSelect }: {
-  uploading: boolean
-  uploaded: boolean
-  info: { sizeKb: number; date: string; originalName: string } | null
-  productId: string
-  productTitle: string
-  onSelect: (file: File) => void
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [dragOver, setDragOver] = useState(false)
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [testing, setTesting] = useState(false)
-
-  const displayName = info?.originalName || fileName || (productTitle ? `${productTitle}.pdf` : null)
-
-  const handleFile = async (file?: File) => {
-    if (!file) return
-    const validation = await validatePdfFile(file)
-    if (!validation.ok) {
-      alert(validation.reason)
-      return
-    }
-    setFileName(file.name)
-    onSelect(file)
-  }
-
-  const testDownload = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setTesting(true)
-    const ok = await triggerPdfDownload(productId, displayName?.replace(/\.pdf$/i, '') || productTitle || 'pattern')
-    setTesting(false)
-    if (!ok) alert("Couldn't retrieve the file from storage — the upload may not have completed, or there's a bucket permissions issue. Check Supabase Dashboard → Storage → patterns bucket.")
-  }
-
-  return (
-    <div
-      onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
-      className={`cursor-pointer border-2 border-dashed rounded-xl px-6 py-8 text-center transition-colors ${dragOver ? 'border-ink bg-surface' : 'border-line hover:border-ink-soft'}`}
-    >
-      <p className="text-[12px] mb-1"><span className="underline underline-offset-2">Choose a file</span> or drop it here</p>
-      <p className="text-[11px] text-ink-soft">PDF only</p>
-      {uploading && <p className="text-[11px] text-ink-soft mt-1">Uploading…</p>}
-      {uploaded && !uploading && (
-        <div className="text-[11px] text-ink-soft mt-1">
-          <p>
-            PDF uploaded — customers who buy this pattern can now download it.{' '}
-            <button onClick={testDownload} disabled={testing} className="underline underline-offset-2 hover:text-ink disabled:opacity-50">
-              {testing ? 'Testing…' : 'Test download'}
-            </button>
-          </p>
-          {info && (
-            <p className="mt-1 text-ink font-medium">
-              {displayName} · {info.sizeKb} KB · uploaded {info.date}
-            </p>
-          )}
+      {hasMore && (
+        <div className="mt-5 text-center">
+          <Btn onClick={loadMore} disabled={loadingMore}>{loadingMore ? 'Loading…' : 'Load more'}</Btn>
         </div>
       )}
-      {!uploaded && fileName && !uploading && <p className="text-[11px] mt-2 text-ink font-medium">{fileName}</p>}
-      <input ref={inputRef} type="file" accept="application/pdf" onChange={(e) => { handleFile(e.target.files?.[0]); e.target.value = '' }} className="hidden" />
     </div>
-  )
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="block text-[10px] tracking-[0.1em] text-ink-soft mb-1.5">{label}</span>
-      {children}
-    </label>
   )
 }
