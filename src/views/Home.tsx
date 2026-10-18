@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { Fragment, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { DEFAULT_LAYOUT } from '../lib/defaultLayout'
@@ -12,7 +12,7 @@ import {
   type HomeCatalogSnapshot,
 } from '../lib/homeCatalogCache'
 import type { CategoryWithCount } from '../lib/categories'
-import type { Product, HeroContent, ChapterContent, LayoutSection } from '../lib/types'
+import { DEFAULT_HOME_COPY, type Product, type HeroContent, type ChapterContent, type LayoutSection, type HomeCopy } from '../lib/types'
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
 import { Button } from '../components/ui/Button'
@@ -38,6 +38,7 @@ function applyCatalogSnapshot(
     setChapters: (v: ChapterContent[]) => void
     setCategories: (v: CategoryWithCount[]) => void
     setHero: Dispatch<SetStateAction<HeroContent | null>>
+    setCopy: (v: HomeCopy) => void
     setSkillCounts: (v: HomeCatalogSnapshot['skillCounts']) => void
   },
 ) {
@@ -47,6 +48,7 @@ function applyCatalogSnapshot(
   setters.setChapters(snap.chapters)
   setters.setCategories(snap.categories ?? [])
   setters.setSkillCounts(snap.skillCounts)
+  if (snap.copy) setters.setCopy(snap.copy)
   if (snap.hero) {
     setters.setHero((prev) => {
       const prevUrls = (prev?.images ?? []).join('|')
@@ -104,6 +106,7 @@ export function Home({
     () => seed?.freePatternCollage ?? (seed?.freeProduct ? [seed.freeProduct] : []),
   )
   const [hero, setHero] = useState<HeroContent | null>(() => seed?.hero ?? initialHero)
+  const [copy, setCopy] = useState<HomeCopy>(() => seed?.copy ?? DEFAULT_HOME_COPY)
   const [chapters, setChapters] = useState<ChapterContent[]>(() => seed?.chapters ?? [])
   const [categories, setCategories] = useState<CategoryWithCount[]>(() => seed?.categories ?? [])
   const [skillCounts, setSkillCounts] = useState<HomeCatalogSnapshot['skillCounts']>(
@@ -189,6 +192,7 @@ export function Home({
       setChapters,
       setCategories,
       setHero,
+      setCopy,
       setSkillCounts,
     }
 
@@ -257,28 +261,34 @@ export function Home({
       {/* 1 · Hero */}
       <section className="mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-14 lg:grid-cols-[1fr_1.02fr] lg:gap-[5%] lg:py-[55px]">
         <div>
-          <p className="eyebrow">For the love of making</p>
+          <p className="eyebrow">{copy.hero_eyebrow}</p>
           <h1 className="my-5 font-heading text-[clamp(48px,6.1vw,86px)] font-normal leading-[0.98] tracking-[-0.045em] text-ink md:my-6">
-            Make room
-            <br />
-            for <em className="not-italic text-coral">something</em>
-            <br />
-            lovely.
+            {copy.hero_title.split('\n').map((line, i) => (
+              <Fragment key={i}>
+                {i > 0 && <br />}
+                {line.split(/(\*[^*]+\*)/).map((part, j) =>
+                  part.startsWith('*') && part.endsWith('*') && part.length > 2 ? (
+                    <em key={j} className="not-italic text-coral">{part.slice(1, -1)}</em>
+                  ) : (
+                    part
+                  ),
+                )}
+              </Fragment>
+            ))}
             <span className="sr-only"> Crochet patterns, ready to download.</span>
           </h1>
           <p className="mb-7 max-w-[420px] text-[14px] leading-[1.9] text-muted">
-            Thoughtful crochet patterns for slow mornings, creative afternoons, and all the little things you can&apos;t wait
-            to make.
+            {copy.hero_subtitle}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href={heroPrimaryHref(hero?.cta_link)}>
               <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>↗</span>}>
-                Explore patterns
+                {copy.hero_cta}
               </Button>
             </Link>
             <Link href={heroSecondaryHref(hero?.secondary_cta_link)}>
               <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                Browse free patterns
+                {copy.hero_cta2}
               </Button>
             </Link>
           </div>
@@ -477,21 +487,19 @@ export function Home({
           </div>
         ) : null}
         <div>
-          <p className="eyebrow">A slower, lovelier way to create</p>
+          <p className="eyebrow">{copy.story_eyebrow}</p>
           <h2 className="my-[18px] font-heading text-[clamp(38px,4vw,55px)] font-normal leading-[1.08] tracking-[-0.035em] text-ink">
-            Made for the joy of making.
+            {copy.story_title}
           </h2>
           <p className="mb-3 max-w-[460px] text-[13px] leading-[1.9] text-muted">
-            We believe the best projects aren&apos;t just about what you finish. They&apos;re about the quiet moments, the little
-            discoveries, and the happiness of making something with your own hands.
+            {copy.story_p1}
           </p>
           <p className="mb-5 max-w-[460px] text-[13px] leading-[1.9] text-muted">
-            Our pattern collection is here to help you find that feeling, whether you&apos;re learning your first stitch or
-            adding another lovely project to your list.
+            {copy.story_p2}
           </p>
           <Link href="/shop">
             <Button variant="primary" size="lg" iconRight={<span aria-hidden>↗</span>}>
-              Find your next project
+              {copy.story_cta}
             </Button>
           </Link>
         </div>

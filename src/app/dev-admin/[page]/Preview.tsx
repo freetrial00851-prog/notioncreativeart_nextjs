@@ -2,6 +2,7 @@
 
 import { setAnalyticsSource } from '@/lib/adminAnalytics'
 import { mockSource } from '@/lib/adminAnalyticsMock'
+import { HomepageAdmin } from '@/views/AdminHomepage'
 import { InsightsOverview, InsightsCustomers, InsightsSaved, InsightsProducts, InsightsTraffic, InsightsSetup } from '@/views/AdminInsights'
 
 const PAGES: Record<string, () => React.ReactElement> = {
@@ -11,6 +12,7 @@ const PAGES: Record<string, () => React.ReactElement> = {
   products: () => <InsightsProducts />,
   traffic: () => <InsightsTraffic />,
   setup: () => <InsightsSetup />,
+  homepage: () => <HomepageAdmin />,
 }
 
 /** Dev-only (404 in production): admin analytics pages with sample data, no login needed. */

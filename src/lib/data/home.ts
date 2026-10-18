@@ -1,6 +1,7 @@
 import { createStaticClient } from '@/lib/supabase/static'
 import { loadHomeCatalog, type HomeCatalogFetchResult } from '@/lib/homeCatalog'
 import { mergeLayout } from '@/lib/defaultLayout'
+import { normalizeHomeCopy } from '@/lib/types'
 
 /**
  * Server-side homepage catalog for App Router SSR / ISR (`revalidate`).
@@ -24,6 +25,7 @@ export async function getHomeCatalogServer(): Promise<HomeCatalogFetchResult> {
         chapters: [],
         testimonials: [],
         hero: null,
+        copy: normalizeHomeCopy(null),
         layout: mergeLayout([]),
         skillCounts: { beginner: 0, intermediate: 0, advanced: 0 },
         skillPreview: [],

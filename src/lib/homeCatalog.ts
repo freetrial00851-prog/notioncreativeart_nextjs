@@ -9,7 +9,7 @@ import type {
   LayoutSection,
   TestimonialContent,
 } from './types'
-import { normalizeFreePatternsBanner } from './types'
+import { normalizeFreePatternsBanner, normalizeHomeCopy, type HomeCopy } from './types'
 
 /** Shared homepage catalog shape — used by SSR bootstrap and the client module cache. */
 export type HomeCatalogSnapshot = {
@@ -26,6 +26,7 @@ export type HomeCatalogSnapshot = {
   chapters: ChapterContent[]
   testimonials: TestimonialContent[]
   hero: HeroContent | null
+  copy: HomeCopy
   layout: LayoutSection[] | null
   skillCounts: Record<'beginner' | 'intermediate' | 'advanced', number>
   /** Prefetch for default skill-browse tab so the first paint skips a client round-trip. */
@@ -79,7 +80,7 @@ export async function loadHomeCatalog(
   const settingsP = supabase
     .from('site_settings')
     .select('key, value')
-    .in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials', 'free_patterns'])
+    .in('key', ['hero', 'chapters', 'homepage_layout', 'testimonials', 'free_patterns', 'homepage_copy'])
   const categoriesP = getCategoriesWithProducts(supabase)
   const skillCountPs = (['beginner', 'intermediate', 'advanced'] as const).map((level) =>
     supabase
@@ -115,6 +116,7 @@ export async function loadHomeCatalog(
   let layout: LayoutSection[] | null = null
   let testimonials: TestimonialContent[] = []
   let freePatternsBanner = normalizeFreePatternsBanner(null)
+  let copy = normalizeHomeCopy(null)
 
   for (const row of settingsRes.data ?? []) {
     if (row.key === 'hero') hero = row.value as HeroContent
@@ -123,6 +125,7 @@ export async function loadHomeCatalog(
     if (row.key === 'testimonials') {
       testimonials = (row.value as TestimonialContent[]).filter((t) => t.quote && t.name)
     }
+    if (row.key === 'homepage_copy') copy = normalizeHomeCopy(row.value)
     if (row.key === 'free_patterns') {
       freePatternsBanner = normalizeFreePatternsBanner(row.value)
     }
@@ -166,6 +169,7 @@ export async function loadHomeCatalog(
     chapters,
     testimonials,
     hero,
+    copy,
     layout,
     skillCounts,
     skillPreview: (skillPreviewRes.data as Product[]) ?? [],

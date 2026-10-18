@@ -137,6 +137,50 @@ export function normalizeFreePatternsBanner(raw: unknown): FreePatternsBannerCon
   return { product_ids: ids }
 }
 
+/**
+ * Editable homepage text — site_settings key: `homepage_copy`.
+ * Empty / missing fields fall back to DEFAULT_HOME_COPY, so the page never shows blanks.
+ * `hero_title`: one line per row; wrap the accent word in *asterisks*.
+ */
+export type HomeCopy = {
+  hero_eyebrow: string
+  hero_title: string
+  hero_subtitle: string
+  hero_cta: string
+  hero_cta2: string
+  story_eyebrow: string
+  story_title: string
+  story_p1: string
+  story_p2: string
+  story_cta: string
+}
+
+export const DEFAULT_HOME_COPY: HomeCopy = {
+  hero_eyebrow: 'For the love of making',
+  hero_title: 'Make room\nfor *something*\nlovely.',
+  hero_subtitle:
+    "Thoughtful crochet patterns for slow mornings, creative afternoons, and all the little things you can't wait to make.",
+  hero_cta: 'Explore patterns',
+  hero_cta2: 'Browse free patterns',
+  story_eyebrow: 'A slower, lovelier way to create',
+  story_title: 'Made for the joy of making.',
+  story_p1:
+    "We believe the best projects aren't just about what you finish. They're about the quiet moments, the little discoveries, and the happiness of making something with your own hands.",
+  story_p2:
+    "Our pattern collection is here to help you find that feeling, whether you're learning your first stitch or adding another lovely project to your list.",
+  story_cta: 'Find your next project',
+}
+
+export function normalizeHomeCopy(raw: unknown): HomeCopy {
+  const value = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
+  const out = { ...DEFAULT_HOME_COPY }
+  for (const key of Object.keys(out) as (keyof HomeCopy)[]) {
+    const v = value[key]
+    if (typeof v === 'string' && v.trim()) out[key] = v.trim().slice(0, 600)
+  }
+  return out
+}
+
 /** Homepage + site-wide social/SEO fields (site_settings key: `seo`). */
 export type SiteSeoContent = {
   homepage_meta_title: string
