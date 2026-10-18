@@ -270,7 +270,7 @@ export function Home({
                   part.startsWith('*') && part.endsWith('*') && part.length > 2 ? (
                     <em key={j} className="relative inline-block not-italic text-coral">
                       {part.slice(1, -1)}
-                      <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.16em] w-full text-sun">
+                      <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.14em] w-full text-[#E2B764]">
                         <path d="M2 7 C 20 1, 36 11, 56 6 S 92 2, 112 7 S 150 11, 170 5 S 192 4, 198 6" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
                       </svg>
                     </em>
