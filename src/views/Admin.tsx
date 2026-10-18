@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, Fragment } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { NavLink } from '@/components/NavLink'
 import { supabase } from '../lib/supabase'
 import { processAndUploadImage, validateImageFile, sanitizeFilename, deriveVariantUrl, IMAGE_MAX, PRODUCT_IMAGE_CACHE_CONTROL } from '../lib/imageVariants'
 import { validatePdfFile } from '../lib/uploadValidation'
@@ -13,6 +12,8 @@ import type { Product, Category } from '../lib/types'
 import { profileDisplayName } from '../lib/profileName'
 import { HomepageAdmin } from './AdminHomepage'
 import { AdminDashboard } from './AdminDashboard'
+import { AdminShell } from './AdminShell'
+import { AdminToday } from './AdminToday'
 import { InsightsOverview, InsightsCustomers, InsightsSaved, InsightsProducts, InsightsTraffic, InsightsSetup } from './AdminInsights'
 import { AdminBulkUpload } from './AdminBulkUpload'
 import { AdminReviews } from './AdminReviews'
@@ -23,45 +24,11 @@ import { triggerPdfDownload } from '../lib/downloads'
 import { revalidateStorefront } from '../lib/actions/revalidateStorefront'
 import { clearHomeCatalogCache } from '../lib/homeCatalogCache'
 
-const SHELL_BG = '#f9f8f6'
-const SIDEBAR_BG = '#f3f1ec'
-const ACCENT = '#1f249c'
 const ADMIN_H1 = 'font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink'
-
-type NavItem =
-  | { kind: 'link'; to: string; label: string; icon: string; end?: boolean; badgeKey?: 'reviews' }
-  | { kind: 'group'; id: string; label: string; icon: string; children: { to: string; label: string }[] }
-
-const ADMIN_NAV: NavItem[] = [
-  { kind: 'link', to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true },
-  { kind: 'link', to: '/admin/customers', label: 'Customers', icon: 'group' },
-  { kind: 'link', to: '/admin/saved', label: 'Wishlists & carts', icon: 'favorite' },
-  { kind: 'link', to: '/admin/products', label: 'Product insights', icon: 'insights' },
-  { kind: 'link', to: '/admin/traffic', label: 'Traffic & search', icon: 'travel_explore' },
-  { kind: 'link', to: '/admin/listings', label: 'Listings', icon: 'sell' },
-  { kind: 'link', to: '/admin/bulk-upload', label: 'Bulk Upload', icon: 'upload_file' },
-  { kind: 'link', to: '/admin/orders', label: 'Orders', icon: 'receipt_long' },
-  { kind: 'link', to: '/admin/reviews', label: 'Reviews', icon: 'rate_review', badgeKey: 'reviews' },
-  { kind: 'link', to: '/admin/categories', label: 'Categories', icon: 'category' },
-  {
-    kind: 'group',
-    id: 'settings',
-    label: 'Settings',
-    icon: 'settings',
-    children: [
-      { to: '/admin/homepage', label: 'Homepage' },
-      { to: '/admin/subscribers', label: 'Newsletter' },
-      { to: '/admin/setup', label: 'Tracking setup' },
-    ],
-  },
-  { kind: 'link', to: '/admin/trash', label: 'Trash', icon: 'delete' },
-]
 
 export function Admin() {
   const { user, profile, loading, signOut } = useAuth()
   const pathname = usePathname()
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ settings: true })
   const [pendingReviewCount, setPendingReviewCount] = useState(0)
   const shopLabel = profileDisplayName(profile, 'Notion Creative Art')
 
@@ -80,146 +47,21 @@ export function Admin() {
     )
   }
 
-  const navContent = (
-    <>
-      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-        {ADMIN_NAV.map((item) => {
-          if (item.kind === 'link') {
-            const badge = item.badgeKey === 'reviews' && pendingReviewCount > 0 ? pendingReviewCount : null
-            return (
-              <NavLink
-                key={item.to}
-                href={item.to}
-                end={item.end}
-                onClick={() => setMobileNavOpen(false)}
-                className={({ isActive }) =>
-                  `flex min-h-11 items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
-                    isActive ? 'bg-white text-ink font-medium shadow-sm' : 'text-[#444] hover:bg-white/70 hover:text-ink'
-                  }`
-                }
-              >
-                <MaterialIcon name={item.icon} size={18} />
-                <span className="flex-1">{item.label}</span>
-                {badge != null && (
-                  <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full text-[10px] font-semibold flex items-center justify-center text-canvas" style={{ background: ACCENT }}>
-                    {badge}
-                  </span>
-                )}
-              </NavLink>
-            )
-          }
-          const groupOpen = openGroups[item.id]
-          const childActive = item.children.some((c) => pathname === c.to || pathname?.startsWith(c.to + '/'))
-          return (
-            <div key={item.id}>
-              <button
-                type="button"
-                onClick={() => setOpenGroups((g) => ({ ...g, [item.id]: !g[item.id] }))}
-                className={`w-full min-h-11 flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-colors ${
-                  childActive ? 'text-ink font-medium' : 'text-[#444] hover:bg-white/70'
-                }`}
-              >
-                <MaterialIcon name={item.icon} size={18} />
-                <span className="flex-1 text-left">{item.label}</span>
-                <MaterialIcon name="expand_more" size={16} style={{ transform: groupOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-              </button>
-              {groupOpen && (
-                <div className="ml-4 pl-3 border-l border-[#e4e1db] space-y-0.5 mb-1">
-                  {item.children.map((c) => (
-                    <NavLink
-                      key={c.to}
-                      href={c.to}
-                      onClick={() => setMobileNavOpen(false)}
-                      className={({ isActive }) =>
-                        `flex min-h-10 items-center px-3 py-1.5 rounded-full text-[12px] ${isActive ? 'text-ink font-medium bg-white' : 'text-[#666] hover:text-ink'}`
-                      }
-                    >
-                      {c.label}
-                    </NavLink>
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </nav>
-
-      <div className="px-3 pb-2">
-        <p className="px-3 text-[11px] font-semibold tracking-wide text-[#888] uppercase mb-1.5">Sales channels</p>
-        <a
-          href="/"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2.5 px-3 py-2 rounded-full text-[13px] text-ink hover:bg-white/70"
-        >
-          <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0" style={{ background: ACCENT }}>N</span>
-          <span className="truncate">NCA Shop</span>
-        </a>
-      </div>
-
-      <div className="border-t border-[#e4e1db] px-3 py-3">
-        <div className="flex items-center gap-2.5 px-2 py-1.5">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[12px] font-semibold shrink-0" style={{ background: ACCENT }}>
-            {(shopLabel[0] || 'A').toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-medium truncate">{shopLabel}</p>
-            <p className="text-[11px] text-[#888] truncate">{user.email}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 px-2 mt-2 text-[11px]">
-          <Link href="/" target="_blank" rel="noreferrer" className="text-[#666] hover:text-ink">View site</Link>
-          <button onClick={signOut} className="text-[#666] hover:text-ink">Sign out</button>
-        </div>
-      </div>
-    </>
-  )
-
   return (
-    <div className="min-h-screen md:flex" style={{ background: SHELL_BG }}>
-      <div className="md:hidden flex items-center justify-between px-4 py-3 sticky top-0 z-40 border-b border-[#e4e1db]" style={{ background: SIDEBAR_BG }}>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setMobileNavOpen(true)} aria-label="Open menu" className="p-1">
-            <MaterialIcon name="menu" size={22} />
-          </button>
-          <p className="font-heading text-[18px] font-semibold">Shop Manager</p>
-        </div>
-      </div>
-
-      {mobileNavOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-ink/30" onClick={() => setMobileNavOpen(false)} />
-          <aside className="relative w-[260px] shrink-0 flex flex-col border-r border-[#e4e1db]" style={{ background: SIDEBAR_BG }}>
-            <div className="px-4 py-4 flex items-center justify-between border-b border-[#e4e1db]">
-              <p className="font-heading text-[18px] font-semibold">Shop Manager</p>
-              <button onClick={() => setMobileNavOpen(false)} aria-label="Close menu"><MaterialIcon name="close" size={20} /></button>
-            </div>
-            {navContent}
-          </aside>
-        </div>
-      )}
-
-      <aside className="hidden md:flex w-[240px] shrink-0 flex-col border-r border-[#e4e1db] sticky top-0 h-screen" style={{ background: SIDEBAR_BG }}>
-        <div className="px-4 py-5 flex items-center gap-2 border-b border-[#e4e1db]">
-          <MaterialIcon name="menu" size={20} />
-          <p className="font-heading text-[18px] font-semibold">Shop Manager</p>
-        </div>
-        {navContent}
-      </aside>
-
-      <main className="flex-1 min-w-0 page-gutter py-6 md:py-8 overflow-x-auto">
-        <AdminContent />
-      </main>
-    </div>
+    <AdminShell pendingReviews={pendingReviewCount} email={user.email} name={shopLabel} onSignOut={signOut}>
+      <AdminContent name={shopLabel} />
+    </AdminShell>
   )
 }
 
 /** Renders the correct admin sub-page based on the current URL pathname. */
-function AdminContent() {
+function AdminContent({ name }: { name: string }) {
   const pathname = usePathname()
   switch (pathname) {
     case '/admin':
     case '/admin/':
+      return <AdminToday name={name} />
+    case '/admin/analytics':
       return <InsightsOverview />
     case '/admin/classic':
       return <AdminDashboard />
@@ -254,7 +96,7 @@ function AdminContent() {
     case '/admin/trash':
       return <TrashAdmin />
     default:
-      return <InsightsOverview />
+      return <AdminToday name={name} />
   }
 }
 
@@ -740,7 +582,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
 
     return (
       <div className="max-w-3xl mx-auto pb-24">
-        <div className="sticky top-0 z-20 -mx-5 md:-mx-8 page-gutter py-3 mb-6 border-b border-[#e4e1db] flex flex-wrap items-center gap-2" style={{ background: SHELL_BG }}>
+        <div className="sticky top-14 z-20 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-6 border-b border-[#E5E7EB] bg-[#F6F6F7] flex flex-wrap items-center gap-2">
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-semibold text-ink truncate">{form.title || (form.id ? 'Edit listing' : 'New listing')}</p>
             {form.id && (
@@ -748,14 +590,14 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
             )}
           </div>
           {form.slug && (
-            <a href={`/pattern/${form.slug}`} target="_blank" rel="noreferrer" className="px-3 py-2 text-[13px] border border-[#d9d5ce] rounded-full bg-white hover:bg-[#f3f1ec]">
+            <a href={`/pattern/${form.slug}`} target="_blank" rel="noreferrer" className="px-3 py-2 text-[13px] border border-[#D1D5DB] rounded-full bg-white hover:bg-[#F1F2F4]">
               Preview
             </a>
           )}
           <button
             onClick={async () => { const id = await save(false); if (id) setEditing(false) }}
             disabled={saving}
-            className="px-3 py-2 text-[13px] border border-[#d9d5ce] rounded-full bg-white hover:bg-[#f3f1ec] disabled:opacity-50"
+            className="px-3 py-2 text-[13px] border border-[#D1D5DB] rounded-full bg-white hover:bg-[#F1F2F4] disabled:opacity-50"
           >
             Save as draft
           </button>
@@ -770,19 +612,19 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
           </button>
         </div>
 
-        <div className="flex gap-1 border-b border-[#e4e1db] mb-6 overflow-x-auto">
+        <div className="flex gap-1 border-b border-[#E5E7EB] mb-6 overflow-x-auto">
           {tabs.map((key) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`px-4 py-2.5 text-[13px] whitespace-nowrap -mb-px border-b-2 transition-colors ${activeTab === key ? 'border-[#1f249c] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
+              className={`px-4 py-2.5 text-[13px] whitespace-nowrap -mb-px border-b-2 transition-colors ${activeTab === key ? 'border-[#111111] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'}`}
             >
               {tabLabels[key]}
             </button>
           ))}
         </div>
 
-        <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
           <div className="p-6">
             {activeTab === 'general' && (
               <div className="grid gap-5">
@@ -866,7 +708,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                 <Field label="Materials needed (one per line)">
                   <textarea value={form.materials} onChange={(e) => setForm({ ...form, materials: e.target.value })} rows={4} className="input" placeholder={"5mm (US H/8) crochet hook\nDK weight yarn, approx 400 yds"} />
                 </Field>
-                <div className="pt-2 border-t border-[#e4e1db]">
+                <div className="pt-2 border-t border-[#E5E7EB]">
                   <p className="text-[14px] font-semibold mb-2">Digital files</p>
                   {form.id ? (
                     <PdfDropzone uploading={uploadingPdf} uploaded={pdfUploaded} info={pdfInfo} productId={form.id} productTitle={form.title} onSelect={(file) => uploadPdf(file, form.id)} />
@@ -892,12 +734,12 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                 <Field label="Lemon Squeezy numeric variant ID"><input value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value })} className="input" placeholder="1255414" /></Field>
                 <div>
                   <span className="block text-[12px] text-ink-soft mb-1.5">Checkout style</span>
-                  <div className="flex border border-[#d9d5ce] w-fit text-[12px] rounded-lg overflow-hidden bg-white">
+                  <div className="flex border border-[#D1D5DB] w-fit text-[12px] rounded-lg overflow-hidden bg-white">
                     <button onClick={() => setForm({ ...form, checkout_mode: 'overlay' })} className={`px-4 py-2 ${form.checkout_mode === 'overlay' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Overlay</button>
-                    <button onClick={() => setForm({ ...form, checkout_mode: 'hosted' })} className={`px-4 py-2 border-l border-[#d9d5ce] ${form.checkout_mode === 'hosted' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Hosted</button>
+                    <button onClick={() => setForm({ ...form, checkout_mode: 'hosted' })} className={`px-4 py-2 border-l border-[#D1D5DB] ${form.checkout_mode === 'hosted' ? 'bg-[#222] text-white' : 'text-ink-soft hover:text-ink'}`}>Hosted</button>
                   </div>
                 </div>
-                <div className="border-t border-[#e4e1db] pt-4">
+                <div className="border-t border-[#E5E7EB] pt-4">
                   <label className="flex items-center gap-2 text-[13px] mb-3">
                     <input type="checkbox" checked={form.is_bundle} onChange={(e) => setForm({ ...form, is_bundle: e.target.checked })} /> This is a bundle
                   </label>
@@ -910,7 +752,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                           <button onClick={() => setForm({ ...form, bundle_includes: form.bundle_includes.filter((_, idx) => idx !== i) })} className="px-3 text-[12px] text-ink-soft hover:text-madder">✕</button>
                         </div>
                       ))}
-                      <button onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })} className="text-[13px] text-[#1f249c] hover:underline">+ Add included pattern</button>
+                      <button onClick={() => setForm({ ...form, bundle_includes: [...form.bundle_includes, ''] })} className="text-[13px] text-[#111111] hover:underline">+ Add included pattern</button>
                     </div>
                   )}
                 </div>
@@ -927,7 +769,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                 <Field label={`Meta description (${form.meta_description.length}/155)`}>
                   <textarea value={form.meta_description} onChange={(e) => setForm({ ...form, meta_description: e.target.value })} className="input" rows={3} maxLength={200} placeholder={form.description ? form.description.slice(0, 155) : 'Product description'} />
                 </Field>
-                <div className="border border-[#e4e1db] rounded-lg p-4 bg-[#f9f8f6]">
+                <div className="border border-[#E5E7EB] rounded-lg p-4 bg-[#F6F6F7]">
                   <p className="text-[11px] text-ink-soft mb-2">Search preview</p>
                   <p className="text-[17px] leading-tight" style={{ color: '#1a0dab' }}>{form.meta_title || form.title || 'Product title'}</p>
                   <p className="text-[12px] text-ink-soft mt-0.5">notioncreativeart.com/pattern/{form.slug || slugify(form.title) || 'product-slug'}</p>
@@ -937,13 +779,13 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
             )}
           </div>
 
-          <div className="px-6 py-4 border-t border-[#e4e1db] bg-[#f9f8f6]">
+          <div className="px-6 py-4 border-t border-[#E5E7EB] bg-[#F6F6F7]">
             {saveError && <p className="text-[12px] text-madder mb-2">{saveError}</p>}
             {!canPublish && (
               <p className="text-[12px] text-madder mb-2">Still needed to publish: {missingFields.join(', ')}.</p>
             )}
             <div className="flex flex-wrap gap-2">
-              <button onClick={async () => { const id = await save(false); if (id) setEditing(false) }} disabled={saving} className="px-4 py-2 border border-[#d9d5ce] text-[13px] rounded-full bg-white disabled:opacity-50">Save as draft</button>
+              <button onClick={async () => { const id = await save(false); if (id) setEditing(false) }} disabled={saving} className="px-4 py-2 border border-[#D1D5DB] text-[13px] rounded-full bg-white disabled:opacity-50">Save as draft</button>
               {!isLastTab && (
                 <button onClick={async () => { const id = await save(false); if (id) setActiveTab(tabs[tabs.indexOf(activeTab) + 1]) }} disabled={saving} className="px-4 py-2 text-[13px] rounded-full text-white disabled:opacity-50" style={{ background: '#222' }}>
                   Save &amp; continue
@@ -955,7 +797,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
             </div>
           </div>
         </div>
-        <style>{`.input { width: 100%; border: 1px solid #d9d5ce; padding: 10px 12px; font-size: 13px; background: white; border-radius: 8px; } .input:focus { outline: none; border-color: #222; }`}</style>
+        <style>{`.input { width: 100%; border: 1px solid #D1D5DB; padding: 10px 12px; font-size: 13px; background: white; border-radius: 8px; } .input:focus { outline: none; border-color: #222; }`}</style>
       </div>
     )
   }
@@ -979,7 +821,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by title…"
-                className="w-full border border-[#d9d5ce] rounded-full pl-10 pr-9 py-2.5 text-[13px] bg-white focus:outline-none focus:border-ink"
+                className="w-full border border-[#D1D5DB] rounded-full pl-10 pr-9 py-2.5 text-[13px] bg-white focus:outline-none focus:border-ink"
               />
               {search && (
                 <button onClick={() => setSearch('')} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink text-[13px]">✕</button>
@@ -992,19 +834,19 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <label className="flex items-center gap-2 px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px]">
+          <label className="flex items-center gap-2 px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px]">
             <input type="checkbox" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} />
           </label>
-          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(true)} className="px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] disabled:opacity-40">Activate</button>
-          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(false)} className="px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] disabled:opacity-40">Deactivate</button>
-          <button disabled={selected.size === 0 || bulkWorking} onClick={bulkTrash} className="px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] disabled:opacity-40">Delete</button>
+          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(true)} className="px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] disabled:opacity-40">Activate</button>
+          <button disabled={selected.size === 0 || bulkWorking} onClick={() => bulkSetActive(false)} className="px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] disabled:opacity-40">Deactivate</button>
+          <button disabled={selected.size === 0 || bulkWorking} onClick={bulkTrash} className="px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] disabled:opacity-40">Delete</button>
           {selected.size > 0 && (
             <button onClick={() => setSelected(new Set())} className="text-[13px] text-ink-soft hover:text-ink ml-1">Clear ({selected.size})</button>
           )}
           <button
             type="button"
             onClick={() => setShowExportModal(true)}
-            className="ml-auto px-3 py-1.5 border border-[#d9d5ce] rounded-full bg-white text-[13px] hover:bg-[#f9f8f6]"
+            className="ml-auto px-3 py-1.5 border border-[#D1D5DB] rounded-full bg-white text-[13px] hover:bg-[#F6F6F7]"
           >
             Export CSV
           </button>
@@ -1015,7 +857,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
         )}
 
         {products.length === 0 ? (
-          <div className="bg-white border border-[#e4e1db] rounded-xl py-16 text-center text-[14px] text-ink-soft">
+          <div className="bg-white border border-[#E5E7EB] rounded-xl py-16 text-center text-[14px] text-ink-soft">
             {search ? `No listings match "${search}".` : emptyMessage}
           </div>
         ) : viewMode === 'grid' ? (
@@ -1024,13 +866,13 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
               const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
               const isDuplicateVariant = !!p.lemon_variant_id && variantCounts[p.lemon_variant_id] > 1
               return (
-                <div key={p.id} className={`bg-white border rounded-xl overflow-hidden ${selected.has(p.id) ? 'border-[#1f249c]' : 'border-[#e4e1db]'}`}>
-                  <div className="relative aspect-[4/3] bg-[#f3f1ec]">
+                <div key={p.id} className={`bg-white border rounded-xl overflow-hidden ${selected.has(p.id) ? 'border-[#111111]' : 'border-[#E5E7EB]'}`}>
+                  <div className="relative aspect-[4/3] bg-[#F1F2F4]">
                     {p.images?.[0] ? (
                       <img src={deriveVariantUrl(p.images[0], 'thumb')} alt="" className="w-full h-full object-cover" />
                     ) : null}
-                    <span className="absolute bottom-2 left-2 text-[10px] font-medium px-2 py-0.5 rounded bg-white/90 border border-[#e4e1db]">Digital</span>
-                    {p.featured && <MaterialIcon name="star" size={18} color="#c9a227" className="absolute top-2 right-2" />}
+                    <span className="absolute bottom-2 left-2 text-[10px] font-medium px-2 py-0.5 rounded bg-white/90 border border-[#E5E7EB]">Digital</span>
+                    {p.featured && <MaterialIcon name="star" size={18} color="#B7791F" className="absolute top-2 right-2" />}
                   </div>
                   <div className="p-3">
                     <p className="text-[13px] font-medium text-ink truncate mb-1">{p.title}</p>
@@ -1040,7 +882,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                     </p>
                     {isDuplicateVariant && <p className="text-[11px] text-madder mb-1">Duplicate checkout ID</p>}
                     {showStats && (
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-ink-soft border-t border-[#e4e1db] pt-2 mb-2">
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-ink-soft border-t border-[#E5E7EB] pt-2 mb-2">
                         <div>
                           <p className="font-semibold text-[10px] tracking-wide text-[#888] mb-0.5">ALL TIME</p>
                           <p>{c.sales} sales</p>
@@ -1055,21 +897,21 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                     <div className="flex items-center gap-2 relative">
                       <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} className="accent-ink" />
                       <button onClick={() => setFeatured(p)} className="p-1 text-ink-soft hover:text-ink" aria-label="Toggle featured">
-                        <MaterialIcon name={p.featured ? 'star' : 'star_border'} size={18} color={p.featured ? '#c9a227' : undefined} />
+                        <MaterialIcon name={p.featured ? 'star' : 'star_border'} size={18} color={p.featured ? '#B7791F' : undefined} />
                       </button>
                       <div className="ml-auto relative">
-                        <button onClick={() => setMenuOpenId(menuOpenId === p.id ? null : p.id)} className="p-1.5 rounded-full hover:bg-[#f3f1ec]" aria-label="Listing options">
+                        <button onClick={() => setMenuOpenId(menuOpenId === p.id ? null : p.id)} className="p-1.5 rounded-full hover:bg-[#F1F2F4]" aria-label="Listing options">
                           <MaterialIcon name="settings" size={18} />
                         </button>
                         {menuOpenId === p.id && (
                           <>
                             <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
-                            <div className="absolute right-0 bottom-full mb-1 z-20 w-44 bg-white border border-[#e4e1db] rounded-lg shadow-lg py-1 text-[13px]">
-                              <a href={`/pattern/${p.slug}`} target="_blank" rel="noreferrer" className="block px-3 py-2 hover:bg-[#f3f1ec]">View on shop</a>
-                              <button onClick={() => { setMenuOpenId(null); startEdit(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec]">Edit</button>
-                              <button onClick={() => { setMenuOpenId(null); duplicateProduct(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec]">Copy</button>
-                              <button onClick={() => { setMenuOpenId(null); setActive(p, !p.active) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec]">{p.active ? 'Deactivate' : 'Activate'}</button>
-                              <button onClick={() => { setMenuOpenId(null); trash(p.id) }} className="block w-full text-left px-3 py-2 hover:bg-[#f3f1ec] text-madder">Delete</button>
+                            <div className="absolute right-0 bottom-full mb-1 z-20 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg py-1 text-[13px]">
+                              <a href={`/pattern/${p.slug}`} target="_blank" rel="noreferrer" className="block px-3 py-2 hover:bg-[#F1F2F4]">View on shop</a>
+                              <button onClick={() => { setMenuOpenId(null); startEdit(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4]">Edit</button>
+                              <button onClick={() => { setMenuOpenId(null); duplicateProduct(p) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4]">Copy</button>
+                              <button onClick={() => { setMenuOpenId(null); setActive(p, !p.active) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4]">{p.active ? 'Deactivate' : 'Activate'}</button>
+                              <button onClick={() => { setMenuOpenId(null); trash(p.id) }} className="block w-full text-left px-3 py-2 hover:bg-[#F1F2F4] text-madder">Delete</button>
                             </div>
                           </>
                         )}
@@ -1081,10 +923,10 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
             })}
           </div>
         ) : (
-          <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden">
+          <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-[#e4e1db] text-left text-[11px] text-ink-soft">
+                <tr className="border-b border-[#E5E7EB] text-left text-[11px] text-ink-soft">
                   <th className="px-4 py-3 w-10"><input type="checkbox" checked={selected.size === products.length && products.length > 0} onChange={toggleSelectAll} /></th>
                   <th className="px-4 py-3 font-medium">Listing</th>
                   <th className="px-4 py-3 font-medium">Price</th>
@@ -1093,15 +935,15 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                   <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e4e1db]">
+              <tbody className="divide-y divide-[#E5E7EB]">
                 {products.map((p) => {
                   const c = counts[p.id] ?? { wishlist: 0, sales: 0 }
                   return (
-                    <tr key={p.id} className={selected.has(p.id) ? 'bg-[#f3f1ec]/70' : 'hover:bg-[#f9f8f6]'}>
+                    <tr key={p.id} className={selected.has(p.id) ? 'bg-[#F1F2F4]/70' : 'hover:bg-[#F6F6F7]'}>
                       <td className="px-4 py-3"><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} /></td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#f3f1ec] shrink-0">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#F1F2F4] shrink-0">
                             {p.images?.[0] && <img src={deriveVariantUrl(p.images[0], 'micro')} alt="" className="w-full h-full object-cover" />}
                           </div>
                           <p className="font-medium truncate">{p.title}</p>
@@ -1111,7 +953,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
                       <td className="px-4 py-3">{p.active ? 'Active' : 'Draft'}</td>
                       <td className="px-4 py-3 text-ink-soft">{c.sales} · {c.wishlist} fav</td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => startEdit(p)} className="text-[#1f249c] hover:underline">Edit</button>
+                        <button onClick={() => startEdit(p)} className="text-[#111111] hover:underline">Edit</button>
                       </td>
                     </tr>
                   )
@@ -1123,7 +965,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
 
         {hasMore && (
           <div className="text-center mt-6">
-            <button onClick={loadMore} disabled={loadingMore} className="px-5 py-2 border border-[#d9d5ce] text-[13px] rounded-full hover:bg-white bg-white disabled:opacity-50">
+            <button onClick={loadMore} disabled={loadingMore} className="px-5 py-2 border border-[#D1D5DB] text-[13px] rounded-full hover:bg-white bg-white disabled:opacity-50">
               {loadingMore ? 'Loading…' : 'Load more'}
             </button>
           </div>
@@ -1139,16 +981,16 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
             role="switch"
             aria-checked={showStats}
             onClick={() => setShowStats((v) => !v)}
-            className={`w-9 h-5 rounded-full transition-colors relative ${showStats ? 'bg-[#222]' : 'bg-[#d9d5ce]'}`}
+            className={`w-9 h-5 rounded-full transition-colors relative ${showStats ? 'bg-[#222]' : 'bg-[#D1D5DB]'}`}
           >
             <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${showStats ? 'left-4' : 'left-0.5'}`} />
           </button>
         </div>
         <div className="flex gap-1">
-          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-full border ${viewMode === 'grid' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="Grid view">
+          <button onClick={() => setViewMode('grid')} className={`p-2 rounded-full border ${viewMode === 'grid' ? 'border-ink bg-white' : 'border-[#D1D5DB] bg-white'}`} aria-label="Grid view">
             <MaterialIcon name="grid_view" size={18} />
           </button>
-          <button onClick={() => setViewMode('list')} className={`p-2 rounded-full border ${viewMode === 'list' ? 'border-ink bg-white' : 'border-[#d9d5ce] bg-white'}`} aria-label="List view">
+          <button onClick={() => setViewMode('list')} className={`p-2 rounded-full border ${viewMode === 'list' ? 'border-ink bg-white' : 'border-[#D1D5DB] bg-white'}`} aria-label="List view">
             <MaterialIcon name="view_list" size={18} />
           </button>
         </div>
@@ -1191,7 +1033,7 @@ function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'listings'
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="text-[13px] font-semibold text-ink">Sections</p>
-            <Link href="/admin/categories" className="text-[12px] text-[#1f249c] hover:underline">Manage</Link>
+            <Link href="/admin/categories" className="text-[12px] text-[#111111] hover:underline">Manage</Link>
           </div>
           <p className="text-[12px] text-ink-soft">Filter by category from the listing editor, or manage shop sections in Categories.</p>
         </div>

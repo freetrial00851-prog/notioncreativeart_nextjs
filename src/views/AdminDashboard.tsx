@@ -154,7 +154,7 @@ export function AdminDashboard() {
     <div className="max-w-[1100px]">
       {/* Welcome header */}
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
-        <div className="w-11 h-11 rounded-full shrink-0 flex items-center justify-center text-white text-[15px] font-semibold" style={{ background: '#1f249c' }}>
+        <div className="w-11 h-11 rounded-full shrink-0 flex items-center justify-center text-white text-[15px] font-semibold" style={{ background: '#111111' }}>
           {(shopName[0] || 'N').toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
@@ -173,7 +173,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-[#e4e1db] mb-6">
+      <div className="flex gap-1 border-b border-[#E5E7EB] mb-6">
         {([
           { id: 'home' as const, label: 'Home' },
           { id: 'activity' as const, label: 'Recent activity' },
@@ -182,7 +182,7 @@ export function AdminDashboard() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-2.5 text-[14px] -mb-px border-b-2 transition-colors ${
-              tab === t.id ? 'border-[#1f249c] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'
+              tab === t.id ? 'border-[#111111] text-ink font-medium' : 'border-transparent text-ink-soft hover:text-ink'
             }`}
           >
             {t.label}
@@ -232,14 +232,14 @@ export function AdminDashboard() {
               <select
                 value={range}
                 onChange={(e) => setRange(e.target.value as typeof range)}
-                className="border border-[#d9d5ce] rounded-md bg-white px-2.5 py-1.5 text-[13px]"
+                className="border border-[#D1D5DB] rounded-md bg-white px-2.5 py-1.5 text-[13px]"
               >
                 <option value="today">Today</option>
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
               </select>
             </div>
-            <div className="bg-white border border-[#e4e1db] rounded-xl overflow-hidden grid grid-cols-2 lg:grid-cols-5">
+            <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden grid grid-cols-2 lg:grid-cols-5">
               <StatCell label="Views" value={String(stats?.views ?? '—')} />
               <StatCell label="Orders" value={String(stats?.ordersToday ?? '—')} pct={ordersPct} />
               <StatCell
@@ -268,7 +268,7 @@ export function AdminDashboard() {
                 className={`px-3.5 py-1.5 rounded-full text-[13px] border transition-colors ${
                   activityFilter === f.id
                     ? 'bg-[#222] text-white border-[#222]'
-                    : 'bg-white text-ink border-[#d9d5ce] hover:bg-[#f3f1ec]'
+                    : 'bg-white text-ink border-[#D1D5DB] hover:bg-[#F1F2F4]'
                 }`}
               >
                 {f.label}
@@ -277,16 +277,16 @@ export function AdminDashboard() {
           </div>
 
           {filteredActivity.length === 0 ? (
-            <div className="bg-white border border-[#e4e1db] rounded-xl py-16 text-center text-[14px] text-ink-soft">
+            <div className="bg-white border border-[#E5E7EB] rounded-xl py-16 text-center text-[14px] text-ink-soft">
               No recent activity yet.
             </div>
           ) : (
             <div className="space-y-3">
               {filteredActivity.map((item) => (
-                <div key={`${item.kind}-${item.id}`} className="bg-white border border-[#e4e1db] rounded-xl p-4 flex gap-4">
+                <div key={`${item.kind}-${item.id}`} className="bg-white border border-[#E5E7EB] rounded-xl p-4 flex gap-4">
                   {item.kind === 'order' ? (
                     <>
-                      <div className="w-12 h-12 rounded-lg bg-[#f3f1ec] flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-[#F1F2F4] flex items-center justify-center shrink-0">
                         <MaterialIcon name="receipt_long" size={22} />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -297,14 +297,14 @@ export function AdminDashboard() {
                         <p className="text-[13px] text-ink-soft mt-0.5">
                           USD {item.amount.toFixed(2)} · {timeAgo(item.created_at)}
                         </p>
-                        <Link href="/admin/orders" className="inline-block mt-2 text-[13px] text-[#1f249c] hover:underline">
+                        <Link href="/admin/orders" className="inline-block mt-2 text-[13px] text-[#111111] hover:underline">
                           View orders
                         </Link>
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="w-12 h-12 rounded-lg bg-[#f3f1ec] overflow-hidden shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-[#F1F2F4] overflow-hidden shrink-0">
                         {item.productImage ? (
                           <img src={deriveVariantUrl(item.productImage, 'micro')} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -318,7 +318,7 @@ export function AdminDashboard() {
                           Someone favourited <span className="font-medium">{item.productTitle}</span>
                         </p>
                         <p className="text-[13px] text-ink-soft mt-0.5">{timeAgo(item.created_at)}</p>
-                        <Link href="/admin/listings" className="inline-block mt-2 text-[13px] text-[#1f249c] hover:underline">
+                        <Link href="/admin/listings" className="inline-block mt-2 text-[13px] text-[#111111] hover:underline">
                           View listings
                         </Link>
                       </div>
@@ -344,7 +344,7 @@ function TaskCard({
   links: { label: string; href: string; count?: number }[]
 }) {
   return (
-    <div className="bg-white border border-[#e4e1db] rounded-xl p-4">
+    <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
       <div className="flex items-center gap-2 mb-3">
         <MaterialIcon name={icon} size={20} />
         <p className="text-[14px] font-semibold text-ink">{title}</p>
@@ -352,7 +352,7 @@ function TaskCard({
       <ul className="space-y-2">
         {links.map((l) => (
           <li key={l.href + l.label}>
-            <Link href={l.href} className="text-[13px] text-[#1f249c] hover:underline inline-flex items-center gap-1.5">
+            <Link href={l.href} className="text-[13px] text-[#111111] hover:underline inline-flex items-center gap-1.5">
               {l.label}
               {typeof l.count === 'number' && (
                 <span className="text-ink-soft">({l.count})</span>
@@ -367,7 +367,7 @@ function TaskCard({
 
 function StatCell({ label, value, pct }: { label: string; value: string; pct?: number }) {
   return (
-    <div className="p-5 border-b border-r border-[#e4e1db] last:border-r-0">
+    <div className="p-5 border-b border-r border-[#E5E7EB] last:border-r-0">
       <p className="text-[12px] text-ink-soft mb-1">{label}</p>
       <p className="text-[18px] font-semibold text-ink tracking-tight">{value}</p>
       {typeof pct === 'number' && (

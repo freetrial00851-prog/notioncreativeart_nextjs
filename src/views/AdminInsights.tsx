@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   analytics,
   money,
@@ -26,7 +27,7 @@ import {
 } from '../lib/adminAnalytics'
 
 const H1 = 'font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink'
-const CARD = 'rounded-2xl border border-[#e4e1db] bg-white'
+const CARD = 'rounded-2xl border border-[#E5E7EB] bg-white'
 const TH = 'px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-[#777] whitespace-nowrap'
 const TD = 'px-3 py-2.5 text-[13px] text-ink align-top'
 
@@ -59,7 +60,7 @@ export function SetupNeeded({ what }: { what: string }) {
 }
 
 function Gate<T>({ state, what, children }: { state: { loading: boolean; res: Result<T> | null }; what: string; children: (d: T) => ReactNode }) {
-  if (state.loading && !state.res) return <div className={`${CARD} h-32 animate-pulse bg-[#f3f1ec]`} aria-busy="true" />
+  if (state.loading && !state.res) return <div className={`${CARD} h-32 animate-pulse bg-[#F1F2F4]`} aria-busy="true" />
   if (!state.res) return null
   if (!state.res.ok) {
     return state.res.missing ? (
@@ -73,7 +74,7 @@ function Gate<T>({ state, what, children }: { state: { loading: boolean; res: Re
 
 function RangePicker({ value, onChange }: { value: RangeId; onChange: (r: RangeId) => void }) {
   return (
-    <div className="inline-flex rounded-full border border-[#e4e1db] bg-white p-0.5" role="tablist" aria-label="Date range">
+    <div className="inline-flex rounded-full border border-[#E5E7EB] bg-white p-0.5" role="tablist" aria-label="Date range">
       {RANGES.map((r) => (
         <button
           key={r.id}
@@ -143,10 +144,10 @@ function Table({ head, children, empty }: { head: string[]; children: ReactNode;
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[520px]">
-        <thead className="border-b border-[#eceae5]">
+        <thead className="border-b border-[#EEF0F2]">
           <tr>{head.map((h) => <th key={h} className={TH}>{h}</th>)}</tr>
         </thead>
-        <tbody className="divide-y divide-[#f1efea]">{children}</tbody>
+        <tbody className="divide-y divide-[#F1F2F4]">{children}</tbody>
       </table>
       {isEmpty && <p className="px-3 py-6 text-center text-[13px] text-[#888]">{empty ?? 'Nothing here yet.'}</p>}
     </div>
@@ -241,7 +242,7 @@ export function InsightsOverview() {
                       ['Added to cart', sum(rows, 'cart_adds')],
                       ['Newsletter', sum(rows, 'newsletter')],
                     ].map(([k, v]) => (
-                      <div key={String(k)} className="rounded-xl bg-[#f7f6f3] py-4">
+                      <div key={String(k)} className="rounded-xl bg-[#F6F6F7] py-4">
                         <dd className="text-[22px] font-bold tabular-nums">{String(v)}</dd>
                         <dt className="text-[11px] text-[#777] mt-1">{k}</dt>
                       </div>
@@ -256,7 +257,7 @@ export function InsightsOverview() {
 
               {live?.ok && live.data.recent?.length > 0 && (
                 <Section title="Live activity">
-                  <ul className="divide-y divide-[#f1efea]">
+                  <ul className="divide-y divide-[#F1F2F4]">
                     {live.data.recent.slice(0, 10).map((e, i) => (
                       <li key={i} className="flex items-center justify-between gap-3 py-2 text-[13px]">
                         <span className="font-medium">{e.event_name.replace(/_/g, ' ')}</span>
@@ -294,7 +295,7 @@ function FunnelView({ f }: { f: Funnel }) {
               {n.toLocaleString()} {i > 0 && steps[i - 1][1] > 0 && <span className="text-[#999]">· {pct(n, steps[i - 1][1])}</span>}
             </span>
           </div>
-          <div className="h-2 rounded-full bg-[#eeece7]"><div className="h-2 rounded-full bg-ink" style={{ width: `${Math.max((n / top) * 100, n > 0 ? 2 : 0)}%` }} /></div>
+          <div className="h-2 rounded-full bg-[#ECEEF0]"><div className="h-2 rounded-full bg-ink" style={{ width: `${Math.max((n / top) * 100, n > 0 ? 2 : 0)}%` }} /></div>
         </li>
       ))}
     </ol>
@@ -314,8 +315,9 @@ const SEGMENTS = [
 const PAGE = 25
 
 export function InsightsCustomers() {
-  const [search, setSearch] = useState('')
-  const [q, setQ] = useState('')
+  const initialQ = useSearchParams().get('q') ?? ''
+  const [search, setSearch] = useState(initialQ)
+  const [q, setQ] = useState(initialQ.trim())
   const [segment, setSegment] = useState('all')
   const [sort, setSort] = useState('joined')
   const [page, setPage] = useState(0)
@@ -343,12 +345,12 @@ export function InsightsCustomers() {
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search name or email"
           aria-label="Search customers"
-          className="min-h-11 flex-1 min-w-[200px] rounded-full border border-[#e4e1db] bg-white px-4 text-[14px] outline-none focus:border-ink"
+          className="min-h-11 flex-1 min-w-[200px] rounded-full border border-[#E5E7EB] bg-white px-4 text-[14px] outline-none focus:border-ink"
         />
-        <select value={segment} onChange={(e) => { setSegment(e.target.value); setPage(0) }} aria-label="Segment" className="min-h-11 rounded-full border border-[#e4e1db] bg-white px-3 text-[13px]">
+        <select value={segment} onChange={(e) => { setSegment(e.target.value); setPage(0) }} aria-label="Segment" className="min-h-11 rounded-full border border-[#E5E7EB] bg-white px-3 text-[13px]">
           {SEGMENTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
         </select>
-        <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(0) }} aria-label="Sort" className="min-h-11 rounded-full border border-[#e4e1db] bg-white px-3 text-[13px]">
+        <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(0) }} aria-label="Sort" className="min-h-11 rounded-full border border-[#E5E7EB] bg-white px-3 text-[13px]">
           <option value="joined">Newest first</option>
           <option value="revenue">Top spenders</option>
           <option value="orders">Most orders</option>
@@ -363,7 +365,7 @@ export function InsightsCustomers() {
             <div className={CARD}>
               <Table head={['Customer', 'Joined', 'Orders', 'Spent', 'Free', 'Wishlist', 'Cart', 'Reviews']} empty="No customers match.">
                 {rows.map((c) => (
-                  <tr key={c.user_id} className="hover:bg-[#faf9f7] cursor-pointer" onClick={() => setOpen(c.user_id)}>
+                  <tr key={c.user_id} className="hover:bg-[#FAFAFA] cursor-pointer" onClick={() => setOpen(c.user_id)}>
                     <td className={TD}>
                       <button className="text-left" onClick={() => setOpen(c.user_id)}>
                         <span className="block font-medium">{c.name || c.email}</span>
@@ -394,12 +396,12 @@ export function InsightsCustomers() {
 function Pager({ page, total, size, onPage }: { page: number; total: number; size: number; onPage: (n: number) => void }) {
   const pages = Math.max(1, Math.ceil(total / size))
   return (
-    <div className="flex items-center justify-between border-t border-[#eceae5] px-3 py-2.5 text-[12px] text-[#666]">
+    <div className="flex items-center justify-between border-t border-[#EEF0F2] px-3 py-2.5 text-[12px] text-[#666]">
       <span>{total.toLocaleString()} total</span>
       <div className="flex items-center gap-2">
-        <button disabled={page === 0} onClick={() => onPage(page - 1)} className="min-h-9 px-3 rounded-full border border-[#e4e1db] disabled:opacity-40">Prev</button>
+        <button disabled={page === 0} onClick={() => onPage(page - 1)} className="min-h-9 px-3 rounded-full border border-[#E5E7EB] disabled:opacity-40">Prev</button>
         <span>{page + 1} / {pages}</span>
-        <button disabled={page + 1 >= pages} onClick={() => onPage(page + 1)} className="min-h-9 px-3 rounded-full border border-[#e4e1db] disabled:opacity-40">Next</button>
+        <button disabled={page + 1 >= pages} onClick={() => onPage(page + 1)} className="min-h-9 px-3 rounded-full border border-[#E5E7EB] disabled:opacity-40">Next</button>
       </div>
     </div>
   )
@@ -419,8 +421,8 @@ function CustomerPanel({ id, onClose }: { id: string; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Customer details">
       <div className="absolute inset-0 bg-ink/30" onClick={onClose} />
-      <aside className="relative h-full w-full max-w-[520px] overflow-y-auto bg-[#f9f8f6] p-4 md:p-5 shadow-xl">
-        <button onClick={onClose} className="mb-3 min-h-10 rounded-full border border-[#e4e1db] bg-white px-4 text-[13px]">Close</button>
+      <aside className="relative h-full w-full max-w-[520px] overflow-y-auto bg-[#F6F6F7] p-4 md:p-5 shadow-xl">
+        <button onClick={onClose} className="mb-3 min-h-10 rounded-full border border-[#E5E7EB] bg-white px-4 text-[13px]">Close</button>
         <Gate state={state} what="this customer">{(d) => <CustomerBody d={d} />}</Gate>
       </aside>
     </div>
@@ -440,7 +442,7 @@ function CustomerBody({ d }: { d: CustomerDetail }) {
   const list = (title: string, items: Row[], line: (r: Row) => ReactNode) => (
     <Section title={`${title} (${items.length})`}>
       {items.length === 0 ? <p className="text-[13px] text-[#888]">None.</p> : (
-        <ul className="divide-y divide-[#f1efea] max-h-64 overflow-y-auto">{items.map((r, i) => <li key={i} className="py-2 text-[13px]">{line(r)}</li>)}</ul>
+        <ul className="divide-y divide-[#F1F2F4] max-h-64 overflow-y-auto">{items.map((r, i) => <li key={i} className="py-2 text-[13px]">{line(r)}</li>)}</ul>
       )}
     </Section>
   )
@@ -492,7 +494,7 @@ export function InsightsSaved() {
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {(['wishlists', 'carts'] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} aria-pressed={tab === t} className={`min-h-10 rounded-full px-4 text-[13px] font-medium border ${tab === t ? 'bg-ink text-white border-ink' : 'bg-white border-[#e4e1db] text-[#555]'}`}>
+          <button key={t} onClick={() => setTab(t)} aria-pressed={tab === t} className={`min-h-10 rounded-full px-4 text-[13px] font-medium border ${tab === t ? 'bg-ink text-white border-ink' : 'bg-white border-[#E5E7EB] text-[#555]'}`}>
             {t === 'wishlists' ? 'Wishlists' : 'Carts'}
           </button>
         ))}
@@ -571,7 +573,7 @@ export function InsightsProducts() {
             <div className={CARD}>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px]">
-                  <thead className="border-b border-[#eceae5]">
+                  <thead className="border-b border-[#EEF0F2]">
                     <tr>
                       <th className={TH}>Product</th>
                       {cols.map(([k, l]) => (
@@ -582,7 +584,7 @@ export function InsightsProducts() {
                       <th className={TH}>View→buy</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#f1efea]">
+                  <tbody className="divide-y divide-[#F1F2F4]">
                     {sorted.map((r) => (
                       <tr key={r.product_id}>
                         <td className={TD}><Link href={`/product/${r.slug}`} target="_blank" className="font-medium hover:underline">{r.title}</Link><span className="block text-[12px] text-[#888]">{money(Number(r.price))}</span></td>
@@ -668,7 +670,7 @@ export function InsightsSetup() {
   const h: Health | null = health.res?.ok ? health.res.data : null
   const step = (done: boolean, title: string, body: ReactNode) => (
     <li className={`${CARD} p-4 flex gap-3`}>
-      <span className={`mt-0.5 h-6 w-6 shrink-0 rounded-full flex items-center justify-center text-[12px] font-bold ${done ? 'bg-deal text-white' : 'bg-[#eeece7] text-[#777]'}`}>{done ? '✓' : '•'}</span>
+      <span className={`mt-0.5 h-6 w-6 shrink-0 rounded-full flex items-center justify-center text-[12px] font-bold ${done ? 'bg-deal text-white' : 'bg-[#ECEEF0] text-[#777]'}`}>{done ? '✓' : '•'}</span>
       <div className="text-[13px] text-[#555]"><p className="text-[14px] font-semibold text-ink">{title}</p>{body}</div>
     </li>
   )
@@ -679,16 +681,16 @@ export function InsightsSetup() {
         <p className="text-[13px] text-[#777] mt-0.5">Three one-time steps switch on full customer tracking. Until then the shop works exactly as before.</p>
       </div>
       <ol className="space-y-3">
-        {step(!!h, '1. Install the analytics database functions', <p>Supabase → SQL Editor → paste the file <code className="bg-[#f1efea] px-1 rounded">supabase/admin-analytics.sql</code> → Run. Safe to run twice.</p>)}
-        {step(!!h && h.events_total > 0, '2. Deploy the track-event function', <p>Supabase → Edge Functions → deploy <code className="bg-[#f1efea] px-1 rounded">track-event</code> (or run <code className="bg-[#f1efea] px-1 rounded">scripts/deploy-edge-functions.mjs</code>).</p>)}
-        {step(trackingOn, '3. Turn tracking on', <p>Vercel → Project → Environment Variables → <code className="bg-[#f1efea] px-1 rounded">NEXT_PUBLIC_EVENT_TRACKING=on</code> → redeploy. {trackingOn ? 'It is on in this build.' : 'It is off in this build.'}</p>)}
+        {step(!!h, '1. Install the analytics database functions', <p>Supabase → SQL Editor → paste the file <code className="bg-[#F1F2F4] px-1 rounded">supabase/admin-analytics.sql</code> → Run. Safe to run twice.</p>)}
+        {step(!!h && h.events_total > 0, '2. Deploy the track-event function', <p>Supabase → Edge Functions → deploy <code className="bg-[#F1F2F4] px-1 rounded">track-event</code> (or run <code className="bg-[#F1F2F4] px-1 rounded">scripts/deploy-edge-functions.mjs</code>).</p>)}
+        {step(trackingOn, '3. Turn tracking on', <p>Vercel → Project → Environment Variables → <code className="bg-[#F1F2F4] px-1 rounded">NEXT_PUBLIC_EVENT_TRACKING=on</code> → redeploy. {trackingOn ? 'It is on in this build.' : 'It is off in this build.'}</p>)}
       </ol>
       <Gate state={health} what="status">
         {(x: Health) => (
           <Section title="Status">
             <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
               {[['Events stored', x.events_total], ['Last 24h', x.events_24h], ['Page views', x.page_views_total], ['Accounts', x.users_total]].map(([k, v]) => (
-                <div key={String(k)} className="rounded-xl bg-[#f7f6f3] py-3"><dd className="text-[20px] font-bold tabular-nums">{Number(v).toLocaleString()}</dd><dt className="text-[11px] text-[#777]">{k}</dt></div>
+                <div key={String(k)} className="rounded-xl bg-[#F6F6F7] py-3"><dd className="text-[20px] font-bold tabular-nums">{Number(v).toLocaleString()}</dd><dt className="text-[11px] text-[#777]">{k}</dt></div>
               ))}
             </dl>
             <p className="mt-3 text-[12px] text-[#888]">Last event: {timeAgo(x.last_event_at)}. Only visitors who accept cookies are counted as sessions; refusing visitors are stored anonymously (no session, no user).</p>

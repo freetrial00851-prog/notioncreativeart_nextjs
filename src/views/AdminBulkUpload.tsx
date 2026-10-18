@@ -234,14 +234,14 @@ export function AdminBulkUpload() {
         </div>
         <Link
           href="/admin/listings"
-          className="text-[12px] tracking-[0.1em] border border-[#d9d5ce] px-4 py-2 rounded-full hover:bg-white transition-colors"
+          className="text-[12px] tracking-[0.1em] border border-[#D1D5DB] px-4 py-2 rounded-full hover:bg-white transition-colors"
         >
           ← Back to Listings
         </Link>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2 mb-8">
-        <section className="bg-white border border-[#e8e4dd] rounded-xl p-5">
+        <section className="bg-white border border-[#E5E7EB] rounded-xl p-5">
           <h2 className="text-[13px] font-semibold mb-3 flex items-center gap-2">
             <MaterialIcon name="table_chart" size={18} />
             CSV file
@@ -253,7 +253,7 @@ export function AdminBulkUpload() {
             <button
               type="button"
               onClick={() => csvInputRef.current?.click()}
-              className="text-[12px] px-4 py-2 rounded-full border border-[#d9d5ce] bg-[#faf9f7] hover:bg-white"
+              className="text-[12px] px-4 py-2 rounded-full border border-[#D1D5DB] bg-[#FAFAFA] hover:bg-white"
             >
               Choose CSV
             </button>
@@ -275,19 +275,19 @@ export function AdminBulkUpload() {
           />
         </section>
 
-        <section className="bg-white border border-[#e8e4dd] rounded-xl p-5">
+        <section className="bg-white border border-[#E5E7EB] rounded-xl p-5">
           <h2 className="text-[13px] font-semibold mb-3 flex items-center gap-2">
             <MaterialIcon name="folder_open" size={18} />
             Asset folder
           </h2>
           <p className="text-[12px] text-ink-soft mb-3">
-            Select the parent folder (e.g. &quot;NCA uploads&quot;). Each CSV <code className="text-[11px] bg-[#f3f1ec] px-1 rounded">folder_name</code> must match a direct sub-folder name.
+            Select the parent folder (e.g. &quot;NCA uploads&quot;). Each CSV <code className="text-[11px] bg-[#F1F2F4] px-1 rounded">folder_name</code> must match a direct sub-folder name.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={() => folderInputRef.current?.click()}
-              className="text-[12px] px-4 py-2 rounded-full border border-[#d9d5ce] bg-[#faf9f7] hover:bg-white"
+              className="text-[12px] px-4 py-2 rounded-full border border-[#D1D5DB] bg-[#FAFAFA] hover:bg-white"
             >
               Choose folder
             </button>
@@ -317,7 +317,7 @@ export function AdminBulkUpload() {
           type="button"
           onClick={handlePreview}
           disabled={uploading}
-          className="text-[12px] tracking-[0.08em] px-5 py-2.5 rounded-full bg-[#1f249c] text-white font-medium hover:opacity-90 disabled:opacity-50"
+          className="text-[12px] tracking-[0.08em] px-5 py-2.5 rounded-full bg-[#111111] text-white font-medium hover:opacity-90 disabled:opacity-50"
         >
           Preview
         </button>
@@ -341,7 +341,7 @@ export function AdminBulkUpload() {
       )}
 
       {previewRows && (
-        <div className="bg-white border border-[#e8e4dd] rounded-xl overflow-hidden mb-8">
+        <div className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden mb-8">
           <div className="px-5 py-3 border-b border-[#eee] flex items-center justify-between">
             <h2 className="text-[13px] font-semibold">Preview ({previewRows.length} rows)</h2>
             <p className="text-[11px] text-ink-soft">
@@ -352,7 +352,7 @@ export function AdminBulkUpload() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[12px]">
               <thead>
-                <tr className="bg-[#faf9f7] text-ink-soft border-b border-[#eee]">
+                <tr className="bg-[#FAFAFA] text-ink-soft border-b border-[#eee]">
                   <th className="px-4 py-2 font-medium">#</th>
                   <th className="px-4 py-2 font-medium">Title</th>
                   <th className="px-4 py-2 font-medium">Folder</th>
@@ -366,7 +366,7 @@ export function AdminBulkUpload() {
                 {previewRows.map((row) => (
                   <tr
                     key={row.rowNumber}
-                    className={`border-b border-[#f0ede8] ${row.status === 'skip' ? 'bg-red-50/40' : row.status === 'pdf_warning' ? 'bg-amber-50/30' : ''}`}
+                    className={`border-b border-[#F1F2F4] ${row.status === 'skip' ? 'bg-red-50/40' : row.status === 'pdf_warning' ? 'bg-amber-50/30' : ''}`}
                   >
                     <td className="px-4 py-3 tabular-nums">{row.rowNumber}</td>
                     <td className="px-4 py-3 max-w-[200px] truncate" title={row.title}>{row.title || '—'}</td>
@@ -394,7 +394,7 @@ export function AdminBulkUpload() {
 
       {results && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <section className="bg-white border border-[#e8e4dd] rounded-xl p-5">
+          <section className="bg-white border border-[#E5E7EB] rounded-xl p-5">
             <h2 className="text-[13px] font-semibold mb-3 text-emerald-800">
               Created ({created.length})
             </h2>
@@ -403,12 +403,12 @@ export function AdminBulkUpload() {
             ) : (
               <ul className="space-y-2 text-[12px]">
                 {created.map((r) => (
-                  <li key={r.rowNumber} className="border-b border-[#f0ede8] pb-2">
+                  <li key={r.rowNumber} className="border-b border-[#F1F2F4] pb-2">
                     <span className="font-medium">Row {r.rowNumber}:</span> {r.title}
                     {r.outcome === 'created' && (
                       <>
                         {' '}
-                        <Link href={`/admin/listings`} className="text-[#1f249c] underline">
+                        <Link href={`/admin/listings`} className="text-[#111111] underline">
                           (draft)
                         </Link>
                         {r.draftReason && <p className="text-ink-soft mt-0.5">{r.draftReason}</p>}
@@ -420,7 +420,7 @@ export function AdminBulkUpload() {
             )}
           </section>
 
-          <section className="bg-white border border-[#e8e4dd] rounded-xl p-5">
+          <section className="bg-white border border-[#E5E7EB] rounded-xl p-5">
             <h2 className="text-[13px] font-semibold mb-3 text-red-800">
               Skipped rows ({skipped.length})
             </h2>
@@ -429,7 +429,7 @@ export function AdminBulkUpload() {
             ) : (
               <ul className="space-y-2 text-[12px]">
                 {skipped.map((r) => (
-                  <li key={r.rowNumber} className="border-b border-[#f0ede8] pb-2">
+                  <li key={r.rowNumber} className="border-b border-[#F1F2F4] pb-2">
                     <span className="font-medium">Row {r.rowNumber}:</span> {r.title}
                     <p className="text-red-700 mt-0.5">{r.reason}</p>
                   </li>

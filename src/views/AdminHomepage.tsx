@@ -162,7 +162,7 @@ export function HomepageAdmin() {
           <h1 className="font-heading text-[22px] md:text-[24px] font-bold leading-tight text-ink">Homepage</h1>
           <p className="mt-1 text-[13px] text-[#777]">Each card matches a section of the live homepage, top to bottom. Changes go live as soon as you press Save.</p>
         </div>
-        <Link href="/" target="_blank" className="min-h-10 inline-flex items-center rounded-full border border-[#e4e1db] bg-white px-4 text-[13px] text-ink">View homepage ↗</Link>
+        <Link href="/" target="_blank" className="min-h-10 inline-flex items-center rounded-full border border-[#E5E7EB] bg-white px-4 text-[13px] text-ink">View homepage ↗</Link>
       </div>
 
       {card('hero', '1 · Top banner', 'First thing visitors see: headline, buttons and photos', (
@@ -240,7 +240,7 @@ export function HomepageAdmin() {
       ))}
 
       {card('reviews', '5 · Reviews', 'Shows real approved customer reviews only — manage them under Reviews.', (
-        <Link href="/admin/reviews" className="inline-flex min-h-10 items-center rounded-full border border-[#e4e1db] px-4 text-[13px]">Go to Reviews →</Link>
+        <Link href="/admin/reviews" className="inline-flex min-h-10 items-center rounded-full border border-[#E5E7EB] px-4 text-[13px]">Go to Reviews →</Link>
       ))}
 
       {announcements && card('announcement', 'Announcement bar', 'The thin strip above the header on every page', (
@@ -252,7 +252,7 @@ export function HomepageAdmin() {
                 role="switch"
                 aria-checked={announcements.enabled}
                 onClick={() => setAnnouncements({ ...announcements, enabled: !announcements.enabled })}
-                className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${announcements.enabled ? 'bg-ink' : 'bg-[#d4d0c8]'}`}
+                className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${announcements.enabled ? 'bg-ink' : 'bg-[#D1D5DB]'}`}
               >
                 <span
                   className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${announcements.enabled ? 'translate-x-5' : 'translate-x-0'}`}
@@ -368,7 +368,7 @@ export function HomepageAdmin() {
 
 function Card({ id, title, where, open, onToggle, children }: { id: string; title: string; where: string; open: boolean; onToggle: () => void; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-[#e4e1db] bg-white">
+    <section className="rounded-2xl border border-[#E5E7EB] bg-white">
       <button type="button" onClick={onToggle} aria-expanded={open} aria-controls={`hp-${id}`} className="flex w-full min-h-14 items-center justify-between gap-3 px-5 py-3 text-left">
         <span>
           <span className="block text-[15px] font-semibold text-ink">{title}</span>
@@ -376,7 +376,7 @@ function Card({ id, title, where, open, onToggle, children }: { id: string; titl
         </span>
         <span aria-hidden className={`text-[#888] transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
       </button>
-      {open && <div id={`hp-${id}`} className="space-y-4 border-t border-[#eceae5] p-5">{children}</div>}
+      {open && <div id={`hp-${id}`} className="space-y-4 border-t border-[#EEF0F2] p-5">{children}</div>}
     </section>
   )
 }

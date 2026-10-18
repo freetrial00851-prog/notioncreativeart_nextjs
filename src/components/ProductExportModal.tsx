@@ -163,7 +163,7 @@ export function ProductExportModal({ categories, onClose }: Props) {
             <div className="flex items-center justify-between mb-2">
               <p className="text-[11px] tracking-[0.15em] text-ink-soft">COLUMNS</p>
               <div className="flex gap-3 text-[11px]">
-                <button type="button" onClick={() => setAllFields(true)} className="text-[#1f249c] hover:underline">
+                <button type="button" onClick={() => setAllFields(true)} className="text-[#111111] hover:underline">
                   Select all
                 </button>
                 <button type="button" onClick={() => setAllFields(false)} className="text-ink-soft hover:text-ink hover:underline">

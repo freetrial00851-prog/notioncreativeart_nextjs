@@ -368,3 +368,28 @@ button:not(:disabled):active,
     box-shadow: inset 0 -2px 0 var(--color-ink);
   }
 }
+
+/* Admin: softer, app-like look. Scoped tokens re-skin every legacy admin screen
+   (rounded-*, border-line, bg-canvas, …) without touching the storefront. */
+.admin-theme {
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --color-line: #E5E7EB;
+  --color-canvas: #FFFFFF;
+  --color-ink-soft: #6B7280;
+  font-family: var(--font-body, system-ui), system-ui, sans-serif;
+}
+.admin-theme input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='file']),
+.admin-theme select,
+.admin-theme textarea {
+  border-radius: 10px;
+}
+.admin-theme :where(input, select, textarea):focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 1px;
+}
+.admin-theme table { border-collapse: collapse; }
+.admin-theme nav { scrollbar-width: thin; scrollbar-color: #D1D5DB transparent; }
