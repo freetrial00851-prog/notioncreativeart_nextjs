@@ -416,7 +416,7 @@ export function Home({
       <section id="collections" className="scroll-mt-20 bg-navy py-[58px] text-white md:py-20">
         <div className="mx-auto max-w-site page-gutter">
           <p className="eyebrow text-white before:bg-white">Find your kind of making</p>
-          <div className="mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <div className="reveal mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <h2 className="font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
               A little something
               <br />
@@ -431,7 +431,7 @@ export function Home({
               <Link
                 key={c.t}
                 href={c.href}
-                className="press-card group relative isolate flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[5px] bg-[#222] text-white md:aspect-[4/5] md:min-h-0"
+                className="reveal press-card group relative isolate flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[5px] bg-[#222] text-white md:aspect-[4/5] md:min-h-0"
               >
                 {c.img ? (
                   <Image
@@ -528,7 +528,7 @@ export function Home({
             Less searching, more making. Start whenever inspiration strikes.
           </p>
         </div>
-        <ol className="reveal grid border-y border-border md:grid-cols-3">
+        <ol className="grid border-y border-border md:grid-cols-3">
           {[
             { n: '01', t: 'Choose a pattern', d: 'Find a design that fits your mood, skill level, and next creative idea.' },
             { n: '02', t: 'Download instantly', d: 'Your digital PDF is ready after purchase, so there is no waiting for delivery.' },
@@ -536,7 +536,7 @@ export function Home({
           ].map((st, i) => (
             <li
               key={st.n}
-              className={`py-[25px] md:pr-[26px] ${i > 0 ? 'border-t border-border md:border-l md:border-t-0 md:pl-[26px]' : ''}`}
+              className={`reveal py-[25px] md:pr-[26px] ${i > 0 ? 'border-t border-border md:border-l md:border-t-0 md:pl-[26px]' : ''}`}
             >
               <b className="text-[24px] font-black text-coral">{st.n}</b>
               <h3 className="mb-2 mt-3.5 text-[20px] font-bold leading-snug text-ink">{st.t}</h3>
@@ -641,7 +641,7 @@ export function Home({
             {makerReviews.slice(0, 3).map((t, i) => (
               <figure
                 key={t.id}
-                className={`rounded-[5px] p-[25px] text-navy ${['bg-aqua', 'bg-pink', 'bg-butter'][i % 3]} ${i === 2 ? 'hidden md:block' : ''}`}
+                className={`reveal rounded-[5px] p-[25px] text-navy ${['bg-aqua', 'bg-pink', 'bg-butter'][i % 3]} ${i === 2 ? 'hidden md:block' : ''}`}
               >
                 <div className="mb-3 flex gap-0.5 text-navy" aria-label={`${t.rating} out of 5 stars`}>
                   {Array.from({ length: 5 }).map((_, si) => (
