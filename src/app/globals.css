@@ -147,7 +147,7 @@
 
 html {
   background: var(--color-background);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 @utility max-w-site {
@@ -249,7 +249,7 @@ body {
   color: var(--color-ink);
   background: var(--color-background);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
 }
 
@@ -294,6 +294,41 @@ button, .btn { font-weight: 600; }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ───────────── Motion (evidence-based budget) ─────────────
+   Only responses to user actions + one subtle once-only reveal below the fold.
+   transform/opacity only; 100–300ms; ease-out in, never linear. */
+:root {
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.animate-pop { animation: pop 220ms var(--ease-pop); }
+
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+/* Content is ALWAYS visible by default (no-JS, SSR, old browsers). */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+}
+/* Fallback for browsers without scroll timelines: hidden only once JS has marked <html>. */
+@supports not (animation-timeline: view()) {
+  .js-reveal .reveal[data-armed]:not(.is-in) { opacity: 0; transform: translateY(12px); }
+  .js-reveal .reveal {
+    transition: opacity 400ms var(--ease-expo), transform 400ms var(--ease-expo);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -301,6 +336,7 @@ button, .btn { font-weight: 600; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .reveal { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 @utility eyebrow {

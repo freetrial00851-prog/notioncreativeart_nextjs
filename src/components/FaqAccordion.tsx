@@ -26,9 +26,11 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
               </span>
             </button>
             <div
-              className={`px-5 pb-4 text-[14px] text-muted leading-relaxed ${isOpen ? '' : 'hidden'}`}
+              className={`grid transition-[grid-template-rows] duration-200 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
             >
-              {item.answer}
+              <div inert={!isOpen} className="overflow-hidden">
+                <div className="px-5 pb-4 text-[14px] text-muted leading-relaxed">{item.answer}</div>
+              </div>
             </div>
           </div>
         )

@@ -251,9 +251,9 @@ export function Header() {
               className="relative inline-flex min-h-11 items-center gap-1 px-2 text-[12px] font-semibold transition-colors hover:text-coral"
             >
               <MaterialIcon name="shopping_bag" size={22} color="currentColor" className="sm:hidden" />
-              <span className="hidden sm:inline">Bag ({cartCount})</span>
+              <span key={`t${cartCount}`} className={`hidden sm:inline ${cartCount > 0 ? 'animate-pop' : ''}`}>Bag ({cartCount})</span>
               {cartCount > 0 && (
-                <span className="absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[11px] font-bold leading-none text-white sm:hidden">
+                <span key={cartCount} className="animate-pop absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[11px] font-bold leading-none text-white sm:hidden">
                   {cartCount}
                 </span>
               )}

@@ -58,6 +58,7 @@ export function ProductCard({
 
   const inCart = isInCart(product.id)
   const inWishlist = isWishlisted(product.id)
+  const [heartPop, setHeartPop] = useState(0)
   const href = `/pattern/${product.slug}`
   const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
   const statusBadge = getStatusBadge(product)
@@ -68,6 +69,7 @@ export function ProductCard({
   const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (!inWishlist) setHeartPop((n) => n + 1) // pop instantly on press, not after the network round-trip
     const { added } = await toggleWishlistItem(product.id)
     if (added) {
       showToast('Saved to wishlist', 'success', {
@@ -149,7 +151,7 @@ export function ProductCard({
           aria-pressed={inWishlist}
           className="absolute right-1 top-1 z-10 inline-flex size-11 items-center justify-center"
         >
-          <span className="flex size-8 items-center justify-center rounded-[3px] bg-white">
+          <span key={heartPop} className={`flex size-8 items-center justify-center rounded-[3px] bg-white ${heartPop > 0 ? 'animate-pop' : ''}`}>
             <HeartIcon filled={inWishlist} />
           </span>
         </button>
