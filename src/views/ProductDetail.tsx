@@ -824,7 +824,7 @@ export function ProductDetail({
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1">
                     {inCart ? (
                       <Link href="/cart" className={primaryButtonClass}>
-                        <MaterialIcon name="check" size={20} />
+                        <span className="animate-pop inline-flex"><MaterialIcon name="check" size={20} /></span>
                         In cart, view cart
                       </Link>
                     ) : (

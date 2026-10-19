@@ -309,24 +309,58 @@ button, .btn { font-weight: 600; }
 }
 .animate-pop { animation: pop 220ms var(--ease-pop); }
 
+/* Scroll reveal uses the independent `translate` property so it never fights hover
+   `transform`s (cards lift on hover after they have revealed). */
 @keyframes reveal-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; translate: 0 24px; }
+  to { opacity: 1; translate: 0 0; }
 }
 /* Content is ALWAYS visible by default (no-JS, SSR, old browsers). */
 @supports (animation-timeline: view()) {
   .reveal {
     animation: reveal-in linear both;
     animation-timeline: view();
-    animation-range: entry 0% entry 35%;
+    animation-range: entry 0% entry 45%;
   }
 }
-/* Fallback for browsers without scroll timelines: hidden only once JS has marked <html>. */
+/* Fallback for browsers without scroll timelines: hidden only once JS has armed the element. */
 @supports not (animation-timeline: view()) {
-  .js-reveal .reveal[data-armed]:not(.is-in) { opacity: 0; transform: translateY(12px); }
+  .js-reveal .reveal[data-armed]:not(.is-in) { opacity: 0; translate: 0 24px; }
   .js-reveal .reveal {
-    transition: opacity 400ms var(--ease-expo), transform 400ms var(--ease-expo);
+    transition: opacity 450ms var(--ease-expo), translate 450ms var(--ease-expo);
   }
+}
+
+/* Hero entrance on first paint: short staggered rise. Text stays readable immediately
+   (only transform on the headline, so the LCP text is never hidden). */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rise-y {
+  from { transform: translateY(22px); }
+  to { transform: none; }
+}
+@keyframes settle {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.hero-rise { animation: rise 520ms var(--ease-expo) both; animation-delay: var(--d, 0ms); }
+.hero-rise-y { animation: rise-y 560ms var(--ease-expo) both; }
+.hero-settle { animation: settle 650ms var(--ease-expo) both; animation-delay: var(--d, 0ms); }
+
+/* Page-to-page: quick opacity fade only (no transform, so fixed bars never jump). */
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+.page-in { animation: page-in 240ms ease-out backwards; }
+
+/* Product images fade in over their tinted tile instead of popping in. */
+@keyframes img-in { from { opacity: 0; } to { opacity: 1; } }
+.img-fade { animation: img-in 450ms ease-out both; }
+
+/* Card lift (mouse only). */
+@media (hover: hover) {
+  .card-lift { transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out); }
+  .card-lift:hover { transform: translateY(-5px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -336,7 +370,8 @@ button, .btn { font-weight: 600; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .reveal, .hero-rise, .hero-rise-y, .hero-settle, .page-in, .img-fade { animation: none !important; opacity: 1 !important; transform: none !important; translate: none !important; }
+  .card-lift:hover { transform: none !important; }
 }
 
 @utility eyebrow {

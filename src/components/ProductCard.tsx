@@ -113,7 +113,7 @@ export function ProductCard({
   const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Get free ↓') : inCart ? 'In your bag ✓' : 'Add to bag +'
 
   return (
-    <article className="group/card flex h-full flex-col">
+    <article className="reveal card-lift group/card flex h-full flex-col">
       {/* Landscape card: the photo fills the whole tile (colour only shows while loading) */}
       <div
         className="relative aspect-[4/3] overflow-hidden rounded-[5px]"
@@ -130,7 +130,7 @@ export function ProductCard({
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 priority={priority}
-                className={`object-cover transition-transform duration-500 [@media(hover:hover)]:group-hover/card:scale-[1.05] ${product.sold_out ? 'opacity-50' : ''}`}
+                className={`img-fade object-cover transition-transform duration-500 [@media(hover:hover)]:group-hover/card:scale-[1.05] ${product.sold_out ? 'opacity-50' : ''}`}
               />
             </span>
           ) : (

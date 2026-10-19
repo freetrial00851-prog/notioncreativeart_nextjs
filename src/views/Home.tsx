@@ -261,8 +261,8 @@ export function Home({
       {/* 1 · Hero */}
       <section className="mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-14 lg:grid-cols-[1fr_1.02fr] lg:gap-[5%] lg:py-[55px]">
         <div>
-          <p className="eyebrow">{copy.hero_eyebrow}</p>
-          <h1 className="my-5 font-heading text-[clamp(48px,6.1vw,86px)] font-normal leading-[0.98] tracking-[-0.045em] text-ink md:my-6">
+          <p className="eyebrow hero-rise">{copy.hero_eyebrow}</p>
+          <h1 className="hero-rise-y my-5 font-heading text-[clamp(48px,6.1vw,86px)] font-normal leading-[0.98] tracking-[-0.045em] text-ink md:my-6">
             {copy.hero_title.split('\n').map((line, i) => (
               <Fragment key={i}>
                 {i > 0 && <br />}
@@ -282,10 +282,10 @@ export function Home({
             ))}
             <span className="sr-only"> Crochet patterns, ready to download.</span>
           </h1>
-          <p className="mb-7 max-w-[420px] text-[14px] leading-[1.9] text-muted">
+          <p className="hero-rise mb-7 max-w-[420px] text-[14px] leading-[1.9] text-muted" style={{ ["--d" as string]: "120ms" }}>
             {copy.hero_subtitle}
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="hero-rise flex flex-col gap-3 sm:flex-row" style={{ ["--d" as string]: "220ms" }}>
             <Link href={heroPrimaryHref(hero?.cta_link)}>
               <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>↗</span>}>
                 {copy.hero_cta}
@@ -297,7 +297,7 @@ export function Home({
               </Button>
             </Link>
           </div>
-          <ul className="mt-9 flex flex-wrap gap-x-[22px] gap-y-2 text-[11px] text-muted">
+          <ul className="hero-rise mt-9 flex flex-wrap gap-x-[22px] gap-y-2 text-[11px] text-muted">
             {['Instant PDF downloads', 'Made for every skill level'].map((t) => (
               <li key={t} className="inline-flex items-center gap-2">
                 <span className="text-coral" aria-hidden>✳</span>
@@ -305,13 +305,13 @@ export function Home({
               </li>
             ))}
           </ul>
-          <p className="mt-5 -rotate-2 font-hand text-[24px] font-bold leading-none text-coral" aria-hidden>
+          <p className="hero-rise mt-5 -rotate-2 font-hand text-[24px] font-bold leading-none text-coral" aria-hidden>
             psst… it’s in your downloads in a minute ↗
           </p>
         </div>
 
         {/* Yellow art panel — real photo framed over a pink sun */}
-        <div className="relative isolate grid min-h-[360px] place-items-center overflow-hidden rounded-[5px] bg-sun sm:min-h-[430px] lg:min-h-[470px]">
+        <div className="hero-settle relative isolate grid min-h-[360px] place-items-center overflow-hidden rounded-[5px] bg-sun sm:min-h-[430px] lg:min-h-[470px]">
           <span aria-hidden className="absolute -z-0 size-[220px] rounded-full bg-pink sm:size-[280px]" style={{ top: 35, right: '10%' }} />
           <span aria-hidden className="absolute right-[10%] top-[8%] text-[46px] leading-none text-violet">✳</span>
           <span aria-hidden className="pointer-events-none absolute inset-4 z-[1] border-2 border-navy/20" />
