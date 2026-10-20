@@ -3,6 +3,7 @@
 import { setAnalyticsSource } from '@/lib/adminAnalytics'
 import { mockSource } from '@/lib/adminAnalyticsMock'
 import { ProductsAdmin } from '@/views/Admin'
+import { AdminImport } from '@/views/AdminImport'
 import { AdminOrders } from '@/views/AdminOrders'
 import { AdminReviews } from '@/views/AdminReviews'
 import { AdminCategories, AdminSubscribers, AdminTrash } from '@/views/AdminCatalog'
@@ -21,6 +22,7 @@ const PAGES: Record<string, () => React.ReactElement> = {
   homepage: () => <HomepageAdmin />,
   listings: () => <ProductsAdmin mode="listings" />,
   orders: () => <AdminOrders />,
+  import: () => <AdminImport />,
   reviews: () => <AdminReviews />,
   categories: () => <AdminCategories />,
   subscribers: () => <AdminSubscribers />,
