@@ -8,11 +8,11 @@ import { IMAGE_MAX, PRODUCT_IMAGE_CACHE_CONTROL, deriveVariantUrl, validateImage
 import { revalidateStorefront } from '../lib/actions/revalidateStorefront'
 import { clearHomeCatalogCache } from '../lib/homeCatalogCache'
 import type { Category, Product } from '../lib/types'
-import { Btn, Card, Chip, Drawer, Empty, Field, PageHeader, SearchBox, ago, downloadCsv, inputCls, slugify, useAdminUi } from '../components/adminUi'
+import { Btn, Card, Chip, Drawer, Empty, Field, PageHeader, SearchBox, ago, downloadCsv, inputCls, textareaCls, slugify, useAdminUi } from '../components/adminUi'
 
 /* ═════════════════ Categories ═════════════════ */
 
-type CatForm = { name: string; slug: string; parent_id: string; image: string }
+type CatForm = { name: string; slug: string; parent_id: string; image: string; intro: string }
 
 export function AdminCategories() {
   const { confirm, toast } = useAdminUi()
@@ -20,19 +20,22 @@ export function AdminCategories() {
   const [counts, setCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<string | null>(null) // category id | 'new'
-  const [form, setForm] = useState<CatForm>({ name: '', slug: '', parent_id: '', image: '' })
+  const [form, setForm] = useState<CatForm>({ name: '', slug: '', parent_id: '', image: '', intro: '' })
   const [slugTouched, setSlugTouched] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [moveTo, setMoveTo] = useState<{ cat: Category; count: number } | null>(null)
   const [moveTarget, setMoveTarget] = useState('')
+  const [intros, setIntros] = useState<Record<string, string>>({})
 
   const load = useCallback(async () => {
-    const [{ data }, { data: prods }] = await Promise.all([
+    const [{ data }, { data: prods }, { data: introRow }] = await Promise.all([
       supabase.from('categories').select('*').order('sort_order'),
       supabase.from('products').select('category_id').is('deleted_at', null).limit(5000),
+      supabase.from('site_settings').select('value').eq('key', 'category_intros').maybeSingle(),
     ])
+    setIntros(((introRow?.value ?? {}) as Record<string, string>) || {})
     setCats((data as Category[]) ?? [])
     const t: Record<string, number> = {}
     for (const p of (prods ?? []) as { category_id: string | null }[]) if (p.category_id) t[p.category_id] = (t[p.category_id] ?? 0) + 1
@@ -52,13 +55,13 @@ export function AdminCategories() {
   const startNew = (parent = '') => {
     setError(null)
     setSlugTouched(false)
-    setForm({ name: '', slug: '', parent_id: parent, image: '' })
+    setForm({ name: '', slug: '', parent_id: parent, image: '', intro: '' })
     setEditing('new')
   }
   const startEdit = (c: Category) => {
     setError(null)
     setSlugTouched(true)
-    setForm({ name: c.name, slug: c.slug, parent_id: c.parent_id ?? '', image: c.image ?? '' })
+    setForm({ name: c.name, slug: c.slug, parent_id: c.parent_id ?? '', image: c.image ?? '', intro: intros[c.slug] ?? '' })
     setEditing(c.id)
   }
 
@@ -100,6 +103,15 @@ export function AdminCategories() {
         : await supabase.from('categories').update(payload).eq('id', editing)
     setSaving(false)
     if (err) return setError(err.message)
+    // Category description for Google: kept in site_settings (no schema change), keyed by slug.
+    const nextIntros = { ...intros }
+    const oldSlug = editing && editing !== 'new' ? cats.find((c) => c.id === editing)?.slug : undefined
+    if (oldSlug && oldSlug !== slug) delete nextIntros[oldSlug]
+    if (form.intro.trim()) nextIntros[slug] = form.intro.trim()
+    else delete nextIntros[slug]
+    if (JSON.stringify(nextIntros) !== JSON.stringify(intros)) {
+      await supabase.from('site_settings').upsert({ key: 'category_intros', value: nextIntros, updated_at: new Date().toISOString() })
+    }
     toast('Category saved')
     setEditing(null)
     await load()
@@ -229,6 +241,17 @@ export function AdminCategories() {
               <input value={form.slug} onChange={(e) => { setSlugTouched(true); setForm({ ...form, slug: slugify(e.target.value) }) }} className={inputCls} />
             </Field>
           </div>
+        </Card>
+        <Card title="Description for Google" desc="Shows above the patterns on this category page. 2–4 sentences with the words people search for (e.g. “amigurumi crochet patterns”). Leave empty to show nothing.">
+          <textarea
+            value={form.intro}
+            onChange={(e) => setForm({ ...form, intro: e.target.value })}
+            rows={5}
+            maxLength={900}
+            className={`${textareaCls}`}
+            placeholder="Beginner-friendly amigurumi crochet patterns you can download instantly…"
+          />
+          <p className="mt-1.5 text-right text-[12px] text-[#8a8f98]">{form.intro.length}/900</p>
         </Card>
         <Card title="Picture" desc="Optional. Shows in the shop menu. Square, around 200×200.">
           <DropzoneUpload

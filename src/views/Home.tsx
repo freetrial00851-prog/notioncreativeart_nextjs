@@ -364,7 +364,7 @@ export function Home({
 
       {/* 3 · Patterns to fall for */}
       <section className="max-w-site mx-auto page-gutter py-[58px] md:py-[88px]">
-        <div className="reveal mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div suppressHydrationWarning className="reveal mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Your next favourite project</p>
             <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
@@ -416,7 +416,7 @@ export function Home({
       <section id="collections" className="scroll-mt-20 bg-navy py-[58px] text-white md:py-20">
         <div className="mx-auto max-w-site page-gutter">
           <p className="eyebrow text-white before:bg-white">Find your kind of making</p>
-          <div className="reveal mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <div suppressHydrationWarning className="reveal mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <h2 className="font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
               A little something
               <br />
@@ -431,6 +431,7 @@ export function Home({
               <Link
                 key={c.t}
                 href={c.href}
+                suppressHydrationWarning
                 className="reveal press-card group relative isolate flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[5px] bg-[#222] text-white md:aspect-[4/5] md:min-h-0"
               >
                 {c.img ? (
@@ -470,7 +471,7 @@ export function Home({
 
       {/* 5 · Story */}
       <section className="bg-peach">
-      <div className="reveal mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
+      <div suppressHydrationWarning className="reveal mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
         {storyPhotos.length > 0 ? (
           <div className="relative mx-auto w-full max-w-[640px] pb-10 pr-8 md:pb-14 md:pr-12 lg:max-w-none">
             <div className="relative aspect-[16/10] overflow-hidden rounded-[5px] bg-surface-warm">
@@ -517,7 +518,7 @@ export function Home({
 
       {/* 6 · Three steps */}
       <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
-        <div className="reveal mb-8 flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
+        <div suppressHydrationWarning className="reveal mb-8 flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Simple from the very start</p>
             <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
@@ -536,6 +537,7 @@ export function Home({
           ].map((st, i) => (
             <li
               key={st.n}
+              suppressHydrationWarning
               className={`reveal py-[25px] md:pr-[26px] ${i > 0 ? 'border-t border-border md:border-l md:border-t-0 md:pl-[26px]' : ''}`}
             >
               <b className="text-[24px] font-black text-coral">{st.n}</b>
@@ -548,7 +550,7 @@ export function Home({
 
       {/* 7 · Free feature */}
       <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
-        <div className="reveal grid min-h-[310px] overflow-hidden rounded-[5px] bg-coral text-white md:grid-cols-[1.1fr_1fr]">
+        <div suppressHydrationWarning className="reveal grid min-h-[310px] overflow-hidden rounded-[5px] bg-coral text-white md:grid-cols-[1.1fr_1fr]">
           <div className="relative grid min-h-[230px] place-items-center overflow-hidden bg-sun">
             {freeImages[0]?.images?.[0] ? (
               <Link
@@ -641,6 +643,7 @@ export function Home({
             {makerReviews.slice(0, 3).map((t, i) => (
               <figure
                 key={t.id}
+                suppressHydrationWarning
                 className={`reveal rounded-[5px] p-[25px] text-navy ${['bg-aqua', 'bg-pink', 'bg-butter'][i % 3]} ${i === 2 ? 'hidden md:block' : ''}`}
               >
                 <div className="mb-3 flex gap-0.5 text-navy" aria-label={`${t.rating} out of 5 stars`}>
@@ -661,7 +664,7 @@ export function Home({
 
       {/* 10 · FAQ */}
       <section className="bg-pink-soft">
-        <div className="reveal max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div suppressHydrationWarning className="reveal max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <p className="eyebrow">Questions, answered</p>
             <h2 className="my-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">

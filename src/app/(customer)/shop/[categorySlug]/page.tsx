@@ -8,6 +8,7 @@ import {
   virtualShopCategoryTitle,
 } from '@/lib/shopTitle'
 import { Shop } from '@/views/Shop'
+import { getShopSeed, getCategoryIntro } from '@/lib/data/products'
 
 type Props = {
   params: Promise<{ categorySlug: string }>
@@ -86,6 +87,8 @@ function ShopLoading({ title }: { title: string }) {
 export default async function CategoryShopPage({ params, searchParams }: Props) {
   const { categorySlug } = await params
   const sp = await searchParams
+  const seed = Object.keys(sp).length === 0 ? await getShopSeed(categorySlug) : null
+  const intro = Object.keys(sp).length === 0 ? await getCategoryIntro(categorySlug) : null
   const virtual = virtualShopCategoryTitle(categorySlug)
   const category = virtual ? null : await getCategoryBySlug(categorySlug)
   const title = resolveShopPageTitle({
@@ -114,7 +117,7 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Suspense fallback={<ShopLoading title={title} />}>
-        <Shop initialTitle={title} initialCategoryName={category?.name ?? null} />
+        <Shop initialTitle={title} initialCategoryName={category?.name ?? null} initialProducts={seed?.products} initialCategories={seed?.categories} introText={intro} />
       </Suspense>
     </>
   )

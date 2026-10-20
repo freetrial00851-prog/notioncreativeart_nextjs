@@ -113,7 +113,7 @@ export function ProductCard({
   const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Get free ↓') : inCart ? 'In your bag ✓' : 'Add to bag +'
 
   return (
-    <article className="reveal card-lift group/card flex h-full flex-col">
+    <article suppressHydrationWarning className="reveal card-lift group/card flex h-full flex-col">
       {/* Landscape card: the photo fills the whole tile (colour only shows while loading) */}
       <div
         className="relative aspect-[3/4] overflow-hidden rounded-[5px]"

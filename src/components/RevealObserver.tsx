@@ -30,20 +30,26 @@ export function RevealObserver() {
       },
       { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
     )
+    // Elements already on screen are only remembered here (no DOM changes), so nothing we do
+    // can disagree with server-rendered markup that React is still hydrating.
+    const seen = new WeakSet<Element>()
     const arm = () => {
       document.querySelectorAll<HTMLElement>('.reveal:not(.is-in)').forEach((el) => {
-        if (!el.hasAttribute('data-armed') && el.getBoundingClientRect().top < window.innerHeight * 0.92) {
-          el.classList.add('is-in')
-        } else {
-          // Re-observing an already-armed element is harmless and keeps it alive across
-          // observer re-creation (StrictMode, route changes).
-          el.setAttribute('data-armed', '')
-          io.observe(el)
+        if (!el.hasAttribute('data-armed') && (seen.has(el) || el.getBoundingClientRect().top < window.innerHeight * 0.92)) {
+          seen.add(el)
+          return
         }
+        // Re-observing an already-armed element is harmless and keeps it alive across
+        // observer re-creation (StrictMode, route changes).
+        el.setAttribute('data-armed', '')
+        io.observe(el)
       })
     }
-    document.documentElement.classList.add('js-reveal')
-    arm()
+    // Wait for hydration to settle before touching below-the-fold elements.
+    const start = window.setTimeout(() => {
+      document.documentElement.classList.add('js-reveal')
+      arm()
+    }, 700)
     let raf = 0
     const mo = new MutationObserver(() => {
       cancelAnimationFrame(raf)
@@ -54,6 +60,7 @@ export function RevealObserver() {
       mo.disconnect()
       io.disconnect()
       cancelAnimationFrame(raf)
+      window.clearTimeout(start)
     }
   }, [pathname])
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { env } from '@/lib/env'
+import { deriveVariantUrl } from '@/lib/imageVariants'
 
 /** Brand constants — single source of truth for SEO across the site. */
 export const SITE_NAME = 'Notion Creative Art'
@@ -178,12 +179,16 @@ export function buildProductJsonLd(
     '@type': 'Product',
     name: product.title,
     description: product.description ?? undefined,
-    image: product.images?.[0],
+    // Google wants several high-res images, not just the small card variant.
+    image: (product.images ?? []).slice(0, 8).map((u) => deriveVariantUrl(u, 'large')),
+    sku: product.slug,
     brand: { '@type': 'Brand', name: SITE_NAME },
     offers: {
       '@type': 'Offer',
       price: product.price,
       priceCurrency: 'USD',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: SITE_NAME },
       availability: product.sold_out
         ? 'https://schema.org/SoldOut'
         : 'https://schema.org/InStock',

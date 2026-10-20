@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
+import { getShopSeed } from '@/lib/data/products'
 import {
   resolveShopPageTitle,
   shopTitleFiltersFromSearchParams,
@@ -33,6 +34,7 @@ function ShopLoading({ title }: { title: string }) {
 /** Shop index — all patterns, filterable via query params. */
 export default async function ShopPage({ searchParams }: Props) {
   const sp = await searchParams
+  const seed = Object.keys(sp).length === 0 ? await getShopSeed() : null
   const title = resolveShopPageTitle(shopTitleFiltersFromSearchParams(sp))
   const collectionJsonLd = buildCollectionPageJsonLd({
     name: 'Crochet PDF patterns',
@@ -48,7 +50,7 @@ export default async function ShopPage({ searchParams }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Suspense fallback={<ShopLoading title={title} />}>
-        <Shop initialTitle={title} />
+        <Shop initialTitle={title} initialProducts={seed?.products} initialCategories={seed?.categories} />
       </Suspense>
     </>
   )

@@ -54,9 +54,17 @@ function emptyDraft(): ShopFilterDraft {
 export function Shop({
   initialTitle,
   initialCategoryName = null,
+  initialProducts,
+  initialCategories,
+  introText,
 }: {
   initialTitle: string
   initialCategoryName?: string | null
+  /** Server-rendered first page (unfiltered state) so the HTML already contains products. */
+  initialProducts?: Product[]
+  initialCategories?: Category[]
+  /** Admin-written category description, rendered in the server HTML for SEO. */
+  introText?: string | null
 }) {
   const params = useParams()
   const router = useRouter()
@@ -74,11 +82,13 @@ export function Shop({
   const pageParam = Number.parseInt(searchParams?.get('page') ?? '1', 10)
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1
 
-  const [products, setProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [initialLoading, setInitialLoading] = useState(true)
+  const [products, setProducts] = useState<Product[]>(() => initialProducts ?? [])
+  const [categories, setCategories] = useState<Category[]>(() => initialCategories ?? [])
+  const [initialLoading, setInitialLoading] = useState(() => !initialProducts)
   const [filterFetching, setFilterFetching] = useState(false)
   const hasLoadedOnce = useRef(false)
+  // The seed already shows real products: refresh the full list silently (no skeleton / “Updating…”).
+  const seeded = useRef(!!initialProducts)
   const fetchGen = useRef(0)
   const [purchaseCounts, setPurchaseCounts] = useState<Map<string, number>>(() => new Map())
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -123,7 +133,11 @@ export function Shop({
 
     const gen = ++fetchGen.current
     const hasPrior = hasLoadedOnce.current
-    if (hasPrior) setFilterFetching(true)
+    const silent = seeded.current
+    seeded.current = false
+    if (silent) {
+      /* keep showing the server-rendered products while the full list loads */
+    } else if (hasPrior) setFilterFetching(true)
     else setInitialLoading(true)
 
     let query = supabase.from('products').select('*').eq('active', true)
@@ -344,6 +358,9 @@ export function Shop({
         </nav>
 
         <h1 className="type-h1 text-ink mb-2">{displayTitle}</h1>
+        {introText && page === 1 && levels.length === 0 && !priceFilter && !bundleFilter && !saleFilter ? (
+          <p className="mb-4 max-w-[68ch] whitespace-pre-line text-[14px] leading-[1.75] text-muted">{introText}</p>
+        ) : null}
         <p className="text-[13px] text-muted mb-4 md:mb-5" aria-live="polite">
           {filterFetching ? 'Updating…' : showingLabel}
           {activeFilterCount > 0 && !initialLoading ? (

@@ -746,7 +746,7 @@ export function ProductDetail({
                     >
                       <Image
                         src={deriveVariantUrl(img, 'thumb')}
-                        alt=""
+                        alt={images.length > 1 ? `${product.title}, photo ${i + 1} of ${images.length}` : product.title}
                         fill
                         sizes="(max-width: 1023px) 25vw, 140px"
                         className="object-cover"
