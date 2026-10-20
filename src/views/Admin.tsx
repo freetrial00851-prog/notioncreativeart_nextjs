@@ -15,6 +15,7 @@ import { AdminShell } from './AdminShell'
 import { ProductEditor } from './AdminProductEditor'
 import { AdminOrders } from './AdminOrders'
 import { AdminImport } from './AdminImport'
+import { AdminTextFixes } from './AdminTextFixes'
 import { AdminCategories, AdminSubscribers, AdminTrash } from './AdminCatalog'
 import { Btn, Chip, Empty, PageHeader, SearchBox, Tabs, Toggle, useAdminUi } from '../components/adminUi'
 import { AdminToday } from './AdminToday'
@@ -78,6 +79,8 @@ function AdminContent({ name }: { name: string }) {
       return <AdminCategories />
     case '/admin/listings':
       return <ProductsAdmin mode="listings" />
+    case '/admin/text-fixes':
+      return <AdminTextFixes />
     case '/admin/import':
       return <AdminImport />
     case '/admin/bulk-upload':

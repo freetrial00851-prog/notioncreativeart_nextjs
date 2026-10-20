@@ -4,6 +4,7 @@ import { setAnalyticsSource } from '@/lib/adminAnalytics'
 import { mockSource } from '@/lib/adminAnalyticsMock'
 import { ProductsAdmin } from '@/views/Admin'
 import { AdminImport } from '@/views/AdminImport'
+import { AdminTextFixes } from '@/views/AdminTextFixes'
 import { AdminOrders } from '@/views/AdminOrders'
 import { AdminReviews } from '@/views/AdminReviews'
 import { AdminCategories, AdminSubscribers, AdminTrash } from '@/views/AdminCatalog'
@@ -23,6 +24,7 @@ const PAGES: Record<string, () => React.ReactElement> = {
   listings: () => <ProductsAdmin mode="listings" />,
   orders: () => <AdminOrders />,
   import: () => <AdminImport />,
+  'text-fixes': () => <AdminTextFixes />,
   reviews: () => <AdminReviews />,
   categories: () => <AdminCategories />,
   subscribers: () => <AdminSubscribers />,

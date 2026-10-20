@@ -27,6 +27,7 @@ export const ADMIN_GROUPS: NavGroup[] = [
     title: 'Catalog',
     items: [
       { to: '/admin/listings', label: 'Listings', icon: 'sell', hint: 'add, edit patterns' },
+      { to: '/admin/text-fixes', label: 'Text fixes', icon: 'description', hint: 'review and apply text corrections' },
       { to: '/admin/import', label: 'Smart import', icon: 'auto_awesome', hint: 'folder of PDFs + photos → drafts' },
       { to: '/admin/bulk-upload', label: 'Bulk upload', icon: 'upload_file', hint: 'many patterns at once' },
       { to: '/admin/categories', label: 'Categories', icon: 'category' },
