@@ -2,8 +2,8 @@
 // Receives storefront analytics events and writes them to public.events with the
 // service role (browsers cannot insert directly — see supabase/admin-analytics.sql).
 //
-// Deploy: Supabase Dashboard → Edge Functions → New function → paste this file
-// (+ _shared/cors.ts) → name it "track-event". No new secrets needed:
+// Deploy: Supabase Dashboard → Edge Functions → track-event → Code → replace everything with
+// this ONE file → Deploy. No new secrets needed:
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided automatically.
 //
 // Privacy rules enforced HERE (not only in the browser):
@@ -15,7 +15,42 @@
 //   * no IP address is stored. Bots are ignored. Per-IP rate limit.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeadersFor, isOriginAllowed, jsonHeaders } from '../_shared/cors.ts'
+
+// ── CORS helpers (inlined so this function is ONE self-contained file and can be pasted
+//    straight into the Supabase dashboard; same rules as supabase/functions/_shared/cors.ts) ──
+const DEFAULT_ORIGINS = [
+  'https://notioncreativeartnextjs.vercel.app',
+  'https://notioncreativeart.com',
+  'https://www.notioncreativeart.com',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+]
+const normalizeOrigin = (o: string) => o.replace(/\/$/, '')
+function allowedOrigins(): string[] {
+  const out = new Set(DEFAULT_ORIGINS.map(normalizeOrigin))
+  const siteUrl = Deno.env.get('SITE_URL') ?? Deno.env.get('NEXT_PUBLIC_SITE_URL')
+  if (siteUrl) out.add(normalizeOrigin(siteUrl))
+  const extra = Deno.env.get('ALLOWED_ORIGINS')
+  if (extra) for (const o of extra.split(',')) if (o.trim()) out.add(normalizeOrigin(o.trim()))
+  return [...out]
+}
+function isOriginAllowed(req: Request): boolean {
+  const origin = req.headers.get('Origin')
+  if (!origin) return true
+  return allowedOrigins().includes(normalizeOrigin(origin))
+}
+function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get('Origin')
+  const match = origin && allowedOrigins().includes(normalizeOrigin(origin)) ? origin : null
+  return {
+    ...(match ? { 'Access-Control-Allow-Origin': match } : {}),
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
+}
+function jsonHeaders(req: Request): Record<string, string> {
+  return { ...corsHeadersFor(req), 'Content-Type': 'application/json' }
+}
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
 
