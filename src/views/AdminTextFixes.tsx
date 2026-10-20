@@ -31,7 +31,9 @@ type Row = Fix & {
 }
 
 const show = (v: unknown) => (v == null || v === '' ? '—' : String(v))
-const same = (a: unknown, b: unknown) => (a ?? null) === (b ?? null) || String(a ?? '').trim() === String(b ?? '').trim()
+// Exact comparison: a title that only differs by a trailing space IS a change we want to apply.
+const empty = (v: unknown) => v == null || (typeof v === 'string' && v === '')
+const same = (a: unknown, b: unknown) => (empty(a) && empty(b)) || (a ?? null) === (b ?? null) || (typeof a === 'number' && Number(b) === a)
 
 export function AdminTextFixes() {
   const { confirm, toast } = useAdminUi()
