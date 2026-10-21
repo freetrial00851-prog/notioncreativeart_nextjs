@@ -906,6 +906,9 @@ export function ProductDetail({
                   <p className="mt-1 leading-relaxed text-muted">
                     You will sign in or create a free account at checkout, so your PDF is saved to your downloads.
                   </p>
+                  <p className="mt-2 leading-relaxed text-muted">
+                    Listing photos are AI-generated, so your finished piece may vary slightly. If something goes wrong with your order, contact us within 14 days and we&apos;ll make it right.
+                  </p>
                   <Link
                     href="/refund-policy"
                     className="mt-2 inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-2 hover:text-primary-hover md:min-h-0 md:mt-3"
@@ -1082,7 +1085,7 @@ export function ProductDetail({
 
       {/* Mobile sticky buy bar */}
       {showStickyBar && !(mode !== 'owned' && product.sold_out) && (
-        <div className="md:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-5 pt-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <div data-sticky-bar className="md:hidden fixed inset-x-0 bottom-[var(--cookie-h,0px)] z-30 border-t border-border bg-surface px-5 pt-3 pb-[max(12px,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-3">
             {mode === 'paid' && (
               <>

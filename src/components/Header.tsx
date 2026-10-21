@@ -17,6 +17,7 @@ import {
 } from '../lib/categories'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
+import { useFocusTrap } from '../lib/useFocusTrap'
 import type { Product } from '../lib/types'
 import { profileDisplayName, profileInitial } from '../lib/profileName'
 import { MaterialIcon } from './MaterialIcon'
@@ -61,6 +62,7 @@ export function Header() {
   const shopWrapRef = useRef<HTMLDivElement>(null)
   const accountWrapRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useBodyScrollLock(menuOpen)
 
@@ -145,6 +147,8 @@ export function Header() {
     setMenuOpen(false)
     setExpandedCategory(null)
   }
+  // Keyboard users stay inside the open menu; Escape closes it and focus returns to the menu button.
+  useFocusTrap(menuRef, menuOpen, { onEscape: closeMenu })
 
   const goSignIn = () => {
     closeMenu()
@@ -391,7 +395,7 @@ export function Header() {
       {menuOpen &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <div ref={menuRef} className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
             <button type="button" aria-label="Close menu" tabIndex={-1} onClick={closeMenu} className="absolute inset-0 bg-navy/45" />
             <div className="absolute inset-y-0 right-0 flex w-[min(92vw,420px)] flex-col bg-bg shadow-2xl">
               <div className="flex h-[67px] shrink-0 items-center justify-between border-b border-border page-gutter">

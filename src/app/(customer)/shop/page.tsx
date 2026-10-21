@@ -1,3 +1,4 @@
+import { jsonLdString } from '@/lib/jsonLd'
 import { Suspense } from 'react'
 import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
@@ -47,8 +48,8 @@ export default async function ShopPage({ searchParams }: Props) {
   ])
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(collectionJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }} />
       <Suspense fallback={<ShopLoading title={title} />}>
         <Shop initialTitle={title} initialProducts={seed?.products} initialCategories={seed?.categories} />
       </Suspense>

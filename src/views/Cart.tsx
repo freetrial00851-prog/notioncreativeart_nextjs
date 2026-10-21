@@ -351,7 +351,7 @@ export function Cart() {
 
       {recommendationsSection}
 
-      <div className="md:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div data-sticky-bar className="md:hidden fixed inset-x-0 bottom-[var(--cookie-h,0px)] z-30 border-t border-border bg-surface px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-4">
           <div className="shrink-0">
             <p className="text-[13px] text-muted leading-tight">Total</p>

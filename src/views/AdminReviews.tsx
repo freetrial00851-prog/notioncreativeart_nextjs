@@ -32,7 +32,8 @@ export function AdminReviews() {
   }, [])
 
   const load = useCallback(async () => {
-    let q = supabase.from('reviews').select('*, product:products(title, slug)').order('created_at', { ascending: false }).limit(200)
+    // Explicit columns (no `*`): reviewer_email is not readable through the API, so `*` would fail once it is revoked.
+    let q = supabase.from('reviews').select('id, product_id, user_id, reviewer_name, rating, body, is_verified, purchase_id, status, created_at, moderated_at, moderated_by, product:products(title, slug)').order('created_at', { ascending: false }).limit(200)
     if (filter !== 'all') q = q.eq('status', filter)
     const { data } = await q
     setReviews((data ?? []) as unknown as ReviewRow[])

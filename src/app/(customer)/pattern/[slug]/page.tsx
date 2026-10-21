@@ -6,6 +6,7 @@ import { getCategoryById, getProductBySlug } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
 import { isVercelProduction } from '@/lib/env'
+import { jsonLdString } from '@/lib/jsonLd'
 import { getSiteSeoContext } from '@/lib/seoSettings'
 import { ProductDetail } from '@/views/ProductDetail'
 
@@ -122,13 +123,13 @@ export default async function PatternPage({ params }: Props) {
       {productJsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(productJsonLd) }}
         />
       )}
       {breadcrumbJsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }}
         />
       )}
       <ProductDetail

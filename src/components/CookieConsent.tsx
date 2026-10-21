@@ -1,17 +1,37 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const COOKIE_CONSENT_KEY = 'nca_cookie_consent'
 export const COOKIE_CONSENT_EVENT = 'nca-cookie-consent-changed'
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false)
+  const barRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const stored = localStorage.getItem(COOKIE_CONSENT_KEY)
     if (!stored) setVisible(true)
   }, [])
+
+  // Publish the banner height as --cookie-h so fixed UI (mobile buy bar, chat button) sits above it
+  // instead of being covered while the visitor has not chosen yet.
+  useEffect(() => {
+    const root = document.documentElement
+    const el = barRef.current
+    if (!visible || !el) {
+      root.style.removeProperty('--cookie-h')
+      return
+    }
+    const sync = () => root.style.setProperty('--cookie-h', `${el.offsetHeight}px`)
+    sync()
+    const ro = new ResizeObserver(sync)
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      root.style.removeProperty('--cookie-h')
+    }
+  }, [visible])
 
   const choose = (value: 'accepted' | 'rejected') => {
     localStorage.setItem(COOKIE_CONSENT_KEY, value)
@@ -22,13 +42,18 @@ export function CookieConsent() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-5 py-4 md:px-8">
-      <div className="max-w-site w-full mx-auto flex flex-col md:flex-row items-center gap-4">
-        <p className="text-[12px] text-ink-soft flex-1 leading-relaxed">
-          We use cookies to understand how visitors use this site and improve it. See our{' '}
-          <a href="/privacy" className="inline-block py-2 underline underline-offset-2 hover:text-ink">Privacy Policy</a> for details.
+    <div
+      ref={barRef}
+      role="region"
+      aria-label="Cookie preferences"
+      className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-4 py-2 md:px-8 md:py-4"
+    >
+      <div className="max-w-site w-full mx-auto flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4">
+        <p className="text-[13px] text-ink-soft flex-1 leading-snug md:leading-relaxed">
+          We use cookies to improve this site.{' '}
+          <a href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</a>
         </p>
-        <div className="grid w-full grid-cols-2 gap-3 md:flex md:w-auto md:shrink-0">
+        <div className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto md:shrink-0 md:gap-3">
           <button
             onClick={() => choose('rejected')}
             className="min-h-11 px-6 border border-ink text-[12px] tracking-[0.1em] rounded-[3px] hover:bg-surface transition-colors"

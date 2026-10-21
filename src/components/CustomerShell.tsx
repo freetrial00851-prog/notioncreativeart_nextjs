@@ -32,6 +32,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <a href="#main" className="skip-link">Skip to content</a>
       <ScrollToTop />
       <StorefrontPageViewTracker />
       <AdminAreaGuard />
@@ -44,7 +45,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
         <AnnouncementBar />
         <Header />
         <GlobalAccountBanners />
-        <main className="flex-1">{children}</main>
+        <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
         <Footer />
       </div>
     </>

@@ -263,6 +263,29 @@ body {
 
 ::selection { background: var(--color-ink); color: var(--color-canvas); }
 
+/* Help chat button: sits above the cookie banner (--cookie-h, set by CookieConsent) and, on mobile
+   pages that have a sticky buy bar, above that bar too so it never covers Add to cart. */
+.support-chat-btn { bottom: calc(1.25rem + var(--cookie-h, 0px)); }
+@media (max-width: 767px) {
+  body:has([data-sticky-bar]) .support-chat-btn { bottom: calc(5.75rem + var(--cookie-h, 0px)); }
+}
+
+/* Skip link: first Tab stop, visible only when focused. */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -64px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
 button, .btn { font-weight: 600; }
 
 .listing-filter-check:checked {

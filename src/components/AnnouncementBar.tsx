@@ -11,9 +11,9 @@ import {
 
 /** DESIGN_SPEC §1 — default copy when CMS announcements are empty / disabled. */
 const DEFAULT_BY_BREAKPOINT = {
-  mobile: 'Instant PDF download · 10% off when you join',
-  tablet: 'Instant PDF download on every pattern · Join the list, get 10% off',
-  desktop: 'Instant PDF download on every pattern · Join the list and get 10% off your next order',
+  mobile: 'Instant PDF download · Free patterns available',
+  tablet: 'Instant PDF download on every pattern · Free patterns available',
+  desktop: 'Instant PDF download on every pattern · Free patterns available, no account needed',
 } as const
 
 /**

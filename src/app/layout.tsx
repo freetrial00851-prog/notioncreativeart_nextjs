@@ -4,6 +4,7 @@ import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { RevealObserver } from '@/components/RevealObserver'
+import { jsonLdString } from '@/lib/jsonLd'
 import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
 import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
@@ -74,11 +75,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(orgJsonLd) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd) }}
         />
       </head>
       <body className="font-body antialiased">

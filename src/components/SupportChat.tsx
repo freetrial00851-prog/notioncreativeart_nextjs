@@ -244,7 +244,7 @@ export function SupportChat() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open support chat"
-        className={`fixed bottom-5 right-5 z-[60] flex items-center gap-2 rounded-full pl-3.5 pr-4 py-3 text-white shadow-lg hover:opacity-95 transition-opacity ${open ? 'invisible pointer-events-none' : ''}`}
+        className={`support-chat-btn fixed right-5 z-[60] flex items-center gap-2 rounded-full pl-3.5 pr-4 py-3 text-white shadow-lg hover:opacity-95 transition-opacity ${open ? 'invisible pointer-events-none' : ''}`}
         style={{ background: 'var(--color-accent)' }}
       >
         <MaterialIcon name="chat" size={20} />
