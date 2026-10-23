@@ -6,7 +6,10 @@ import { Btn, Card, Chip, Drawer, Empty, PageHeader, SearchBox, Tabs, ago, downl
 
 type Order = {
   id: string
-  lemon_order_id: string
+  lemon_order_id: string | null
+  display_order_number?: string | null
+  provider?: string | null
+  environment?: string | null
   customer_email: string
   amount: number
   currency: string
@@ -45,7 +48,7 @@ export function AdminOrders() {
     (query: any) => {
       let x = query
       if (filter !== 'all') x = x.eq('status', filter)
-      if (q) x = x.or(`customer_email.ilike.%${q.replace(/[%,()]/g, '')}%,lemon_order_id.ilike.%${q.replace(/[%,()]/g, '')}%`)
+      if (q) x = x.or(`customer_email.ilike.%${q.replace(/[%,()]/g, '')}%,lemon_order_id.ilike.%${q.replace(/[%,()]/g, '')}%,display_order_number.ilike.%${q.replace(/[%,()]/g, '')}%`)
       return x
     },
     [filter, q],
@@ -114,7 +117,7 @@ export function AdminOrders() {
     const rows = (data ?? []) as Order[]
     downloadCsv('orders.csv', [
       ['order', 'date', 'email', 'amount', 'currency', 'status'],
-      ...rows.map((o) => [o.lemon_order_id, o.created_at, o.customer_email, o.amount, o.currency, o.status]),
+      ...rows.map((o) => [o.display_order_number ?? o.lemon_order_id, o.created_at, o.customer_email, o.amount, o.currency, o.status]),
     ])
   }
 
@@ -248,7 +251,7 @@ export function AdminOrders() {
         </div>
       )}
 
-      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `Order ${open.lemon_order_id}` : 'Order'}>
+      <Drawer open={!!open} onClose={() => setOpenId(null)} title={open ? `Order ${open.display_order_number ?? open.lemon_order_id}` : 'Order'}>
         {open && (
           <>
             <Card>

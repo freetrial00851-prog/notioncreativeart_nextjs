@@ -310,7 +310,7 @@ function MyOrders() {
                   <div>
                     <h2 className="text-[17px] md:text-[16px] font-bold text-ink">
                       <Link href={`/account/orders/${o.id}`} className="hover:text-primary hover:underline underline-offset-2">
-                        Order #{o.lemon_order_id || o.id.slice(0, 8)}
+                        Order #{o.display_order_number || o.lemon_order_id || o.id.slice(0, 8)}
                       </Link>
                     </h2>
                     <p className="mt-0.5 text-[14px] md:text-[13px] text-muted">Placed {formatShortDate(o.created_at)}</p>
@@ -396,7 +396,7 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
     if (!user) return
     supabase
       .from('purchases')
-      .select('*, product:products(*), order:orders(lemon_order_id, status, amount, currency)')
+      .select('*, product:products(*), order:orders(lemon_order_id, display_order_number, status, amount, currency)')
       .eq('user_id', user.id)
       .order('purchase_date', { ascending: false })
       .then(({ data }) => {

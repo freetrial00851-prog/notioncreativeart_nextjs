@@ -15,16 +15,16 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   // Next hydration + JSON-LD inline; GA gtag loader; Lemon.js overlay; Pinterest Tag
   // GA4 may also pull helpers from www.google-analytics.com (not only googletagmanager.com).
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://assets.lemonsqueezy.com https://s.pinimg.com",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.supabase.co https://notioncreativeart.com https://www.notioncreativeart.com https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://ct.pinterest.com https://*.pinimg.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://assets.lemonsqueezy.com https://s.pinimg.com https://ct.pinterest.com https://*.paddle.com",
+  "style-src 'self' 'unsafe-inline' https://*.paddle.com",
+  "img-src 'self' data: blob: https://*.supabase.co https://notioncreativeart.com https://www.notioncreativeart.com https://images.unsplash.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://ct.pinterest.com https://*.pinimg.com https://*.paddle.com",
   // next/font self-hosts — no fonts.googleapis.com
-  "font-src 'self' data:",
+  "font-src 'self' data: https://*.paddle.com",
   // Pageview hits use fetch/sendBeacon (connect-src). Include apex analytics.google.com
   // (CSP *.analytics.google.com does NOT cover the apex host) + regional GA + DoubleClick.
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.lemonsqueezy.com https://ct.pinterest.com https://*.pinterest.com",
-  // Lemon checkout overlay (+ nested Stripe card iframe inside overlay)
-  "frame-src https://*.lemonsqueezy.com https://lemonsqueezy.com https://js.stripe.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.lemonsqueezy.com https://ct.pinterest.com https://*.pinterest.com https://*.paddle.com",
+  // Lemon checkout overlay (+ nested Stripe card iframe inside overlay); Paddle inline checkout frame
+  "frame-src https://*.lemonsqueezy.com https://lemonsqueezy.com https://js.stripe.com https://ct.pinterest.com https://*.paddle.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self' https://*.lemonsqueezy.com",

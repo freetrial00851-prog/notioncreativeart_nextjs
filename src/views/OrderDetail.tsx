@@ -104,7 +104,7 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="type-h1 text-ink">
-            Order #{order.lemon_order_id || order.id.slice(0, 8)}
+            Order #{order.display_order_number || order.lemon_order_id || order.id.slice(0, 8)}
           </h1>
           <p className="mt-1 text-[16px] md:text-[14px] text-muted">Placed {formatShortDate(order.created_at)}</p>
         </div>

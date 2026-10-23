@@ -286,7 +286,7 @@ export function ProductDetail({
     ;(async () => {
       const { data, error } = await supabase
         .from('purchases')
-        .select('id, order_id, purchase_date, order:orders(lemon_order_id)')
+        .select('id, order_id, purchase_date, order:orders(lemon_order_id, display_order_number)')
         .eq('user_id', userId)
         .eq('product_id', product.id)
         .order('purchase_date', { ascending: false })
@@ -294,13 +294,13 @@ export function ProductDetail({
       if (cancelled) return
       if (!error) {
         const row = data?.[0] as
-          | { order_id: string | null; purchase_date: string | null; order: { lemon_order_id: string | null } | { lemon_order_id: string | null }[] | null }
+          | { order_id: string | null; purchase_date: string | null; order: { lemon_order_id: string | null; display_order_number: string | null } | { lemon_order_id: string | null; display_order_number: string | null }[] | null }
           | undefined
         const order = Array.isArray(row?.order) ? row?.order[0] : row?.order
         setOwnedState({
           userId,
           info: row
-            ? { purchaseDate: row.purchase_date, orderId: row.order_id, orderNumber: order?.lemon_order_id ?? null }
+            ? { purchaseDate: row.purchase_date, orderId: row.order_id, orderNumber: order?.display_order_number ?? order?.lemon_order_id ?? null }
             : null,
         })
         return

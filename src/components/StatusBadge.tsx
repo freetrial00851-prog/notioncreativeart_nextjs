@@ -1,6 +1,7 @@
 export type OrderRow = {
   id: string
-  lemon_order_id: string
+  lemon_order_id: string | null
+  display_order_number?: string | null
   amount: number
   currency: string
   status: string

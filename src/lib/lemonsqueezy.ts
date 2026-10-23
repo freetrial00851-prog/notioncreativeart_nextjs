@@ -12,6 +12,7 @@ declare global {
 import { supabase } from './supabase'
 import { trackPinterestCheckout } from './pinterest'
 import { track } from './track'
+import { allProductsUsePaddle, startPaddleCheckout } from './paddle'
 
 const FALLBACK_CHECKOUT_ERROR = "Couldn't start checkout — please try again in a moment."
 
@@ -65,6 +66,19 @@ export async function startApiCheckout(
   productIds: string[],
   customer: ApiCheckoutCustomer,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  // Per-product provider: patterns set to Paddle in the admin use the inline Paddle checkout. If Paddle is not
+  // available to this visitor (for example sandbox testing is admin-only), fall back to Lemon Squeezy.
+  let paddleFellBack = false
+  if (await allProductsUsePaddle(productIds)) {
+    const paddle = await startPaddleCheckout(productIds)
+    if (paddle.ok) {
+      trackPinterestCheckout({ productIds })
+      return { ok: true }
+    }
+    if (!paddle.fallback) return { ok: false, error: paddle.error }
+    paddleFellBack = true
+  }
+
   const { data, error: fnError } = await supabase.functions.invoke('create-cart-checkout', {
     body: {
       productIds,
@@ -79,6 +93,7 @@ export async function startApiCheckout(
   if (fnError || !data?.url) {
     const error = await readFunctionError(fnError, data)
     console.error('Checkout creation failed:', fnError, data)
+    if (paddleFellBack) return { ok: false, error: "This pattern can't be purchased right now. Please try again later." }
     return { ok: false, error }
   }
 

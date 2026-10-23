@@ -103,7 +103,7 @@ export type Purchase = {
   order_id: string | null
   purchase_date: string
   product?: Product
-  order?: { lemon_order_id: string; status: string; amount: number; currency: string }
+  order?: { lemon_order_id: string | null; display_order_number?: string | null; status: string; amount: number; currency: string }
 }
 
 export type WishlistItem = {

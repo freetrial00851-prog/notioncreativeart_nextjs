@@ -21,7 +21,8 @@ import type { Product } from '../lib/types'
 
 type RecentOrder = {
   id: string
-  lemon_order_id: string
+  lemon_order_id: string | null
+  display_order_number: string | null
   customer_email: string
   status: string
   amount: number
@@ -93,7 +94,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
     const poll = () => {
       supabase
         .from('orders')
-        .select('id, lemon_order_id, customer_email, status, amount, currency, product_ids, created_at')
+        .select('id, lemon_order_id, display_order_number, customer_email, status, amount, currency, product_ids, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -113,7 +114,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
             }
             trackPinterestPurchase({
               orderId: data.id,
-              lemonOrderId: data.lemon_order_id,
+              lemonOrderId: data.display_order_number ?? data.lemon_order_id ?? '',
             })
             return
           }
@@ -309,8 +310,8 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
         >
           <p>
             {pending
-              ? `Order #${order.lemon_order_id} is not confirmed yet. As soon as it is, your patterns will appear in My downloads.`
-              : `Order #${order.lemon_order_id} was refunded, so its patterns are no longer in your downloads.`}
+              ? `Order #${order.display_order_number ?? order.lemon_order_id} is not confirmed yet. As soon as it is, your patterns will appear in My downloads.`
+              : `Order #${order.display_order_number ?? order.lemon_order_id} was refunded, so its patterns are no longer in your downloads.`}
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
             {pending && (
@@ -346,7 +347,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
           Thank you, your order is confirmed
         </h1>
         <p className="mt-3 text-[16px] md:text-[15px] text-muted">
-          Order #{order.lemon_order_id} · {formatOrderDate(order.created_at)}
+          Order #{order.display_order_number ?? order.lemon_order_id} · {formatOrderDate(order.created_at)}
         </p>
         <p className="mt-2 flex items-start justify-center gap-2 text-[16px] md:text-[14px] text-ink">
           <MaterialIcon name="mail" size={16} className="mt-1 md:mt-0.5 shrink-0" />
