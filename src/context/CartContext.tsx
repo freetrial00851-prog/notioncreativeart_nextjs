@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from './AuthContext'
 import { useToast } from './ToastContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
+import { allProductsUsePaddle } from '../lib/paddle'
 import { trackPinterestAddToCart } from '../lib/pinterest'
 import { track } from '../lib/track'
 import { profileDisplayName } from '../lib/profileName'
@@ -234,9 +235,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const isInCart = (productId: string) => items.some((i) => i.product_id === productId)
 
   const checkout = async () => {
-    if (!user || itemsRef.current.length === 0) return
+    if (itemsRef.current.length === 0) return
     setCheckoutError(null)
     const current = itemsRef.current
+    // Without an account only Paddle can take the payment; anything else needs a sign-in first.
+    if (!user && !(await allProductsUsePaddle(current.map((i) => i.product_id)))) return
     const freeInCart = current.filter((i) => Number(i.product?.price) === 0)
     if (freeInCart.length > 0) {
       setCheckoutError('Free patterns can’t be checked out — remove them and use Download Free on the product page.')
@@ -246,8 +249,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const result = await startApiCheckout(
       current.map((i) => i.product_id),
       {
-        userId: user.id,
-        email: user.email,
+        userId: user?.id,
+        email: user?.email,
         name: profileDisplayName(profile) || undefined,
         billingCountry: profile?.billing_country,
         billingState: profile?.billing_state,

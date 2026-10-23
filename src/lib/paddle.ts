@@ -128,6 +128,8 @@ export async function startPaddleCheckout(productIds: string[]): Promise<PaddleS
   // Full page load on purpose: Paddle.js is initialised once per page load. The product ids let the checkout page
   // show our own product card (photo, name, price) above Paddle's form.
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.href = `/checkout?txn=${encodeURIComponent(data.transactionId)}&items=${encodeURIComponent(productIds.join(','))}`
+  // Guests also get their private download token (`t`), carried through to the success page.
+  const guest = typeof data.grantToken === 'string' ? `&t=${encodeURIComponent(data.grantToken)}` : ''
+  window.location.href = `/checkout?txn=${encodeURIComponent(data.transactionId)}&items=${encodeURIComponent(productIds.join(','))}${guest}`
   return { ok: true }
 }

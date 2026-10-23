@@ -26,6 +26,13 @@ function hex(buf: ArrayBuffer) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+async function sha256Hex(text: string) {
+  return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))
+}
+
+const GUEST_LINK_DAYS = 30
+const GUEST_TOKEN_RE = /^[A-Za-z0-9_-]{32,64}$/
+
 function safeEqual(a: string, b: string) {
   if (a.length !== b.length) return false
   let diff = 0
@@ -67,7 +74,7 @@ async function fetchCustomerEmail(customerId: string): Promise<string> {
   }
 }
 
-async function sendConfirmation(opts: { email: string; orderNumber: string; amount: number; currency: string; productIds: string[] }) {
+async function sendConfirmation(opts: { email: string; orderNumber: string; amount: number; currency: string; productIds: string[]; downloadsUrl?: string }) {
   const to = opts.email.trim().toLowerCase()
   if (!to) return
   const { data } = await supabase.from('products').select('id, title, price').in('id', opts.productIds)
@@ -82,7 +89,7 @@ async function sendConfirmation(opts: { email: string; orderNumber: string; amou
     amount: opts.amount,
     currency: opts.currency,
     products: products.length ? products : [{ title: 'Your crochet pattern(s)' }],
-    downloadsUrl: `${siteBaseUrl()}/account/downloads`,
+    downloadsUrl: opts.downloadsUrl ?? `${siteBaseUrl()}/account/downloads`,
   })
   const result = await sendResendEmail({ to, subject: built.subject, html: built.html, text: built.text, idempotencyKey: `order-confirm-${opts.orderNumber}` })
   if (!result.ok) console.error('paddle-webhook: confirmation email failed', result.error)
@@ -157,6 +164,24 @@ async function handleTransactionCompleted(data: Record<string, any>): Promise<st
     .single()
   if (orderErr) throw orderErr
 
+  // Guest (no account): store the hashed download token that was created with the checkout, so /d/<token> works.
+  let guestToken: string | null = null
+  if (!userId) {
+    const raw = data.custom_data?.grant_token
+    if (typeof raw === 'string' && GUEST_TOKEN_RE.test(raw)) guestToken = raw
+  }
+  if (guestToken) {
+    const { error: grantErr } = await supabase.from('download_grants').upsert(
+      {
+        order_id: order.id,
+        token_hash: await sha256Hex(guestToken),
+        expires_at: new Date(Date.now() + GUEST_LINK_DAYS * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      { onConflict: 'token_hash', ignoreDuplicates: true },
+    )
+    if (grantErr) throw grantErr
+  }
+
   if (userId && productIds.length > 0) {
     const { error: purchaseErr } = await supabase
       .from('purchases')
@@ -167,7 +192,8 @@ async function handleTransactionCompleted(data: Record<string, any>): Promise<st
 
   if (email) {
     // Paddle wants a 2xx within 5 seconds, so the email is sent in the background after the order is saved.
-    const emailJob = sendConfirmation({ email, orderNumber: displayNumber, amount, currency, productIds }).catch((err) =>
+    const downloadsUrl = guestToken ? `${siteBaseUrl()}/d/${guestToken}` : undefined
+    const emailJob = sendConfirmation({ email, orderNumber: displayNumber, amount, currency, productIds, downloadsUrl }).catch((err) =>
       console.error('paddle-webhook: confirmation email threw', err),
     )
     const runtime = (globalThis as { EdgeRuntime?: { waitUntil?: (p: Promise<unknown>) => void } }).EdgeRuntime

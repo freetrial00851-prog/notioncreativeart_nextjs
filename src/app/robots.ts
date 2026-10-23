@@ -17,6 +17,8 @@ export default function robots(): MetadataRoute.Robots {
         '/reset-password',
         '/order-success',
         '/checkout',
+        '/d/',
+        '/resend-download',
         '/design-preview',
       ],
     },

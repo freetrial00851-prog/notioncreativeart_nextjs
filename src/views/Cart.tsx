@@ -19,6 +19,7 @@ import { PatternGrid } from '../components/PatternGrid'
 import { ContentSkeleton } from '../components/Skeleton'
 import type { Product } from '../lib/types'
 import { useCheckoutProvider } from '../lib/useCheckoutProvider'
+import { allProductsUsePaddle } from '../lib/paddle'
 
 const RECOMMENDATION_POOL = 12
 const RECOMMENDATIONS_SHOWN = 4
@@ -82,8 +83,9 @@ export function Cart() {
   const savings = Math.max(0, regularSubtotal - total)
   const count = lines.length
 
-  const handleCheckout = () => {
-    if (!user) {
+  const handleCheckout = async () => {
+    // Paddle carts can be paid for without an account; Lemon Squeezy ones still need a sign-in first.
+    if (!user && !(await allProductsUsePaddle(lines.map((l) => l.product_id)))) {
       setPendingCheckout(true)
       requireAuth()
       return

@@ -15,6 +15,7 @@ import { Button } from './ui/Button'
 import { MaterialIcon } from './MaterialIcon'
 import type { Product } from '../lib/types'
 import { useCheckoutProvider } from '../lib/useCheckoutProvider'
+import { allProductsUsePaddle } from '../lib/paddle'
 
 /**
  * Cart drawer — DESIGN_SPEC §3.9.
@@ -46,8 +47,9 @@ export function CartDrawer() {
     },
   })
 
-  const handleCheckout = () => {
-    if (!user) {
+  const handleCheckout = async () => {
+    // Paddle carts can be paid for without an account; Lemon Squeezy ones still need a sign-in first.
+    if (!user && !(await allProductsUsePaddle(items.map((i) => i.product_id)))) {
       setPendingCheckout(true)
       requireAuth()
       return

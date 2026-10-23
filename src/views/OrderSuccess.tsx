@@ -16,6 +16,7 @@ import { triggerPdfDownload } from '../lib/downloads'
 import { downloadOrderReceipt } from '../lib/orderReceipt'
 import { trackPinterestPurchase } from '../lib/pinterest'
 import { track } from '../lib/track'
+import { GuestDownload } from './GuestDownload'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import type { Product } from '../lib/types'
 
@@ -70,7 +71,23 @@ function fileLabel(pages: number | null) {
   return pages ? `PDF · ${pages} ${pages === 1 ? 'page' : 'pages'}` : 'PDF'
 }
 
-export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerCopyPlaceholders?: boolean }) {
+/**
+ * Entry point of /order-success. A buyer who paid without an account arrives with a private token (`?t=`) and gets
+ * the guest download page; everyone else gets the normal account order page below.
+ */
+export function OrderSuccess(props: { hideOwnerCopyPlaceholders?: boolean }) {
+  const { user, loading } = useAuth()
+  const [guestToken, setGuestToken] = useState<string | null>(null)
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get('t')
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setGuestToken(t && /^[A-Za-z0-9_-]{32,64}$/.test(t) ? t : null)
+  }, [])
+  if (!loading && !user && guestToken) return <GuestDownload token={guestToken} justPaid />
+  return <OrderSuccessAccount {...props} />
+}
+
+function OrderSuccessAccount({ hideOwnerCopyPlaceholders = false }: { hideOwnerCopyPlaceholders?: boolean }) {
   const { user, loading: authLoading } = useAuth()
   const { requireAuth } = useUI()
   const { showToast } = useToast()

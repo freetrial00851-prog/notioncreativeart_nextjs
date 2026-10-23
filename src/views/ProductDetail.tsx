@@ -31,6 +31,7 @@ import { getStatusBadge, SKILL_PILL_STYLES, skillLevelTagLabel } from '../lib/pr
 import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
 import { useCheckoutProvider } from '../lib/useCheckoutProvider'
+import { allProductsUsePaddle } from '../lib/paddle'
 
 /**
  * Main gallery sizes — stable across SSR and hydration.
@@ -396,13 +397,15 @@ export function ProductDetail({
       if (result.ok) maybeOpenNewsletterPrompt()
       return
     }
-    if (!requireAuth({ type: 'buy', productId: product.id })) return
+    // Paddle patterns can be bought without an account; Lemon Squeezy ones still need a sign-in.
+    const guestOk = !user && (await allProductsUsePaddle([product.id]))
+    if (!guestOk && !requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
     showBusyOverlay('checkout')
     const result = await startApiCheckout([product.id], {
-      userId: user!.id,
-      email: user!.email,
+      userId: user?.id,
+      email: user?.email,
       name: profileDisplayName(profile) || undefined,
       billingCountry: profile?.billing_country,
       billingState: profile?.billing_state,

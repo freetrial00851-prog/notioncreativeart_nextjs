@@ -8,6 +8,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadPaddle, paddleConfigured, removePaddleListener, PADDLE_ENVIRONMENT, type PaddleEvent } from '../lib/paddle'
 import { track } from '../lib/track'
+import { clearGuestCart } from '../lib/guestStorage'
 
 type Phase = 'loading' | 'ready' | 'error' | 'blocked'
 
@@ -32,6 +33,9 @@ export function PaddleCheckout() {
   )
   const [items, setItems] = useState<OrderItem[]>([])
   const [total, setTotal] = useState<string | null>(null)
+  // Guests carry a private download token (`t`) to the success page; signed-in buyers do not need it.
+  const guestToken = params.get('t') ?? ''
+  const successPath = `/order-success?txn=${encodeURIComponent(txn ?? '')}${/^[A-Za-z0-9_-]{32,64}$/.test(guestToken) ? `&t=${encodeURIComponent(guestToken)}` : ''}`
   const itemIds = (params.get('items') ?? '').split(',').filter((id) => UUID_RE.test(id)).slice(0, 25).join(',')
   const opened = useRef(false)
 
@@ -69,7 +73,8 @@ export function PaddleCheckout() {
       // Paddle.js reports amounts in major units (5.99), not cents.
       if (data.totals?.total != null) setTotal(formatMoney(data.totals.total, data.currency_code))
       if (event.name === 'checkout.completed') {
-        router.push(`/order-success?txn=${encodeURIComponent(txn)}`)
+        clearGuestCart()
+        router.push(successPath)
       }
       if (event.name === 'checkout.error' || event.name === 'checkout.failed') {
         setMessage('Something went wrong with the payment form. Please try again.')
@@ -94,7 +99,7 @@ export function PaddleCheckout() {
           frameTarget: FRAME_CLASS,
           frameInitialHeight: 450,
           frameStyle: 'width: 100%; min-width: 312px; background-color: transparent; border: none;',
-          successUrl: `${window.location.origin}/order-success?txn=${encodeURIComponent(txn)}`,
+          successUrl: `${window.location.origin}${successPath}`,
           theme: 'light',
         },
       })
@@ -104,7 +109,7 @@ export function PaddleCheckout() {
       alive = false
       removePaddleListener(onEvent)
     }
-  }, [txn, router])
+  }, [txn, router, successPath])
 
   return (
     <div className="mx-auto w-full max-w-3xl px-5 py-10 md:py-14">

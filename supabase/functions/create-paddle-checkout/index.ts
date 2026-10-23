@@ -2,13 +2,15 @@
 // Creates a Paddle transaction on the SERVER (prices come from our database + Paddle price ids,
 // never from the browser) and returns its id. The browser then opens it as an inline checkout.
 //
-// Deploy with JWT verification ON (signed-in buyers only for now; guest checkout is a later step).
+// Deploy with JWT verification ON (the browser always sends at least the public anon key). Signed-in buyers are
+// attached to their account; guests (no user session) get a one-time download token that the paddle-webhook stores,
+// hashed, once the payment completes (see download-guest-order).
 // Secrets (Dashboard → Edge Functions → Secrets):
 //   PADDLE_API_KEY — server API key for the matching Paddle account (sandbox key while testing)
 //   PADDLE_ENV     — 'sandbox' (default) or 'live'
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are auto-provided.
 //
-// Any signed-in buyer can check out a product that is sold through Paddle. A product is sold through Paddle when
+// Anyone can check out a product that is sold through Paddle. A product is sold through Paddle when
 // its own checkout_provider is 'paddle', or when it has no provider set and the site default (site_settings key
 // 'checkout', value {"default_provider":"paddle"}) is Paddle. While PADDLE_ENV = 'sandbox' only Paddle test cards
 // work, so keep the site default on Lemon Squeezy except while Paddle reviews the site.
@@ -31,6 +33,16 @@ function reply(req: Request, status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: jsonHeaders(req) })
 }
 
+const MAX_CHECKOUTS_PER_HOUR = 30
+
+/** Random URL-safe token (43 chars from 32 random bytes). */
+function randomToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32))
+  let bin = ''
+  for (const b of bytes) bin += String.fromCharCode(b)
+  return btoa(bin).split('+').join('-').split('/').join('_').split('=').join('')
+}
+
 const UNAVAILABLE = { error: 'Paddle checkout is not available for this item yet.', code: 'paddle_unavailable' }
 
 Deno.serve(async (req) => {
@@ -42,10 +54,20 @@ Deno.serve(async (req) => {
     if (!PADDLE_API_KEY) return reply(req, 503, UNAVAILABLE)
 
     const jwt = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
-    if (!jwt) return reply(req, 401, { error: 'Sign in to checkout.' })
-    const { data: userData, error: userErr } = await supabase.auth.getUser(jwt)
-    if (userErr || !userData?.user) return reply(req, 401, { error: 'Sign in to checkout.' })
-    const userId = userData.user.id
+    // Signed-in buyer if the session token belongs to a user; otherwise a guest (only the public anon key).
+    let userId: string | null = null
+    if (jwt) {
+      const { data: userData } = await supabase.auth.getUser(jwt)
+      userId = userData?.user?.id ?? null
+    }
+
+    // Light abuse guard: transactions per IP per hour (card testing / cart spam).
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const rlKey = `paddle-checkout:${ip}`
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+    const { count: recent } = await supabase.from('rate_limit_events').select('id', { count: 'exact', head: true }).eq('key', rlKey).gte('created_at', since)
+    if ((recent ?? 0) >= MAX_CHECKOUTS_PER_HOUR) return reply(req, 429, { error: 'Too many checkout attempts — please try again in a bit.' })
+    await supabase.from('rate_limit_events').insert({ key: rlKey })
 
     const { productIds } = await req.json()
     if (!Array.isArray(productIds) || productIds.length === 0 || productIds.length > 25 ||
@@ -74,6 +96,9 @@ Deno.serve(async (req) => {
       return reply(req, 400, UNAVAILABLE)
     }
 
+    // Guests get a random download token now; the webhook stores only its hash once the payment completes.
+    const grantToken = userId ? null : randomToken()
+
     const res = await fetch(`${PADDLE_API}/transactions`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${PADDLE_API_KEY}`, 'Content-Type': 'application/json' },
@@ -94,7 +119,10 @@ Deno.serve(async (req) => {
         }),
         collection_mode: 'automatic',
         // Set here on the server so the webhook can trust who bought what.
-        custom_data: { user_id: userId, product_ids: JSON.stringify(products.map((p) => p.id)) },
+        custom_data: {
+          ...(userId ? { user_id: userId } : { grant_token: grantToken }),
+          product_ids: JSON.stringify(products.map((p) => p.id)),
+        },
       }),
     })
     const json = await res.json().catch(() => ({}))
@@ -103,7 +131,7 @@ Deno.serve(async (req) => {
       return reply(req, 502, { error: 'Couldn’t start checkout — please try again in a moment.' })
     }
 
-    return reply(req, 200, { transactionId: json.data.id, environment: PADDLE_ENV })
+    return reply(req, 200, { transactionId: json.data.id, environment: PADDLE_ENV, ...(grantToken ? { grantToken } : {}) })
   } catch (err) {
     console.error('create-paddle-checkout error:', err)
     return reply(req, 500, { error: 'Internal error' })

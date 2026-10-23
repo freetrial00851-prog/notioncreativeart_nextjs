@@ -9,6 +9,7 @@ import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
+import { allProductsUsePaddle } from '../lib/paddle'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 import { useToast } from '../context/ToastContext'
@@ -78,13 +79,14 @@ export function QuickView({
       if (result.ok) maybeOpenNewsletterPrompt()
       return
     }
-    if (!requireAuth({ type: 'buy', productId: product.id })) return
+    const guestOk = !user && (await allProductsUsePaddle([product.id]))
+    if (!guestOk && !requireAuth({ type: 'buy', productId: product.id })) return
     if (buying) return
     setBuying(true)
     showBusyOverlay('checkout')
     const result = await startApiCheckout([product.id], {
-      userId: user!.id,
-      email: user!.email,
+      userId: user?.id,
+      email: user?.email,
       name: profileDisplayName(profile) || undefined,
       billingCountry: profile?.billing_country,
       billingState: profile?.billing_state,
