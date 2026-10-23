@@ -91,11 +91,18 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
     // The Lemon Squeezy webhook that creates this order runs asynchronously
     // and can land a few seconds after the redirect, so poll briefly before
     // giving up. Only an order from the last 30 minutes counts as this purchase.
+    // A Paddle checkout sends us back with ?txn=<transaction id>: wait for exactly THAT order, so a previous
+    // order from the last 30 minutes is never shown while the new one is still being recorded.
+    const txn = new URLSearchParams(window.location.search).get('txn')
+    const maxAttempts = txn ? 12 : POLL_ATTEMPTS
+
     const poll = () => {
-      supabase
+      let query = supabase
         .from('orders')
         .select('id, lemon_order_id, display_order_number, customer_email, status, amount, currency, product_ids, created_at')
         .eq('user_id', user.id)
+      if (txn) query = query.eq('provider', 'paddle').eq('provider_order_id', txn)
+      query
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -119,7 +126,7 @@ export function OrderSuccess({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
             return
           }
           attempts += 1
-          if (attempts < POLL_ATTEMPTS) timer = setTimeout(poll, POLL_INTERVAL_MS)
+          if (attempts < maxAttempts) timer = setTimeout(poll, POLL_INTERVAL_MS)
           else setLookup({ kind: 'not_found' })
         })
     }

@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
               name: title.slice(0, 100),
               description: title.slice(0, 200),
               unit_price: { amount: String(Math.round(Number(p.price) * 100)), currency_code: 'USD' },
-              product: { name: title.slice(0, 200), description: 'Digital crochet pattern (PDF download)', tax_category: 'digital-goods' },
+              product: { name: title.slice(0, 200), description: 'Digital crochet pattern (PDF download)', tax_category: 'standard' },
             },
           }
         }),

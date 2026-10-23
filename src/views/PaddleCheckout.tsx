@@ -69,7 +69,7 @@ export function PaddleCheckout() {
       // Paddle.js reports amounts in major units (5.99), not cents.
       if (data.totals?.total != null) setTotal(formatMoney(data.totals.total, data.currency_code))
       if (event.name === 'checkout.completed') {
-        router.push('/order-success')
+        router.push(`/order-success?txn=${encodeURIComponent(txn)}`)
       }
       if (event.name === 'checkout.error' || event.name === 'checkout.failed') {
         setMessage('Something went wrong with the payment form. Please try again.')
@@ -94,7 +94,7 @@ export function PaddleCheckout() {
           frameTarget: FRAME_CLASS,
           frameInitialHeight: 450,
           frameStyle: 'width: 100%; min-width: 312px; background-color: transparent; border: none;',
-          successUrl: `${window.location.origin}/order-success`,
+          successUrl: `${window.location.origin}/order-success?txn=${encodeURIComponent(txn)}`,
           theme: 'light',
         },
       })
