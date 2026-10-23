@@ -417,7 +417,6 @@ export function Header() {
                     { href: '/shop?sort=newest', label: 'New arrivals' },
                     { href: '/shop?price=free', label: 'Free patterns' },
                     { href: '/#collections', label: 'Collections' },
-                    { href: '/shop/sale', label: 'Sale' },
                     { href: '/about', label: 'Our story' },
                   ].map((l) => (
                     <li key={l.href}>
@@ -576,7 +575,6 @@ function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]
                 { href: '/shop', label: 'All patterns' },
                 { href: '/shop?sort=newest', label: 'New arrivals' },
                 { href: '/shop?price=free', label: 'Free patterns' },
-                { href: '/shop/sale', label: 'Sale' },
               ].map((l) => (
                 <li key={l.href}>
                   <Link

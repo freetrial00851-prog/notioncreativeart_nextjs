@@ -5,6 +5,8 @@ import './globals.css'
 import { Providers } from '@/components/Providers'
 import { RevealObserver } from '@/components/RevealObserver'
 import { jsonLdString } from '@/lib/jsonLd'
+import { getCheckoutProvider } from '@/lib/data/checkout'
+import { CheckoutProviderContext } from '@/lib/CheckoutProviderContext'
 import { SITE_NAME, SITE_URL, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/seo'
 import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoSettings'
 
@@ -64,7 +66,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return metadata
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const checkoutProvider = await getCheckoutProvider()
   const orgJsonLd = buildOrganizationJsonLd()
   const siteJsonLd = buildWebSiteJsonLd()
 
@@ -84,8 +87,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-body antialiased">
         <RevealObserver />
-        <Providers>{children}</Providers>
-        <Script src="https://assets.lemonsqueezy.com/lemon.js" strategy="afterInteractive" />
+        <CheckoutProviderContext initial={checkoutProvider}>
+          <Providers>{children}</Providers>
+        </CheckoutProviderContext>
+        {/* Lemon Squeezy's overlay script is only needed while Lemon Squeezy is the shop's payment provider. */}
+        {checkoutProvider !== 'paddle' && <Script src="https://assets.lemonsqueezy.com/lemon.js" strategy="afterInteractive" />}
       </body>
     </html>
   )

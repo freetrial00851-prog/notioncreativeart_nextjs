@@ -9,17 +9,17 @@ export const HOME_FAQ: { question: string; answer: string }[] = [
   {
     question: 'How do I get my pattern after paying?',
     answer:
-      'Right after payment you can download the PDF from the confirmation page. It is also emailed to you and saved in My downloads.',
+      'Right after payment you can download the PDF from the confirmation page. We also email you a private download link, and if you have an account the file is saved in My downloads.',
   },
   {
     question: 'Do I need an account?',
     answer:
-      'Yes for paid patterns, so your files are safe and you can download them again. Free crochet PDFs can be downloaded without signing in.',
+      'No. You can pay as a guest with just your email and card, and free crochet PDFs download without signing in. A free account is optional and keeps all your purchases in one place.',
   },
   {
     question: 'Can I download a pattern again later?',
     answer:
-      'Yes. Every pattern you buy stays in your account, and you can download it as many times as you like.',
+      'Yes. Use the private link in your confirmation email, or request a new one any time on the Send my download again page. If you have an account, your patterns stay in My downloads.',
   },
   {
     question: 'Which skill level should I choose?',

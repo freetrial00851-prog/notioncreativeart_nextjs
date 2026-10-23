@@ -1,4 +1,5 @@
 import type { Product } from './types'
+import { SHOW_COMPARE_AT_PRICES } from './pricing'
 
 export const LISTING_SKILL_LEVELS = ['beginner', 'intermediate', 'advanced'] as const
 export type ListingSkillLevel = (typeof LISTING_SKILL_LEVELS)[number]
@@ -62,7 +63,7 @@ export function toggleSkillLevel(
 
 /** True when the product would show an “On sale” badge. */
 export function isProductOnSale(p: Product): boolean {
-  return p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price
+  return SHOW_COMPARE_AT_PRICES && p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price
 }
 
 /**

@@ -20,6 +20,7 @@ import { ContentSkeleton } from '../components/Skeleton'
 import type { Product } from '../lib/types'
 import { useCheckoutProvider } from '../lib/useCheckoutProvider'
 import { allProductsUsePaddle } from '../lib/paddle'
+import { SHOW_COMPARE_AT_PRICES } from '../lib/pricing'
 
 const RECOMMENDATION_POOL = 12
 const RECOMMENDATIONS_SHOWN = 4
@@ -29,7 +30,7 @@ function money(n: number) {
 }
 
 function isOnSale(p: Product) {
-  return p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price
+  return SHOW_COMPARE_AT_PRICES && p.price > 0 && !!p.compare_at_price && p.compare_at_price > p.price
 }
 
 function patternsLabel(n: number) {
@@ -347,7 +348,7 @@ export function Cart() {
             </li>
             <li className="flex items-center gap-2.5">
               <ClockIcon />
-              Lifetime access in your account
+              Download link also sent to your email
             </li>
           </ul>
         </aside>

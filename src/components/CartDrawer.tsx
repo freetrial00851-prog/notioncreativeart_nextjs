@@ -16,6 +16,7 @@ import { MaterialIcon } from './MaterialIcon'
 import type { Product } from '../lib/types'
 import { useCheckoutProvider } from '../lib/useCheckoutProvider'
 import { allProductsUsePaddle } from '../lib/paddle'
+import { SHOW_COMPARE_AT_PRICES } from '../lib/pricing'
 
 /**
  * Cart drawer — DESIGN_SPEC §3.9.
@@ -208,7 +209,7 @@ function CartLine({
 }) {
   if (!product) return null
   const onSale =
-    product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
+    SHOW_COMPARE_AT_PRICES && product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
 
   return (
     <li className="flex gap-4 border-b border-border py-5">

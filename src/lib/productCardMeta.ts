@@ -1,4 +1,5 @@
 import type { Product } from './types'
+import { SHOW_COMPARE_AT_PRICES } from './pricing'
 
 const SKILL_LABELS: Record<NonNullable<Product['skill_level']>, string> = {
   beginner: 'Beginner',
@@ -47,6 +48,7 @@ export function getStatusBadge(
 ): StatusBadgeKind | null {
   if (product.sold_out) return 'sold_out'
   const onSale =
+    SHOW_COMPARE_AT_PRICES &&
     Number(product.price) > 0 &&
     !!product.compare_at_price &&
     Number(product.compare_at_price) > Number(product.price)

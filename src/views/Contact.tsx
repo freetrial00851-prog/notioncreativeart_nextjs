@@ -3,14 +3,17 @@ import { ContentPage } from '../components/ContentPage'
 export function Contact() {
   return (
     <ContentPage eyebrow="SUPPORT" title="Contact">
-      <p>Questions about a pattern, an order, or something else — I read every message myself and I'm happy to help.</p>
+      <p>Questions about a pattern, an order, or something else — we read every message and are happy to help.</p>
       <p>
         Email:{' '}
         <a href="mailto:patterns@notioncreativeart.com" className="text-ink underline underline-offset-4">
           patterns@notioncreativeart.com
         </a>
       </p>
-      <p>I typically reply within 1–2 days.</p>
+      <p>We typically reply within 1–2 days. Please include your order number if your question is about a purchase.</p>
+      <p className="text-[14px]">
+        NotionCreativeArt is the trading name of Muhammad Sufyan, a sole proprietor based in Pakistan. Payments are processed by our merchant of record (see our <a href="/terms">Terms</a> and <a href="/refund-policy">Refund policy</a>).
+      </p>
     </ContentPage>
   )
 }

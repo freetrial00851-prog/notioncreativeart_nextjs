@@ -32,6 +32,7 @@ import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
 import { useCheckoutProvider } from '../lib/useCheckoutProvider'
 import { allProductsUsePaddle } from '../lib/paddle'
+import { SHOW_COMPARE_AT_PRICES } from '../lib/pricing'
 
 /**
  * Main gallery sizes — stable across SSR and hydration.
@@ -472,7 +473,7 @@ export function ProductDetail({
   const free = isFreeProduct(product)
   const mode: 'free' | 'owned' | 'paid' = free ? 'free' : owned ? 'owned' : 'paid'
   const inCart = isInCart(product.id)
-  const onSale = !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
+  const onSale = SHOW_COMPARE_AT_PRICES && !!(product.compare_at_price && product.compare_at_price > product.price && product.price > 0)
   const savePercent = onSale ? Math.round((1 - product.price / product.compare_at_price!) * 100) : 0
   const statusBadge = getStatusBadge(product)
   const skillLabel = skillLevelTagLabel(product.skill_level)
@@ -484,7 +485,7 @@ export function ProductDetail({
   const paidTicks = [
     'Instant PDF download after payment',
     ...(product.pdf_pages ? [`${product.pdf_pages}-page printable PDF pattern`] : []),
-    'Lifetime access in your account',
+    'Download link also sent to your email',
   ]
   const downloadTicks = [
     pdfLine,
@@ -922,6 +923,12 @@ export function ProductDetail({
                   >
                     Refund policy
                   </Link>
+                  {payProvider === 'paddle' && (
+                    <p className="mt-2 text-[13px] leading-relaxed text-muted">
+                      Payments are processed by Paddle.com Market Limited, our merchant of record. See{' '}
+                      <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer" className="underline">Paddle&apos;s Checkout Buyer Terms</a>.
+                    </p>
+                  )}
                 </div>
               </div>
             )}

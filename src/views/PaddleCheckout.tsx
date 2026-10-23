@@ -168,8 +168,10 @@ export function PaddleCheckout() {
       </section>
 
       <p className="mt-5 text-[13px] text-muted">
-        By paying you agree to our <Link href="/terms" className="underline">Terms</Link> and{' '}
-        <Link href="/refund-policy" className="underline">Refund policy</Link>. Digital download; any sales tax or VAT is calculated in the checkout.{' '}
+        By paying you agree to our <Link href="/terms" className="underline">Terms</Link>,{' '}
+        <Link href="/refund-policy" className="underline">Refund policy</Link> and{' '}
+        <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer" className="underline">Paddle&apos;s Checkout Buyer Terms</a>.
+        Paddle.com Market Limited is our merchant of record. Digital download; any sales tax or VAT is calculated in the checkout.{' '}
         <Link href="/shop" className="underline">Back to the shop</Link>
       </p>
     </div>

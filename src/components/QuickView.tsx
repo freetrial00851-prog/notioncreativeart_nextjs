@@ -10,6 +10,7 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { allProductsUsePaddle } from '../lib/paddle'
+import { SHOW_COMPARE_AT_PRICES } from '../lib/pricing'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 import { useToast } from '../context/ToastContext'
@@ -198,7 +199,7 @@ export function QuickView({
           <ProductCardMeta product={product} reviewStats={reviewStats} className="mb-3" />
           {!isFreeProduct(product) && Number(product.price) !== 0 && (
             <div className="flex items-center gap-3 mb-3">
-              {product.compare_at_price && product.compare_at_price > product.price ? (
+              {SHOW_COMPARE_AT_PRICES && product.compare_at_price && product.compare_at_price > product.price ? (
                 <>
                   <span className="text-xl font-bold text-deal">${product.price.toFixed(2)}</span>
                   <span className="line-through text-base font-medium text-sale">${product.compare_at_price.toFixed(2)}</span>

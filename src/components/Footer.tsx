@@ -6,7 +6,6 @@ const EXPLORE = [
   { label: 'New arrivals', to: '/shop?sort=newest' },
   { label: 'Bundles', to: '/shop/bundles' },
   { label: 'Free patterns', to: '/shop?price=free' },
-  { label: 'Sale', to: '/shop/sale' },
 ]
 
 const HELP = [

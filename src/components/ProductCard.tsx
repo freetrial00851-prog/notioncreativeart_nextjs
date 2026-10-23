@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { SHOW_COMPARE_AT_PRICES } from '../lib/pricing'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -60,7 +61,7 @@ export function ProductCard({
   const inWishlist = isWishlisted(product.id)
   const [heartPop, setHeartPop] = useState(0)
   const href = `/pattern/${product.slug}`
-  const isOnSale = product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
+  const isOnSale = SHOW_COMPARE_AT_PRICES && product.price > 0 && !!product.compare_at_price && product.compare_at_price > product.price
   const statusBadge = getStatusBadge(product)
   const skillLabel = skillLevelTagLabel(product.skill_level)
   const free = isFreeProduct(product)
