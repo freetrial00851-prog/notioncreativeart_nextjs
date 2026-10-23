@@ -22,6 +22,7 @@ import { AdminToday } from './AdminToday'
 import { InsightsOverview, InsightsCustomers, InsightsSaved, InsightsProducts, InsightsTraffic, InsightsSetup } from './AdminInsights'
 import { AdminBulkUpload } from './AdminBulkUpload'
 import { AdminReviews } from './AdminReviews'
+import { AdminPayments } from './AdminPayments'
 import { ProductExportModal } from '../components/ProductExportModal'
 import { revalidateStorefront } from '../lib/actions/revalidateStorefront'
 import { clearHomeCatalogCache } from '../lib/homeCatalogCache'
@@ -75,6 +76,8 @@ function AdminContent({ name }: { name: string }) {
       return <InsightsTraffic />
     case '/admin/setup':
       return <InsightsSetup />
+    case '/admin/payments':
+      return <AdminPayments />
     case '/admin/categories':
       return <AdminCategories />
     case '/admin/listings':

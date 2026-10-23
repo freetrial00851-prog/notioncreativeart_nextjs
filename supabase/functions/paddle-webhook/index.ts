@@ -55,7 +55,7 @@ async function verifySignature(rawBody: string, header: string | null, secret: s
 }
 
 async function fetchCustomerEmail(customerId: string): Promise<string> {
-  const key = Deno.env.get('PADDLE_API_KEY')
+  const key = (Deno.env.get('PADDLE_API_KEY') ?? '').trim().replace(/^Bearer\s+/i, '').replace(/^["']+|["']+$/g, '').trim()
   if (!key || !customerId) return ''
   try {
     const res = await fetch(`${PADDLE_API}/customers/${customerId}`, { headers: { Authorization: `Bearer ${key}` } })
@@ -96,9 +96,32 @@ async function handleTransactionCompleted(data: Record<string, any>): Promise<st
   const priceIds: string[] = (data.items ?? []).map((i: any) => i?.price?.id ?? i?.price_id).filter(Boolean)
   const { data: rows, error: prodErr } = await supabase.from('products').select(`id, ${PRICE_COL}`).in(PRICE_COL, priceIds)
   if (prodErr) throw prodErr
-  const productIds = (rows ?? []).map((r: any) => r.id as string)
+  let productIds = (rows ?? []).map((r: any) => r.id as string)
+
+  const totals = data.details?.totals ?? {}
+  const currency = String(data.currency_code ?? 'USD')
+  const divisor = ['JPY', 'KRW', 'VND', 'CLP', 'HUF'].includes(currency) ? 1 : 100
+  const amount = Number(totals.total ?? totals.grand_total ?? 0) / divisor
+  const tax = totals.tax != null ? Number(totals.tax) / divisor : null
+
   if (productIds.length !== priceIds.length) {
-    console.error('paddle-webhook: some price ids are not mapped to a product', { priceIds, mapped: productIds.length })
+    // One-off (non-catalog) prices created by create-paddle-checkout have no price id in our database. For those,
+    // the server put the product ids in custom_data. Accept them only if every product exists and the amount paid
+    // covers their database prices, so nobody can claim a dearer pattern than they paid for.
+    let claimed: string[] = []
+    try {
+      const raw = data.custom_data?.product_ids
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+      if (Array.isArray(parsed)) claimed = parsed.filter((id: unknown): id is string => typeof id === 'string' && UUID_RE.test(id))
+    } catch { /* ignore */ }
+    if (claimed.length > 0 && claimed.length === (data.items ?? []).length) {
+      const { data: cps } = await supabase.from('products').select('id, price').in('id', claimed).eq('active', true)
+      const expected = (cps ?? []).reduce((sum: number, p: any) => sum + Number(p.price), 0)
+      if ((cps ?? []).length === claimed.length && amount + 0.01 >= expected) productIds = claimed
+      else console.error('paddle-webhook: claimed products do not match the amount paid', { claimed, expected, amount })
+    } else {
+      console.error('paddle-webhook: some price ids are not mapped to a product', { priceIds, mapped: productIds.length })
+    }
   }
 
   // Who bought: user id was set on the server when the transaction was created.
@@ -109,11 +132,6 @@ async function handleTransactionCompleted(data: Record<string, any>): Promise<st
     if (profile?.id) userId = profile.id
   }
 
-  const totals = data.details?.totals ?? {}
-  const currency = String(data.currency_code ?? 'USD')
-  const divisor = ['JPY', 'KRW', 'VND', 'CLP', 'HUF'].includes(currency) ? 1 : 100
-  const amount = Number(totals.total ?? totals.grand_total ?? 0) / divisor
-  const tax = totals.tax != null ? Number(totals.tax) / divisor : null
   const email = await fetchCustomerEmail(String(data.customer_id ?? ''))
   const displayNumber = String(data.invoice_number ?? txnId)
 
@@ -187,14 +205,15 @@ async function handleAdjustment(data: Record<string, any>): Promise<string | nul
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
 
-  const secret = Deno.env.get('PADDLE_WEBHOOK_SECRET')
+  // Tolerate stray spaces / newlines / quotes from pasting the secret.
+  const secret = (Deno.env.get('PADDLE_WEBHOOK_SECRET') ?? '').trim().replace(/^["']+|["']+$/g, '').trim()
   if (!secret) {
     console.error('paddle-webhook: PADDLE_WEBHOOK_SECRET is not set')
     return new Response('Webhook not configured', { status: 500 })
   }
   const rawBody = await req.text()
   if (!(await verifySignature(rawBody, req.headers.get('Paddle-Signature'), secret))) {
-    console.error('paddle-webhook: invalid signature')
+    console.error('paddle-webhook: invalid signature', 'secretLength', secret.length, 'secretPrefix', secret.slice(0, 10), 'hasHeader', !!req.headers.get('Paddle-Signature'))
     return new Response('Invalid signature', { status: 401 })
   }
 

@@ -18,6 +18,7 @@ import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
 import { ContentSkeleton } from '../components/Skeleton'
 import type { Product } from '../lib/types'
+import { useCheckoutProvider } from '../lib/useCheckoutProvider'
 
 const RECOMMENDATION_POOL = 12
 const RECOMMENDATIONS_SHOWN = 4
@@ -36,6 +37,7 @@ function patternsLabel(n: number) {
 
 export function Cart() {
   const { user, loading: authLoading } = useAuth()
+  const { name: payProviderName } = useCheckoutProvider()
   const { requireAuth } = useUI()
   const { items, loading, removeFromCart, checkingOut, checkoutError, checkout } = useCart()
   const { isWishlisted, toggleWishlist } = useWishlist()
@@ -335,7 +337,7 @@ export function Cart() {
           <ul className="mt-2 space-y-3 border-t border-border pt-4 text-[14px] md:text-[13px] text-muted">
             <li className="flex items-center gap-2.5">
               <MaterialIcon name="verified_user" size={16} color="var(--color-free)" className="shrink-0" />
-              Secure checkout by Lemon Squeezy
+              Secure checkout by {payProviderName}
             </li>
             <li className="flex items-center gap-2.5">
               <MaterialIcon name="download" size={16} color="var(--color-free)" className="shrink-0" />

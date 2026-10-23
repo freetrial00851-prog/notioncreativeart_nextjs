@@ -52,7 +52,10 @@ export const ADMIN_GROUPS: NavGroup[] = [
   },
   {
     title: 'System',
-    items: [{ to: '/admin/setup', label: 'Tracking setup', icon: 'tune', hint: 'turn analytics on' }],
+    items: [
+      { to: '/admin/payments', label: 'Payments', icon: 'payments', hint: 'Lemon Squeezy or Paddle' },
+      { to: '/admin/setup', label: 'Tracking setup', icon: 'tune', hint: 'turn analytics on' },
+    ],
   },
 ]
 

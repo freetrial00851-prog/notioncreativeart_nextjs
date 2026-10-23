@@ -61,15 +61,44 @@ export function removePaddleListener(fn: Listener) {
   listeners.delete(fn)
 }
 
+export type CheckoutProvider = 'lemonsqueezy' | 'paddle'
+
+let defaultProviderCache: { value: CheckoutProvider; at: number } | null = null
+
+/**
+ * Site-wide default payment provider (Admin → Payments). Products with their own provider setting ignore it.
+ * Cached briefly; any failure means Lemon Squeezy (the safe, current behaviour).
+ */
+export async function getDefaultCheckoutProvider(): Promise<CheckoutProvider> {
+  if (defaultProviderCache && Date.now() - defaultProviderCache.at < 60_000) return defaultProviderCache.value
+  let value: CheckoutProvider = 'lemonsqueezy'
+  try {
+    const { data } = await supabase.from('site_settings').select('value').eq('key', 'checkout').maybeSingle()
+    if ((data?.value as { default_provider?: string } | null)?.default_provider === 'paddle') value = 'paddle'
+  } catch {
+    /* keep Lemon Squeezy */
+  }
+  defaultProviderCache = { value, at: Date.now() }
+  return value
+}
+
+/** Forget the cached default (after the admin changes it). */
+export function resetDefaultCheckoutProvider() {
+  defaultProviderCache = null
+}
+
 type ProviderRow = { id: string; checkout_provider: string | null }
 
 /** True only when every product in the cart is sold through Paddle (mixed carts use Lemon Squeezy). */
 export async function allProductsUsePaddle(productIds: string[]): Promise<boolean> {
   if (!paddleConfigured() || productIds.length === 0) return false
-  const { data, error } = await supabase.from('products').select('id, checkout_provider').in('id', productIds)
+  const [{ data, error }, fallback] = await Promise.all([
+    supabase.from('products').select('id, checkout_provider').in('id', productIds),
+    getDefaultCheckoutProvider(),
+  ])
   if (error || !data) return false
   const rows = data as ProviderRow[]
-  return rows.length === new Set(productIds).size && rows.every((r) => r.checkout_provider === 'paddle')
+  return rows.length === new Set(productIds).size && rows.every((r) => (r.checkout_provider ?? fallback) === 'paddle')
 }
 
 export type PaddleStart = { ok: true } | { ok: false; error: string; fallback: boolean }
@@ -96,8 +125,9 @@ export async function startPaddleCheckout(productIds: string[]): Promise<PaddleS
       error: message || "Couldn't start checkout — please try again in a moment.",
     }
   }
-  // Full page load on purpose: Paddle.js is initialised once per page load.
+  // Full page load on purpose: Paddle.js is initialised once per page load. The product ids let the checkout page
+  // show our own product card (photo, name, price) above Paddle's form.
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.href = `/checkout?txn=${encodeURIComponent(data.transactionId)}`
+  window.location.href = `/checkout?txn=${encodeURIComponent(data.transactionId)}&items=${encodeURIComponent(productIds.join(','))}`
   return { ok: true }
 }

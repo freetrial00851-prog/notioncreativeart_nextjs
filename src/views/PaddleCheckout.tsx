@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { supabase } from '../lib/supabase'
+import { deriveVariantUrl } from '../lib/imageVariants'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadPaddle, paddleConfigured, removePaddleListener, PADDLE_ENVIRONMENT, type PaddleEvent } from '../lib/paddle'
 import { track } from '../lib/track'
 
 type Phase = 'loading' | 'ready' | 'error' | 'blocked'
 
-type CheckoutLine = { product?: { name?: string }; product_name?: string; totals?: { total?: unknown } }
-type CheckoutData = { items?: CheckoutLine[]; currency_code?: string; totals?: { total?: unknown } }
+type CheckoutData = { items?: unknown[]; currency_code?: string; totals?: { total?: unknown } }
+type OrderItem = { id: string; title: string; image: string | null; price: number }
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const FRAME_CLASS = 'paddle-checkout-frame'
 
@@ -26,9 +30,30 @@ export function PaddleCheckout() {
   const [message, setMessage] = useState<string | null>(
     !txn ? 'This checkout link is missing its order. Please start again from the pattern page.' : !paddleConfigured() ? 'Checkout is not available right now.' : null,
   )
-  const [lines, setLines] = useState<{ name: string; total: string }[]>([])
+  const [items, setItems] = useState<OrderItem[]>([])
   const [total, setTotal] = useState<string | null>(null)
+  const itemIds = (params.get('items') ?? '').split(',').filter((id) => UUID_RE.test(id)).slice(0, 25).join(',')
   const opened = useRef(false)
+
+  // Our own product card(s): photo, name and price come from our database, never from the browser's URL.
+  useEffect(() => {
+    if (!itemIds) return
+    let alive = true
+    supabase
+      .from('products')
+      .select('id, title, images, price')
+      .in('id', itemIds.split(','))
+      .then(({ data }) => {
+        if (!alive || !data) return
+        const order = itemIds.split(',')
+        setItems(
+          [...data]
+            .sort((a, b) => order.indexOf(a.id as string) - order.indexOf(b.id as string))
+            .map((p) => ({ id: p.id as string, title: p.title as string, image: ((p.images as string[] | null) ?? [])[0] ?? null, price: Number(p.price) })),
+        )
+      })
+    return () => { alive = false }
+  }, [itemIds])
 
   useEffect(() => {
     if (!txn || !paddleConfigured()) return
@@ -41,20 +66,14 @@ export function PaddleCheckout() {
         setPhase('ready')
         track('begin_checkout', { props: { items: Array.isArray(data.items) ? data.items.length : 1 } })
       }
-      if (Array.isArray(data.items)) {
-        setLines(
-          data.items.map((i) => ({
-            name: String(i?.product?.name ?? i?.product_name ?? 'Crochet pattern'),
-            total: formatMoney(i?.totals?.total, data.currency_code),
-          })),
-        )
-      }
+      // Paddle.js reports amounts in major units (5.99), not cents.
       if (data.totals?.total != null) setTotal(formatMoney(data.totals.total, data.currency_code))
       if (event.name === 'checkout.completed') {
         router.push('/order-success')
       }
       if (event.name === 'checkout.error' || event.name === 'checkout.failed') {
         setMessage('Something went wrong with the payment form. Please try again.')
+        setPhase('error')
       }
     }
 
@@ -103,17 +122,25 @@ export function PaddleCheckout() {
       <section aria-labelledby="checkout-heading" className="rounded-[10px] border border-border bg-surface p-4 md:p-6">
         <h2 id="checkout-heading" className="sr-only">Payment details</h2>
 
-        {lines.length > 0 && (
-          <ul className="mb-4 divide-y divide-border text-[14px]" aria-label="Order summary">
-            {lines.map((l, i) => (
-              <li key={i} className="flex justify-between gap-4 py-2">
-                <span className="text-ink">{l.name}</span>
-                <span className="text-muted">{l.total}</span>
+        {items.length > 0 && (
+          <ul className="mb-5 divide-y divide-border" aria-label="Your order">
+            {items.map((it) => (
+              <li key={it.id} className="flex items-center gap-4 py-3">
+                {it.image ? (
+                  <Image src={deriveVariantUrl(it.image, 'card')} alt="" width={64} height={80} className="h-20 w-16 shrink-0 rounded-md object-cover" />
+                ) : (
+                  <span className="h-20 w-16 shrink-0 rounded-md bg-surface-warm" aria-hidden />
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-medium leading-snug text-ink">{it.title}</span>
+                  <span className="mt-0.5 block text-[13px] text-muted">Crochet pattern · PDF download</span>
+                </span>
+                <span className="shrink-0 text-[15px] font-semibold text-ink">{formatMoney(it.price, 'USD')}</span>
               </li>
             ))}
             {total && (
-              <li className="flex justify-between gap-4 py-2 font-semibold text-ink">
-                <span>Total</span>
+              <li className="flex justify-between gap-4 pt-3 text-[15px] font-semibold text-ink">
+                <span>Total (including any tax)</span>
                 <span>{total}</span>
               </li>
             )}
@@ -144,14 +171,13 @@ export function PaddleCheckout() {
   )
 }
 
-function formatMoney(minor: unknown, currency: unknown) {
-  const n = Number(minor)
+function formatMoney(amount: unknown, currency: unknown) {
+  const n = Number(amount)
   if (!Number.isFinite(n)) return ''
   const code = typeof currency === 'string' && currency ? currency : 'USD'
-  const zeroDecimal = ['JPY', 'KRW', 'VND', 'CLP', 'HUF'].includes(code)
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: code }).format(zeroDecimal ? n : n / 100)
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: code }).format(n)
   } catch {
-    return `${(n / 100).toFixed(2)} ${code}`
+    return `${n.toFixed(2)} ${code}`
   }
 }

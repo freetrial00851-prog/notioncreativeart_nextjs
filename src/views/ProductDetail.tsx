@@ -30,6 +30,7 @@ import { ProductDetailSkeleton } from '../components/Skeleton'
 import { getStatusBadge, SKILL_PILL_STYLES, skillLevelTagLabel } from '../lib/productCardMeta'
 import { profileDisplayName } from '../lib/profileName'
 import type { Product, ReviewStats } from '../lib/types'
+import { useCheckoutProvider } from '../lib/useCheckoutProvider'
 
 /**
  * Main gallery sizes — stable across SSR and hydration.
@@ -186,6 +187,7 @@ export function ProductDetail({
   const seeded =
     initialProduct && slug && initialProduct.slug === slug ? initialProduct : null
   const [product, setProduct] = useState<Product | null>(() => seeded)
+  const { name: payProviderName } = useCheckoutProvider(product?.checkout_provider)
   const [categoryState, setCategoryState] = useState<{ id: string; data: { name: string; slug: string } | null } | null>(null)
   const [related, setRelated] = useState<Product[]>([])
   const [activeImage, setActiveImage] = useState(0)
@@ -902,7 +904,7 @@ export function ProductDetail({
               <div className="mt-5 flex items-start gap-3 rounded-[5px] border border-border bg-surface-warm px-4 py-4 md:px-5">
                 <MaterialIcon name="verified_user" size={20} color="var(--color-primary)" className="mt-0.5 shrink-0" />
                 <div className="min-w-0 text-[14px]">
-                  <p className="font-bold text-ink">Secure checkout by Lemon Squeezy</p>
+                  <p className="font-bold text-ink">Secure checkout by {payProviderName}</p>
                   <p className="mt-1 leading-relaxed text-muted">
                     You will sign in or create a free account at checkout, so your PDF is saved to your downloads.
                   </p>

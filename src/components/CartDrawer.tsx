@@ -14,6 +14,7 @@ import { LevelBadge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { MaterialIcon } from './MaterialIcon'
 import type { Product } from '../lib/types'
+import { useCheckoutProvider } from '../lib/useCheckoutProvider'
 
 /**
  * Cart drawer — DESIGN_SPEC §3.9.
@@ -21,6 +22,7 @@ import type { Product } from '../lib/types'
  */
 export function CartDrawer() {
   const { user } = useAuth()
+  const { name: payProviderName } = useCheckoutProvider()
   const { requireAuth } = useUI()
   const { items, count, drawerOpen, closeDrawer, justAdded, removeFromCart, checkingOut, checkoutError, checkout } =
     useCart()
@@ -182,7 +184,7 @@ export function CartDrawer() {
               <p className="flex items-start gap-2 text-[12px] text-muted leading-relaxed">
                 <MaterialIcon name="verified_user" size={15} color="var(--color-free)" className="mt-0.5 shrink-0" />
                 <span>
-                  Secure checkout by Lemon Squeezy. You will sign in or create a free account to get your downloads.
+                  Secure checkout by {payProviderName}. You will sign in or create a free account to get your downloads.
                 </span>
               </p>
             </div>
