@@ -88,6 +88,7 @@ Deno.serve(async (req) => {
         currency: String(order.currency ?? 'USD'),
         products: (products ?? []).map((p) => ({ title: p.title as string, price: p.price as number | null })),
         downloadsUrl: `${siteBaseUrl()}/d/${token}`,
+        guest: true,
       })
       const sent = await sendResendEmail({ to: email, subject: built.subject, html: built.html, text: built.text })
       if (!sent.ok) console.error('resend-guest-download: email failed', sent.error)

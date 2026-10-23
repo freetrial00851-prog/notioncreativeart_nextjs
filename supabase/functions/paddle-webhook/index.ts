@@ -90,6 +90,7 @@ async function sendConfirmation(opts: { email: string; orderNumber: string; amou
     currency: opts.currency,
     products: products.length ? products : [{ title: 'Your crochet pattern(s)' }],
     downloadsUrl: opts.downloadsUrl ?? `${siteBaseUrl()}/account/downloads`,
+    guest: !!opts.downloadsUrl,
   })
   const result = await sendResendEmail({ to, subject: built.subject, html: built.html, text: built.text, idempotencyKey: `order-confirm-${opts.orderNumber}` })
   if (!result.ok) console.error('paddle-webhook: confirmation email failed', result.error)

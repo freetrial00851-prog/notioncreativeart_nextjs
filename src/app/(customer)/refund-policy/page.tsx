@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
+import { getCheckoutProvider } from '@/lib/data/checkout'
 import { RefundPolicy } from '@/views/RefundPolicy'
 
 export const metadata = buildMetadata({
@@ -7,6 +8,9 @@ export const metadata = buildMetadata({
   path: '/refund-policy',
 })
 
-export default function RefundPolicyPage() {
-  return <RefundPolicy />
+/** Re-read the payment provider setting every minute so the wording follows Admin → Payments. */
+export const revalidate = 60
+
+export default async function RefundPolicyPage() {
+  return <RefundPolicy provider={await getCheckoutProvider()} />
 }

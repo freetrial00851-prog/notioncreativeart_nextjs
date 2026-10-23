@@ -23,7 +23,7 @@ import { allProductsUsePaddle } from '../lib/paddle'
  */
 export function CartDrawer() {
   const { user } = useAuth()
-  const { name: payProviderName } = useCheckoutProvider()
+  const { name: payProviderName, provider: payProvider } = useCheckoutProvider()
   const { requireAuth } = useUI()
   const { items, count, drawerOpen, closeDrawer, justAdded, removeFromCart, checkingOut, checkoutError, checkout } =
     useCart()
@@ -186,7 +186,7 @@ export function CartDrawer() {
               <p className="flex items-start gap-2 text-[12px] text-muted leading-relaxed">
                 <MaterialIcon name="verified_user" size={15} color="var(--color-free)" className="mt-0.5 shrink-0" />
                 <span>
-                  Secure checkout by {payProviderName}. You will sign in or create a free account to get your downloads.
+                  Secure checkout by {payProviderName}. {payProvider === 'paddle' ? 'No account needed: your download link appears right after payment.' : 'You will sign in or create a free account to get your downloads.'}
                 </span>
               </p>
             </div>

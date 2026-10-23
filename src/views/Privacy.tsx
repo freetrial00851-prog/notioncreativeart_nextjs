@@ -1,8 +1,10 @@
 import { ContentPage } from '../components/ContentPage'
+import { paymentPartner, type PaymentProviderName } from '../lib/paymentPartner'
 
 const H = 'text-ink font-medium'
 
-export function Privacy() {
+export function Privacy({ provider = 'lemonsqueezy' }: { provider?: PaymentProviderName }) {
+  const partner = paymentPartner(provider)
   return (
     <ContentPage eyebrow="LEGAL" title="Privacy Policy">
       <p>Last updated: October 2026. This page explains what information Notion Creative Art collects, why, who handles it, and the choices you have. For any privacy question, use our <a href="/contact">Contact page</a>.</p>
@@ -10,7 +12,7 @@ export function Privacy() {
       <p><span className={H}>What we collect.</span></p>
       <ul className="list-disc space-y-2 pl-5">
         <li><span className={H}>Account:</span> your name and email address (through Google sign-in or email signup), and the wishlist, cart and downloads linked to your account.</li>
-        <li><span className={H}>Orders:</span> your order details and email. Card and payment details are handled entirely by Lemon Squeezy; Notion Creative Art never sees or stores them.</li>
+        <li><span className={H}>Orders:</span> your order details and email. Card and payment details are handled entirely by {partner.name}; Notion Creative Art never sees or stores them. If you pay without an account we keep the email you paid with, so we can send your download link and answer questions about the order.</li>
         <li><span className={H}>Newsletter:</span> your email address, only if you subscribe.</li>
         <li><span className={H}>Support chat and contact messages:</span> what you type and the email you give us, so we can answer you. Chat messages are processed by an AI service to draft replies, so please do not put sensitive information in them.</li>
         <li><span className={H}>Usage data:</span> pages viewed, searches, and actions such as adding to cart or downloading. Before you choose on the cookie banner this is limited to anonymous events (event name, page and pattern). If you accept, we also record a random session ID, how you arrived (for example a campaign link or referring site) and your device type.</li>
@@ -24,7 +26,7 @@ export function Privacy() {
       <ul className="list-disc space-y-2 pl-5">
         <li>Supabase (database, sign-in and file storage) and Vercel (website hosting).</li>
         <li>Google (sign-in; Google Analytics only if you accept cookies).</li>
-        <li>Lemon Squeezy (checkout, payments, taxes and digital delivery; it acts as the seller of record for purchases).</li>
+        <li>{partner.entity} (checkout, payments, taxes and refunds; it acts as the merchant of record for purchases). See its <a href={partner.privacyUrl} target="_blank" rel="noopener noreferrer">privacy policy</a>.</li>
         <li>Pinterest (advertising tag, only if you accept cookies).</li>
         <li>Resend (sending emails) and an AI model provider (support chat replies).</li>
       </ul>

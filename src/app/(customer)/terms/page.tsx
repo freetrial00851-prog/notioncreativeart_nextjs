@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
+import { getCheckoutProvider } from '@/lib/data/checkout'
 import { Terms } from '@/views/Terms'
 
 export const metadata = buildMetadata({
@@ -7,6 +8,9 @@ export const metadata = buildMetadata({
   path: '/terms',
 })
 
-export default function TermsPage() {
-  return <Terms />
+/** Re-read the payment provider setting every minute so the wording follows Admin → Payments. */
+export const revalidate = 60
+
+export default async function TermsPage() {
+  return <Terms provider={await getCheckoutProvider()} />
 }

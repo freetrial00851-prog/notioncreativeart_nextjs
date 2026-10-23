@@ -38,7 +38,7 @@ function patternsLabel(n: number) {
 
 export function Cart() {
   const { user, loading: authLoading } = useAuth()
-  const { name: payProviderName } = useCheckoutProvider()
+  const { name: payProviderName, provider: payProvider } = useCheckoutProvider()
   const { requireAuth } = useUI()
   const { items, loading, removeFromCart, checkingOut, checkoutError, checkout } = useCart()
   const { isWishlisted, toggleWishlist } = useWishlist()
@@ -327,7 +327,7 @@ export function Cart() {
           </Button>
           {!user && (
             <p className="mt-2.5 text-center text-[12px] text-muted">
-              You will sign in or create a free account at checkout.
+              {payProvider === 'paddle' ? 'No account needed. Your download link appears right after payment.' : 'You will sign in or create a free account at checkout.'}
             </p>
           )}
           <div className="mt-1 text-center">

@@ -188,7 +188,7 @@ export function ProductDetail({
   const seeded =
     initialProduct && slug && initialProduct.slug === slug ? initialProduct : null
   const [product, setProduct] = useState<Product | null>(() => seeded)
-  const { name: payProviderName } = useCheckoutProvider(product?.checkout_provider)
+  const { name: payProviderName, provider: payProvider } = useCheckoutProvider(product?.checkout_provider)
   const [categoryState, setCategoryState] = useState<{ id: string; data: { name: string; slug: string } | null } | null>(null)
   const [related, setRelated] = useState<Product[]>([])
   const [activeImage, setActiveImage] = useState(0)
@@ -909,7 +909,9 @@ export function ProductDetail({
                 <div className="min-w-0 text-[14px]">
                   <p className="font-bold text-ink">Secure checkout by {payProviderName}</p>
                   <p className="mt-1 leading-relaxed text-muted">
-                    You will sign in or create a free account at checkout, so your PDF is saved to your downloads.
+                    {payProvider === 'paddle'
+                      ? 'No account needed. Your download link appears right after payment and is emailed to you.'
+                      : 'You will sign in or create a free account at checkout, so your PDF is saved to your downloads.'}
                   </p>
                   <p className="mt-2 leading-relaxed text-muted">
                     Digital download; any sales tax or VAT is calculated at checkout. Listing photos are AI-generated, so your finished piece may vary slightly. If something goes wrong with your order, contact us within 14 days and we&apos;ll make it right.

@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/seo'
+import { getCheckoutProvider } from '@/lib/data/checkout'
 import { Privacy } from '@/views/Privacy'
 
 export const metadata = buildMetadata({
@@ -7,6 +8,9 @@ export const metadata = buildMetadata({
   path: '/privacy',
 })
 
-export default function PrivacyPage() {
-  return <Privacy />
+/** Re-read the payment provider setting every minute so the wording follows Admin → Payments. */
+export const revalidate = 60
+
+export default async function PrivacyPage() {
+  return <Privacy provider={await getCheckoutProvider()} />
 }

@@ -22,6 +22,8 @@ export type OrderConfirmationParams = {
   currency: string
   products: OrderConfirmationProduct[]
   downloadsUrl: string
+  /** Paid without an account: the button is a private link (30 days) instead of the account's My Downloads. */
+  guest?: boolean
 }
 
 function escapeHtml(value: string): string {
@@ -48,7 +50,13 @@ export function buildOrderConfirmationEmail(params: OrderConfirmationParams): {
   html: string
   text: string
 } {
-  const { orderNumber, amount, currency, products, downloadsUrl } = params
+  const { orderNumber, amount, currency, products, downloadsUrl, guest } = params
+  const intro = guest
+    ? `Your payment went through. Use the button below to download your pattern PDF${products.length === 1 ? '' : 's'}. The link is private to you and works for 30 days.`
+    : `Your payment went through and your pattern PDF${products.length === 1 ? ' is' : 's are'} ready to download anytime from your account.`
+  const footnote = guest
+    ? 'Lost the link? You can request a new one any time at notioncreativeart.com/resend-download. Please keep this link to yourself.'
+    : 'Prefer the account menu? Open <strong style="color:#1A1A1A;">My Downloads</strong> after signing in — the same files are always there.'
   const paid = formatMoney(amount, currency)
   const subject = `Your Notion Creative Art order #${orderNumber} is ready`
   const productLines = products.length
@@ -87,7 +95,7 @@ export function buildOrderConfirmationEmail(params: OrderConfirmationParams): {
                 Thank you for your purchase
               </h1>
               <p style="margin:0 0 24px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:${MUTED};">
-                Your payment went through and your pattern PDF${products.length === 1 ? ' is' : 's are'} ready to download anytime from your account.
+                ${intro}
               </p>
 
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CANVAS};border:1px solid ${LINE};border-radius:12px;margin:0 0 28px;">
@@ -129,7 +137,7 @@ export function buildOrderConfirmationEmail(params: OrderConfirmationParams): {
               </table>
 
               <p style="margin:0 0 8px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:${MUTED};">
-                Prefer the account menu? Open <strong style="color:${INK};">My Downloads</strong> after signing in — the same files are always there.
+                ${footnote}
               </p>
               <p style="margin:0;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:${MUTED};">
                 Happy making,<br />
