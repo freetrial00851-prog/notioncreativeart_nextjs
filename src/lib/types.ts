@@ -24,6 +24,12 @@ export type Product = {
   wishlist_count: number
   lemon_variant_id: string
   lemon_numeric_variant_id: string | null
+  /** Which payment provider sells this pattern. null/undefined = the site default (Lemon Squeezy). */
+  checkout_provider?: 'lemonsqueezy' | 'paddle' | null
+  /** Paddle price ids (pri_...): live and sandbox are separate Paddle accounts. */
+  paddle_price_id?: string | null
+  paddle_price_id_sandbox?: string | null
+  paddle_product_id?: string | null
   active: boolean
   featured: boolean
   /** Optional card badge. null = none. Admin-controlled; default none. */

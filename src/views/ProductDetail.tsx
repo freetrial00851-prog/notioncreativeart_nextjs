@@ -907,7 +907,7 @@ export function ProductDetail({
                     You will sign in or create a free account at checkout, so your PDF is saved to your downloads.
                   </p>
                   <p className="mt-2 leading-relaxed text-muted">
-                    Listing photos are AI-generated, so your finished piece may vary slightly. If something goes wrong with your order, contact us within 14 days and we&apos;ll make it right.
+                    Digital download; any sales tax or VAT is calculated at checkout. Listing photos are AI-generated, so your finished piece may vary slightly. If something goes wrong with your order, contact us within 14 days and we&apos;ll make it right.
                   </p>
                   <Link
                     href="/refund-policy"

@@ -25,6 +25,9 @@ export type ProductForm = {
   materials: string
   lemon_variant_id: string
   lemon_numeric_variant_id: string
+  checkout_provider: 'lemonsqueezy' | 'paddle'
+  paddle_price_id: string
+  paddle_price_id_sandbox: string
   active: boolean
   featured: boolean
   card_badge: '' | 'sale' | 'new' | 'featured'
@@ -116,7 +119,9 @@ export function ProductEditor(p: Props) {
       ? []
       : [
           { id: 'price', label: 'Price above $0', done: !!(priceNum && priceNum > 0), anchor: 'ed-price' },
-          { id: 'lemon', label: 'Checkout IDs from Lemon Squeezy', done: !!form.lemon_variant_id.trim() && !!form.lemon_numeric_variant_id.trim(), anchor: 'ed-checkout' },
+          form.checkout_provider === 'paddle'
+            ? { id: 'paddle', label: 'Price ID from Paddle (live or test)', done: !!form.paddle_price_id.trim() || !!form.paddle_price_id_sandbox.trim(), anchor: 'ed-checkout' }
+            : { id: 'lemon', label: 'Checkout IDs from Lemon Squeezy', done: !!form.lemon_variant_id.trim() && !!form.lemon_numeric_variant_id.trim(), anchor: 'ed-checkout' },
         ]),
   ]
   const doneCount = checklist.filter((c) => c.done).length
@@ -252,18 +257,36 @@ export function ProductEditor(p: Props) {
           </Card>
 
           {!isFree && (
-            <Card id="ed-checkout" title="Checkout (Lemon Squeezy)" desc="Connects this listing to its payment page.">
+            <Card id="ed-checkout" title="Checkout" desc="Choose who takes the payment for this listing, then add its IDs.">
               <div className="space-y-4">
-                <Field label="Checkout ID" hint="Lemon Squeezy → Products → your product → Share → the long code at the end of the link.">
-                  <input value={form.lemon_variant_id} onChange={(e) => setForm({ ...form, lemon_variant_id: e.target.value.trim() })} className={inputCls} placeholder="a208e95b-8f17-407f-b7a7-115583bed5a5" />
-                </Field>
-                <Field label="Variant ID (number)" hint="Lemon Squeezy → Products → your product → Variants → the number in the web address.">
-                  <input inputMode="numeric" value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value.trim() })} className={inputCls} placeholder="1255414" />
-                </Field>
                 <div>
-                  <p className="mb-1.5 text-[13px] font-medium">Checkout style</p>
-                  <Segmented label="Checkout style" value={form.checkout_mode} onChange={(v) => setForm({ ...form, checkout_mode: v })} items={[{ id: 'overlay', label: 'Pop-up on the page' }, { id: 'hosted', label: 'Separate page' }]} />
+                  <p className="mb-1.5 text-[13px] font-medium">Sell this pattern with</p>
+                  <Segmented label="Payment provider" value={form.checkout_provider} onChange={(v) => setForm({ ...form, checkout_provider: v })} items={[{ id: 'lemonsqueezy', label: 'Lemon Squeezy' }, { id: 'paddle', label: 'Paddle' }]} />
                 </div>
+                {form.checkout_provider === 'lemonsqueezy' ? (
+                  <>
+                    <Field label="Checkout ID" hint="Lemon Squeezy → Products → your product → Share → the long code at the end of the link.">
+                      <input value={form.lemon_variant_id} onChange={(e) => setForm({ ...form, lemon_variant_id: e.target.value.trim() })} className={inputCls} placeholder="a208e95b-8f17-407f-b7a7-115583bed5a5" />
+                    </Field>
+                    <Field label="Variant ID (number)" hint="Lemon Squeezy → Products → your product → Variants → the number in the web address.">
+                      <input inputMode="numeric" value={form.lemon_numeric_variant_id} onChange={(e) => setForm({ ...form, lemon_numeric_variant_id: e.target.value.trim() })} className={inputCls} placeholder="1255414" />
+                    </Field>
+                    <div>
+                      <p className="mb-1.5 text-[13px] font-medium">Checkout style</p>
+                      <Segmented label="Checkout style" value={form.checkout_mode} onChange={(v) => setForm({ ...form, checkout_mode: v })} items={[{ id: 'overlay', label: 'Pop-up on the page' }, { id: 'hosted', label: 'Separate page' }]} />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Field label="Paddle price ID (live)" hint="Paddle → Catalog → Products → this product → its price → the ID starting with pri_. Leave empty until your live Paddle account is approved.">
+                      <input value={form.paddle_price_id} onChange={(e) => setForm({ ...form, paddle_price_id: e.target.value.trim() })} className={inputCls} placeholder="pri_01abc..." />
+                    </Field>
+                    <Field label="Paddle price ID (test)" hint="Same place in your Paddle sandbox account. Used only while testing.">
+                      <input value={form.paddle_price_id_sandbox} onChange={(e) => setForm({ ...form, paddle_price_id_sandbox: e.target.value.trim() })} className={inputCls} placeholder="pri_01xyz..." />
+                    </Field>
+                    <p className="text-[12px] text-[#6b7280]">Until Paddle checkout is switched on for the shop, customers still pay through Lemon Squeezy.</p>
+                  </>
+                )}
               </div>
             </Card>
           )}

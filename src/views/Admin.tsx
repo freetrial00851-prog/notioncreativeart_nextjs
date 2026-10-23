@@ -137,6 +137,9 @@ const emptyForm = {
   materials: '',
   lemon_variant_id: '',
   lemon_numeric_variant_id: '',
+  checkout_provider: 'lemonsqueezy' as 'lemonsqueezy' | 'paddle',
+  paddle_price_id: '',
+  paddle_price_id_sandbox: '',
   active: true,
   featured: false,
   card_badge: '' as '' | 'sale' | 'new' | 'featured',
@@ -386,6 +389,9 @@ export function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'li
         materials: p.materials ?? '',
         lemon_variant_id: p.lemon_variant_id,
         lemon_numeric_variant_id: p.lemon_numeric_variant_id ?? '',
+        checkout_provider: p.checkout_provider ?? 'lemonsqueezy',
+        paddle_price_id: p.paddle_price_id ?? '',
+        paddle_price_id_sandbox: p.paddle_price_id_sandbox ?? '',
         active: p.active,
         featured: p.featured,
         card_badge: p.card_badge ?? '',
@@ -447,6 +453,9 @@ export function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'li
       // checkout and immediately trigger the "Duplicate checkout ID" warning.
       lemon_variant_id: '',
       lemon_numeric_variant_id: '',
+      checkout_provider: p.checkout_provider ?? 'lemonsqueezy',
+      paddle_price_id: '',
+      paddle_price_id_sandbox: '',
       active: false,
       featured: false,
       card_badge: p.card_badge ?? '',
@@ -477,6 +486,23 @@ export function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'li
       return null
     }
     setSaving(true)
+    // Paddle columns are only written when they matter, so ordinary Lemon Squeezy listings keep saving
+    // exactly as before (and keep working even if this code is live before the Paddle migration is applied).
+    const original = form.id ? products.find((x) => x.id === form.id) : undefined
+    const touchesPaddle =
+      form.checkout_provider === 'paddle' ||
+      !!form.paddle_price_id.trim() ||
+      !!form.paddle_price_id_sandbox.trim() ||
+      original?.checkout_provider === 'paddle' ||
+      !!original?.paddle_price_id ||
+      !!original?.paddle_price_id_sandbox
+    const paddleFields: { checkout_provider?: 'lemonsqueezy' | 'paddle'; paddle_price_id?: string | null; paddle_price_id_sandbox?: string | null } = touchesPaddle
+      ? {
+          checkout_provider: form.checkout_provider,
+          paddle_price_id: form.paddle_price_id.trim() || null,
+          paddle_price_id_sandbox: form.paddle_price_id_sandbox.trim() || null,
+        }
+      : {}
     const payload = {
       title: form.title,
       slug,
@@ -491,6 +517,7 @@ export function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'li
       materials: form.materials || null,
       lemon_variant_id: form.lemon_variant_id || '',
       lemon_numeric_variant_id: form.lemon_numeric_variant_id || null,
+      ...paddleFields,
       active: publish,
       featured: form.featured,
       card_badge: form.card_badge || null,
