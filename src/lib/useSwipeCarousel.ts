@@ -8,8 +8,8 @@ const HYSTERESIS = 10 // px before a drag commits to a direction
 const FLICK_SPEED = 300 // px/s — above this the SIGN of velocity decides, not the position
 const COMMIT_FRACTION = 0.25 // of the width: a shorter drag is enough to turn the page
 // Photo carousel only: quicker than the shared sheet/drawer spring so a swipe feels immediate.
-const SPRING_SWIPE = { damping: 1, response: 0.28 }
-const SPRING_SWIPE_FLICK = { damping: 0.85, response: 0.22 }
+const SPRING_SWIPE = { damping: 1, response: 0.2 }
+const SPRING_SWIPE_FLICK = { damping: 0.9, response: 0.18 }
 
 /**
  * Pointer-driven carousel for a single visible slide.
@@ -31,6 +31,8 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
   const springRef = useRef<Spring | null>(null)
   const drag = useRef<{ id: number; x0: number; y0: number; startPos: number; committed: boolean; locked: 'x' | 'y' | null } | null>(null)
   const tracker = useRef(new VelocityTracker())
+  /** A slide that is animating to its new photo but has not been swapped in yet. */
+  const pending = useRef<1 | -1 | null>(null)
   const cbs = useRef({ onNext, onPrev })
   const countRef = useRef(count)
   useEffect(() => {
@@ -54,9 +56,26 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
    * photo is on screen the whole time (no blank frame). When the spring lands we swap
    * the index synchronously and recentre the track in the same task, before paint.
    */
+  /**
+   * If a slide is still animating in, land it NOW (swap the photo, keep the track where it visually is) so the
+   * next tap or grab starts from the right photo. This is what lets you page through many photos per second:
+   * no tap or swipe is ever dropped or ignored while an animation runs.
+   */
+  const finishPending = useCallback(() => {
+    const spring = springRef.current
+    const dir = pending.current
+    if (!spring || !dir) return
+    pending.current = null
+    const cur = spring.value
+    spring.stop()
+    flushSync(() => (dir === 1 ? cbs.current.onNext() : cbs.current.onPrev()))
+    spring.set(cur + dir * width())
+  }, [])
+
   const commit = useCallback((dirIn: 1 | -1, velocity = 0, fromFlick = false) => {
     const spring = springRef.current
     if (!spring) return
+    finishPending()
     // With only two photos there is no "previous" neighbour in the DOM: always slide the same way.
     const dir: 1 | -1 = countRef.current < 3 ? 1 : dirIn
     const w = width()
@@ -66,15 +85,17 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
       swap()
       return
     }
+    pending.current = dir
     spring.to(-dir * w, {
       velocity,
       config: fromFlick ? SPRING_SWIPE_FLICK : SPRING_SWIPE,
       onComplete: () => {
+        pending.current = null
         flushSync(() => swap())
         spring.set(0)
       },
     })
-  }, [])
+  }, [finishPending])
 
   const settle = useCallback((velocity = 0, fromFlick = false) => {
     springRef.current?.to(0, { velocity, config: fromFlick ? SPRING_SWIPE_FLICK : SPRING_SWIPE })
@@ -83,7 +104,8 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
     if (count < 2 || (e.pointerType === 'mouse' && e.button !== 0)) return
     const spring = springRef.current
-    // Interrupt: stop where the photo is right now.
+    // Interrupt: land any slide still animating, then stop where the photo is right now.
+    finishPending()
     const startPos = spring?.value ?? 0
     spring?.stop()
     drag.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, startPos, committed: false, locked: null }
