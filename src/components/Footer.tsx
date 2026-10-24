@@ -6,6 +6,7 @@ const EXPLORE = [
   { label: 'New arrivals', to: '/shop?sort=newest' },
   { label: 'Bundles', to: '/shop/bundles' },
   { label: 'Free patterns', to: '/free-crochet-patterns' },
+  { label: 'Crochet guides', to: '/guides' },
 ]
 
 const HELP = [

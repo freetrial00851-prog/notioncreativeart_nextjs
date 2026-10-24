@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/lib/seo'
 import { getSitemapData } from '@/lib/data/products'
+import { getAllGuides } from '@/lib/guides'
 import { deriveVariantUrl } from '@/lib/imageVariants'
 
 /** Rebuild hourly so new patterns reach the sitemap without a deploy. */
@@ -11,6 +12,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${SITE_URL}/`, changeFrequency: 'daily', priority: 1.0 },
   { url: `${SITE_URL}/shop`, changeFrequency: 'daily', priority: 0.9 },
   { url: `${SITE_URL}/free-crochet-patterns`, changeFrequency: 'weekly', priority: 0.8 },
+  { url: `${SITE_URL}/guides`, changeFrequency: 'weekly', priority: 0.6 },
   { url: `${SITE_URL}/faq`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/contact`, changeFrequency: 'monthly', priority: 0.3 },
@@ -25,6 +27,11 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [...STATIC_ROUTES]
+
+  // Guides live in the repo, so they are listed even if the database is unreachable.
+  for (const g of getAllGuides()) {
+    routes.push({ url: `${SITE_URL}/guides/${g.slug}`, lastModified: new Date(g.dateModified), changeFrequency: 'monthly', priority: 0.6 })
+  }
 
   try {
     const { products, categories } = await getSitemapData()

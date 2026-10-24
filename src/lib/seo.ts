@@ -339,6 +339,32 @@ export function buildOrganizationJsonLd() {
   }
 }
 
+/** JSON-LD Article for a guide: real author and honest published / modified dates. */
+export function buildArticleJsonLd(opts: {
+  title: string
+  description: string
+  path: string
+  datePublished: string
+  dateModified: string
+  author: string
+  image?: string
+}) {
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: opts.title,
+    description: opts.description,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${opts.path}` },
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified,
+    inLanguage: 'en',
+    author: { '@type': 'Organization', name: opts.author, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+  }
+  if (opts.image) jsonLd.image = [opts.image]
+  return jsonLd
+}
+
 /** JSON-LD WebPage for the homepage (pairs with WebSite in the root layout). */
 export function buildWebPageJsonLd(opts: {
   name: string
