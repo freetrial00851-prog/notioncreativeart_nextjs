@@ -155,6 +155,8 @@ export type PageMetaInput = {
   path: string
   /** When omitted, no og:image / twitter:image tags are emitted (layout may supply a site default). */
   image?: string
+  /** Real pixel size of `image` (defaults to the 1200x630 social card). Product photos are square. */
+  imageSize?: { width: number; height: number }
   type?: 'website' | 'product'
   noIndex?: boolean
   /** Use title verbatim (no " — Site Name" suffix). For homepage meta title with embedded brand. */
@@ -188,8 +190,12 @@ export function buildMetadata(opts: PageMetaInput): Metadata {
     description: opts.description,
   }
 
+  // Product pages declare og:type "product" themselves (Next's typed field has no such value).
+  if (opts.type === 'product') delete (openGraph as { type?: string }).type
+
   if (opts.image) {
-    openGraph.images = [{ url: opts.image, width: 1200, height: 630, alt: opts.title }]
+    const size = opts.imageSize ?? { width: 1200, height: 630 }
+    openGraph.images = [{ url: opts.image, width: size.width, height: size.height, alt: opts.title }]
     twitter.images = [opts.image]
   }
 

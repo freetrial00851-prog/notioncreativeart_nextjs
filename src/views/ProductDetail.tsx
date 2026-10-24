@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { getPrefetchedProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
+import { SITE_URL } from '../lib/seo'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
@@ -739,6 +740,19 @@ export function ProductDetail({
               >
                 <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-sale)' : 'currentColor'} />
               </button>
+
+              {images[0] && (
+                <a
+                  href={`https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(`${SITE_URL}/pattern/${product.slug}`)}&media=${encodeURIComponent(deriveVariantUrl(images[0], 'full'))}&description=${encodeURIComponent(`${product.title} crochet pattern`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Save this pattern to Pinterest"
+                  title="Save to Pinterest"
+                  className={`absolute right-3 top-[68px] z-10 md:right-4 md:top-[72px] ${ICON_BUTTON}`}
+                >
+                  <MaterialIcon name="push_pin" size={20} />
+                </a>
+              )}
 
               {images.length > 1 && (
                 <>

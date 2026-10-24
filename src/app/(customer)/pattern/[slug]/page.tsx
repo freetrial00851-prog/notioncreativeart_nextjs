@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     path: `/pattern/${slug}`,
     image,
+    imageSize: product.images?.[0] ? { width: 1000, height: 1000 } : undefined,
     type: 'product',
     truncateForSerp: true,
   })
@@ -133,6 +134,16 @@ export default async function PatternPage({ params }: Props) {
 
   return (
     <>
+      {product && (
+        <>
+          {/* React moves these into <head>. They tell Pinterest and Facebook this page is a product with a price. */}
+          <meta property="og:type" content="product" />
+          <meta property="product:price:amount" content={Number(product.price).toFixed(2)} />
+          <meta property="product:price:currency" content="USD" />
+          <meta property="product:availability" content={product.sold_out ? 'out of stock' : 'in stock'} />
+          <meta property="product:condition" content="new" />
+        </>
+      )}
       {productJsonLd && (
         <script
           type="application/ld+json"
