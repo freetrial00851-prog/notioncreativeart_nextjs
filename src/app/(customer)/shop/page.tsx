@@ -1,6 +1,12 @@
 import { jsonLdString } from '@/lib/jsonLd'
 import { Suspense } from 'react'
-import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
+import type { Metadata } from 'next'
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+  buildListingMetadata,
+  listingPageFromParams,
+} from '@/lib/seo'
 import { Shop } from '@/views/Shop'
 import { getShopSeed } from '@/lib/data/products'
 import {
@@ -15,11 +21,14 @@ type Props = {
 const SHOP_DESCRIPTION =
   'Browse all crochet PDF patterns from Notion Creative Art — amigurumi, wearables, home decor, bundles, and free patterns. Instant digital download.'
 
-export const metadata = buildMetadata({
-  title: 'Shop All Patterns',
-  description: SHOP_DESCRIPTION,
-  path: '/shop',
-})
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  return buildListingMetadata({
+    title: 'Shop All Patterns',
+    description: SHOP_DESCRIPTION,
+    path: '/shop',
+    searchParams: await searchParams,
+  })
+}
 
 function ShopLoading({ title }: { title: string }) {
   return (
@@ -35,7 +44,9 @@ function ShopLoading({ title }: { title: string }) {
 /** Shop index — all patterns, filterable via query params. */
 export default async function ShopPage({ searchParams }: Props) {
   const sp = await searchParams
-  const seed = Object.keys(sp).length === 0 ? await getShopSeed() : null
+  // Seed the page asked for (and every page before it) so ?page=N has real products in its HTML.
+  const onlyPage = Object.keys(sp).every((k) => k === 'page')
+  const seed = onlyPage ? await getShopSeed(undefined, 12, listingPageFromParams(sp)) : null
   const title = resolveShopPageTitle(shopTitleFiltersFromSearchParams(sp))
   const collectionJsonLd = buildCollectionPageJsonLd({
     name: 'Crochet PDF patterns',
@@ -51,7 +62,7 @@ export default async function ShopPage({ searchParams }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }} />
       <Suspense fallback={<ShopLoading title={title} />}>
-        <Shop initialTitle={title} initialProducts={seed?.products} initialCategories={seed?.categories} />
+        <Shop initialTitle={title} initialProducts={seed?.products} initialCategories={seed?.categories} initialTotal={seed?.total} />
       </Suspense>
     </>
   )

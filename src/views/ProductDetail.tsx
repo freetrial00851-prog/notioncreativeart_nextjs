@@ -172,9 +172,15 @@ function formatPurchaseDate(iso: string): string {
 
 export function ProductDetail({
   initialProduct = null,
+  initialRelated,
+  initialCategory = null,
   hideOwnerCopyPlaceholders = false,
 }: {
   initialProduct?: Product | null
+  /** Server-rendered related patterns, so the first HTML already links to other products. */
+  initialRelated?: Product[]
+  /** Server-resolved category, so the visible breadcrumb matches the BreadcrumbList markup. */
+  initialCategory?: { id: string; name: string; slug: string } | null
   /** Production: hide copy that still needs the owner's real text (support email, license note). */
   hideOwnerCopyPlaceholders?: boolean
 }) {
@@ -190,8 +196,13 @@ export function ProductDetail({
     initialProduct && slug && initialProduct.slug === slug ? initialProduct : null
   const [product, setProduct] = useState<Product | null>(() => seeded)
   const { name: payProviderName, provider: payProvider } = useCheckoutProvider(product?.checkout_provider)
-  const [categoryState, setCategoryState] = useState<{ id: string; data: { name: string; slug: string } | null } | null>(null)
-  const [related, setRelated] = useState<Product[]>([])
+  const [categoryState, setCategoryState] = useState<{ id: string; data: { name: string; slug: string } | null } | null>(() =>
+    seeded && initialCategory && seeded.category_id === initialCategory.id
+      ? { id: initialCategory.id, data: { name: initialCategory.name, slug: initialCategory.slug } }
+      : null,
+  )
+  const [related, setRelated] = useState<Product[]>(() => (seeded ? initialRelated ?? [] : []))
+  const relatedSeeded = useRef(!!seeded && (initialRelated?.length ?? 0) > 0)
   const [activeImage, setActiveImage] = useState(0)
   const imageCount = product?.images?.length ?? 0
   // Warm every gallery photo (same optimised URL the slider will ask for) so a swipe never waits on the network
@@ -268,12 +279,15 @@ export function ProductDetail({
   useEffect(() => {
     const categoryId = product?.category_id
     if (!categoryId) return
+    if (categoryState?.id === categoryId) return
     supabase.from('categories').select('name, slug').eq('id', categoryId).maybeSingle()
       .then(({ data }) => setCategoryState({ id: categoryId, data: data as { name: string; slug: string } | null }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.category_id])
 
   useEffect(() => {
     if (!product) return
+    if (relatedSeeded.current) return
     const TARGET = 8
     ;(async () => {
       let items: Product[] = []

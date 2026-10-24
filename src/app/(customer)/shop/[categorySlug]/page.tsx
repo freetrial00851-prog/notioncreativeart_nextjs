@@ -2,7 +2,12 @@ import { jsonLdString } from '@/lib/jsonLd'
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
+import {
+  buildBreadcrumbListJsonLd,
+  buildCollectionPageJsonLd,
+  buildListingMetadata,
+  listingPageFromParams,
+} from '@/lib/seo'
 import { getCategoryBySlug } from '@/lib/data/products'
 import {
   resolveShopPageTitle,
@@ -87,8 +92,9 @@ function categoryListingCopy(categorySlug: string, label: string) {
 }
 
 /** Dynamic SEO metadata per shop category — critical for category landing pages. */
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { categorySlug } = await params
+  const sp = await searchParams
   const virtual = virtualShopCategoryTitle(categorySlug)
   const category = virtual ? null : await getCategoryBySlug(categorySlug)
   const label =
@@ -97,10 +103,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   const copy = categoryListingCopy(categorySlug, label)
 
-  return buildMetadata({
+  return buildListingMetadata({
     title: copy.title,
     description: copy.description,
     path: `/shop/${categorySlug}`,
+    searchParams: sp,
   })
 }
 
@@ -119,8 +126,10 @@ function ShopLoading({ title }: { title: string }) {
 export default async function CategoryShopPage({ params, searchParams }: Props) {
   const { categorySlug } = await params
   const sp = await searchParams
-  const seed = Object.keys(sp).length === 0 ? await getShopSeed(categorySlug) : null
-  const intro = Object.keys(sp).length === 0 ? await getCategoryIntro(categorySlug) : null
+  const onlyPage = Object.keys(sp).every((k) => k === 'page')
+  const pageNum = listingPageFromParams(sp)
+  const seed = onlyPage ? await getShopSeed(categorySlug, 12, pageNum) : null
+  const intro = onlyPage && pageNum === 1 ? await getCategoryIntro(categorySlug) : null
   const virtual = virtualShopCategoryTitle(categorySlug)
   const category = virtual ? null : await getCategoryBySlug(categorySlug)
   // Unknown category slugs are real 404s (not an indexable empty shop page).
@@ -151,7 +160,7 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }} />
       <Suspense fallback={<ShopLoading title={title} />}>
-        <Shop initialTitle={title} initialCategoryName={category?.name ?? null} initialProducts={seed?.products} initialCategories={seed?.categories} introText={intro} />
+        <Shop initialTitle={title} initialCategoryName={category?.name ?? null} initialProducts={seed?.products} initialCategories={seed?.categories} initialTotal={seed?.total} introText={intro} />
       </Suspense>
     </>
   )

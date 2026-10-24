@@ -280,7 +280,6 @@ export function Home({
                 )}
               </Fragment>
             ))}
-            <span className="sr-only"> Crochet patterns, ready to download.</span>
           </h1>
           <p className="hero-rise mb-7 max-w-[420px] text-[14px] leading-[1.9] text-muted" style={{ ["--d" as string]: "120ms" }}>
             {copy.hero_subtitle}
@@ -298,7 +297,7 @@ export function Home({
             </Link>
           </div>
           <ul className="hero-rise mt-9 flex flex-wrap gap-x-[22px] gap-y-2 text-[11px] text-muted">
-            {['Instant PDF downloads', 'Made for every skill level'].map((t) => (
+            {['Instant PDF downloads', 'Made for every skill level', 'Free crochet patterns included'].map((t) => (
               <li key={t} className="inline-flex items-center gap-2">
                 <span className="text-coral" aria-hidden>✳</span>
                 {t}
@@ -362,13 +361,31 @@ export function Home({
         </ul>
       </section>
 
+      {/* 2b · Plain-text introduction with real category links (server-rendered, for search engines and readers) */}
+      <section className="mx-auto max-w-site page-gutter pb-2 md:pb-4">
+        <div className="max-w-3xl text-[14px] leading-[1.9] text-muted">
+          <h2 className="font-heading text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
+            Crochet patterns you can download in minutes
+          </h2>
+          <p className="mt-3">
+            Notion Creative Art is a small studio writing <Link className="underline" href="/shop">crochet patterns</Link> as instant PDF
+            downloads. Browse cuddly <Link className="underline" href="/shop/amigurumi">amigurumi patterns</Link>, easy{' '}
+            <Link className="underline" href="/shop/no-sew-amigurumi">no-sew amigurumi</Link> and{' '}
+            <Link className="underline" href="/shop/wearables">wearable crochet patterns</Link>, or start with a{' '}
+            <Link className="underline" href="/free-crochet-patterns">free crochet pattern</Link>. New to crochet? Try our{' '}
+            <Link className="underline" href="/shop?level=beginner">beginner patterns</Link> first. Every pattern lists its skill level,
+            materials and photos, and you can print the PDF or follow it on your phone.
+          </p>
+        </div>
+      </section>
+
       {/* 3 · Patterns to fall for */}
       <section className="max-w-site mx-auto page-gutter py-[58px] md:py-[88px]">
         <div suppressHydrationWarning className="reveal mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Your next favourite project</p>
             <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
-              Patterns to fall for.
+              Crochet patterns to fall for.
             </h2>
           </div>
           <div>
@@ -418,7 +435,7 @@ export function Home({
           <p className="eyebrow text-white before:bg-white">Find your kind of making</p>
           <div suppressHydrationWarning className="reveal mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <h2 className="font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
-              A little something
+              Crochet patterns
               <br />
               for every maker.
             </h2>
@@ -522,7 +539,7 @@ export function Home({
           <div>
             <p className="eyebrow">Simple from the very start</p>
             <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
-              Your next project, in three steps.
+              Your next crochet project, in three steps.
             </h2>
           </div>
           <p className="max-w-[310px] text-[12px] leading-[1.7] text-muted">
@@ -575,7 +592,7 @@ export function Home({
           <div className="self-center p-[26px] md:p-12">
             <p className="eyebrow text-white before:bg-white">A little gift from us</p>
             <h2 className="my-[17px] font-heading text-[clamp(34px,4vw,48px)] font-normal leading-[1.08] tracking-[-0.035em]">
-              Good things start with one stitch.
+              Free crochet patterns to try first.
             </h2>
             <p className="mb-2 max-w-[360px] text-[12px] leading-[1.8] text-white/90">
               Try something new with our free crochet patterns. Pick a project, gather your yarn, and make a little time for

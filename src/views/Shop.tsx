@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from 'react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
 import { supabase } from '../lib/supabase'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
@@ -58,6 +58,7 @@ export function Shop({
   initialCategories,
   introText,
   forcedPrice,
+  initialTotal,
 }: {
   initialTitle: string
   initialCategoryName?: string | null
@@ -68,8 +69,11 @@ export function Shop({
   introText?: string | null
   /** The dedicated /free-crochet-patterns page: the price filter is part of the path, not the query string. */
   forcedPrice?: 'free'
+  /** Total number of patterns behind the server seed, so page links exist in the first HTML. */
+  initialTotal?: number
 }) {
   const params = useParams()
+  const pathname = usePathname()
   const router = useRouter()
   const categorySlug = typeof params?.categorySlug === 'string' ? params.categorySlug : undefined
   const [searchParams, setSearchParams] = useUpdateSearchParams()
@@ -194,7 +198,10 @@ export function Shop({
     [products, sort, countsForSort],
   )
 
-  const pageCount = Math.max(1, Math.ceil(sortedProducts.length / LISTING_PAGE_SIZE))
+  // Before the full list arrives, the server-provided total keeps the page links visible (and crawlable).
+  const unfiltered = levels.length === 0 && (!priceFilter || !!forcedPrice) && !bundleFilter && !saleFilter
+  const knownTotal = Math.max(sortedProducts.length, unfiltered ? initialTotal ?? 0 : 0)
+  const pageCount = Math.max(1, Math.ceil(knownTotal / LISTING_PAGE_SIZE))
   const safePage = Math.min(page, pageCount)
   const pagedProducts = sortedProducts.slice(
     (safePage - 1) * LISTING_PAGE_SIZE,
@@ -225,6 +232,14 @@ export function Shop({
     saleFilter: saleFilter || categorySlug === 'sale',
     bundleFilter,
   }) + (categorySlug && categorySlug !== 'sale' && categorySlug !== 'new' && categorySlug !== 'bestsellers' ? 1 : 0)
+
+  const hrefFor = (p: number) => {
+    const q = new URLSearchParams(searchParams?.toString() ?? '')
+    if (p <= 1) q.delete('page')
+    else q.set('page', String(p))
+    const qs = q.toString()
+    return `${pathname ?? '/shop'}${qs ? `?${qs}` : ''}`
+  }
 
   const setPage = (p: number) => {
     setSearchParams((params) => {
@@ -614,12 +629,14 @@ export function Shop({
                 variant="simple"
                 currentPage={safePage}
                 pageCount={pageCount}
+                hrefFor={hrefFor}
                 onPageChange={setPage}
               />
               <ListingPagination
                 variant="desktop"
                 currentPage={safePage}
                 pageCount={pageCount}
+                hrefFor={hrefFor}
                 onPageChange={setPage}
               />
             </>

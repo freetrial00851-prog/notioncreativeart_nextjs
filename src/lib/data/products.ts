@@ -84,12 +84,14 @@ export async function getCategoryById(
 export async function getShopSeed(
   categorySlug?: string,
   limit = 12,
-): Promise<{ products: Product[]; categories: Category[] } | null> {
+  /** Seed enough products (page x limit, newest first) that the requested page can be sliced out of the list on the server. */
+  page = 1,
+): Promise<{ products: Product[]; categories: Category[]; total: number } | null> {
   try {
     const supabase = createStaticClient()
     const { data: cats } = await supabase.from('categories').select('*').order('sort_order')
     const categories = (cats as Category[]) ?? []
-    let q = supabase.from('products').select('*').eq('active', true).is('deleted_at', null)
+    let q = supabase.from('products').select('*', { count: 'exact' }).eq('active', true).is('deleted_at', null)
     if (categorySlug === 'sale') q = q.not('compare_at_price', 'is', null)
     else if (categorySlug === 'bestsellers') q = q.eq('featured', true)
     else if (categorySlug && categorySlug !== 'new') {
@@ -98,10 +100,13 @@ export async function getShopSeed(
       const subIds = cat.parent_id ? [] : categories.filter((c) => c.parent_id === cat.id).map((c) => c.id)
       q = q.in('category_id', [cat.id, ...subIds])
     }
-    const { data } = await q.order('created_at', { ascending: false }).limit(limit * 4)
+    const want = limit * Math.max(1, page)
+    const { data, count } = await q
+      .order('created_at', { ascending: false })
+      .limit(categorySlug === 'sale' ? want * 4 : want)
     let rows = (data as Product[]) ?? []
     if (categorySlug === 'sale') rows = filterProductsByListingParams(rows, { sale: true })
-    return { products: rows.slice(0, limit), categories }
+    return { products: rows.slice(0, want), categories, total: categorySlug === 'sale' ? rows.length : count ?? rows.length }
   } catch {
     return null
   }
@@ -125,6 +130,41 @@ export async function getFreeSeed(limit = 48): Promise<{ products: Product[]; ca
     return { products: (data as Product[]) ?? [], categories: (cats as Category[]) ?? [], total: count ?? (data?.length ?? 0) }
   } catch {
     return null
+  }
+}
+
+/** Up to `n` other patterns: same category first, then the newest — server-rendered so every product page links to others. */
+export async function getRelatedProducts(p: { id: string; category_id: string | null }, n = 8): Promise<Product[]> {
+  try {
+    const supabase = createStaticClient()
+    let items: Product[] = []
+    if (p.category_id) {
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .is('deleted_at', null)
+        .eq('category_id', p.category_id)
+        .neq('id', p.id)
+        .order('created_at', { ascending: false })
+        .limit(n)
+      items = (data as Product[]) ?? []
+    }
+    if (items.length < n) {
+      const exclude = [p.id, ...items.map((x) => x.id)]
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .is('deleted_at', null)
+        .not('id', 'in', `(${exclude.join(',')})`)
+        .order('created_at', { ascending: false })
+        .limit(n - items.length)
+      items = [...items, ...((data as Product[]) ?? [])]
+    }
+    return items
+  } catch {
+    return []
   }
 }
 

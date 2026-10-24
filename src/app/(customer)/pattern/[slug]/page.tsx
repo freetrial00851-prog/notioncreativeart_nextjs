@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getImageProps } from 'next/image'
 import { preload } from 'react-dom'
 import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd, clampDescription } from '@/lib/seo'
-import { getCategoryById, getProductBySlug } from '@/lib/data/products'
+import { getCategoryById, getProductBySlug, getRelatedProducts } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
 import { isVercelProduction } from '@/lib/env'
@@ -92,17 +92,22 @@ export default async function PatternPage({ params }: Props) {
 
   let productJsonLd: ReturnType<typeof buildProductJsonLd> | null = null
   let breadcrumbJsonLd: ReturnType<typeof buildBreadcrumbListJsonLd> | null = null
+  let related: Awaited<ReturnType<typeof getRelatedProducts>> = []
+  let categoryForPage: { id: string; name: string; slug: string } | null = null
 
   if (product) {
     if (product.images?.[0]) {
       preloadProductLcpImage(product.images[0], product.title)
     }
 
-    const [reviewStats, reviews, category] = await Promise.all([
+    const [reviewStats, reviews, category, relatedItems] = await Promise.all([
       getProductReviewStats(product.id),
       getApprovedReviews(product.id),
       product.category_id ? getCategoryById(product.category_id) : Promise.resolve(null),
+      getRelatedProducts(product),
     ])
+    related = relatedItems
+    categoryForPage = category && product.category_id ? { id: product.category_id, ...category } : null
     productJsonLd = buildProductJsonLd(product, {
       averageRating: reviewStats.averageRating,
       reviewCount: reviewStats.reviewCount,
@@ -138,6 +143,8 @@ export default async function PatternPage({ params }: Props) {
       <ProductDetail
         key={slug}
         initialProduct={product}
+        initialRelated={related}
+        initialCategory={categoryForPage}
         hideOwnerCopyPlaceholders={isVercelProduction()}
       />
     </>

@@ -112,6 +112,43 @@ export function clampDescription(text: string, max = 155): string {
   return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.\-–—]+$/u, '')}…`
 }
 
+type ListingSearchParams = Record<string, string | string[] | undefined>
+
+/** Page number from ?page=N (1 when absent or invalid). */
+export function listingPageFromParams(sp: ListingSearchParams): number {
+  const raw = Array.isArray(sp.page) ? sp.page[0] : sp.page
+  const n = Number.parseInt(raw ?? '1', 10)
+  return Number.isFinite(n) && n > 1 ? Math.min(n, 200) : 1
+}
+
+/**
+ * Listing-page SEO rules: the clean URL (and ?page=N, with its own canonical) is indexable;
+ * any filter or sort variant is noindex,follow and points its canonical at the clean URL.
+ */
+export function buildListingMetadata(opts: {
+  title: string
+  description: string
+  path: string
+  searchParams: ListingSearchParams
+}): Metadata {
+  const { searchParams: sp } = opts
+  const page = listingPageFromParams(sp)
+  const filterKeys = Object.keys(sp).filter(
+    (k) => k !== 'page' && !k.startsWith('utm_') && k !== 'fbclid' && k !== 'gclid',
+  )
+  if (filterKeys.length > 0) {
+    return buildMetadata({ title: opts.title, description: opts.description, path: opts.path, noIndex: true })
+  }
+  if (page > 1) {
+    return buildMetadata({
+      title: `${opts.title} (Page ${page})`,
+      description: opts.description,
+      path: `${opts.path}?page=${page}`,
+    })
+  }
+  return buildMetadata({ title: opts.title, description: opts.description, path: opts.path })
+}
+
 export type PageMetaInput = {
   title: string
   description: string

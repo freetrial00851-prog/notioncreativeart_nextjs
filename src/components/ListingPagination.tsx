@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 export type ListingPaginationProps = {
   currentPage: number
   pageCount: number
@@ -10,6 +12,8 @@ export type ListingPaginationProps = {
    * `desktop` = numbered pages, laptop-only (shop).
    */
   variant?: 'full' | 'simple' | 'desktop'
+  /** When given, page controls are real links (crawlable) that still switch pages without a full reload. */
+  hrefFor?: (page: number) => string
 }
 
 type PageItem = number | 'ellipsis'
@@ -48,6 +52,57 @@ export function getListingPageItems(currentPage: number, pageCount: number): Pag
   return items
 }
 
+/** A page control: a real <a href> when `hrefFor` is given (so search engines can follow it), otherwise a button. */
+function PageControl({
+  page,
+  disabled,
+  active,
+  label,
+  className,
+  hrefFor,
+  onPageChange,
+  children,
+}: {
+  page: number
+  disabled?: boolean
+  active?: boolean
+  label: string
+  className: string
+  hrefFor?: (page: number) => string
+  onPageChange: (page: number) => void
+  children: React.ReactNode
+}) {
+  if (hrefFor && !disabled) {
+    return (
+      <Link
+        href={hrefFor(page)}
+        scroll={false}
+        aria-label={label}
+        aria-current={active ? 'page' : undefined}
+        className={className}
+        onClick={(e) => {
+          e.preventDefault()
+          onPageChange(page)
+        }}
+      >
+        {children}
+      </Link>
+    )
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => onPageChange(page)}
+      disabled={disabled}
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
+      className={className}
+    >
+      {children}
+    </button>
+  )
+}
+
 /**
  * Shared Shop / Search / Wishlist pagination — DESIGN_SPEC §4.2.
  */
@@ -56,6 +111,7 @@ export function ListingPagination({
   pageCount,
   onPageChange,
   variant = 'full',
+  hrefFor,
 }: ListingPaginationProps) {
   if (pageCount <= 1) return null
 
@@ -65,27 +121,15 @@ export function ListingPagination({
   if (variant === 'simple') {
     return (
       <div className="flex lg:hidden items-center justify-center gap-4 mt-8">
-        <button
-          type="button"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          aria-label="Previous page"
-          className={btn}
-        >
+        <PageControl page={currentPage - 1} disabled={currentPage === 1} label="Previous page" className={btn} hrefFor={hrefFor} onPageChange={onPageChange}>
           ‹
-        </button>
+        </PageControl>
         <span className="text-[13px] text-muted">
           Page {currentPage} of {pageCount}
         </span>
-        <button
-          type="button"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === pageCount}
-          aria-label="Next page"
-          className={btn}
-        >
+        <PageControl page={currentPage + 1} disabled={currentPage === pageCount} label="Next page" className={btn} hrefFor={hrefFor} onPageChange={onPageChange}>
           ›
-        </button>
+        </PageControl>
       </div>
     )
   }
@@ -98,15 +142,9 @@ export function ListingPagination({
 
   return (
     <div className={wrapClass}>
-      <button
-        type="button"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        aria-label="Previous page"
-        className={btn}
-      >
+      <PageControl page={currentPage - 1} disabled={currentPage === 1} label="Previous page" className={btn} hrefFor={hrefFor} onPageChange={onPageChange}>
         ‹
-      </button>
+      </PageControl>
       {items.map((item, i) =>
         item === 'ellipsis' ? (
           <span
@@ -117,12 +155,13 @@ export function ListingPagination({
             …
           </span>
         ) : (
-          <button
-            type="button"
+          <PageControl
             key={item}
-            onClick={() => onPageChange(item)}
-            aria-label={`Page ${item}`}
-            aria-current={item === currentPage ? 'page' : undefined}
+            page={item}
+            active={item === currentPage}
+            label={`Page ${item}`}
+            hrefFor={hrefFor}
+            onPageChange={onPageChange}
             className={`w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-[3px] text-[13px] transition-colors ${
               item === currentPage
                 ? 'bg-primary text-white'
@@ -130,18 +169,12 @@ export function ListingPagination({
             }`}
           >
             {item}
-          </button>
+          </PageControl>
         ),
       )}
-      <button
-        type="button"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === pageCount}
-        aria-label="Next page"
-        className={btn}
-      >
+      <PageControl page={currentPage + 1} disabled={currentPage === pageCount} label="Next page" className={btn} hrefFor={hrefFor} onPageChange={onPageChange}>
         ›
-      </button>
+      </PageControl>
     </div>
   )
 }

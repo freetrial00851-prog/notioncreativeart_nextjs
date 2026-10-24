@@ -1,11 +1,13 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { jsonLdString } from '@/lib/jsonLd'
 import {
   SITE_URL,
   buildBreadcrumbListJsonLd,
   buildCollectionPageJsonLd,
   buildItemListJsonLd,
-  buildMetadata,
+  buildListingMetadata,
+  listingPageFromParams,
 } from '@/lib/seo'
 import { getFreeSeed } from '@/lib/data/products'
 import { Shop } from '@/views/Shop'
@@ -15,7 +17,11 @@ const TITLE = 'Free Crochet Patterns (PDF), Instant Download'
 const DESCRIPTION =
   'Free crochet patterns you can download instantly as PDFs: amigurumi animals, keychains and more. No account or sign-up needed.'
 
-export const metadata = buildMetadata({ title: TITLE, description: DESCRIPTION, path: PATH })
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, path: PATH, searchParams: await searchParams })
+}
 
 /** Rebuild every minute so new free patterns appear without a deploy. */
 export const revalidate = 60
@@ -30,8 +36,9 @@ function ShopLoading() {
 }
 
 /** Dedicated, indexable landing page for "free crochet patterns" (replaces /shop?price=free). */
-export default async function FreeCrochetPatternsPage() {
-  const seed = await getFreeSeed()
+export default async function FreeCrochetPatternsPage({ searchParams }: Props) {
+  const sp = await searchParams
+  const seed = await getFreeSeed(Math.max(48, listingPageFromParams(sp) * 12))
   const total = seed?.total ?? 0
 
   const intro =
@@ -67,6 +74,7 @@ export default async function FreeCrochetPatternsPage() {
           forcedPrice="free"
           initialProducts={seed?.products}
           initialCategories={seed?.categories}
+          initialTotal={seed?.total}
           introText={intro}
         />
       </Suspense>

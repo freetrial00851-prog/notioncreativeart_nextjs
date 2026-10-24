@@ -162,10 +162,10 @@ export type HomeCopy = {
 }
 
 export const DEFAULT_HOME_COPY: HomeCopy = {
-  hero_eyebrow: 'For the love of making',
-  hero_title: 'Make room\nfor *something*\nlovely.',
+  hero_eyebrow: 'Crochet patterns, instant PDF downloads',
+  hero_title: 'Crochet patterns\nto make something\n*lovely.*',
   hero_subtitle:
-    "Thoughtful crochet patterns for slow mornings, creative afternoons, and all the little things you can't wait to make.",
+    'Amigurumi, wearables and free crochet patterns for every skill level. Download the PDF instantly and start stitching today.',
   hero_cta: 'Explore patterns',
   hero_cta2: 'Browse free patterns',
   story_eyebrow: 'A slower, lovelier way to create',

@@ -5,7 +5,7 @@ export const DEFAULT_HOMEPAGE_META_TITLE =
   'Crochet Patterns & Instant PDF Downloads | Notion Creative Art'
 
 export const DEFAULT_HOMEPAGE_META_DESCRIPTION =
-  'Shop amigurumi, wearables, home decor, and free crochet patterns as instant PDF downloads. Beginner-friendly designs from a small studio that tests every pattern.'
+  'Download crochet patterns as instant PDFs: cute amigurumi, wearables and free crochet patterns. Beginner-friendly designs from a small studio.'
 
 export const DEFAULT_SITE_SEO: SiteSeoContent = {
   homepage_meta_title: DEFAULT_HOMEPAGE_META_TITLE,
