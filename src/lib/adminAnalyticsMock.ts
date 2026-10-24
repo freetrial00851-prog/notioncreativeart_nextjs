@@ -52,7 +52,13 @@ export const mockSource: AnalyticsSource = {
     reviews: [{ title: 'Amigurumi Bunny', rating: 5, status: 'approved', body: 'Lovely pattern!' }],
     events: [{ at: new Date().toISOString(), event: 'view_item', path: '/product/x', product: 'Lace Doily Set' }],
   } as never),
-  wishlists: () => ok(customers.slice(0, 5).map((c, i) => ({ user_id: c.user_id, email: c.email, name: c.name, product_id: `p${i}`, title: titles[i], slug: 'x', price: 6, added_at: new Date(Date.now() - i * 5e6).toISOString(), bought: i === 3, total_count: 5 }))),
-  carts: () => ok(customers.slice(0, 3).map((c, i) => ({ user_id: c.user_id, email: c.email, name: c.name, items: [{ product_id: 'p', title: titles[i], slug: 'x', price: 6 }], item_count: 1, value: 6 + i, updated_at: new Date(Date.now() - i * 40 * 3600000).toISOString(), abandoned: i > 0 }))),
+  guestDetail: () => ok({
+    guest: true,
+    profile: { email: 'guest@example.com', created_at: new Date(Date.now() - 2 * 86400000).toISOString() },
+    newsletter: false,
+    orders: [{ id: 'g1', amount: 5.43, status: 'paid', created_at: new Date(Date.now() - 86400000).toISOString(), items: [{ title: 'Amigurumi Bunny' }] }],
+  } as never),
+  wishlists: () => ok(customers.slice(0, 5).map((c, i) => ({ user_id: c.user_id ?? 'guest', email: c.email, name: c.name, product_id: `p${i}`, title: titles[i], slug: 'x', price: 6, added_at: new Date(Date.now() - i * 5e6).toISOString(), bought: i === 3, total_count: 5 }))),
+  carts: () => ok(customers.slice(0, 3).map((c, i) => ({ user_id: c.user_id ?? 'guest', email: c.email, name: c.name, items: [{ product_id: 'p', title: titles[i], slug: 'x', price: 6 }], item_count: 1, value: 6 + i, updated_at: new Date(Date.now() - i * 40 * 3600000).toISOString(), abandoned: i > 0 }))),
   topProducts: () => ok(products),
 }

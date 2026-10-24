@@ -31,7 +31,9 @@ export type Traffic = {
 export type SearchTerm = { term: string; searches: number; zero_results: number; avg_results: number }
 export type Live = { active_visitors: number; recent: { event_name: string; path: string | null; created_at: string }[] }
 export type Customer = {
-  user_id: string
+  /** null for a guest buyer (paid without an account). */
+  user_id: string | null
+  is_guest?: boolean
   email: string
   name: string | null
   joined: string
@@ -111,6 +113,7 @@ export interface AnalyticsSource {
   live(): Promise<Result<Live>>
   customers(q: CustomerQuery): Promise<Result<Customer[]>>
   customerDetail(id: string): Promise<Result<CustomerDetail>>
+  guestDetail(email: string): Promise<Result<CustomerDetail>>
   wishlists(onlyUnbought: boolean, limit: number, offset: number): Promise<Result<WishlistRow[]>>
   carts(): Promise<Result<CartRow[]>>
   topProducts(from: Date, to: Date): Promise<Result<ProductRow[]>>
@@ -182,6 +185,7 @@ const realSource: AnalyticsSource = {
       (d) => rows<Customer>(d),
     ),
   customerDetail: (id) => call('admin_customer_detail', { p_user_id: id }, (d) => (d ?? {}) as CustomerDetail),
+  guestDetail: (email) => call('admin_guest_detail', { p_email: email }, (d) => (d ?? {}) as CustomerDetail),
   wishlists: (onlyUnbought, limit, offset) =>
     call('admin_wishlists', { p_only_unbought: onlyUnbought, p_limit: limit, p_offset: offset }, (d) => rows<WishlistRow>(d)),
   carts: () => call('admin_carts', { p_abandon_hours: 24 }, (d) => rows<CartRow>(d)),

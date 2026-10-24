@@ -337,7 +337,7 @@ export function InsightsCustomers() {
     <div className="space-y-5 max-w-6xl">
       <div>
         <h1 className={H1}>Customers</h1>
-        <p className="text-[13px] text-[#777] mt-0.5">Everyone who made an account. Open a row to see everything they did.</p>
+        <p className="text-[13px] text-[#777] mt-0.5">Everyone who made an account, plus buyers who paid as a guest. A guest becomes a normal customer automatically when they sign up with the same email. Open a row to see everything they did.</p>
       </div>
       <div className="flex flex-wrap gap-2">
         <input
@@ -365,10 +365,10 @@ export function InsightsCustomers() {
             <div className={CARD}>
               <Table head={['Customer', 'Joined', 'Orders', 'Spent', 'Free', 'Wishlist', 'Cart', 'Reviews']} empty="No customers match.">
                 {rows.map((c) => (
-                  <tr key={c.user_id} className="hover:bg-[#FAFAFA] cursor-pointer" onClick={() => setOpen(c.user_id)}>
+                  <tr key={c.user_id ?? `guest:${c.email}`} className="hover:bg-[#FAFAFA] cursor-pointer" onClick={() => setOpen(c.user_id ?? `guest:${c.email}`)}>
                     <td className={TD}>
-                      <button className="text-left" onClick={() => setOpen(c.user_id)}>
-                        <span className="block font-medium">{c.name || c.email}</span>
+                      <button className="text-left" onClick={() => setOpen(c.user_id ?? `guest:${c.email}`)}>
+                        <span className="block font-medium">{c.name || c.email}{c.is_guest && <span className="ml-2 rounded-full bg-[#F1F2F4] px-2 py-0.5 text-[11px] font-medium text-[#4B5563]">Guest</span>}</span>
                         {c.name && <span className="block text-[12px] text-[#777]">{c.email}</span>}
                       </button>
                     </td>
@@ -411,7 +411,7 @@ type Row = Record<string, unknown>
 const s = (v: unknown) => (v == null ? '' : String(v))
 
 function CustomerPanel({ id, onClose }: { id: string; onClose: () => void }) {
-  const state = useLoad(() => analytics.customerDetail(id), [id])
+  const state = useLoad(() => (id.startsWith('guest:') ? analytics.guestDetail(id.slice(6)) : analytics.customerDetail(id)), [id])
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', k)
@@ -438,7 +438,8 @@ function CustomerBody({ d }: { d: CustomerDetail }) {
   const reviews = (d.reviews ?? []) as Row[]
   const events = (d.events ?? []) as unknown as Row[]
   const spent = orders.filter((o) => o.status !== 'refunded').reduce((a, o) => a + Number(o.amount || 0), 0)
-  const name = [s(p.first_name), s(p.last_name)].filter(Boolean).join(' ')
+  const name = s(p.name) || [s(p.first_name), s(p.last_name)].filter(Boolean).join(' ')
+  const isGuest = d.guest === true
   const list = (title: string, items: Row[], line: (r: Row) => ReactNode) => (
     <Section title={`${title} (${items.length})`}>
       {items.length === 0 ? <p className="text-[13px] text-[#888]">None.</p> : (
@@ -449,10 +450,10 @@ function CustomerBody({ d }: { d: CustomerDetail }) {
   return (
     <div className="space-y-3">
       <div>
-        <h2 className="font-heading text-[20px] font-bold">{name || s(p.email)}</h2>
+        <h2 className="font-heading text-[20px] font-bold">{name || s(p.email)}{isGuest && <span className="ml-2 align-middle rounded-full bg-[#F1F2F4] px-2 py-0.5 text-[11px] font-medium text-[#4B5563]">Guest</span>}</h2>
         {name && <p className="text-[13px] text-[#666]">{s(p.email)}</p>}
         <p className="mt-1 text-[12px] text-[#888]">
-          Joined {timeAgo(s(p.created_at))} · last sign-in {timeAgo(s(p.last_sign_in_at))}
+          {isGuest ? `First order ${timeAgo(s(p.created_at))} · paid without an account` : `Joined ${timeAgo(s(p.created_at))} · last sign-in ${timeAgo(s(p.last_sign_in_at))}`}
           {s(p.billing_country) && ` · ${s(p.billing_country)}`} · {d.newsletter ? 'subscribed to newsletter' : 'not on newsletter'}
         </p>
       </div>
