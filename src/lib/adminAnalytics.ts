@@ -177,7 +177,19 @@ const realSource: AnalyticsSource = {
       }
     }),
   searchTerms: (from, to) => call('admin_search_terms', { p_from: iso(from), p_to: iso(to) }, (d) => rows<SearchTerm>(d)),
-  live: () => call('admin_live', { p_minutes: 5 }, (d) => d as Live),
+  live: () =>
+    call('admin_live', { p_minutes: 5 }, (d) => {
+      // The database sends { at, event }; the page reads { created_at, event_name }.
+      const raw = (d ?? {}) as { active_visitors?: number; recent?: { at?: string; created_at?: string; event?: string; event_name?: string; path?: string | null }[] }
+      return {
+        active_visitors: Number(raw.active_visitors ?? 0),
+        recent: (raw.recent ?? []).map((e) => ({
+          event_name: String(e.event_name ?? e.event ?? 'event'),
+          path: e.path ?? null,
+          created_at: String(e.created_at ?? e.at ?? ''),
+        })),
+      } as Live
+    }),
   customers: (q) =>
     call(
       'admin_customers',
