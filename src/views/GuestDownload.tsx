@@ -188,7 +188,7 @@ export function GuestDownload({ token, justPaid = false }: { token: string; just
           <>
             <span className="font-medium text-ink">Want more?</span>
             <Link href="/shop" className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">Browse new patterns</Link>
-            <Link href="/shop?price=free" className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">Free patterns</Link>
+            <Link href="/free-crochet-patterns" className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">Free patterns</Link>
           </>
         ) : (
           <>

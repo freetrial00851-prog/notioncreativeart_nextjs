@@ -410,7 +410,7 @@ function MyOrders() {
       ) : orders.length === 0 ? (
         <EmptyCard icon="receipt_long" title="No orders yet" text="Patterns you buy appear here with receipts and downloads. Bought as a guest? Use the box above to add those orders.">
           <Link href="/shop" className={`${PRIMARY_PILL} sm:min-w-[200px]`}>Shop all patterns</Link>
-          <Link href="/shop?price=free" className={SECONDARY_PILL}>Browse free patterns</Link>
+          <Link href="/free-crochet-patterns" className={SECONDARY_PILL}>Browse free patterns</Link>
         </EmptyCard>
       ) : (
         <ul className="space-y-4">
@@ -555,7 +555,7 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
           text="Patterns you buy will appear here, ready to download anytime. Free patterns you claim show up here too."
         >
           <Link href="/shop" className={`${PRIMARY_PILL} sm:min-w-[220px]`}>Shop all patterns</Link>
-          <Link href="/shop?price=free" className={SECONDARY_PILL}>Browse free patterns</Link>
+          <Link href="/free-crochet-patterns" className={SECONDARY_PILL}>Browse free patterns</Link>
         </EmptyCard>
       </>
     )

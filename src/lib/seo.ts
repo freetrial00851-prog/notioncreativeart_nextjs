@@ -90,6 +90,28 @@ export function truncateTitleForBrandSuffix(
   return polishTruncatedTitleBase(cut)
 }
 
+/**
+ * Branded title that never cuts the keywords: brand is added only when it fits in {@link META_TITLE_MAX};
+ * otherwise the full keyword title is kept without the brand; only a title that is itself too long is cut.
+ */
+export function composeTitle(title: string, max: number = META_TITLE_MAX): string {
+  const raw = title.trim()
+  if (!raw || raw === SITE_NAME) return raw
+  const branded = `${raw}${META_TITLE_BRAND_SUFFIX}`
+  if (branded.length <= max) return branded
+  if (raw.length <= max) return raw
+  return truncateTitleForBrandSuffix(raw, max + META_TITLE_BRAND_SUFFIX.length)
+}
+
+/** Meta description cut on a word boundary with an ellipsis (no mid-word cuts). */
+export function clampDescription(text: string, max = 155): string {
+  const clean = text.replace(/\s+/g, ' ').trim()
+  if (clean.length <= max) return clean
+  const cut = clean.slice(0, max - 1)
+  const lastSpace = cut.lastIndexOf(' ')
+  return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.\-–—]+$/u, '')}…`
+}
+
 export type PageMetaInput = {
   title: string
   description: string
@@ -111,14 +133,7 @@ export type PageMetaInput = {
  * Server-rendered metadata is indexable immediately (no JS execution required).
  */
 export function buildMetadata(opts: PageMetaInput): Metadata {
-  const baseTitle = opts.truncateForSerp
-    ? truncateTitleForBrandSuffix(opts.title)
-    : opts.title.trim()
-  const fullTitle = opts.exactTitle
-    ? baseTitle
-    : baseTitle === SITE_NAME
-      ? baseTitle
-      : `${baseTitle}${META_TITLE_BRAND_SUFFIX}`
+  const fullTitle = opts.exactTitle ? opts.title.trim() : composeTitle(opts.title)
   const url = `${SITE_URL}${opts.path}`
 
   const openGraph: NonNullable<Metadata['openGraph']> = {
@@ -145,7 +160,7 @@ export function buildMetadata(opts: PageMetaInput): Metadata {
     title: fullTitle,
     description: opts.description,
     alternates: { canonical: url },
-    robots: opts.noIndex ? { index: false, follow: false } : undefined,
+    robots: opts.noIndex ? { index: false, follow: true } : undefined,
     openGraph,
     twitter,
   }
@@ -252,6 +267,7 @@ export function buildOrganizationJsonLd() {
     '@context': 'https://schema.org',
     '@type': ['Organization', 'OnlineStore'],
     name: SITE_NAME,
+    alternateName: ['NotionCreativeArt', 'NCA'],
     url: SITE_URL,
     logo: `${SITE_URL}/favicon.svg`,
     description:
@@ -371,6 +387,7 @@ export function buildWebSiteJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
+    alternateName: ['NotionCreativeArt', 'NCA'],
     url: SITE_URL,
     potentialAction: {
       '@type': 'SearchAction',

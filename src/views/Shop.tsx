@@ -57,6 +57,7 @@ export function Shop({
   initialProducts,
   initialCategories,
   introText,
+  forcedPrice,
 }: {
   initialTitle: string
   initialCategoryName?: string | null
@@ -65,6 +66,8 @@ export function Shop({
   initialCategories?: Category[]
   /** Admin-written category description, rendered in the server HTML for SEO. */
   introText?: string | null
+  /** The dedicated /free-crochet-patterns page: the price filter is part of the path, not the query string. */
+  forcedPrice?: 'free'
 }) {
   const params = useParams()
   const router = useRouter()
@@ -74,7 +77,7 @@ export function Shop({
 
   const levels = useMemo(() => parseSkillLevels(searchParams?.get('level')), [searchParams])
   const levelsKey = levels.join(',')
-  const priceFilter = searchParams?.get('price') ?? null
+  const priceFilter = forcedPrice ?? searchParams?.get('price') ?? null
   const bundleFilter = searchParams?.get('bundle') === '1'
   const saleFilter = searchParams?.get('sale') === '1'
   const sortParam = searchParams?.get('sort')
@@ -358,7 +361,7 @@ export function Shop({
         </nav>
 
         <h1 className="type-h1 text-ink mb-2">{displayTitle}</h1>
-        {introText && page === 1 && levels.length === 0 && !priceFilter && !bundleFilter && !saleFilter ? (
+        {introText && page === 1 && levels.length === 0 && (!priceFilter || !!forcedPrice) && !bundleFilter && !saleFilter ? (
           <p className="mb-4 max-w-[68ch] whitespace-pre-line text-[14px] leading-[1.75] text-muted">{introText}</p>
         ) : null}
         <p className="text-[13px] text-muted mb-4 md:mb-5" aria-live="polite">
@@ -405,14 +408,16 @@ export function Shop({
           <FilterPill
             active={isFreePill}
             onClick={() => {
-              if (isFreePill) {
+              if (isFreePill && forcedPrice) {
+                goShop('/shop')
+              } else if (isFreePill) {
                 setSearchParams((p) => {
                   p.delete('price')
                   p.delete('page')
                   return p
                 })
               } else {
-                goShop('/shop?price=free')
+                goShop('/free-crochet-patterns')
               }
             }}
           >
@@ -591,7 +596,7 @@ export function Shop({
                 <Button variant="primary" size="md" onClick={clearAllFilters}>
                   Clear all filters
                 </Button>
-                <Link href="/shop?price=free">
+                <Link href="/free-crochet-patterns">
                   <Button variant="secondary" size="md">
                     Browse free patterns
                   </Button>

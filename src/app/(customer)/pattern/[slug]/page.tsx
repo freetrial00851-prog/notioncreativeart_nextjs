@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { getImageProps } from 'next/image'
 import { preload } from 'react-dom'
-import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd } from '@/lib/seo'
+import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd, clampDescription } from '@/lib/seo'
 import { getCategoryById, getProductBySlug } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     product.meta_description?.trim() ||
     product.subtitle?.trim() ||
-    (product.description ? product.description.slice(0, 155) : '') ||
+    (product.description ? clampDescription(product.description) : '') ||
     'A crochet PDF pattern from Notion Creative Art — instant download.'
 
   const { siteOgImage } = await getSiteSeoContext()
@@ -86,6 +87,8 @@ function preloadProductLcpImage(cardUrl: string, alt: string) {
 export default async function PatternPage({ params }: Props) {
   const { slug } = await params
   const product = await getProductBySlug(slug)
+  // A removed or mistyped pattern must be a real 404, not a 200 page that search engines treat as a soft 404.
+  if (!product) notFound()
 
   let productJsonLd: ReturnType<typeof buildProductJsonLd> | null = null
   let breadcrumbJsonLd: ReturnType<typeof buildBreadcrumbListJsonLd> | null = null

@@ -87,6 +87,13 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
+      // The old filter URL for free patterns now lives on its own indexable page.
+      {
+        source: '/shop',
+        has: [{ type: 'query' as const, key: 'price', value: 'free' }],
+        destination: '/free-crochet-patterns',
+        permanent: true,
+      },
       // WooCommerce default product base → Next.js pattern PDP
       {
         source: '/product/:slug',

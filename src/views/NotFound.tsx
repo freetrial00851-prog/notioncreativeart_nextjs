@@ -8,7 +8,7 @@ const QUICK = [
   { label: 'Amigurumi', href: '/shop/amigurumi' },
   { label: 'Wearables', href: '/shop/wearables' },
   { label: 'Home decor', href: '/shop/home-decor' },
-  { label: 'Free patterns', href: '/shop?price=free' },
+  { label: 'Free patterns', href: '/free-crochet-patterns' },
 ]
 
 export function NotFound() {

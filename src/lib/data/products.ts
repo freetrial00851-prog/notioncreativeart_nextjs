@@ -14,6 +14,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     .select('*')
     .eq('slug', slug)
     .eq('active', true)
+    .is('deleted_at', null)
     .maybeSingle()
   return data as Product | null
 }
@@ -23,6 +24,23 @@ export async function getAllProductSlugs(): Promise<string[]> {
   const supabase = createStaticClient()
   const { data } = await supabase.from('products').select('slug').eq('active', true)
   return (data ?? []).map((p) => p.slug)
+}
+
+/** Everything the sitemap needs in one go: products (slug, date, photos) and the categories that actually have products. */
+export async function getSitemapData() {
+  const supabase = createStaticClient()
+  const [products, categories] = await Promise.all([
+    supabase.from('products').select('slug, created_at, images, category_id').eq('active', true).is('deleted_at', null),
+    supabase.from('categories').select('id, slug').order('sort_order'),
+  ])
+  if (products.error) throw products.error
+  if (categories.error) throw categories.error
+  const used = new Set((products.data ?? []).map((p) => p.category_id).filter(Boolean))
+  return {
+    products: products.data ?? [],
+    // Empty categories are thin pages: keep them out of the sitemap until they hold patterns.
+    categories: (categories.data ?? []).filter((c) => used.has(c.id)),
+  }
 }
 
 /** Fetches all categories — build-time safe for sitemap generation. */
@@ -84,6 +102,27 @@ export async function getShopSeed(
     let rows = (data as Product[]) ?? []
     if (categorySlug === 'sale') rows = filterProductsByListingParams(rows, { sale: true })
     return { products: rows.slice(0, limit), categories }
+  } catch {
+    return null
+  }
+}
+
+/** Server seed for the dedicated free-patterns page: free products (price 0), newest first, plus the true total. */
+export async function getFreeSeed(limit = 48): Promise<{ products: Product[]; categories: Category[]; total: number } | null> {
+  try {
+    const supabase = createStaticClient()
+    const [{ data: cats }, { data, count }] = await Promise.all([
+      supabase.from('categories').select('*').order('sort_order'),
+      supabase
+        .from('products')
+        .select('*', { count: 'exact' })
+        .eq('active', true)
+        .is('deleted_at', null)
+        .eq('price', 0)
+        .order('created_at', { ascending: false })
+        .limit(limit),
+    ])
+    return { products: (data as Product[]) ?? [], categories: (cats as Category[]) ?? [], total: count ?? (data?.length ?? 0) }
   } catch {
     return null
   }

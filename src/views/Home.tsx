@@ -66,7 +66,7 @@ function heroPrimaryHref(link: string | undefined) {
 
 function heroSecondaryHref(link: string | undefined) {
   const raw = (link ?? '').trim()
-  if (!raw || raw === '/shop' || raw === '/shop/') return '/shop?price=free'
+  if (!raw || raw === '/shop' || raw === '/shop/') return '/free-crochet-patterns'
   return raw
 }
 
@@ -581,7 +581,7 @@ export function Home({
               Try something new with our free crochet patterns. Pick a project, gather your yarn, and make a little time for
               yourself.
             </p>
-            <Link href="/shop?price=free" className="mt-3 inline-block">
+            <Link href="/free-crochet-patterns" className="mt-3 inline-block">
               <span className="inline-flex min-h-12 items-center justify-center rounded-[3px] border-2 border-white bg-white px-[22px] text-[11px] font-bold uppercase tracking-[0.12em] text-navy transition-colors hover:bg-navy hover:text-white">
                 Explore free patterns ↗
               </span>

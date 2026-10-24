@@ -1,5 +1,6 @@
 import { jsonLdString } from '@/lib/jsonLd'
 import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
 import { getCategoryBySlug } from '@/lib/data/products'
@@ -38,17 +39,47 @@ const CATEGORY_META_OVERRIDES: Record<string, { title: string; description: stri
     description:
       'Save with crochet PDF pattern bundles from Notion Creative Art. Instant download, yours to keep.',
   },
+  accessories: {
+    title: 'Crochet Accessory Patterns',
+    description:
+      'Crochet PDF patterns for bags, charms, keychains and small gifts. Quick makes with instant download and US-term instructions.',
+  },
+  'baby-kids': {
+    title: 'Baby & Kids Crochet Patterns',
+    description:
+      'Crochet PDF patterns for baby gifts, nursery toys and kids. Instant download with US-term instructions.',
+  },
+  holiday: {
+    title: 'Holiday Crochet Patterns',
+    description:
+      'Crochet PDF patterns for Halloween, Christmas, Easter and more. Festive amigurumi and decor with instant download.',
+  },
+  seasonal: {
+    title: 'Seasonal Crochet Patterns',
+    description:
+      'Seasonal crochet PDF patterns for every time of year. Instant download with US-term instructions.',
+  },
+  'kitchen-storage': {
+    title: 'Kitchen & Storage Crochet Patterns',
+    description:
+      'Crochet PDF patterns for baskets, coasters and storage. Practical makes with instant download.',
+  },
+  'tools-guides': {
+    title: 'Crochet Guides & Tools',
+    description:
+      'Crochet guides, stitch references and tools to pair with our patterns. Instant PDF download.',
+  },
   'no-sew-amigurumi': {
     title: 'No-Sew Amigurumi Patterns',
     description:
-      'Browse no-sew amigurumi patterns worked in one continuous piece—quick PDF downloads from Notion Creative Art for keychains, charms, and gifts.',
+      'Browse no-sew amigurumi patterns worked in one continuous piece. Quick PDF downloads from Notion Creative Art for keychains, charms, and gifts.',
   },
 }
 
 function categoryListingCopy(categorySlug: string, label: string) {
   const override = CATEGORY_META_OVERRIDES[categorySlug]
   return {
-    title: override?.title ?? `${label} — Shop`,
+    title: override?.title ?? `${label} Crochet Patterns`,
     description:
       override?.description ??
       `Browse ${label.toLowerCase()} crochet PDF patterns from Notion Creative Art. Instant download, beginner to advanced skill levels.`,
@@ -92,6 +123,8 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
   const intro = Object.keys(sp).length === 0 ? await getCategoryIntro(categorySlug) : null
   const virtual = virtualShopCategoryTitle(categorySlug)
   const category = virtual ? null : await getCategoryBySlug(categorySlug)
+  // Unknown category slugs are real 404s (not an indexable empty shop page).
+  if (!virtual && !category) notFound()
   const title = resolveShopPageTitle({
     categorySlug,
     categoryName: category?.name ?? null,

@@ -177,7 +177,7 @@ export function Cart() {
               Shop all patterns
             </Link>
             <Link
-              href="/shop?price=free"
+              href="/free-crochet-patterns"
               className="inline-flex min-h-11 items-center px-3 text-[15px] font-semibold text-primary underline-offset-2 hover:underline"
             >
               Browse free patterns

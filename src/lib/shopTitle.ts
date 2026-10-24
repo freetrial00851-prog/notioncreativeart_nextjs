@@ -35,7 +35,7 @@ export function resolveShopPageTitle(input: ShopTitleInput): string {
   }
 
   if (input.bundle === '1') return 'Pattern Bundles'
-  if (input.price === 'free') return 'Free Patterns'
+  if (input.price === 'free') return 'Free Crochet Patterns'
   if (input.price === 'paid') return 'Shop'
   if (input.sale === '1') return 'On Sale'
   const levels = parseSkillLevels(input.level)

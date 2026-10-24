@@ -63,7 +63,7 @@ export function AnnouncementBar() {
         </p>
       ) : (
         <>
-          <Link href="/shop?price=free" className="block hover:underline underline-offset-2">
+          <Link href="/free-crochet-patterns" className="block hover:underline underline-offset-2">
             <p className="md:hidden max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.mobile}</p>
             <p className="hidden md:block lg:hidden max-w-site mx-auto truncate leading-none">
               {DEFAULT_BY_BREAKPOINT.tablet}

@@ -25,12 +25,12 @@ import { Logo } from './Logo'
 
 const NAV_LINKS = [
   { href: '/#collections', label: 'Collections' },
-  { href: '/shop?price=free', label: 'Free patterns' },
+  { href: '/free-crochet-patterns', label: 'Free patterns' },
   { href: '/about', label: 'Our story' },
 ] as const
 
 const POPULAR_SEARCHES = [
-  { label: 'Free patterns', href: '/shop?price=free' },
+  { label: 'Free patterns', href: '/free-crochet-patterns' },
   { label: 'Beginner', href: '/shop?level=beginner' },
   { label: 'Amigurumi', href: '/shop/amigurumi' },
   { label: 'New arrivals', href: '/shop?sort=newest' },
@@ -415,7 +415,7 @@ export function Header() {
                   {[
                     { href: '/shop', label: 'Shop patterns' },
                     { href: '/shop?sort=newest', label: 'New arrivals' },
-                    { href: '/shop?price=free', label: 'Free patterns' },
+                    { href: '/free-crochet-patterns', label: 'Free patterns' },
                     { href: '/#collections', label: 'Collections' },
                     { href: '/about', label: 'Our story' },
                   ].map((l) => (
@@ -574,7 +574,7 @@ function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]
               {[
                 { href: '/shop', label: 'All patterns' },
                 { href: '/shop?sort=newest', label: 'New arrivals' },
-                { href: '/shop?price=free', label: 'Free patterns' },
+                { href: '/free-crochet-patterns', label: 'Free patterns' },
               ].map((l) => (
                 <li key={l.href}>
                   <Link
