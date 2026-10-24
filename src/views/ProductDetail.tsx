@@ -1146,20 +1146,9 @@ export function ProductDetail({
                 >
                   <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-sale)' : 'currentColor'} />
                 </button>
-                {inCart ? (
-                  <Link href="/cart" className={`${primaryButtonClass} flex-1`}>
-                    View cart
-                  </Link>
-                ) : (
-                  <>
-                    <button type="button" onClick={toggleCart} className={`${secondaryButtonClass} flex-1`}>
-                      Add to cart
-                    </button>
-                    <button type="button" onClick={handleBuy} disabled={buying} aria-busy={buying || undefined} className={`${primaryButtonClass} flex-1`}>
-                      {buying ? 'Opening…' : 'Buy now'}
-                    </button>
-                  </>
-                )}
+                <button type="button" onClick={handleBuy} disabled={buying} aria-busy={buying || undefined} className={`${primaryButtonClass} flex-1`}>
+                  {buying ? 'Opening…' : 'Buy now'}
+                </button>
               </>
             )}
             {mode === 'owned' && (
