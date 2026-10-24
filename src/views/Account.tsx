@@ -224,6 +224,65 @@ function EmptyCard({ icon, title, text, children }: { icon: string; title: strin
   )
 }
 
+/** Adds orders paid as a guest to this account. Proof of the email comes from Google sign-in or an emailed link. */
+function ClaimGuestOrders({ onClaimed }: { onClaimed: () => void }) {
+  const searchParams = useSearchParams()
+  const { showToast } = useToast()
+  const claimToken = searchParams.get('claim') ?? ''
+  const [busy, setBusy] = useState(false)
+  const [sent, setSent] = useState(false)
+  const ran = useRef(false)
+
+  const run = async (token?: string, quiet = false) => {
+    if (busy) return
+    setBusy(true)
+    const { data, error } = await supabase.functions.invoke('claim-guest-orders', { body: token ? { token } : {} })
+    setBusy(false)
+    if (error) {
+      let text = 'Something went wrong. Please try again in a moment.'
+      try {
+        const body = await (error as { context?: Response }).context?.json()
+        if (body?.error) text = body.error
+      } catch {
+        /* keep generic */
+      }
+      if (!quiet) showToast(text, 'error')
+      return
+    }
+    const result = (data ?? {}) as { claimed?: number; sent?: boolean }
+    if (result.sent) {
+      setSent(true)
+    } else if (result.claimed) {
+      showToast(result.claimed === 1 ? 'Added 1 order to your account.' : `Added ${result.claimed} orders to your account.`, 'success')
+      onClaimed()
+    } else if (!quiet) {
+      showToast('We found no guest orders for your email.', 'info')
+    }
+  }
+
+  useEffect(() => {
+    if (ran.current) return
+    ran.current = true
+    if (claimToken) void run(claimToken)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <div className="mb-4 rounded-[10px] border border-border bg-surface p-4 text-[14px] text-muted">
+      {sent ? (
+        <p role="status">We emailed you a link. Open it while signed in to add your guest orders to this account.</p>
+      ) : (
+        <p>
+          Paid before you had an account?{' '}
+          <button type="button" disabled={busy} onClick={() => void run()} className="underline disabled:opacity-60">
+            {busy ? 'Checking…' : 'Add my guest orders to this account'}
+          </button>
+        </p>
+      )}
+    </div>
+  )
+}
+
 function MyOrders() {
   const { user } = useAuth()
   const { showToast } = useToast()
@@ -232,12 +291,13 @@ function MyOrders() {
   const [products, setProducts] = useState<Map<string, Pick<Product, 'id' | 'title' | 'slug' | 'images'>>>(new Map())
   const [receiptBusy, setReceiptBusy] = useState<string | null>(null)
   const [downloadingOrder, setDownloadingOrder] = useState<string | null>(null)
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     if (!user) return
     supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
       .then(({ data }) => { setOrders((data as OrderRow[]) ?? []); setLoading(false) })
-  }, [user])
+  }, [user, reloadKey])
 
   const productIdsKey = useMemo(
     () => [...new Set(orders.flatMap((o) => o.product_ids ?? []))].sort().join(','),
@@ -292,6 +352,7 @@ function MyOrders() {
   return (
     <div>
       <AccountPageHeader title="Orders" subtitle="Every purchase, with a receipt you can download." />
+      <ClaimGuestOrders onClaimed={() => setReloadKey((k) => k + 1)} />
       {loading ? (
         <ListRowSkeleton />
       ) : orders.length === 0 ? (
