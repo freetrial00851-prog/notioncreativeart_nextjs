@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { slugFromTitle } from '../lib/slug'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -476,7 +477,7 @@ export function ProductsAdmin({ mode }: { mode: 'all' | 'free' | 'bundles' | 'li
 
   const save = async (publish: boolean): Promise<string | null> => {
     setSaveError(null)
-    const slug = form.slug.trim() || slugify(form.title)
+    const slug = form.slug.trim() || slugFromTitle(form.title)
     if (!form.title.trim()) {
       setSaveError('Add a title before saving.')
       return null

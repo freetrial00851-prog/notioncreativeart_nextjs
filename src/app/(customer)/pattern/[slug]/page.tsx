@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { getImageProps } from 'next/image'
 import { preload } from 'react-dom'
 import { buildBreadcrumbListJsonLd, buildMetadata, buildProductJsonLd, clampDescription } from '@/lib/seo'
-import { getCategoryById, getProductBySlug, getRelatedProducts } from '@/lib/data/products'
+import { getCategoryById, getProductBySlug, getRedirectSlug, getRelatedProducts } from '@/lib/data/products'
 import { getApprovedReviews, getProductReviewStats } from '@/lib/data/reviews'
 import { deriveVariantUrl } from '@/lib/imageVariants'
 import { isVercelProduction } from '@/lib/env'
@@ -88,7 +88,12 @@ export default async function PatternPage({ params }: Props) {
   const { slug } = await params
   const product = await getProductBySlug(slug)
   // A removed or mistyped pattern must be a real 404, not a 200 page that search engines treat as a soft 404.
-  if (!product) notFound()
+  if (!product) {
+    // A renamed pattern: send old links (search results, pins, emails) to the new address with a permanent redirect.
+    const next = await getRedirectSlug(slug)
+    if (next && next !== slug) permanentRedirect(`/pattern/${next}`)
+    notFound()
+  }
 
   let productJsonLd: ReturnType<typeof buildProductJsonLd> | null = null
   let breadcrumbJsonLd: ReturnType<typeof buildBreadcrumbListJsonLd> | null = null

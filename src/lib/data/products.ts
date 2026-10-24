@@ -19,6 +19,22 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return data as Product | null
 }
 
+/** Current slug for a retired one (set by a database trigger whenever a slug is renamed), or null. */
+export async function getRedirectSlug(oldSlug: string): Promise<string | null> {
+  try {
+    const supabase = createStaticClient()
+    const { data } = await supabase
+      .from('product_slug_history')
+      .select('product:products!inner(slug, active, deleted_at)')
+      .eq('old_slug', oldSlug)
+      .maybeSingle()
+    const product = (data as { product?: { slug: string; active: boolean; deleted_at: string | null } | null } | null)?.product
+    return product && product.active && !product.deleted_at ? product.slug : null
+  } catch {
+    return null
+  }
+}
+
 /** Fetches all active product slugs — build-time safe, no cookies required. */
 export async function getAllProductSlugs(): Promise<string[]> {
   const supabase = createStaticClient()

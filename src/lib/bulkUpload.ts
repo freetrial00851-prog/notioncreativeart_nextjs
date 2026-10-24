@@ -1,4 +1,5 @@
 import Papa from 'papaparse'
+import { slugFromTitle } from './slug'
 import type { Category } from './types'
 
 /** Exact CSV headers expected by the bulk uploader. */
@@ -42,11 +43,7 @@ const IMAGE_EXT = new Set(['jpg', 'jpeg', 'png', 'webp'])
 const SKILL_LEVELS = new Set(['beginner', 'intermediate', 'advanced'])
 
 export function slugify(title: string) {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+  return slugFromTitle(title)
 }
 
 function fileExt(name: string) {

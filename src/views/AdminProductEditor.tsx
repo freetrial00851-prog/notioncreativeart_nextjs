@@ -8,6 +8,7 @@ import { triggerPdfDownload } from '../lib/downloads'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import type { Category } from '../lib/types'
 import { Btn, Card, Chip, Field, Toggle, inputCls, textareaCls, slugify, useAdminUi } from '../components/adminUi'
+import { slugFromTitle } from '../lib/slug'
 
 export type ProductForm = {
   id: string
@@ -185,7 +186,7 @@ export function ProductEditor(p: Props) {
                   value={form.title}
                   maxLength={120}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  onBlur={() => !form.slug && setForm((f) => ({ ...f, slug: slugify(f.title) }))}
+                  onBlur={() => !form.slug && setForm((f) => ({ ...f, slug: slugFromTitle(f.title) }))}
                   className={inputCls}
                   placeholder="e.g. Granny Stripe Cardigan Pattern"
                 />
@@ -338,7 +339,7 @@ export function ProductEditor(p: Props) {
               <span aria-hidden className="text-[#8a8f98] transition-transform group-open:rotate-180">⌄</span>
             </summary>
             <div className="space-y-4 border-t border-[#EEF0F2] p-5">
-              <Field label="Web address" hint={<>notioncreativeart.com/pattern/<b>{form.slug || slugify(form.title) || 'your-pattern'}</b></>}>
+              <Field label="Web address" hint={<>notioncreativeart.com/pattern/<b>{form.slug || slugFromTitle(form.title) || 'your-pattern'}</b></>}>
                 <input value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className={inputCls} placeholder="granny-stripe-cardigan" />
               </Field>
               <Field label="Google title" right={`${form.meta_title.length}/60`}>
@@ -350,7 +351,7 @@ export function ProductEditor(p: Props) {
               <div className="rounded-xl bg-[#F6F6F7] p-4">
                 <p className="text-[12px] text-[#6b7280]">How it can look in Google</p>
                 <p className="mt-1 text-[17px] leading-tight text-[#1a0dab]">{form.meta_title || form.title || 'Pattern title'}</p>
-                <p className="text-[12px] text-[#188038]">notioncreativeart.com › pattern › {form.slug || slugify(form.title) || '…'}</p>
+                <p className="text-[12px] text-[#188038]">notioncreativeart.com › pattern › {form.slug || slugFromTitle(form.title) || '…'}</p>
                 <p className="mt-0.5 text-[13px] text-[#4B5563]">{(form.meta_description || form.description || 'Description').slice(0, 155)}</p>
               </div>
             </div>

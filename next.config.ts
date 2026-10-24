@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { RENAMED_PATTERN_SLUGS } from './src/lib/slugRedirects'
 
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
@@ -87,6 +88,12 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
+      // Shortened product web addresses: one permanent hop from each old address.
+      ...RENAMED_PATTERN_SLUGS.map(([from, to]) => ({
+        source: `/pattern/${from}`,
+        destination: `/pattern/${to}`,
+        permanent: true,
+      })),
       // The old filter URL for free patterns now lives on its own indexable page.
       {
         source: '/shop',

@@ -6,7 +6,8 @@ import { supabase } from '../lib/supabase'
 import { PRODUCT_IMAGE_CACHE_CONTROL, processAndUploadImage, sanitizeFilename, validateImageFile } from '../lib/imageVariants'
 import { validatePdfFile } from '../lib/uploadValidation'
 import type { Category } from '../lib/types'
-import { Btn, Card, Chip, Empty, PageHeader, slugify, useAdminUi } from '../components/adminUi'
+import { Btn, Card, Chip, Empty, PageHeader, useAdminUi } from '../components/adminUi'
+import { slugFromTitle } from '../lib/slug'
 
 /** One entry of listings.json (all fields optional except what you want filled in). */
 type Draft = {
@@ -131,11 +132,11 @@ export function AdminImport() {
     try {
       const d = it.data
       const title = (d.title ?? pretty(it.folder)).trim()
-      let slug = slugify(d.slug || title)
+      let slug = slugFromTitle(d.slug || title)
       for (let n = 2; ; n++) {
         const { data } = await supabase.from('products').select('id').eq('slug', slug).maybeSingle()
         if (!data) break
-        slug = `${slugify(d.slug || title)}-${n}`
+        slug = `${slugFromTitle(d.slug || title)}-${n}`
       }
       const category = d.category ? categories.find((c) => c.name.toLowerCase() === d.category!.toLowerCase()) : undefined
 
