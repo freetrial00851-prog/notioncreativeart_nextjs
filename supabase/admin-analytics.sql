@@ -379,7 +379,7 @@ begin
       select jsonb_agg(t) from (
         select e.created_at as at, e.event_name as event, e.path,
                (select pr.title from public.products pr where pr.id = e.product_id) as product,
-               (select coalesce(nullif(btrim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '')), ''), split_part(u.email, '@', 1))
+               (select coalesce(nullif(btrim(coalesce(p.name, '')), ''), split_part(u.email, '@', 1))
                   from auth.users u left join public.profiles p on p.id = u.id where u.id = e.user_id) as customer,
                e.user_id
         from public.events e
@@ -431,7 +431,7 @@ begin
   with base as (
     select u.id as user_id,
            u.email::text as email,
-           nullif(btrim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '')), '') as name,
+           nullif(btrim(coalesce(p.name, '')), '') as name,
            u.created_at as joined,
            u.last_sign_in_at as last_sign_in,
            (select count(*) from public.orders o
@@ -502,7 +502,7 @@ begin
     'profile', (
       select to_jsonb(x) from (
         select u.id, u.email::text as email, u.created_at, u.last_sign_in_at,
-               p.first_name, p.last_name, p.billing_country, p.billing_state, p.billing_zip
+               p.name, p.billing_country, p.billing_state, p.billing_zip
         from auth.users u left join public.profiles p on p.id = u.id
         where u.id = p_user_id
       ) x),
@@ -584,7 +584,7 @@ begin
   with rows_ as (
     select wl.user_id,
            u.email::text as email,
-           nullif(btrim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '')), '') as name,
+           nullif(btrim(coalesce(p.name, '')), '') as name,
            pr.id as product_id, pr.title, pr.slug, pr.price,
            wl.created_at as added_at,
            exists (select 1 from public.purchases pu where pu.user_id = wl.user_id and pu.product_id = wl.product_id) as bought
@@ -630,7 +630,7 @@ begin
   return query
   select c.user_id,
          u.email::text,
-         nullif(btrim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, '')), ''),
+         nullif(btrim(coalesce(p.name, '')), ''),
          jsonb_agg(jsonb_build_object('product_id', pr.id, 'title', pr.title, 'slug', pr.slug, 'price', pr.price) order by c.added_at),
          count(*),
          coalesce(sum(pr.price), 0),
@@ -640,7 +640,7 @@ begin
   join public.products pr on pr.id = c.product_id
   join auth.users u on u.id = c.user_id
   left join public.profiles p on p.id = c.user_id
-  group by c.user_id, u.email, p.first_name, p.last_name
+  group by c.user_id, u.email, p.name
   order by max(c.updated_at) desc;
 end
 $$;
