@@ -175,7 +175,7 @@ export function CartDrawer() {
                 onClick={handleCheckout}
                 iconRight={checkingOut ? undefined : <ArrowIcon />}
               >
-                Checkout
+                Checkout · ${total.toFixed(2)}
               </Button>
               <button
                 type="button"
@@ -187,7 +187,8 @@ export function CartDrawer() {
               <p className="flex items-start gap-2 text-[12px] text-muted leading-relaxed">
                 <MaterialIcon name="verified_user" size={15} color="var(--color-free)" className="mt-0.5 shrink-0" />
                 <span>
-                  Secure checkout by {payProviderName}. {payProvider === 'paddle' ? 'No account needed: your download link appears right after payment.' : 'You will sign in or create a free account to get your downloads.'}
+                  Secure checkout by {payProviderName}. {payProvider === 'paddle' ? 'No account needed: your download link appears right after payment.' : 'You will sign in or create a free account to get your downloads.'}{' '}
+                  <Link href="/refund-policy" onClick={closeDrawer} className="font-semibold text-primary underline">14-day refund policy</Link>
                 </span>
               </p>
             </div>

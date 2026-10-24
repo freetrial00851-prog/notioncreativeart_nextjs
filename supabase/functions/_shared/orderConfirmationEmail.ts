@@ -129,16 +129,20 @@ export function buildOrderConfirmationEmail(params: OrderConfirmationParams): {
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
                 <tr>
                   <td align="center" style="border-radius:10px;background:${SAGE};">
-                    <a href="${escapeHtml(downloadsUrl)}" style="display:inline-block;padding:14px 28px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:0.04em;text-decoration:none;color:#ffffff;">
-                      Download your patterns
+                    <a href="${escapeHtml(downloadsUrl)}" style="display:inline-block;padding:16px 32px;mso-padding-alt:16px 32px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;letter-spacing:0.04em;text-decoration:none;color:#ffffff;">
+                      ${products.length === 1 ? 'Download my pattern' : 'Download my patterns'}
                     </a>
                   </td>
                 </tr>
               </table>
 
+              <p style="margin:0 0 12px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:${MUTED};word-break:break-all;">
+                Button not working? Copy this link: ${escapeHtml(downloadsUrl)}
+              </p>
               <p style="margin:0 0 8px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:${MUTED};">
                 ${footnote}
               </p>
+              ${guest ? `<p style="margin:0 0 8px;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:${MUTED};">Want all your patterns in one place? Create a free account with this email at <a href="https://notioncreativeart.com/signup" style="color:${NAVY};font-weight:600;">notioncreativeart.com/signup</a>.</p>` : ''}
               <p style="margin:0;font-family:Manrope,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:${MUTED};">
                 Happy making,<br />
                 <span style="color:${NAVY};font-weight:600;">Notion Creative Art</span>
@@ -170,6 +174,7 @@ export function buildOrderConfirmationEmail(params: OrderConfirmationParams): {
     `Amount paid: ${paid}`,
     '',
     `Download your patterns: ${downloadsUrl}`,
+    ...(guest ? ['', 'The link is private to you and works for 30 days. Lost it? Request a new one at https://notioncreativeart.com/resend-download', 'Want all your patterns in one place? Create a free account with this email: https://notioncreativeart.com/signup'] : []),
     '',
     'Happy making,',
     'Notion Creative Art',

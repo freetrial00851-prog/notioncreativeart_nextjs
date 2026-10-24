@@ -225,19 +225,23 @@ function EmptyCard({ icon, title, text, children }: { icon: string; title: strin
 }
 
 /** Adds orders paid as a guest to this account. Proof of the email comes from Google sign-in or an emailed link. */
-function ClaimGuestOrders({ onClaimed }: { onClaimed: () => void }) {
+function ClaimGuestOrders({ onClaimed, quiet }: { onClaimed: () => void; quiet: boolean }) {
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { user } = useAuth()
   const { showToast } = useToast()
   const claimToken = searchParams.get('claim') ?? ''
-  const [busy, setBusy] = useState(false)
-  const [sent, setSent] = useState(false)
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'none' | 'claimed'>(claimToken ? 'sending' : 'idle')
+  const [count, setCount] = useState(0)
+  const [cooldown, setCooldown] = useState(0)
   const ran = useRef(false)
+  const email = user?.email ?? 'your email'
 
-  const run = async (token?: string, quiet = false) => {
-    if (busy) return
-    setBusy(true)
+  const run = async (token?: string) => {
+    if (state === 'sending' && !token) return
+    setState('sending')
     const { data, error } = await supabase.functions.invoke('claim-guest-orders', { body: token ? { token } : {} })
-    setBusy(false)
+    if (token) router.replace('/account/orders')
     if (error) {
       let text = 'Something went wrong. Please try again in a moment.'
       try {
@@ -246,40 +250,88 @@ function ClaimGuestOrders({ onClaimed }: { onClaimed: () => void }) {
       } catch {
         /* keep generic */
       }
-      if (!quiet) showToast(text, 'error')
+      setState('idle')
+      showToast(text, 'error')
       return
     }
     const result = (data ?? {}) as { claimed?: number; sent?: boolean }
     if (result.sent) {
-      setSent(true)
+      setState('sent')
+      setCooldown(30)
     } else if (result.claimed) {
-      showToast(result.claimed === 1 ? 'Added 1 order to your account.' : `Added ${result.claimed} orders to your account.`, 'success')
+      setCount(result.claimed)
+      setState('claimed')
       onClaimed()
-    } else if (!quiet) {
-      showToast('We found no guest orders for your email.', 'info')
+    } else {
+      setState('none')
     }
   }
 
   useEffect(() => {
     if (ran.current) return
     ran.current = true
-    if (claimToken) void run(claimToken)
+    if (claimToken) void Promise.resolve().then(() => run(claimToken))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [cooldown])
+
+  if (state === 'claimed') {
+    return (
+      <p role="status" className={`${ACCOUNT_CARD} mb-4 p-4 text-[15px] text-ink`}>
+        <MaterialIcon name="check_circle" size={20} color="var(--color-free)" className="mr-2 align-text-bottom" />
+        Added {count === 1 ? '1 order' : `${count} orders`} to your account. Your patterns are in My downloads.
+      </p>
+    )
+  }
+
+  if (quiet && state === 'idle') {
+    return (
+      <p className="mb-4 text-[14px] text-muted">
+        Bought a pattern as a guest?{' '}
+        <button type="button" onClick={() => void run()} className="font-semibold text-primary underline">Find my guest orders</button>
+      </p>
+    )
+  }
+
   return (
-    <div className="mb-4 rounded-[10px] border border-border bg-surface p-4 text-[14px] text-muted">
-      {sent ? (
-        <p role="status">We emailed you a link. Open it while signed in to add your guest orders to this account.</p>
-      ) : (
-        <p>
-          Paid before you had an account?{' '}
-          <button type="button" disabled={busy} onClick={() => void run()} className="underline disabled:opacity-60">
-            {busy ? 'Checking…' : 'Add my guest orders to this account'}
-          </button>
-        </p>
+    <section aria-labelledby="claim-title" className={`${ACCOUNT_CARD} mb-4 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between`}>
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] bg-primary-soft" aria-hidden>
+          <MaterialIcon name="mark_email_read" size={22} color="var(--color-primary)" />
+        </span>
+        <div role="status">
+          <h2 id="claim-title" className="text-[16px] font-bold text-ink">
+            {state === 'sent' ? 'Check your inbox' : 'Bought before you had an account?'}
+          </h2>
+          <p className="mt-0.5 text-[14px] text-muted">
+            {state === 'sent' && `We sent a one-time link to ${email}. Open it while signed in to add your orders. It can take a minute; check spam or promotions too.`}
+            {state === 'none' && `No guest orders found for ${email}. If you paid with a different email, sign in with that one, or contact us.`}
+            {(state === 'idle' || state === 'sending') && `Add those guest orders here to see them with your downloads. We'll check ${email}.`}
+          </p>
+          {(state === 'sent' || state === 'none') && (
+            <p className="mt-1 text-[14px]">
+              <Link href="/contact" className="font-semibold text-primary underline">Contact us</Link>
+            </p>
+          )}
+        </div>
+      </div>
+      {state !== 'none' && (
+        <button
+          type="button"
+          onClick={() => void run()}
+          disabled={state === 'sending' || (state === 'sent' && cooldown > 0)}
+          aria-busy={state === 'sending' || undefined}
+          className={`${SECONDARY_PILL} w-full sm:w-auto sm:shrink-0`}
+        >
+          {state === 'sending' ? 'Checking…' : state === 'sent' ? (cooldown > 0 ? `Resend link (${cooldown}s)` : 'Resend link') : 'Find my guest orders'}
+        </button>
       )}
-    </div>
+    </section>
   )
 }
 
@@ -352,12 +404,13 @@ function MyOrders() {
   return (
     <div>
       <AccountPageHeader title="Orders" subtitle="Every purchase, with a receipt you can download." />
-      <ClaimGuestOrders onClaimed={() => setReloadKey((k) => k + 1)} />
+      <ClaimGuestOrders quiet={orders.length > 0} onClaimed={() => setReloadKey((k) => k + 1)} />
       {loading ? (
         <ListRowSkeleton />
       ) : orders.length === 0 ? (
-        <EmptyCard icon="receipt_long" title="No orders yet" text="Patterns you buy will show up here with their receipts.">
+        <EmptyCard icon="receipt_long" title="No orders yet" text="Patterns you buy appear here with receipts and downloads. Bought as a guest? Use the box above to add those orders.">
           <Link href="/shop" className={`${PRIMARY_PILL} sm:min-w-[200px]`}>Shop all patterns</Link>
+          <Link href="/shop?price=free" className={SECONDARY_PILL}>Browse free patterns</Link>
         </EmptyCard>
       ) : (
         <ul className="space-y-4">

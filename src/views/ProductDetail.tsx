@@ -828,25 +828,29 @@ export function ProductDetail({
               {mode === 'paid' && (
                 product.sold_out ? soldOutPill : (
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1">
-                    {inCart ? (
-                      <Link href="/cart" className={primaryButtonClass}>
-                        <span className="animate-pop inline-flex"><MaterialIcon name="check" size={20} /></span>
-                        In cart, view cart
-                      </Link>
-                    ) : (
-                      <button type="button" onClick={toggleCart} className={primaryButtonClass}>
-                        Add to cart
-                      </button>
-                    )}
                     <button
                       type="button"
                       onClick={handleBuy}
                       disabled={buying}
                       aria-busy={buying || undefined}
-                      className={secondaryButtonClass}
+                      className={primaryButtonClass}
                     >
-                      Buy now
+                      {buying ? 'Opening checkout…' : `Buy now · $${product.price.toFixed(2)}`}
                     </button>
+                    {inCart ? (
+                      <Link href="/cart" className={secondaryButtonClass}>
+                        <span className="animate-pop inline-flex"><MaterialIcon name="check" size={20} /></span>
+                        In cart, view cart
+                      </Link>
+                    ) : (
+                      <button type="button" onClick={toggleCart} className={secondaryButtonClass}>
+                        Add to cart
+                      </button>
+                    )}
+                    <p className="flex items-center justify-center gap-1.5 text-[13px] text-muted md:col-span-2 lg:col-span-1">
+                      <MaterialIcon name="verified_user" size={16} color="var(--color-free)" />
+                      Instant PDF download. {payProvider === 'paddle' ? 'No account needed.' : 'Free account required.'}
+                    </p>
                   </div>
                 )
               )}
@@ -1122,12 +1126,17 @@ export function ProductDetail({
                 </button>
                 {inCart ? (
                   <Link href="/cart" className={`${primaryButtonClass} flex-1`}>
-                    In cart
+                    View cart
                   </Link>
                 ) : (
-                  <button type="button" onClick={toggleCart} className={`${primaryButtonClass} flex-1`}>
-                    Add to cart
-                  </button>
+                  <>
+                    <button type="button" onClick={toggleCart} className={`${secondaryButtonClass} flex-1`}>
+                      Add to cart
+                    </button>
+                    <button type="button" onClick={handleBuy} disabled={buying} aria-busy={buying || undefined} className={`${primaryButtonClass} flex-1`}>
+                      {buying ? 'Opening…' : 'Buy now'}
+                    </button>
+                  </>
                 )}
               </>
             )}

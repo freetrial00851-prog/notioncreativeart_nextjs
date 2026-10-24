@@ -113,9 +113,10 @@ export function PaddleCheckout() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-5 py-10 md:py-14">
+      <Link href="/cart" className="mb-2 inline-flex min-h-11 items-center text-[15px] font-medium text-muted hover:text-ink">← Back to cart</Link>
       <h1 className="type-h1 mb-2 text-ink">Checkout</h1>
       <p className="mb-6 text-[14px] text-muted">
-        Secure payment, processed by Paddle, our merchant of record. Your PDF is available as soon as the payment goes through.
+        Pay securely by card or wallet, processed by Paddle, our merchant of record. Your PDF download appears right after payment and we&apos;ll email you the link. No account needed.
       </p>
 
       {PADDLE_ENVIRONMENT === 'sandbox' && (
@@ -160,16 +161,27 @@ export function PaddleCheckout() {
               <button type="button" className="underline" onClick={() => window.location.reload()}>try again</button>.
             </p>
           )}
-          {phase === 'error' && message && <p role="alert">{message}</p>}
+          {phase === 'error' && message && (
+            <>
+              <p role="alert">{message}</p>
+              <p className="mt-2">
+                <Link href="/shop" className="font-semibold text-primary underline">Back to the shop</Link>
+                {' · '}
+                <Link href="/contact" className="font-semibold text-primary underline">Contact us</Link>
+              </p>
+            </>
+          )}
           {phase !== 'error' && message && <p role="alert" className="mt-2 text-sale">{message}</p>}
         </div>
 
+        <p className="mb-3 text-[13px] text-muted">Instant PDF download · 14-day refund policy · Secure payment by Paddle</p>
         <div className={`${FRAME_CLASS} ${phase === 'error' || phase === 'blocked' ? 'hidden' : ''}`} />
       </section>
 
       <p className="mt-5 text-[13px] text-muted">
         By paying you agree to our <Link href="/terms" className="underline">Terms</Link>,{' '}
-        <Link href="/refund-policy" className="underline">Refund policy</Link> and{' '}
+        <Link href="/refund-policy" className="underline">Refund policy</Link>,{' '}
+        <Link href="/privacy" className="underline">Privacy policy</Link> and{' '}
         <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer" className="underline">Paddle&apos;s Checkout Buyer Terms</a>.
         Paddle.com Market Limited is our merchant of record. Digital download; any sales tax or VAT is calculated in the checkout.{' '}
         <Link href="/shop" className="underline">Back to the shop</Link>

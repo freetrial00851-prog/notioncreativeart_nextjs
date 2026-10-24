@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import {
   activeAnnouncementMessages,
@@ -11,9 +12,9 @@ import {
 
 /** DESIGN_SPEC §1 — default copy when CMS announcements are empty / disabled. */
 const DEFAULT_BY_BREAKPOINT = {
-  mobile: 'Instant PDF download · Free patterns available',
-  tablet: 'Instant PDF download on every pattern · Free patterns available',
-  desktop: 'Instant PDF download on every pattern · Free patterns available, no account needed',
+  mobile: 'Instant PDF · Free patterns, no account →',
+  tablet: 'Instant PDF download on every pattern · Free patterns, no account needed →',
+  desktop: 'Instant PDF download on every pattern · Free patterns available, no account needed →',
 } as const
 
 /**
@@ -62,11 +63,13 @@ export function AnnouncementBar() {
         </p>
       ) : (
         <>
-          <p className="md:hidden max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.mobile}</p>
-          <p className="hidden md:block lg:hidden max-w-site mx-auto truncate leading-none">
-            {DEFAULT_BY_BREAKPOINT.tablet}
-          </p>
-          <p className="hidden lg:block max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.desktop}</p>
+          <Link href="/shop?price=free" className="block hover:underline underline-offset-2">
+            <p className="md:hidden max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.mobile}</p>
+            <p className="hidden md:block lg:hidden max-w-site mx-auto truncate leading-none">
+              {DEFAULT_BY_BREAKPOINT.tablet}
+            </p>
+            <p className="hidden lg:block max-w-site mx-auto truncate leading-none">{DEFAULT_BY_BREAKPOINT.desktop}</p>
+          </Link>
         </>
       )}
     </div>

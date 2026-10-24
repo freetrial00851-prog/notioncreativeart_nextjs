@@ -324,7 +324,7 @@ export function Cart() {
             onClick={handleCheckout}
             iconRight={checkingOut ? undefined : <span aria-hidden>→</span>}
           >
-            Checkout
+            Checkout · {money(total)}
           </Button>
           {!user && (
             <p className="mt-2.5 text-center text-[12px] text-muted">
@@ -350,6 +350,10 @@ export function Cart() {
               <ClockIcon />
               Download link also sent to your email
             </li>
+            <li className="flex items-center gap-2.5">
+              <MaterialIcon name="verified_user" size={16} color="var(--color-free)" className="shrink-0" />
+              <span>14-day refund policy <Link href="/refund-policy" className="font-semibold text-primary underline">(read)</Link></span>
+            </li>
           </ul>
         </aside>
       </div>
@@ -369,7 +373,7 @@ export function Cart() {
             loading={checkingOut}
             onClick={handleCheckout}
           >
-            Checkout
+            Checkout · {money(total)}
           </Button>
         </div>
       </div>

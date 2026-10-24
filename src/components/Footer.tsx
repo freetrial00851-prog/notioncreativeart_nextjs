@@ -20,6 +20,7 @@ const ACCOUNT = [
   { label: 'My purchases', to: '/account/orders' },
   { label: 'Wishlist', to: '/account/wishlist' },
   { label: 'Shopping bag', to: '/cart' },
+  { label: 'Lost your download?', to: '/resend-download' },
 ]
 
 const LINK =
