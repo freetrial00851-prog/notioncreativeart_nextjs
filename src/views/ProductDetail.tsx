@@ -194,6 +194,28 @@ export function ProductDetail({
   const [related, setRelated] = useState<Product[]>([])
   const [activeImage, setActiveImage] = useState(0)
   const imageCount = product?.images?.length ?? 0
+  // Warm every gallery photo (same optimised URL the slider will ask for) so a swipe never waits on the network
+  // or on a cold image encode. Starts after the first photo, which keeps its high-priority preload.
+  const galleryImages = product?.images ?? []
+  const imagesKey = galleryImages.join('|')
+  useEffect(() => {
+    if (galleryImages.length < 2) return
+    const timer = setTimeout(() => {
+      galleryImages.forEach((src, i) => {
+        if (i === 0) return
+        const { props } = getImageProps({ src: deriveVariantUrl(src, 'large'), alt: '', fill: true, sizes: GALLERY_LCP_SIZES })
+        const img = new window.Image()
+        img.decoding = 'async'
+        img.sizes = GALLERY_LCP_SIZES
+        if (props.srcSet) img.srcset = props.srcSet
+        img.src = props.src
+        void img.decode?.().catch(() => {})
+      })
+    }, 300)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imagesKey])
+
   const { containerRef: swipeContainerRef, slideRef: swipeSlideRef, go: swipeGo, handlers: swipeHandlers } = useSwipeCarousel({
     count: imageCount,
     onNext: () => setActiveImage((i) => (i + 1) % Math.max(imageCount, 1)),

@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react'
 import { flushSync } from 'react-dom'
-import { SPRING_DEFAULT, SPRING_FLICK, VelocityTracker, createSpring, prefersReducedMotion, project, type Spring } from './spring'
+import { VelocityTracker, createSpring, prefersReducedMotion, project, type Spring } from './spring'
 
 const HYSTERESIS = 10 // px before a drag commits to a direction
 const FLICK_SPEED = 300 // px/s — above this the SIGN of velocity decides, not the position
+const COMMIT_FRACTION = 0.25 // of the width: a shorter drag is enough to turn the page
+// Photo carousel only: quicker than the shared sheet/drawer spring so a swipe feels immediate.
+const SPRING_SWIPE = { damping: 1, response: 0.28 }
+const SPRING_SWIPE_FLICK = { damping: 0.85, response: 0.22 }
 
 /**
  * Pointer-driven carousel for a single visible slide.
@@ -64,7 +68,7 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
     }
     spring.to(-dir * w, {
       velocity,
-      config: fromFlick ? SPRING_FLICK : SPRING_DEFAULT,
+      config: fromFlick ? SPRING_SWIPE_FLICK : SPRING_SWIPE,
       onComplete: () => {
         flushSync(() => swap())
         spring.set(0)
@@ -73,7 +77,7 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
   }, [])
 
   const settle = useCallback((velocity = 0, fromFlick = false) => {
-    springRef.current?.to(0, { velocity, config: fromFlick ? SPRING_FLICK : SPRING_DEFAULT })
+    springRef.current?.to(0, { velocity, config: fromFlick ? SPRING_SWIPE_FLICK : SPRING_SWIPE })
   }, [])
 
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
@@ -122,7 +126,7 @@ export function useSwipeCarousel({ count, onNext, onPrev }: { count: number; onN
     // Velocity sign decides reverse-vs-commit; otherwise position.
     let dir: 1 | -1 | 0 = 0
     if (flick) dir = v < 0 ? 1 : -1
-    else if (Math.abs(pos + project(v)) > width() * 0.33) dir = pos < 0 ? 1 : -1
+    else if (Math.abs(pos + project(v)) > width() * COMMIT_FRACTION) dir = pos < 0 ? 1 : -1
     if (countRef.current < 3 && dir === -1) dir = 0
     if (dir === 0) settle(v, flick)
     else commit(dir, v, flick)
