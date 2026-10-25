@@ -1,14 +1,19 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { useFocusTrap } from '../lib/useFocusTrap'
+import { useSwipeCarousel } from '../lib/useSwipeCarousel'
 import { MaterialIcon } from './MaterialIcon'
 
 /**
- * Full-screen photo viewer for the product gallery. Shows the biggest photo the site has, lets people pinch-zoom
- * on a phone, and moves between photos with the arrows or the left and right keys. Escape or the close button leaves.
+ * Full-screen photo viewer for the product gallery.
+ * - Swipe left and right (or use the arrows / arrow keys): same sliding motion as the main gallery.
+ * - Endless: after the last photo comes the first, and before the first comes the last.
+ * - The next and previous photos are already on screen beside the current one, and every photo is loaded in
+ *   the background as soon as the viewer opens, so moving on is instant.
+ * - Pinch to zoom on a phone. Escape or the close button leaves.
  */
 export function GalleryLightbox({
   images,
@@ -29,7 +34,20 @@ export function GalleryLightbox({
   useBodyScrollLock(true)
   useFocusTrap(dialogRef, true, { onEscape: onClose, initialFocusRef: closeRef })
 
-  const go = useCallback((dir: 1 | -1) => setIndex((i) => (i + dir + count) % count), [count])
+  const { containerRef, slideRef, go, handlers } = useSwipeCarousel({
+    count,
+    onNext: () => setIndex((i) => (i + 1) % count),
+    onPrev: () => setIndex((i) => (i - 1 + count) % count),
+  })
+
+  // Load every photo right away so no swipe ever waits for the network.
+  useEffect(() => {
+    images.forEach((src) => {
+      const img = new window.Image()
+      img.decoding = 'async'
+      img.src = deriveVariantUrl(src, 'full')
+    })
+  }, [images])
 
   useEffect(() => {
     if (count < 2) return
@@ -41,8 +59,13 @@ export function GalleryLightbox({
     return () => window.removeEventListener('keydown', onKey)
   }, [count, go])
 
-  const btn =
-    'inline-flex size-11 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white'
+  // The photo in the middle plus its neighbours (like the main gallery), so the next photo is already visible.
+  const slides = (() => {
+    const offsets = count >= 3 ? [-1, 0, 1] : count === 2 ? [0, 1] : [0]
+    return offsets.map((off) => ({ off, idx: (index + off + count) % count }))
+  })()
+
+  const btn = 'inline-flex size-11 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm hover:bg-white'
 
   return (
     <div
@@ -50,17 +73,30 @@ export function GalleryLightbox({
       role="dialog"
       aria-modal="true"
       aria-label={`${title}: photo ${index + 1} of ${count}`}
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      className="fixed inset-0 z-[80] bg-black/90"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={deriveVariantUrl(images[index], 'full')}
-        alt={`${title}, photo ${index + 1} of ${count}`}
-        className="max-h-[92dvh] max-w-[96vw] select-none object-contain"
-        style={{ touchAction: 'pinch-zoom' }}
-        draggable={false}
-      />
+      <div ref={containerRef} className="absolute inset-0 overflow-hidden" style={{ touchAction: 'pan-y pinch-zoom' }} {...handlers}>
+        <div ref={slideRef} className="absolute inset-0 will-change-transform">
+          {slides.map(({ off, idx }) => (
+            <div
+              key={idx}
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ transform: `translate3d(${off * 100}%,0,0)` }}
+              onClick={(e) => e.target === e.currentTarget && onClose()}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={deriveVariantUrl(images[idx], 'full')}
+                alt={off === 0 ? `${title}, photo ${idx + 1} of ${count}` : ''}
+                aria-hidden={off !== 0 || undefined}
+                className="max-h-[92dvh] max-w-[96vw] select-none object-contain"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <button ref={closeRef} type="button" onClick={onClose} aria-label="Close photo viewer" className={`absolute right-3 top-3 ${btn}`}>
         <MaterialIcon name="close" size={22} />
       </button>

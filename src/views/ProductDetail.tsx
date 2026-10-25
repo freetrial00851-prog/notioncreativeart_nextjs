@@ -767,7 +767,7 @@ export function ProductDetail({
                   title="View larger"
                   className={`absolute right-3 top-[68px] z-10 md:right-4 md:top-[72px] ${ICON_BUTTON}`}
                 >
-                  <MaterialIcon name="search" size={20} />
+                  <MaterialIcon name="zoom_in" size={22} />
                 </button>
               )}
 
