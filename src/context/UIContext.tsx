@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
 import { hasBeenNewsletterPrompted } from '../lib/newsletterPrompt'
 
@@ -59,8 +59,26 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
   const closeNewsletterPrompt = useCallback(() => setNewsletterPromptOpen(false), [])
 
-  const showBusyOverlay = useCallback((kind: BusyOverlayKind) => setBusyOverlay(kind), [])
-  const hideBusyOverlay = useCallback(() => setBusyOverlay(null), [])
+  const busyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hideBusyOverlay = useCallback(() => {
+    if (busyTimer.current) clearTimeout(busyTimer.current)
+    busyTimer.current = null
+    setBusyOverlay(null)
+  }, [])
+  // Safety net: if something hangs, the screen unlocks after 40 seconds instead of staying blocked.
+  const showBusyOverlay = useCallback((kind: BusyOverlayKind) => {
+    if (busyTimer.current) clearTimeout(busyTimer.current)
+    setBusyOverlay(kind)
+    busyTimer.current = setTimeout(() => setBusyOverlay(null), 40000)
+  }, [])
+  // Coming back with the browser's back button must not show a stuck overlay.
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) hideBusyOverlay()
+    }
+    window.addEventListener('pageshow', onShow)
+    return () => window.removeEventListener('pageshow', onShow)
+  }, [hideBusyOverlay])
 
   return (
     <UIContext.Provider

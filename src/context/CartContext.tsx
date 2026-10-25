@@ -257,6 +257,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         billingZip: profile?.billing_zip,
       },
     )
+    if (result.ok && result.redirecting) {
+      // Page is changing to /checkout: stay in the loading state so the button cannot be tapped twice.
+      setTimeout(() => setCheckingOut(false), 15000)
+      return
+    }
     if (!result.ok) setCheckoutError(result.error)
     setCheckingOut(false)
   }

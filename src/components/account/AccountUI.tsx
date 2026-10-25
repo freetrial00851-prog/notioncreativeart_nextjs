@@ -62,8 +62,7 @@ export function SupportNote({ hidePlaceholder, lead }: { hidePlaceholder: boolea
         </>
       ) : (
         <>
-          {/* TODO(owner): real support email */}
-          write to <span className="text-primary underline">[SUPPORT EMAIL]</span>
+          write to <a href="mailto:patterns@notioncreativeart.com" className="text-primary underline">patterns@notioncreativeart.com</a>
         </>
       )}
       .

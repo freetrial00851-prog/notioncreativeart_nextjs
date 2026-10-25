@@ -270,15 +270,6 @@ export function Shop({
     })
   }
 
-  const toggleSale = () => {
-    setSearchParams((p) => {
-      if (p.get('sale') === '1') p.delete('sale')
-      else p.set('sale', '1')
-      p.delete('page')
-      return p
-    })
-  }
-
   const toggleBundle = () => {
     setSearchParams((p) => {
       if (p.get('bundle') === '1') p.delete('bundle')
@@ -289,6 +280,11 @@ export function Shop({
   }
 
   const toggleFreeQuick = () => {
+    // On the dedicated free page the price is part of the path: the chip leaves it for the full shop.
+    if (forcedPrice) {
+      goShop('/shop')
+      return
+    }
     setSearchParams((p) => {
       if (p.get('price') === 'free') p.delete('price')
       else p.set('price', 'free')
@@ -353,7 +349,6 @@ export function Shop({
   /** Category row “All patterns” — active when not on a category / free / sale path. */
   const isAllPatterns = !categorySlug && priceFilter !== 'free' && !saleFilter && categorySlug !== 'sale'
   const isFreePill = priceFilter === 'free'
-  const isSalePill = saleFilter || categorySlug === 'sale'
 
   const skillPillClass = (level: ListingSkillLevel, active: boolean) => {
     if (!active) return 'border-border bg-surface text-ink'
@@ -437,23 +432,6 @@ export function Shop({
             }}
           >
             Free patterns
-          </FilterPill>
-          <FilterPill
-            active={isSalePill}
-            onClick={() => {
-              if (isSalePill) {
-                setSearchParams((p) => {
-                  p.delete('sale')
-                  p.delete('page')
-                  return p
-                })
-                if (categorySlug === 'sale') goShop('/shop')
-              } else {
-                goShop('/shop?sale=1')
-              }
-            }}
-          >
-            Sale
           </FilterPill>
         </div>
 
@@ -569,16 +547,6 @@ export function Shop({
           >
             {isFreePill ? <CheckIcon /> : null}
             Free
-          </button>
-          <button
-            type="button"
-            onClick={toggleSale}
-            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${
-              isSalePill ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
-            }`}
-          >
-            {isSalePill ? <CheckIcon /> : null}
-            On sale
           </button>
           <button
             type="button"

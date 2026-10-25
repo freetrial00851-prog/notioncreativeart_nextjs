@@ -105,7 +105,16 @@ export type PaddleStart = { ok: true } | { ok: false; error: string; fallback: b
 
 /** Asks the server to create the transaction, then opens the inline checkout page. */
 export async function startPaddleCheckout(productIds: string[]): Promise<PaddleStart> {
-  const { data, error } = await supabase.functions.invoke('create-paddle-checkout', { body: { productIds } })
+  // If the server does not answer in time, stop waiting so the buyer is never stuck behind a spinner.
+  const timedOut = Symbol('timeout')
+  const reply = await Promise.race([
+    supabase.functions.invoke('create-paddle-checkout', { body: { productIds } }),
+    new Promise<typeof timedOut>((resolve) => setTimeout(() => resolve(timedOut), 25000)),
+  ])
+  if (reply === timedOut) {
+    return { ok: false, fallback: false, error: 'Checkout is taking longer than expected. Please try again in a moment.' }
+  }
+  const { data, error } = reply
 
   let code: string | undefined = data?.code
   let message: string | undefined = data?.error

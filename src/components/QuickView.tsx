@@ -93,6 +93,13 @@ export function QuickView({
       billingState: profile?.billing_state,
       billingZip: profile?.billing_zip,
     })
+    if (result.ok && result.redirecting) {
+      setTimeout(() => {
+        hideBusyOverlay()
+        setBuying(false)
+      }, 15000)
+      return
+    }
     hideBusyOverlay()
     setBuying(false)
     if (!result.ok) showToast(result.error, 'error')

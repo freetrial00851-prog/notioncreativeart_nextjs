@@ -111,7 +111,7 @@ export function ProductCard({
 
   const tile = tileColor(product.id)
   const addLabel = inCart ? `Remove ${product.title} from cart` : `Add ${product.title} to cart`
-  const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Get free ↓') : inCart ? 'In your bag ✓' : 'Add to bag +'
+  const quickLabel = free ? (downloadingFree ? 'Preparing…' : 'Get free ↓') : inCart ? 'In your cart ✓' : 'Add to cart +'
 
   return (
     <article suppressHydrationWarning className="reveal card-lift group/card flex h-full flex-col">
@@ -181,7 +181,7 @@ export function ProductCard({
             onMouseEnter={prefetch}
             onTouchStart={prefetch}
             title={product.title}
-            className="block truncate transition-colors [@media(hover:hover)]:group-hover/card:text-violet"
+            className="block line-clamp-2 transition-colors [@media(hover:hover)]:group-hover/card:text-violet"
           >
             {product.title}
           </Link>

@@ -304,9 +304,6 @@ export function Home({
               </li>
             ))}
           </ul>
-          <p className="hero-rise mt-5 -rotate-2 font-hand text-[24px] font-bold leading-none text-coral" aria-hidden>
-            psst… it’s in your downloads in a minute ↗
-          </p>
         </div>
 
         {/* Yellow art panel — real photo framed over a pink sun */}
@@ -362,12 +359,13 @@ export function Home({
       </section>
 
       {/* 2b · Plain-text introduction with real category links (server-rendered, for search engines and readers) */}
-      <section className="mx-auto max-w-site page-gutter pb-2 md:pb-4">
+      <section className="mx-auto max-w-site page-gutter pt-[48px] md:pt-[72px]">
         <div className="max-w-3xl text-[14px] leading-[1.9] text-muted">
-          <h2 className="font-heading text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
+          <p className="eyebrow">Who we are</p>
+          <h2 className="mt-[13px] font-heading text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
             Crochet patterns you can download in minutes
           </h2>
-          <p className="mt-3">
+          <p className="mt-4">
             Notion Creative Art is a small studio writing <Link className="underline" href="/shop">crochet patterns</Link> as instant PDF
             downloads. Browse cuddly <Link className="underline" href="/shop/amigurumi">amigurumi patterns</Link>, easy{' '}
             <Link className="underline" href="/shop/no-sew-amigurumi">no-sew amigurumi</Link> and{' '}
@@ -534,7 +532,7 @@ export function Home({
       </section>
 
       {/* 6 · Three steps */}
-      <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
+      <section className="mx-auto max-w-site page-gutter pt-[58px] pb-[58px] md:pt-[88px] md:pb-[88px]">
         <div suppressHydrationWarning className="reveal mb-8 flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Simple from the very start</p>
@@ -651,7 +649,7 @@ export function Home({
 
       {/* 9 · Reviews (only when real reviews exist) */}
       {makerReviews.length > 0 && (
-        <section id="reviews" className="mx-auto max-w-site scroll-mt-20 page-gutter pb-[58px] md:pb-[88px]">
+        <section id="reviews" className="mx-auto max-w-site scroll-mt-20 page-gutter pt-[58px] pb-[58px] md:pt-[88px] md:pb-[88px]">
           <p className="eyebrow">What makers say</p>
           <h2 className="mb-8 mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
             Kind words from makers.

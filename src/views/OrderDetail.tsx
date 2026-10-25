@@ -33,13 +33,15 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
   const [order, setOrder] = useState<OrderRow | null>(null)
   const [items, setItems] = useState<OrderItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [downloading, setDownloading] = useState<string | null>(null)
   const [receiptBusy, setReceiptBusy] = useState(false)
 
   useEffect(() => {
     if (!user || !orderId) return
     supabase.from('orders').select('*').eq('id', orderId).eq('user_id', user.id).maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) { setLoadFailed(true); setLoading(false); return }
         setOrder(data as OrderRow | null)
         const productIds = (data as OrderRow | null)?.product_ids ?? []
         if (productIds.length === 0) { setLoading(false); return }
@@ -83,6 +85,18 @@ export function OrderDetail({ embedded = false }: { embedded?: boolean }) {
   )
 
   if (loading) return <ContentSkeleton />
+
+  if (loadFailed) {
+    return (
+      <div className="mx-auto w-full max-w-site page-gutter py-10">
+        <div role="alert" className={`${ACCOUNT_CARD} px-6 py-12 text-center`}>
+          <h1 className="type-h1 text-ink">We couldn&apos;t load this order</h1>
+          <p className="mt-2 text-[15px] text-muted">This is a connection problem, not a missing order. Please try again.</p>
+          <button type="button" onClick={() => window.location.reload()} className={`${PRIMARY_PILL} mt-6`}>Try again</button>
+        </div>
+      </div>
+    )
+  }
 
   if (!order) {
     const notFound = (

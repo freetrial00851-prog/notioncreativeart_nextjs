@@ -76,7 +76,11 @@ export function PaddleCheckout() {
         clearGuestCart()
         router.push(successPath)
       }
-      if (event.name === 'checkout.error' || event.name === 'checkout.failed') {
+      if (event.name === 'checkout.failed') {
+        // A declined card: keep the form on screen so the buyer can fix the details or use another card.
+        setMessage('That payment did not go through. Please check your details or try another card.')
+      }
+      if (event.name === 'checkout.error') {
         setMessage('Something went wrong with the payment form. Please try again.')
         setPhase('error')
       }
@@ -110,6 +114,13 @@ export function PaddleCheckout() {
       removePaddleListener(onEvent)
     }
   }, [txn, router, successPath])
+
+  // If the payment form never appears, say so instead of leaving a spinner forever.
+  useEffect(() => {
+    if (phase !== 'loading') return
+    const timer = setTimeout(() => setPhase((p) => (p === 'loading' ? 'blocked' : p)), 20000)
+    return () => clearTimeout(timer)
+  }, [phase])
 
   return (
     <div className="mx-auto w-full max-w-3xl px-5 py-10 md:py-14">
@@ -158,12 +169,18 @@ export function PaddleCheckout() {
           {phase === 'blocked' && (
             <p>
               The payment form couldn’t load. If you use an ad blocker or privacy extension, please allow paddle.com for this page and{' '}
-              <button type="button" className="underline" onClick={() => window.location.reload()}>try again</button>.
+              <button type="button" className="underline" onClick={() => window.location.reload()}>try again</button>. Still stuck?{' '}
+              <Link href="/contact" className="underline">Contact us</Link>.
             </p>
           )}
           {phase === 'error' && message && (
             <>
               <p role="alert">{message}</p>
+              <p className="mt-3">
+                <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-5 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
+                  Try again
+                </button>
+              </p>
               <p className="mt-2">
                 <Link href="/shop" className="font-semibold text-primary underline">Back to the shop</Link>
                 {' · '}
@@ -175,7 +192,7 @@ export function PaddleCheckout() {
         </div>
 
         <p className="mb-3 text-[13px] text-muted">Instant PDF download · 14-day refund policy · Secure payment by Paddle</p>
-        <div className={`${FRAME_CLASS} ${phase === 'error' || phase === 'blocked' ? 'hidden' : ''}`} />
+        <div className={`${FRAME_CLASS} ${phase === 'error' || phase === 'blocked' ? 'hidden' : 'min-h-[450px]'}`} />
       </section>
 
       <p className="mt-5 text-[13px] text-muted">

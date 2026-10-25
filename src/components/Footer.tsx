@@ -20,7 +20,7 @@ const ACCOUNT = [
   { label: 'My account', to: '/account/downloads' },
   { label: 'My purchases', to: '/account/orders' },
   { label: 'Wishlist', to: '/account/wishlist' },
-  { label: 'Shopping bag', to: '/cart' },
+  { label: 'Cart', to: '/cart' },
   { label: 'Lost your download?', to: '/resend-download' },
 ]
 

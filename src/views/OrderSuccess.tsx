@@ -111,7 +111,8 @@ function OrderSuccessAccount({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
     // A Paddle checkout sends us back with ?txn=<transaction id>: wait for exactly THAT order, so a previous
     // order from the last 30 minutes is never shown while the new one is still being recorded.
     const txn = new URLSearchParams(window.location.search).get('txn')
-    const maxAttempts = txn ? 12 : POLL_ATTEMPTS
+    // A Paddle order can take up to ~45 s to be recorded; never tell a buyer "not found" right after paying.
+    const maxAttempts = txn ? 30 : POLL_ATTEMPTS
 
     const poll = () => {
       let query = supabase
@@ -551,8 +552,7 @@ function SupportCard({ hidePlaceholder }: { hidePlaceholder: boolean }) {
               </>
             ) : (
               <>
-                {/* TODO(owner): real support email */}
-                write to us at <span className="text-primary underline">[SUPPORT EMAIL]</span>
+                write to us at <a href="mailto:patterns@notioncreativeart.com" className="text-primary underline">patterns@notioncreativeart.com</a>
               </>
             )}{' '}
             and we will fix it.

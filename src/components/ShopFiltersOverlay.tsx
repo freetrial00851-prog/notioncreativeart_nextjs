@@ -102,11 +102,6 @@ export function ShopFiltersOverlay({
 
       <Section title="Offers">
         <CheckRow
-          label="On sale"
-          checked={draft.sale}
-          onToggle={() => set({ sale: !draft.sale })}
-        />
-        <CheckRow
           label="Bundles"
           checked={draft.bundle}
           onToggle={() => set({ bundle: !draft.bundle })}

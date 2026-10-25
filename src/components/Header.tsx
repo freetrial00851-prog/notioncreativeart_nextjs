@@ -58,6 +58,8 @@ export function Header() {
   const [subcategories, setSubcategories] = useState<Record<string, SubcategoryWithCount[]>>({})
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Product[]>([])
+  // The search words the current suggestions belong to (so "no results" is only said once the answer has arrived).
+  const [resultsFor, setResultsFor] = useState('')
 
   const shopWrapRef = useRef<HTMLDivElement>(null)
   const accountWrapRef = useRef<HTMLDivElement>(null)
@@ -75,10 +77,18 @@ export function Header() {
     if (!searchOpen) return
     const q = query.trim()
     if (!q) return
+    let cancelled = false
     const timer = setTimeout(() => {
-      searchProducts(q, 5).then(setSuggestions)
+      searchProducts(q, 5).then((rows) => {
+        if (cancelled) return // an older, slower answer must not replace a newer one
+        setSuggestions(rows)
+        setResultsFor(q)
+      })
     }, 220)
-    return () => clearTimeout(timer)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
   }, [query, searchOpen])
 
   // Close every overlay on navigation.
@@ -250,12 +260,12 @@ export function Header() {
 
             <button
               type="button"
-              aria-label={`Bag${cartCount > 0 ? `, ${cartCount} items` : ''}`}
+              aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ''}`}
               onClick={openDrawer}
-              className="relative inline-flex min-h-11 items-center gap-1 px-2 text-[12px] font-semibold transition-colors hover:text-coral"
+              className="relative inline-flex min-h-11 min-w-11 items-center justify-center gap-1 px-2 text-[12px] font-semibold transition-colors hover:text-coral"
             >
               <MaterialIcon name="shopping_bag" size={22} color="currentColor" className="sm:hidden" />
-              <span key={`t${cartCount}`} className={`hidden sm:inline ${cartCount > 0 ? 'animate-pop' : ''}`}>Bag ({cartCount})</span>
+              <span key={`t${cartCount}`} className={`hidden sm:inline ${cartCount > 0 ? 'animate-pop' : ''}`}>Cart ({cartCount})</span>
               {cartCount > 0 && (
                 <span key={cartCount} className="animate-pop absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[11px] font-bold leading-none text-white sm:hidden">
                   {cartCount}
@@ -355,6 +365,8 @@ export function Header() {
                         See all results for &ldquo;{query.trim()}&rdquo; ↗
                       </button>
                     </>
+                  ) : resultsFor !== query.trim() ? (
+                    <p role="status" className="text-[14px] text-muted">Searching…</p>
                   ) : (
                     <p className="text-[14px] text-muted">
                       No patterns matched &ldquo;{query.trim()}&rdquo; yet. Press Enter to search the full catalogue.

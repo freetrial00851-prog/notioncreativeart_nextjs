@@ -448,6 +448,14 @@ export function ProductDetail({
       billingState: profile?.billing_state,
       billingZip: profile?.billing_zip,
     })
+    if (result.ok && result.redirecting) {
+      // Moving to /checkout: keep the loading state (and block a second tap) until the page changes.
+      setTimeout(() => {
+        hideBusyOverlay()
+        setBuying(false)
+      }, 15000)
+      return
+    }
     hideBusyOverlay()
     setBuying(false)
     if (!result.ok) showToast(result.error, 'error')

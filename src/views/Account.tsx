@@ -224,6 +224,18 @@ function EmptyCard({ icon, title, text, children }: { icon: string; title: strin
   )
 }
 
+function LoadError({ what, onRetry }: { what: string; onRetry: () => void }) {
+  return (
+    <div role="alert" className={`${ACCOUNT_CARD} px-6 py-10 text-center`}>
+      <p className="type-h2 text-ink">We couldn&apos;t load your {what}</p>
+      <p className="mx-auto mt-2 max-w-[400px] text-[15px] leading-relaxed text-muted">
+        This is a connection problem, not a missing {what}. Please try again.
+      </p>
+      <button type="button" onClick={onRetry} className={`${PRIMARY_PILL} mt-6`}>Try again</button>
+    </div>
+  )
+}
+
 /** Adds orders paid as a guest to this account. Proof of the email comes from Google sign-in or an emailed link. */
 function ClaimGuestOrders({ onClaimed, quiet }: { onClaimed: () => void; quiet: boolean }) {
   const searchParams = useSearchParams()
@@ -345,10 +357,16 @@ function MyOrders() {
   const [downloadingOrder, setDownloadingOrder] = useState<string | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
 
+  const [loadFailed, setLoadFailed] = useState(false)
+
   useEffect(() => {
     if (!user) return
     supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-      .then(({ data }) => { setOrders((data as OrderRow[]) ?? []); setLoading(false) })
+      .then(({ data, error }) => {
+        setLoadFailed(!!error)
+        if (!error) setOrders((data as OrderRow[]) ?? [])
+        setLoading(false)
+      })
   }, [user, reloadKey])
 
   const productIdsKey = useMemo(
@@ -407,6 +425,8 @@ function MyOrders() {
       <ClaimGuestOrders quiet={orders.length > 0} onClaimed={() => setReloadKey((k) => k + 1)} />
       {loading ? (
         <ListRowSkeleton />
+      ) : loadFailed ? (
+        <LoadError what="orders" onRetry={() => { setLoading(true); setReloadKey((k) => k + 1) }} />
       ) : orders.length === 0 ? (
         <EmptyCard icon="receipt_long" title="No orders yet" text="Patterns you buy appear here with receipts and downloads. Bought as a guest? Use the box above to add those orders.">
           <Link href="/shop" className={`${PRIMARY_PILL} sm:min-w-[200px]`}>Shop all patterns</Link>
@@ -502,6 +522,8 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
   const { showToast } = useToast()
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
   const [downloading, setDownloading] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<DownloadSort>('newest')
@@ -513,11 +535,12 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
       .select('*, product:products(*), order:orders(lemon_order_id, display_order_number, status, amount, currency)')
       .eq('user_id', user.id)
       .order('purchase_date', { ascending: false })
-      .then(({ data }) => {
-        setPurchases((data as unknown as Purchase[]) ?? [])
+      .then(({ data, error }) => {
+        setLoadFailed(!!error)
+        if (!error) setPurchases((data as unknown as Purchase[]) ?? [])
         setLoading(false)
       })
-  }, [user])
+  }, [user, reloadKey])
 
   const download = async (productId: string, title?: string) => {
     setDownloading(productId)
@@ -544,6 +567,7 @@ function Downloads({ hideOwnerCopyPlaceholders }: { hideOwnerCopyPlaceholders: b
   )
 
   if (loading) return <>{header}<DownloadsTableSkeleton rows={4} /></>
+  if (loadFailed) return <>{header}<LoadError what="downloads" onRetry={() => { setLoading(true); setReloadKey((k) => k + 1) }} /></>
 
   if (count === 0) {
     return (
@@ -978,13 +1002,18 @@ function BillingAddressCard({ sectionRef }: { sectionRef: Ref<HTMLElement> }) {
     if (billingCountry && !addressValid) return
     setSaving(true)
     setSaved(false)
-    await supabase.from('profiles').update({
+    const { error: saveError } = await supabase.from('profiles').update({
       billing_country: billingCountry || null,
       billing_address_line1: isUS ? (billingAddressLine1 || null) : null,
       billing_city: isUS ? (billingCity || null) : null,
       billing_state: isUS ? (billingState || null) : null,
       billing_zip: billingZip || null,
     }).eq('id', user.id)
+    if (saveError) {
+      setSaving(false)
+      showToast('We could not save your address. Please try again.', 'error')
+      return
+    }
     await refreshProfile()
     setSaving(false)
     setSaved(true)

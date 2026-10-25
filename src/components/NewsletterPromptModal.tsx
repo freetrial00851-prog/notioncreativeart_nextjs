@@ -92,7 +92,9 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="w-full px-4 py-3 rounded-lg border border-line text-ink text-[13px] focus:outline-none focus:ring-2 focus:ring-ink/20 bg-white"
+                aria-label="Email address"
+                autoComplete="email"
+                className="w-full min-h-12 px-4 py-3 rounded-lg border border-line text-ink text-[16px] md:text-[14px] focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                 autoFocus
               />
               <button
@@ -109,7 +111,7 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
             <button
               type="button"
               onClick={dismiss}
-              className="mt-4 w-full text-center text-[12px] text-ink-soft hover:text-ink underline underline-offset-2"
+              className="mt-2 w-full min-h-11 text-center text-[13px] text-ink-soft hover:text-ink underline underline-offset-2"
             >
               Skip for now
             </button>

@@ -65,7 +65,7 @@ async function readFunctionError(
 export async function startApiCheckout(
   productIds: string[],
   customer: ApiCheckoutCustomer,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; redirecting?: boolean } | { ok: false; error: string }> {
   // Per-product provider: patterns set to Paddle in the admin use the inline Paddle checkout. If Paddle is not
   // available to this visitor (for example sandbox testing is admin-only), fall back to Lemon Squeezy.
   let paddleFellBack = false
@@ -73,7 +73,8 @@ export async function startApiCheckout(
     const paddle = await startPaddleCheckout(productIds)
     if (paddle.ok) {
       trackPinterestCheckout({ productIds })
-      return { ok: true }
+      // The browser is already moving to /checkout: callers keep their loading state until the page changes.
+      return { ok: true, redirecting: true }
     }
     if (!paddle.fallback) return { ok: false, error: paddle.error }
     paddleFellBack = true
