@@ -48,7 +48,7 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col gap-3 border-t border-border pt-5 text-[12px] text-muted md:flex-row md:items-center md:justify-between">
-          <span>© {year} NotionCreativeArt. All rights reserved.</span>
+          <span>© {year} Notion Creative Art. All rights reserved.</span>
           <span className="hidden md:inline">Made for makers, with care.</span>
           <span className="flex items-center gap-1">
             <Link href="/privacy" className="inline-flex min-h-11 items-center px-1 hover:text-coral md:min-h-0">

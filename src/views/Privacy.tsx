@@ -7,7 +7,7 @@ export function Privacy({ provider = 'lemonsqueezy' }: { provider?: PaymentProvi
   const partner = paymentPartner(provider)
   return (
     <ContentPage eyebrow="LEGAL" title="Privacy Policy">
-      <p>Last updated: October 2026. NotionCreativeArt (the trading name of Muhammad Sufyan, a sole proprietor based in Pakistan) is responsible for your personal data on this site. This page explains what information we collect, why, who handles it, and the choices you have. For any privacy question, use our <a href="/contact">Contact page</a>.</p>
+      <p>Last updated: October 2026. Notion Creative Art (the trading name of Muhammad Sufyan, a sole proprietor based in Pakistan) is responsible for your personal data on this site. This page explains what information we collect, why, who handles it, and the choices you have. For any privacy question, use our <a href="/contact">Contact page</a>.</p>
 
       <p><span className={H}>What we collect.</span></p>
       <ul className="list-disc space-y-2 pl-5">

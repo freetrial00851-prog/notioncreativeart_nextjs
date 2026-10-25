@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { getPrefetchedProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
+import { GalleryLightbox } from '../components/GalleryLightbox'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
 import { useCart } from '../context/CartContext'
@@ -204,6 +205,7 @@ export function ProductDetail({
   const [related, setRelated] = useState<Product[]>(() => (seeded ? initialRelated ?? [] : []))
   const relatedSeeded = useRef(!!seeded && (initialRelated?.length ?? 0) > 0)
   const [activeImage, setActiveImage] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const imageCount = product?.images?.length ?? 0
   // Warm every gallery photo (same optimised URL the slider will ask for) so a swipe never waits on the network
   // or on a cold image encode. Starts after the first photo, which keeps its high-priority preload.
@@ -677,6 +679,9 @@ export function ProductDetail({
 
   return (
     <div className="pb-24 md:pb-0">
+      {lightboxOpen && images.length > 0 && (
+        <GalleryLightbox images={images} startIndex={activeImage} title={product.title} onClose={() => setLightboxOpen(false)} />
+      )}
       {/* Hero: gallery + buy box */}
       <section className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-8 md:pb-10">
         <Link
@@ -753,6 +758,18 @@ export function ProductDetail({
               >
                 <FavoriteIcon size={20} filled={inWishlist} color={inWishlist ? 'var(--color-sale)' : 'currentColor'} />
               </button>
+
+              {images.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  aria-label="View photo larger"
+                  title="View larger"
+                  className={`absolute right-3 top-[68px] z-10 md:right-4 md:top-[72px] ${ICON_BUTTON}`}
+                >
+                  <MaterialIcon name="search" size={20} />
+                </button>
+              )}
 
               {images.length > 1 && (
                 <>

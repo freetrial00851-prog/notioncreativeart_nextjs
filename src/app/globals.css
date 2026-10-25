@@ -48,6 +48,7 @@
   --color-muted: #6E5E55;
   --color-text-muted: #6E5E55;
   --color-muted-light: #7D6E64;
+  --color-field-border: #8F8077;
 
   --color-gold: #F5A300;
   --color-star: #F5A300;
@@ -259,6 +260,16 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Form fields on the storefront: a border you can see (3:1) and an always-visible focus ring.
+   Not applied inside the admin area, which has its own theme. */
+body:not(:has(.admin-theme)) :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']), textarea, select):not([class*='border-0']):not([class*='border-transparent']) {
+  border-color: var(--color-field-border);
+}
+body:not(:has(.admin-theme)) :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']), textarea, select):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
 }
 
 ::selection { background: var(--color-ink); color: var(--color-canvas); }

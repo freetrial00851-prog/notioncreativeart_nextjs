@@ -20,7 +20,7 @@ export function Logo({ variant = 'full', className = '', light = false }: LogoPr
     <Link
       href="/"
       className={`press inline-flex min-h-11 shrink-0 items-center gap-[11px] leading-none ${className}`}
-      aria-label="NotionCreativeArt — home"
+      aria-label="Notion Creative Art — home"
     >
       <span
         className={`grid shrink-0 place-items-center rounded-[12px] bg-violet font-heading font-normal text-white ${
