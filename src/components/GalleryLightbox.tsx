@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { deriveVariantUrl } from '../lib/imageVariants'
-import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { useFocusTrap } from '../lib/useFocusTrap'
 import { useSwipeCarousel } from '../lib/useSwipeCarousel'
 import { MaterialIcon } from './MaterialIcon'
@@ -11,8 +10,8 @@ import { MaterialIcon } from './MaterialIcon'
  * Full-screen photo viewer for the product gallery.
  * - Swipe left and right (or use the arrows / arrow keys): same sliding motion as the main gallery.
  * - Endless: after the last photo comes the first, and before the first comes the last.
- * - The next and previous photos are already on screen beside the current one, and every photo is loaded in
- *   the background as soon as the viewer opens, so moving on is instant.
+ * - The next and previous photos are already on screen beside the current one, and the rest load quietly in the
+ *   background just after it opens, so moving on is instant. Photos are the 1000px size: fast to show, still sharp.
  * - Pinch to zoom on a phone. Escape or the close button leaves.
  */
 export function GalleryLightbox({
@@ -31,7 +30,15 @@ export function GalleryLightbox({
   const closeRef = useRef<HTMLButtonElement>(null)
   const count = images.length
 
-  useBodyScrollLock(true)
+  // Stop the page behind from scrolling. A light lock (no re-layout of the whole page, which made opening stutter).
+  useEffect(() => {
+    const html = document.documentElement
+    const previous = html.style.overflow
+    html.style.overflow = 'hidden'
+    return () => {
+      html.style.overflow = previous
+    }
+  }, [])
   useFocusTrap(dialogRef, true, { onEscape: onClose, initialFocusRef: closeRef })
 
   const { containerRef, slideRef, go, handlers } = useSwipeCarousel({
@@ -40,13 +47,25 @@ export function GalleryLightbox({
     onPrev: () => setIndex((i) => (i - 1 + count) % count),
   })
 
-  // Load every photo right away so no swipe ever waits for the network.
+  // Once the viewer is open and steady, quietly load the other photos (one by one) so swiping never waits.
+  // Starting this at the same moment as opening made the viewer stutter.
   useEffect(() => {
-    images.forEach((src) => {
-      const img = new window.Image()
-      img.decoding = 'async'
-      img.src = deriveVariantUrl(src, 'full')
+    let cancelled = false
+    const timers: ReturnType<typeof setTimeout>[] = []
+    images.forEach((src, i) => {
+      timers.push(
+        setTimeout(() => {
+          if (cancelled) return
+          const img = new window.Image()
+          img.decoding = 'async'
+          img.src = deriveVariantUrl(src, 'large')
+        }, 500 + i * 150),
+      )
     })
+    return () => {
+      cancelled = true
+      timers.forEach(clearTimeout)
+    }
   }, [images])
 
   useEffect(() => {
@@ -86,7 +105,9 @@ export function GalleryLightbox({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={deriveVariantUrl(images[idx], 'full')}
+                src={deriveVariantUrl(images[idx], 'large')}
+                decoding="async"
+                fetchPriority={off === 0 ? 'high' : 'low'}
                 alt={off === 0 ? `${title}, photo ${idx + 1} of ${count}` : ''}
                 aria-hidden={off !== 0 || undefined}
                 className="max-h-[92dvh] max-w-[96vw] select-none object-contain"
