@@ -38,7 +38,7 @@ const POPULAR_SEARCHES = [
 
 /** Small uppercase nav label — matches the reference header. */
 const NAV_LABEL =
-  'text-[11px] font-semibold uppercase tracking-[0.11em] text-ink transition-colors hover:text-coral'
+  'text-[12px] font-semibold uppercase tracking-[0.11em] text-ink transition-colors hover:text-coral'
 
 const TILE_COLORS = ['#F2F2F2', '#EDEDED', '#F5F5F5', '#EBEBEB'] as const
 
@@ -267,7 +267,7 @@ export function Header() {
               <MaterialIcon name="shopping_bag" size={22} color="currentColor" className="sm:hidden" />
               <span key={`t${cartCount}`} className={`hidden sm:inline ${cartCount > 0 ? 'animate-pop' : ''}`}>Cart ({cartCount})</span>
               {cartCount > 0 && (
-                <span key={cartCount} className="animate-pop absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[11px] font-bold leading-none text-white sm:hidden">
+                <span key={cartCount} className="animate-pop absolute right-0 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[12px] font-bold leading-none text-white sm:hidden">
                   {cartCount}
                 </span>
               )}
@@ -360,7 +360,7 @@ export function Header() {
                       <button
                         type="button"
                         onClick={() => submitSearch()}
-                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[11px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[12px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
                       >
                         See all results for &ldquo;{query.trim()}&rdquo; ↗
                       </button>
@@ -375,13 +375,13 @@ export function Header() {
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-6">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Popular</span>
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-muted">Popular</span>
                   {POPULAR_SEARCHES.map((s) => (
                     <Link
                       key={s.href}
                       href={s.href}
                       onClick={closeSearch}
-                      className="inline-flex min-h-11 items-center rounded-[3px] border-2 border-ink px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:bg-ink hover:text-white"
+                      className="inline-flex min-h-11 items-center rounded-[3px] border-2 border-ink px-4 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:bg-ink hover:text-white"
                     >
                       {s.label}
                     </Link>
@@ -439,7 +439,7 @@ export function Header() {
                   ))}
                 </ul>
 
-                <p className="pb-1 pt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Categories</p>
+                <p className="pb-1 pt-5 text-[12px] font-semibold uppercase tracking-[0.16em] text-muted">Categories</p>
                 <ul>
                   {categories.map((c) => {
                     const expanded = expandedCategory === c.id
@@ -528,7 +528,7 @@ export function Header() {
                     <button
                       type="button"
                       onClick={goSignIn}
-                      className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-2 border-primary bg-primary px-6 text-[11px] font-semibold uppercase tracking-[0.12em] text-white hover:border-violet hover:bg-violet"
+                      className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-2 border-primary bg-primary px-6 text-[12px] font-semibold uppercase tracking-[0.12em] text-white hover:border-violet hover:bg-violet"
                     >
                       Sign in
                     </button>
@@ -545,7 +545,7 @@ export function Header() {
 
 /** Desktop "Shop patterns" panel: categories, skill levels and quick links. */
 function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]; onClose: () => void }) {
-  const colHead = 'mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-violet'
+  const colHead = 'mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-violet'
   const row =
     'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (

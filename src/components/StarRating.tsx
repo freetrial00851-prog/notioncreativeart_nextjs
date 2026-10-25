@@ -90,7 +90,7 @@ export function StarRatingCardSummary({
   if (reviewCount < 1) return null
   return (
     <span
-      className={`inline-flex items-center gap-1 text-[11px] text-ink-soft ${className}`}
+      className={`inline-flex items-center gap-1 text-[12px] text-ink-soft ${className}`}
       role="img"
       aria-label={`${averageRating.toFixed(1)} out of 5 stars, ${reviewCount} review${reviewCount === 1 ? '' : 's'}`}
     >

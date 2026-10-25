@@ -197,7 +197,7 @@ export function Search() {
     <select
       value={sort}
       onChange={(e) => setSort(e.target.value as ListingSort)}
-      className="hidden md:block shrink-0 text-[11px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
+      className="hidden md:block shrink-0 text-[12px] tracking-[0.1em] border border-line px-4 py-2.5 bg-canvas focus:outline-none focus:border-ink"
     >
       {LISTING_SORT_OPTIONS.map((opt) => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -262,7 +262,7 @@ export function Search() {
                 <button
                   type="button"
                   onClick={() => setSearchParams(clearListingFilterParams)}
-                  className="text-[11px] font-semibold tracking-[0.1em] underline underline-offset-2"
+                  className="text-[12px] font-semibold tracking-[0.1em] underline underline-offset-2"
                   style={{ color: 'var(--color-accent)' }}
                 >
                   RESET FILTERS
@@ -317,7 +317,7 @@ export function Search() {
                   />
                   {results.length === 0 && suggestions.length > 0 && (
                     <div className="mt-14">
-                      <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-6">YOU MAY LIKE</p>
+                      <p className="text-[12px] tracking-[0.15em] text-ink-soft mb-6">YOU MAY LIKE</p>
                       <div className={LISTING_PRODUCT_GRID_CLASS}>
                         {suggestions.map((p) => (
                           <ProductCard key={p.id} product={p} reviewStats={reviewStatsMap.get(p.id)} />

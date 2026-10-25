@@ -664,8 +664,14 @@ export function ProductDetail({
     'inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary-soft disabled:opacity-60'
 
   const soldOutPill = (
-    <div className="flex min-h-11 w-full items-center justify-center rounded-[3px] border border-border text-[13px] font-semibold text-muted">
-      SOLD OUT
+    <div>
+      <div className="flex min-h-11 w-full items-center justify-center rounded-[3px] border border-border text-[14px] font-semibold text-muted">
+        Currently unavailable
+      </div>
+      <p className="mt-2 text-[14px] text-muted">Save it to your wishlist, or look at similar patterns.</p>
+      <Link href={shopLink} className="inline-flex min-h-11 items-center text-[15px] font-semibold text-primary hover:underline">
+        Browse similar patterns →
+      </Link>
     </div>
   )
 
@@ -674,11 +680,11 @@ export function ProductDetail({
       {/* Hero: gallery + buy box */}
       <section className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-8 md:pb-10">
         <Link
-          href="/shop"
+          href={shopLink}
           className="md:hidden -ml-2 mb-3 inline-flex min-h-11 items-center gap-1 rounded-[3px] px-2 text-[15px] font-medium text-muted hover:text-ink"
         >
           <MaterialIcon name="chevron_left" size={20} />
-          Shop
+          {category ? category.name : 'Shop'}
         </Link>
         <nav aria-label="Breadcrumb" className="hidden md:block mb-6">
           <ol className="flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
@@ -702,7 +708,7 @@ export function ProductDetail({
             <div
               className="relative aspect-square w-full overflow-hidden rounded-2xl bg-surface-warm shadow-image select-none"
               ref={swipeContainerRef}
-              style={{ touchAction: 'pan-y' }}
+              style={{ touchAction: 'pan-y pinch-zoom' }}
               role="region"
               aria-roledescription="carousel"
               aria-label={`${product.title} photos`}
@@ -959,7 +965,7 @@ export function ProductDetail({
                   <p className="font-bold text-ink">Secure checkout by {payProviderName}</p>
                   <p className="mt-1 leading-relaxed text-muted">
                     {payProvider === 'paddle'
-                      ? 'No account needed. Your download link appears right after payment and is emailed to you.'
+                      ? 'Your download link appears right after payment and is emailed to you.'
                       : 'You will sign in or create a free account at checkout, so your PDF is saved to your downloads.'}
                   </p>
                   <p className="mt-2 leading-relaxed text-muted">

@@ -140,7 +140,7 @@ export function ProductCard({
         </Link>
 
         {statusBadge && (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-[3px] bg-white px-[9px] py-[7px] text-[11px] font-bold uppercase leading-none tracking-[0.13em] text-ink">
+          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-[3px] bg-white px-[9px] py-[7px] text-[12px] font-bold uppercase leading-none tracking-[0.13em] text-ink">
             {STATUS_LABEL[statusBadge]}
           </span>
         )}
@@ -163,7 +163,7 @@ export function ProductCard({
             onClick={free ? downloadFree : toggleCart}
             disabled={free && downloadingFree}
             aria-label={free ? `Download ${product.title} free` : addLabel}
-            className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-[3px] bg-navy text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
+            className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-[3px] bg-navy text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
           >
             <span aria-hidden className="text-[18px] leading-none md:hidden">{free ? (downloadingFree ? '…' : '↓') : inCart ? '✓' : '+'}</span>
             <span className="hidden md:inline">{quickLabel}</span>
@@ -173,7 +173,7 @@ export function ProductCard({
 
       <div className="px-px pb-1 pt-[15px]">
         {skillLabel && (
-          <p className="mb-[7px] text-[11px] font-bold uppercase leading-none tracking-[0.13em] text-violet">{skillLabel}</p>
+          <p className="mb-[7px] text-[12px] font-bold uppercase leading-none tracking-[0.13em] text-violet">{skillLabel}</p>
         )}
         <h3 className="mb-[9px] font-heading text-[17px] font-normal leading-[1.3] text-ink">
           <Link
@@ -198,7 +198,7 @@ export function ProductCard({
             </>
           )}
           {showRating && (
-            <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted">
+            <span className="ml-auto inline-flex items-center gap-1 text-[12px] font-semibold text-muted">
               <StarIcon />
               {reviewStats!.averageRating.toFixed(1)} ({reviewStats!.reviewCount})
             </span>

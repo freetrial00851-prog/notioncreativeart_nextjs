@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { useFocusTrap } from '../lib/useFocusTrap'
 import { subscribeToNewsletter } from '../lib/newsletter'
 import { markNewsletterPrompted } from '../lib/newsletterPrompt'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
@@ -27,12 +28,8 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
     onClose()
   }, [onClose])
 
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && dismiss()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, dismiss])
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, open, { onEscape: dismiss })
 
   const subscribe = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,7 +56,7 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
       aria-modal="true"
       aria-labelledby="newsletter-prompt-title"
     >
-      <div className="relative w-full max-w-md bg-canvas border border-line rounded-2xl shadow-xl p-8">
+      <div ref={dialogRef} className="relative w-full max-w-md bg-canvas border border-line rounded-2xl shadow-xl p-8">
         <button
           type="button"
           onClick={dismiss}
@@ -71,13 +68,13 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
 
         {submitted ? (
           <div className="pt-2 pr-8">
-            <p className="text-[11px] tracking-[0.2em] text-ink-soft mb-2">JOIN OUR MAKER COMMUNITY</p>
+            <p className="text-[12px] tracking-[0.2em] text-ink-soft mb-2">JOIN OUR MAKER COMMUNITY</p>
             <h2 id="newsletter-prompt-title" className="font-heading font-normal text-xl mb-2">You're on the list!</h2>
             <p className="text-[13px] text-ink-soft">Thanks — your download is already on its way.</p>
           </div>
         ) : (
           <>
-            <p className="text-[11px] tracking-[0.2em] text-ink-soft mb-2 pr-8">JOIN OUR MAKER COMMUNITY</p>
+            <p className="text-[12px] tracking-[0.2em] text-ink-soft mb-2 pr-8">JOIN OUR MAKER COMMUNITY</p>
             <h2 id="newsletter-prompt-title" className="font-heading font-normal text-xl mb-2 pr-8">
               Get new patterns in your inbox
             </h2>
@@ -105,7 +102,7 @@ export function NewsletterPromptModal({ open, onClose }: Props) {
               >
                 {submitting ? 'Subscribing…' : 'Subscribe'}
               </button>
-              {error && <p className="text-[11px] text-red-600">{error}</p>}
+              {error && <p className="text-[12px] text-red-600">{error}</p>}
             </form>
 
             <button

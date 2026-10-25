@@ -14,7 +14,7 @@ export function LevelBadge({
   const style = SKILL_PILL_STYLES[level]
   return (
     <span
-      className={`inline-flex items-center rounded-[3px] px-2.5 py-1 text-[11px] font-semibold leading-none ${className}`}
+      className={`inline-flex items-center rounded-[3px] px-2.5 py-1 text-[12px] font-semibold leading-none ${className}`}
       style={{ background: style.background, color: style.color }}
     >
       {label}
@@ -50,7 +50,7 @@ export function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-[3px] px-2.5 py-1 text-[11px] font-extrabold tracking-[0.06em] ${STATUS_CLASS[status]} ${className}`}
+      className={`inline-flex items-center rounded-[3px] px-2.5 py-1 text-[12px] font-extrabold tracking-[0.06em] ${STATUS_CLASS[status]} ${className}`}
     >
       {STATUS_LABEL[status]}
     </span>
@@ -67,7 +67,7 @@ export function CategoryChip({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-[3px] border border-border bg-white px-3 py-1 text-[11px] font-medium text-ink-soft ${className}`}
+      className={`inline-flex items-center rounded-[3px] border border-border bg-white px-3 py-1 text-[12px] font-medium text-ink-soft ${className}`}
     >
       {label}
     </span>

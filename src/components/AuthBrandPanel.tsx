@@ -4,7 +4,7 @@ export function AuthBrandPanel() {
       <div className="max-w-sm">
         <div className="flex items-center gap-3 mb-10">
           <span className="font-extrabold tracking-tight text-[22px] leading-none" style={{ fontFamily: 'var(--font-logo)' }}>NCA</span>
-          <div className="leading-[1.05] text-[11px] font-semibold tracking-[0.06em] uppercase">
+          <div className="leading-[1.05] text-[12px] font-semibold tracking-[0.06em] uppercase">
             <p>Notion</p>
             <p>Creative</p>
             <p>Art</p>

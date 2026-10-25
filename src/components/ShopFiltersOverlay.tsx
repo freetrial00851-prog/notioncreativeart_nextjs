@@ -1,6 +1,7 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
+import { useFocusTrap } from '../lib/useFocusTrap'
 import {
   LISTING_SKILL_LEVELS,
   type ListingSkillLevel,
@@ -47,6 +48,9 @@ export function ShopFiltersOverlay({
   onClose,
 }: Props) {
   const isSheet = variant === 'sheet'
+  const dialogRef = useRef<HTMLDivElement>(null)
+  // Keyboard users stay inside the filters, Escape closes them, and focus returns to the button that opened them.
+  useFocusTrap(dialogRef, true, { onEscape: onClose })
 
   const set = (patch: Partial<ShopFilterDraft>) => onChange({ ...draft, ...patch })
 
@@ -129,7 +133,7 @@ export function ShopFiltersOverlay({
     return (
       <div className="fixed inset-0 z-50 md:hidden">
         <button type="button" className="absolute inset-0 bg-ink/40" aria-label="Close filters" onClick={onClose} />
-        <div className="absolute left-0 right-0 bottom-0 bg-surface rounded-t-2xl flex flex-col max-h-[88dvh] shadow-[0_-8px_32px_rgba(0,0,0,0.12)]">
+        <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Filters" className="absolute left-0 right-0 bottom-0 bg-surface rounded-t-2xl flex flex-col max-h-[88dvh] shadow-[0_-8px_32px_rgba(0,0,0,0.12)]">
           <div className="flex justify-center pt-2.5 pb-1" aria-hidden>
             <span className="w-10 h-1 rounded-[3px] bg-border" />
           </div>
@@ -150,6 +154,7 @@ export function ShopFiltersOverlay({
     <div className="fixed inset-0 z-50 hidden md:flex items-center justify-center p-6">
       <button type="button" className="absolute inset-0 bg-ink/40" aria-label="Close filters" onClick={onClose} />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Filters"

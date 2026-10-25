@@ -46,11 +46,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed z-[100] flex flex-col gap-2 bottom-5 left-1/2 -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 px-4 md:px-0 w-full md:w-auto items-center md:items-end">
+      <div role="status" aria-live="polite" aria-atomic="false" className="fixed z-[100] flex flex-col gap-2 bottom-[calc(var(--cookie-h,0px)+5.5rem)] md:bottom-5 left-1/2 -translate-x-1/2 md:left-auto md:right-5 md:translate-x-0 px-4 md:px-0 w-full md:w-auto items-center md:items-end">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="flex items-center gap-2.5 bg-canvas border border-line rounded-lg shadow-lg px-4 py-3 text-[13px] max-w-sm animate-[fadeIn_0.2s_ease-out] w-full md:w-auto"
+            className="flex items-center gap-2.5 bg-canvas border border-line rounded-lg shadow-lg px-4 py-3 text-[14px] max-w-sm animate-[fadeIn_0.2s_ease-out] w-full md:w-auto"
           >
             {t.type === 'success' && <CheckCircleIcon />}
             {t.type === 'error' && <ErrorCircleIcon />}

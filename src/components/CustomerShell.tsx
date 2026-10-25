@@ -8,9 +8,11 @@ import { GlobalAccountBanners } from '@/components/GlobalAccountBanners'
 import { AdminAreaGuard } from '@/components/AdminAreaGuard'
 import { CartDrawer } from '@/components/CartDrawer'
 import { CheckoutOverlay } from '@/components/CheckoutOverlay'
-import { SupportChat } from '@/components/SupportChat'
+import dynamic from 'next/dynamic'
 import { AuthSheet } from '@/components/AuthSheet'
-import { NewsletterPromptModal } from '@/components/NewsletterPromptModal'
+// Loaded only when needed, so every page does not download the chat and newsletter code.
+const SupportChat = dynamic(() => import('@/components/SupportChat').then((m) => m.SupportChat), { ssr: false })
+const NewsletterPromptModal = dynamic(() => import('@/components/NewsletterPromptModal').then((m) => m.NewsletterPromptModal), { ssr: false })
 import { useUI } from '@/context/UIContext'
 import { ScrollToTop } from '@/components/ScrollToTop'
 import { StorefrontPageViewTracker } from '@/components/StorefrontPageViewTracker'
@@ -21,6 +23,7 @@ import { StorefrontPageViewTracker } from '@/components/StorefrontPageViewTracke
  */
 function NewsletterPromptHost() {
   const { newsletterPromptOpen, closeNewsletterPrompt } = useUI()
+  if (!newsletterPromptOpen) return null
   return <NewsletterPromptModal open={newsletterPromptOpen} onClose={closeNewsletterPrompt} />
 }
 

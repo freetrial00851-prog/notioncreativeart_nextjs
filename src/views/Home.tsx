@@ -296,7 +296,7 @@ export function Home({
               </Button>
             </Link>
           </div>
-          <ul className="hero-rise mt-9 flex flex-wrap gap-x-[22px] gap-y-2 text-[11px] text-muted">
+          <ul className="hero-rise mt-9 flex flex-wrap gap-x-[22px] gap-y-2 text-[12px] text-muted">
             {['Instant PDF downloads', 'Made for every skill level', 'Free crochet patterns included'].map((t) => (
               <li key={t} className="inline-flex items-center gap-2">
                 <span className="text-coral" aria-hidden>✳</span>
@@ -327,7 +327,7 @@ export function Home({
           ) : null}
           <p className="absolute bottom-[26px] left-[29px] z-[3] hidden font-heading text-[19px] leading-tight text-ink sm:block">
             Make something amazing
-            <small className="mt-[7px] block font-sans text-[11px] font-semibold uppercase tracking-[0.18em]">
+            <small className="mt-[7px] block font-sans text-[12px] font-semibold uppercase tracking-[0.18em]">
               Patterns for your next project
             </small>
           </p>
@@ -348,7 +348,7 @@ export function Home({
 
       {/* 2 · Ticker */}
       <section className="border-y-2 border-navy bg-sun">
-        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[11px] font-bold uppercase tracking-[0.13em] text-navy">
+        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[12px] font-bold uppercase tracking-[0.13em] text-navy">
           {['Small projects, big joy', 'Patterns to keep forever', 'Creative time, your way', 'Download and get making'].map((t) => (
             <li key={t} className="inline-flex items-center gap-2.5">
               <span className="text-coral" aria-hidden>✳</span>
@@ -392,7 +392,7 @@ export function Home({
             </p>
             <Link
               href="/shop"
-              className="inline-block whitespace-nowrap border-b-2 border-coral pb-[7px] text-[11px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+              className="inline-block whitespace-nowrap border-b-2 border-coral pb-[7px] text-[12px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
             >
               Shop all patterns ↗
             </Link>
@@ -459,14 +459,14 @@ export function Home({
                   />
                 ) : null}
                 <span aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
-                <span className="absolute left-[22px] top-[22px] rounded-[3px] bg-white px-2.5 py-1.5 text-[11px] font-bold uppercase leading-none tracking-[0.12em] text-ink">
+                <span className="absolute left-[22px] top-[22px] rounded-[3px] bg-white px-2.5 py-1.5 text-[12px] font-bold uppercase leading-none tracking-[0.12em] text-ink">
                   {c.n}
                 </span>
                 <div className="p-[22px] md:p-6">
                   <h3 className="font-heading text-[30px] font-normal leading-tight tracking-[-0.02em] md:text-[34px]">{c.t}</h3>
                   <p className="mt-2 max-w-[300px] text-[13px] leading-[1.6] text-white/80">{c.d}</p>
                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/25 pt-4">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.13em]">
+                    <span className="text-[12px] font-semibold uppercase tracking-[0.13em]">
                       {c.go}
                       {c.count > 0 ? <span className="font-normal text-white/70"> · {c.count} {c.count === 1 ? 'pattern' : 'patterns'}</span> : null}
                     </span>
@@ -597,7 +597,7 @@ export function Home({
               yourself.
             </p>
             <Link href="/free-crochet-patterns" className="mt-3 inline-block">
-              <span className="inline-flex min-h-12 items-center justify-center rounded-[3px] border-2 border-white bg-white px-[22px] text-[11px] font-bold uppercase tracking-[0.12em] text-navy transition-colors hover:bg-navy hover:text-white">
+              <span className="inline-flex min-h-12 items-center justify-center rounded-[3px] border-2 border-white bg-white px-[22px] text-[12px] font-bold uppercase tracking-[0.12em] text-navy transition-colors hover:bg-navy hover:text-white">
                 Explore free patterns ↗
               </span>
             </Link>
@@ -639,7 +639,7 @@ export function Home({
                   </div>
                 ))}
               </div>
-              <Link href="/about" className="inline-block border-b-2 border-coral pb-[7px] text-[11px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
+              <Link href="/about" className="inline-block border-b-2 border-coral pb-[7px] text-[12px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
                 Read our story ↗
               </Link>
             </div>
@@ -667,7 +667,7 @@ export function Home({
                   ))}
                 </div>
                 <blockquote className="mb-5 font-heading text-[22px] leading-[1.25]">&ldquo;{t.body}&rdquo;</blockquote>
-                <figcaption className="text-[11px] font-bold uppercase tracking-[0.13em]">
+                <figcaption className="text-[12px] font-bold uppercase tracking-[0.13em]">
                   {t.reviewerFirstName}
                   <span className="font-medium normal-case tracking-normal opacity-75"> · {t.patternTitle}</span>
                 </figcaption>

@@ -31,14 +31,15 @@ export function PasswordStrength({ password }: { password: string }) {
             style={{ width: strength.width, background: strength.color }}
           />
         </div>
-        <span className="text-[11px] font-semibold shrink-0" style={{ color: strength.color }}>{strength.label}</span>
+        <span className="text-[12px] font-semibold shrink-0" style={{ color: strength.color }}>{strength.label}</span>
       </div>
       <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
         {PASSWORD_RULES.map((rule) => {
           const met = rule.test(password)
           return (
-            <li key={rule.key} className="flex items-center gap-1.5 text-[11px]" style={{ color: met ? 'var(--color-sale-green)' : 'var(--color-ink-soft)' }}>
+            <li key={rule.key} className="flex items-center gap-1.5 text-[12px]" style={{ color: met ? 'var(--color-sale-green)' : 'var(--color-ink-soft)' }}>
               <MaterialIcon name={met ? 'check_circle' : 'radio_button_unchecked'} size={13} />
+              <span className="sr-only">{met ? 'Done: ' : 'Still needed: '}</span>
               {rule.label}
             </li>
           )

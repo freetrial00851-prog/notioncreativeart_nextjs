@@ -100,6 +100,13 @@ function AccountNav({ pathname }: { pathname: string }) {
   const { signOut } = useAuth()
   const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
+  const mobileNavRef = useRef<HTMLElement>(null)
+
+  // On a phone the tab row scrolls sideways: bring the current tab into view.
+  useEffect(() => {
+    const active = mobileNavRef.current?.querySelector<HTMLElement>('[aria-current="page"]')
+    active?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [pathname])
 
   const handleSignOut = async () => {
     setSigningOut(true)
@@ -141,7 +148,7 @@ function AccountNav({ pathname }: { pathname: string }) {
         </div>
       </nav>
 
-      <nav aria-label="Account" className="lg:hidden -mx-5 md:-mx-8 mb-5 overflow-x-auto px-5 md:px-8" style={{ scrollbarWidth: 'none' }}>
+      <nav ref={mobileNavRef} aria-label="Account" className="lg:hidden -mx-5 md:-mx-8 mb-5 overflow-x-auto px-5 md:px-8" style={{ scrollbarWidth: 'none' }}>
         <ul className="flex w-max gap-2 pb-1">
           {NAV.map((item) => {
             const active = item.match(pathname)
@@ -159,6 +166,16 @@ function AccountNav({ pathname }: { pathname: string }) {
               </li>
             )
           })}
+          <li>
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
+              disabled={signingOut}
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-[3px] border border-border bg-surface px-5 text-[15px] md:text-[14px] font-semibold text-muted transition-colors hover:border-primary hover:text-ink disabled:opacity-60"
+            >
+              {signingOut ? 'Signing out…' : 'Sign out'}
+            </button>
+          </li>
         </ul>
       </nav>
     </>

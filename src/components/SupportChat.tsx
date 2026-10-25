@@ -268,7 +268,7 @@ export function SupportChat() {
               <LogoIcon size={36} onAccent />
               <div className="min-w-0">
                 <p className="font-display font-semibold text-[17px] leading-tight">NCA Support</p>
-                <p className="text-[11px] text-white/80 mt-0.5">We're here to help</p>
+                <p className="text-[12px] text-white/80 mt-0.5">We're here to help</p>
               </div>
             </div>
             <button
@@ -368,7 +368,7 @@ export function SupportChat() {
                 className="rounded-2xl border border-line bg-white p-3.5 space-y-2.5 shadow-sm"
               >
                 <p className="text-[13px] font-semibold text-ink">Talk to a human</p>
-                <p className="text-[11px] text-ink-soft leading-snug">
+                <p className="text-[12px] text-ink-soft leading-snug">
                   Leave your email and a short note — we'll reply by email.
                 </p>
                 <label className="block">
@@ -473,7 +473,7 @@ export function SupportChat() {
             </form>
           ) : (
             <div className="shrink-0 border-t border-line bg-white px-4 py-3">
-              <p className="text-[11px] text-ink-soft">Fill in the form above to reach support by email.</p>
+              <p className="text-[12px] text-ink-soft">Fill in the form above to reach support by email.</p>
             </div>
           )}
         </div>

@@ -34,7 +34,7 @@ export default function GuidesIndexPage() {
             <li aria-current="page" className="text-ink">Guides</li>
           </ol>
         </nav>
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">Learn</p>
+        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Learn</p>
         <h1 className="type-h1 mb-4 text-ink">Crochet Guides and Tutorials</h1>
         <p className="mb-10 max-w-[60ch] text-[15px] leading-relaxed text-muted md:text-[16px]">{DESCRIPTION}</p>
         <ul className="space-y-4">

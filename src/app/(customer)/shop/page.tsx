@@ -33,9 +33,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 function ShopLoading({ title }: { title: string }) {
   return (
     <div className="max-w-site w-full mx-auto px-4 md:px-16 xl:px-24 2xl:px-32 py-14">
-      <h1 className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words mb-8">
+      <p className="font-display font-semibold text-3xl md:text-4xl leading-tight break-words mb-8">
         {title}
-      </h1>
+      </p>
       <p className="text-ink-soft text-sm">Loading…</p>
     </div>
   )

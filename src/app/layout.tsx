@@ -20,7 +20,8 @@ import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoS
 const fraunces = Fraunces({
   subsets: ['latin'],
   axes: ['SOFT', 'WONK', 'opsz'],
-  style: ['normal', 'italic'],
+  // No italic file: nothing on the storefront uses it, so visitors do not download it.
+  style: ['normal'],
   variable: '--font-fraunces',
   display: 'swap',
 })

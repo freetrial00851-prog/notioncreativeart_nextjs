@@ -66,7 +66,7 @@ export default async function GuidePage({ params }: Props) {
             <li aria-current="page" className="text-ink">{guide.title}</li>
           </ol>
         </nav>
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">Guide</p>
+        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Guide</p>
         <h1 className="type-h1 mb-3 text-ink">{guide.title}</h1>
         <p className="mb-8 text-[13px] text-muted">
           By {guide.author} · Updated <time dateTime={guide.dateModified}>{formatDate(guide.dateModified)}</time>

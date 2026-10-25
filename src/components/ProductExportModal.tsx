@@ -83,7 +83,7 @@ export function ProductExportModal({ categories, onClose }: Props) {
 
         <div className="px-5 py-4 space-y-5 max-h-[min(70vh,520px)] overflow-y-auto">
           <div>
-            <p className="text-[11px] tracking-[0.15em] text-ink-soft mb-3">FILTERS</p>
+            <p className="text-[12px] tracking-[0.15em] text-ink-soft mb-3">FILTERS</p>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <label className="block text-[12px] text-ink-soft">
@@ -161,8 +161,8 @@ export function ProductExportModal({ categories, onClose }: Props) {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] tracking-[0.15em] text-ink-soft">COLUMNS</p>
-              <div className="flex gap-3 text-[11px]">
+              <p className="text-[12px] tracking-[0.15em] text-ink-soft">COLUMNS</p>
+              <div className="flex gap-3 text-[12px]">
                 <button type="button" onClick={() => setAllFields(true)} className="text-[#111111] hover:underline">
                   Select all
                 </button>

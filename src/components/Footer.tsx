@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Logo } from './Logo'
+import { CookieSettingsButton } from './CookieSettingsButton'
 
 const EXPLORE = [
   { label: 'All patterns', to: '/shop' },
@@ -46,7 +47,7 @@ export function Footer() {
           <FooterCol title="Your account" links={ACCOUNT} />
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-border pt-5 text-[11px] text-muted md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 border-t border-border pt-5 text-[12px] text-muted md:flex-row md:items-center md:justify-between">
           <span>© {year} NotionCreativeArt. All rights reserved.</span>
           <span className="hidden md:inline">Made for makers, with care.</span>
           <span className="flex items-center gap-1">
@@ -61,6 +62,8 @@ export function Footer() {
             <Link href="/refund-policy" className="inline-flex min-h-11 items-center px-1 hover:text-coral md:min-h-0">
               Refund policy
             </Link>
+            ·
+            <CookieSettingsButton />
           </span>
         </div>
       </div>
@@ -71,7 +74,7 @@ export function Footer() {
 function FooterCol({ title, links }: { title: string; links: { label: string; to: string }[] }) {
   return (
     <div>
-      <p className="mb-2 mt-1 text-[11px] font-bold uppercase tracking-[0.15em] text-ink">{title}</p>
+      <p className="mb-2 mt-1 text-[12px] font-bold uppercase tracking-[0.15em] text-ink">{title}</p>
       <ul>
         {links.map((l) => (
           <li key={l.to}>

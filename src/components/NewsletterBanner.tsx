@@ -19,7 +19,7 @@ export function NewsletterBanner(_props: { image?: string; standalone?: boolean 
       style={{ background: 'var(--color-primary)' }}
     >
       <div className="min-w-0 w-full lg:flex-1">
-        <p className="text-[11px] tracking-[0.2em] opacity-70 mb-2">JOIN OUR MAKER COMMUNITY</p>
+        <p className="text-[12px] tracking-[0.2em] opacity-70 mb-2">JOIN OUR MAKER COMMUNITY</p>
         <h2 className="font-heading font-normal text-2xl md:text-3xl mb-2 md:mb-3">Be First to See New Patterns</h2>
         <p className="text-[14px] opacity-80 leading-relaxed max-w-sm mx-auto md:mx-0 md:max-w-none lg:max-w-sm">
           New releases and crochet notes, sent to your inbox. See our{' '}
@@ -85,7 +85,7 @@ function NewsletterForm() {
           Subscribe
         </button>
       </form>
-      {error && <p className="text-[11px] text-white/90 mt-2 text-center md:text-left">{error}</p>}
+      {error && <p className="text-[12px] text-white/90 mt-2 text-center md:text-left">{error}</p>}
     </div>
   )
 }

@@ -47,7 +47,7 @@
   --color-text: #2A1B14;
   --color-muted: #6E5E55;
   --color-text-muted: #6E5E55;
-  --color-muted-light: #A8978C;
+  --color-muted-light: #7D6E64;
 
   --color-gold: #F5A300;
   --color-star: #F5A300;
@@ -361,8 +361,9 @@ button, .btn { font-weight: 600; }
   to { transform: none; }
 }
 @keyframes settle {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to { opacity: 1; transform: none; }
+  /* Movement only: the hero photo is visible from the first paint (it is the largest thing on the page). */
+  from { transform: translateY(14px) scale(0.97); }
+  to { transform: none; }
 }
 .hero-rise { animation: rise 520ms var(--ease-expo) both; animation-delay: var(--d, 0ms); }
 .hero-rise-y { animation: rise-y 560ms var(--ease-expo) both; }

@@ -34,7 +34,7 @@ export function EmailSignup() {
         </p>
 
         {subscribed ? (
-          <p role="status" className="mx-auto mt-6 inline-flex items-center gap-3 rounded-[3px] bg-ink px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
+          <p role="status" className="mx-auto mt-6 inline-flex items-center gap-3 rounded-[3px] bg-ink px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-white">
             <span aria-hidden>✓</span> Subscribed
           </p>
         ) : (
@@ -57,7 +57,7 @@ export function EmailSignup() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[11px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:text-violet disabled:opacity-50"
+              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:text-violet disabled:opacity-50"
             >
               {submitting ? 'Joining…' : 'Join the list ↗'}
             </button>
@@ -69,7 +69,7 @@ export function EmailSignup() {
           </p>
         )}
         {!subscribed && (
-          <p className="mt-4 text-[11px] text-muted">
+          <p className="mt-4 text-[12px] text-muted">
             Unsubscribe anytime. Read our{' '}
             <Link href="/privacy" className="underline underline-offset-2 hover:text-ink">
               privacy policy

@@ -501,7 +501,7 @@ export function Shop({
             <FilterGlyph />
             Filters
             {activeFilterCount > 0 ? (
-              <span className="min-w-5 h-5 px-1 rounded-[3px] bg-primary text-white text-[11px] flex items-center justify-center">
+              <span className="min-w-5 h-5 px-1 rounded-[3px] bg-primary text-white text-[12px] flex items-center justify-center">
                 {activeFilterCount}
               </span>
             ) : null}

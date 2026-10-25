@@ -1,4 +1,6 @@
 import { ContentPage } from '../components/ContentPage'
+import Link from 'next/link'
+import { CopyEmailButton } from '../components/CopyEmailButton'
 
 export function Contact() {
   return (
@@ -9,10 +11,11 @@ export function Contact() {
         <a href="mailto:patterns@notioncreativeart.com" className="text-ink underline underline-offset-4">
           patterns@notioncreativeart.com
         </a>
+        <CopyEmailButton email="patterns@notioncreativeart.com" />
       </p>
       <p>We typically reply within 1–2 days. Please include your order number if your question is about a purchase.</p>
       <p className="text-[14px]">
-        NotionCreativeArt is the trading name of Muhammad Sufyan, a sole proprietor based in Pakistan. Payments are processed by our merchant of record (see our <a href="/terms">Terms</a> and <a href="/refund-policy">Refund policy</a>).
+        NotionCreativeArt is the trading name of Muhammad Sufyan, a sole proprietor based in Pakistan. Payments are processed by our merchant of record (see our <Link href="/terms">Terms</Link> and <Link href="/refund-policy">Refund policy</Link>).
       </p>
     </ContentPage>
   )

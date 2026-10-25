@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { friendlyAuthError } from '../lib/authErrors'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { authCallbackUrl } from '../lib/authCallbackUrl'
@@ -110,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.setItem('nca_signin_intent', '1')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) sessionStorage.removeItem('nca_signin_intent')
-    return { error: error?.message ?? null }
+    return { error: friendlyAuthError(error?.message) }
   }
 
   const signUpWithEmail = async ({ name, email, password }: { name: string; email: string; password: string }) => {

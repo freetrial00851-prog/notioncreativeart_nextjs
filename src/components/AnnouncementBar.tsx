@@ -49,7 +49,7 @@ export function AnnouncementBar() {
 
   return (
     <div
-      className="w-full bg-navy px-4 py-2.5 text-center text-[11px] font-semibold uppercase tracking-[0.13em] text-white"
+      className="w-full bg-navy px-4 py-2.5 text-center text-[12px] font-semibold uppercase tracking-[0.13em] text-white"
       role="status"
       style={
         useCms && announcement

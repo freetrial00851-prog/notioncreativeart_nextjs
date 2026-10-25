@@ -45,7 +45,7 @@ const ROW_CLASS_SHEET =
 
 /** Desktop: small muted caps. */
 const SECTION_TITLE_PANEL =
-  'text-[11px] font-normal uppercase tracking-[0.15em] text-ink-soft mb-1'
+  'text-[12px] font-normal uppercase tracking-[0.15em] text-ink-soft mb-1'
 
 /** Sheet: Etsy-style sentence case, bold, ~19–20px, full ink. */
 const SECTION_TITLE_SHEET =
