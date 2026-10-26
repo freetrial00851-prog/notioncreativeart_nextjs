@@ -127,7 +127,8 @@ Deno.serve(async (req) => {
     })
     const json = await res.json().catch(() => ({}))
     if (!res.ok || !json?.data?.id) {
-      console.error('create-paddle-checkout: Paddle rejected the transaction', res.status, JSON.stringify(json?.error ?? json))
+      // The key's first 9 characters (pdl_live_ or pdl_sdbx_) say which Paddle account it belongs to; the rest is never logged.
+      console.error('create-paddle-checkout: Paddle rejected the transaction', res.status, JSON.stringify(json?.error ?? json), `env=${PADDLE_ENV}`, `key=${PADDLE_API_KEY.slice(0, 9)}`)
       return reply(req, 502, { error: 'Couldn’t start checkout — please try again in a moment.' })
     }
 

@@ -211,7 +211,11 @@ async function handleAdjustment(data: Record<string, any>): Promise<string | nul
   const txnId = String(data.transaction_id ?? '')
   if (!txnId || status !== 'approved') return null
   if (!['refund', 'chargeback', 'chargeback_warning'].includes(action) || action === 'chargeback_warning') return null
-  if (action === 'refund' && data.type && data.type !== 'full') return null
+  // Paddle can label a refund of the whole item "partial" at the top level (seen on a live $1.00 refund) while every
+  // line is "full", so a refund counts as full when the top-level type is full or when every line item is full.
+  const items: Array<{ type?: string }> = Array.isArray(data.items) ? data.items : []
+  const allItemsFull = items.length > 0 && items.every((i) => i?.type === 'full')
+  if (action === 'refund' && data.type && data.type !== 'full' && !allItemsFull) return null
 
   const { data: order, error } = await supabase
     .from('orders')

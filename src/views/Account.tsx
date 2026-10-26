@@ -483,6 +483,15 @@ function MyOrders() {
                           ) : (
                             <span className="text-[15px] md:text-[14px] text-muted">Pattern no longer available</span>
                           )}
+                          {p && o.status === 'paid' && (
+                            <Link
+                              href={`/pattern/${p.slug}?review=1#reviews`}
+                              className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-1 text-[14px] font-semibold text-primary hover:underline md:min-h-9 md:text-[13px]"
+                            >
+                              <MaterialIcon name="star" size={16} />
+                              Write a review
+                            </Link>
+                          )}
                         </li>
                       )
                     })}

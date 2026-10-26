@@ -250,6 +250,16 @@ export function ProductDetail({
   const [alsoBought, setAlsoBought] = useState<Product[]>([])
   const carouselReviewStats = useReviewStatsMapForLists([alsoBought, related])
 
+  // "Write a review" links from My Orders arrive as /pattern/<slug>?review=1: open the review form and scroll to it.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('review') !== '1') return
+    const t = setTimeout(() => {
+      setReviewFormOpen(true)
+      requestAnimationFrame(() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    }, 400)
+    return () => clearTimeout(t)
+  }, [])
+
   useEffect(() => {
     // Seeded from the server ISR payload — `page.tsx` keys this component by
     // slug, so soft-nav to another pattern remounts with fresh state.
