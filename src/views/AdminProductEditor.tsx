@@ -121,7 +121,7 @@ export function ProductEditor(p: Props) {
       : [
           { id: 'price', label: 'Price above $0', done: !!(priceNum && priceNum > 0), anchor: 'ed-price' },
           form.checkout_provider === 'paddle'
-            ? { id: 'paddle', label: 'Price ID from Paddle (live or test)', done: !!form.paddle_price_id.trim() || !!form.paddle_price_id_sandbox.trim(), anchor: 'ed-checkout' }
+            ? { id: 'paddle', label: 'Sold through Paddle', done: true, anchor: 'ed-checkout' }
             : { id: 'lemon', label: 'Checkout IDs from Lemon Squeezy', done: !!form.lemon_variant_id.trim() && !!form.lemon_numeric_variant_id.trim(), anchor: 'ed-checkout' },
         ]),
   ]
@@ -279,10 +279,10 @@ export function ProductEditor(p: Props) {
                   </>
                 ) : (
                   <>
-                    <Field label="Paddle price ID (live)" hint="Paddle → Catalog → Products → this product → its price → the ID starting with pri_. Leave empty until your live Paddle account is approved.">
+                    <Field label="Paddle price ID (live)" hint="Paddle → Catalog → Products → this product → its price → the ID starting with pri_. Optional: leave empty and checkout sends this listing's price from the shop.">
                       <input value={form.paddle_price_id} onChange={(e) => setForm({ ...form, paddle_price_id: e.target.value.trim() })} className={inputCls} placeholder="pri_01abc..." />
                     </Field>
-                    <Field label="Paddle price ID (test)" hint="Same place in your Paddle sandbox account. Used only while testing.">
+                    <Field label="Paddle price ID (test)" hint="Optional. Same place in your Paddle sandbox account. Used only while testing.">
                       <input value={form.paddle_price_id_sandbox} onChange={(e) => setForm({ ...form, paddle_price_id_sandbox: e.target.value.trim() })} className={inputCls} placeholder="pri_01xyz..." />
                     </Field>
                     <p className="text-[12px] text-[#6b7280]">Until Paddle checkout is switched on for the shop, customers still pay through Lemon Squeezy.</p>
