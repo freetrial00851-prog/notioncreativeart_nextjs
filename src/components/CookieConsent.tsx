@@ -27,7 +27,8 @@ export function CookieConsent() {
       root.style.removeProperty('--cookie-h')
       return
     }
-    const sync = () => root.style.setProperty('--cookie-h', `${el.offsetHeight}px`)
+    // Only the phone bar spans the bottom of the screen; the desktop card sits in the corner and blocks nothing.
+    const sync = () => root.style.setProperty('--cookie-h', window.matchMedia('(min-width: 768px)').matches ? '0px' : `${el.offsetHeight}px`)
     sync()
     const ro = new ResizeObserver(sync)
     ro.observe(el)
@@ -50,9 +51,9 @@ export function CookieConsent() {
       ref={barRef}
       role="region"
       aria-label="Cookie preferences"
-      className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-4 py-2 md:px-8 md:py-4"
+      className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-4 py-2 md:bottom-4 md:left-4 md:right-auto md:max-w-[440px] md:rounded-xl md:border md:px-5 md:py-4 md:shadow-card"
     >
-      <div className="max-w-site w-full mx-auto flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4">
+      <div className="max-w-site w-full mx-auto flex flex-col items-stretch gap-2 md:gap-3">
         <p className="text-[13px] text-ink-soft flex-1 leading-snug md:leading-relaxed">
           We use cookies for site analytics and to measure Pinterest ads, only if you accept. Declining does not affect shopping.{' '}
           <a href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</a>

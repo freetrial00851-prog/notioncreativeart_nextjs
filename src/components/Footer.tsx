@@ -41,6 +41,11 @@ export function Footer() {
               Thoughtful digital patterns for curious makers. Find a project, make it your own, and enjoy every stitch along
               the way.
             </p>
+            <p className="mt-3 max-w-[260px] text-[13px] leading-[1.7] text-muted">
+              Questions? <a href="mailto:patterns@notioncreativeart.com" className="font-semibold text-ink underline underline-offset-4 hover:text-coral">patterns@notioncreativeart.com</a>
+              <br />
+              We reply in 1 to 2 days.
+            </p>
           </div>
           <FooterCol title="Explore" links={EXPLORE} />
           <FooterCol title="Here to help" links={HELP} />

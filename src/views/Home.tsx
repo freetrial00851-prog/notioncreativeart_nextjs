@@ -16,6 +16,8 @@ import { DEFAULT_HOME_COPY, type Product, type HeroContent, type ChapterContent,
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
 import { Button } from '../components/ui/Button'
+import { MaterialIcon } from '../components/MaterialIcon'
+import { MAKER } from '../content/maker'
 import { EmailSignup } from '../components/EmailSignup'
 import { FaqAccordion } from '../components/FaqAccordion'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
@@ -346,35 +348,24 @@ export function Home({
         </div>
       </section>
 
-      {/* 2 · Ticker */}
-      <section className="border-y-2 border-navy bg-sun">
-        <ul className="mx-auto flex max-w-site flex-wrap justify-between gap-x-5 gap-y-2 page-gutter py-[18px] text-[12px] font-bold uppercase tracking-[0.13em] text-navy">
-          {['Small projects, big joy', 'Patterns to keep forever', 'Creative time, your way', 'Download and get making'].map((t) => (
-            <li key={t} className="inline-flex items-center gap-2.5">
-              <span className="text-coral" aria-hidden>✳</span>
-              {t}
+      {/* 2 · Trust strip */}
+      <section aria-label="Why buy here" className="border-y border-border bg-surface-warm">
+        <ul className="mx-auto grid max-w-site grid-cols-2 gap-x-4 gap-y-3 page-gutter py-4 md:grid-cols-4 md:gap-x-6 md:py-5">
+          {[
+            { icon: 'download', t: 'Instant PDF download', d: 'Yours the moment you pay' },
+            { icon: 'verified_user', t: '14-day refund', d: 'If something is not right' },
+            { icon: 'lock', t: 'Secure checkout', d: 'Paid through Paddle' },
+            { icon: 'mail', t: 'Real support', d: 'We reply in 1 to 2 days' },
+          ].map((x) => (
+            <li key={x.t} className="flex items-start gap-3">
+              <MaterialIcon name={x.icon} size={22} color="var(--color-primary)" className="mt-0.5 shrink-0" />
+              <span className="min-w-0">
+                <span className="block text-[14px] font-semibold leading-tight text-ink">{x.t}</span>
+                <span className="mt-0.5 block text-[12px] leading-snug text-muted">{x.d}</span>
+              </span>
             </li>
           ))}
         </ul>
-      </section>
-
-      {/* 2b · Plain-text introduction with real category links (server-rendered, for search engines and readers) */}
-      <section className="mx-auto max-w-site page-gutter pt-[48px] md:pt-[72px]">
-        <div className="max-w-3xl text-[14px] leading-[1.9] text-muted">
-          <p className="eyebrow">Who we are</p>
-          <h2 className="mt-[13px] font-heading text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
-            Crochet patterns you can download in minutes
-          </h2>
-          <p className="mt-4">
-            Notion Creative Art is a small studio writing <Link className="underline" href="/shop">crochet patterns</Link> as instant PDF
-            downloads. Browse cuddly <Link className="underline" href="/shop/amigurumi">amigurumi patterns</Link>, easy{' '}
-            <Link className="underline" href="/shop/no-sew-amigurumi">no-sew amigurumi</Link> and{' '}
-            <Link className="underline" href="/shop/wearables">wearable crochet patterns</Link>, or start with a{' '}
-            <Link className="underline" href="/free-crochet-patterns">free crochet pattern</Link>. New to crochet? Try our{' '}
-            <Link className="underline" href="/shop?level=beginner">beginner patterns</Link> first. Every pattern lists its skill level,
-            materials and photos, and you can print the PDF or follow it on your phone.
-          </p>
-        </div>
       </section>
 
       {/* 3 · Patterns to fall for */}
@@ -425,6 +416,25 @@ export function Home({
             ))}
           </PatternGrid>
         )}
+      </section>
+
+      {/* 2b · Plain-text introduction with real category links (server-rendered, for search engines and readers) */}
+      <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
+        <div className="max-w-3xl text-[14px] leading-[1.9] text-muted">
+          <p className="eyebrow">Who we are</p>
+          <h2 className="mt-[13px] font-heading text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
+            Crochet patterns you can download in minutes
+          </h2>
+          <p className="mt-4">
+            Notion Creative Art is a small studio writing <Link className="underline" href="/shop">crochet patterns</Link> as instant PDF
+            downloads. Browse cuddly <Link className="underline" href="/shop/amigurumi">amigurumi patterns</Link>, easy{' '}
+            <Link className="underline" href="/shop/no-sew-amigurumi">no-sew amigurumi</Link> and{' '}
+            <Link className="underline" href="/shop/wearables">wearable crochet patterns</Link>, or start with a{' '}
+            <Link className="underline" href="/free-crochet-patterns">free crochet pattern</Link>. New to crochet? Try our{' '}
+            <Link className="underline" href="/shop?level=beginner">beginner patterns</Link> first. Every pattern lists its skill level,
+            materials and photos, and you can print the PDF or follow it on your phone.
+          </p>
+        </div>
       </section>
 
       {/* 4 · Collections (navy band) */}
@@ -605,41 +615,32 @@ export function Home({
         </div>
       </section>
 
-      {/* 8 · Meet the maker — owner copy; hidden in production until supplied */}
-      {!hideOwnerCopyPlaceholders && (
+      {/* 8 · Meet the maker: shown only once the owner has supplied real text (src/content/maker.ts) */}
+      {MAKER.headline && MAKER.story && (
         <section className="bg-surface-warm">
           <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
-            <div
-              className="relative aspect-[4/3] overflow-hidden rounded-[5px] lg:aspect-[4/5] lg:max-w-[440px]"
-              style={{ background: 'var(--color-tint-cream)' }}
-            >
-              <span className="absolute inset-0 flex items-center justify-center text-[13px] text-muted">Designer photo</span>
-            </div>
-            <div>
-              <p className="eyebrow">Meet the maker</p>
-              {/* TODO: story headline from owner */}
-              <h2 className="my-4 font-heading text-[clamp(34px,4vw,48px)] font-normal leading-[1.08] tracking-[-0.035em] text-ink">
-                [Story headline: why these patterns exist]
-              </h2>
-              {/* TODO: maker story copy from owner */}
-              <p className="mb-6 max-w-xl text-[13px] leading-[1.9] text-muted">
-                [Two or three sentences in your own voice: who designs the patterns, how each one is tested, and what a
-                buyer can trust about them.]
-              </p>
-              <div className="mb-6 flex flex-wrap gap-x-12 gap-y-4 border-t border-border pt-6">
-                {[
-                  { n: '[N]', l: 'Patterns designed' },
-                  { n: '[N]', l: 'Makers helped' },
-                  { n: '[N]', l: 'Years crocheting' },
-                ].map((s) => (
-                  <div key={s.l}>
-                    {/* TODO: real stats from owner */}
-                    <p className="font-heading text-[40px] font-normal leading-none text-ink">{s.n}</p>
-                    <p className="mt-1.5 text-[12px] text-muted">{s.l}</p>
-                  </div>
-                ))}
+            {MAKER.photo && (
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[5px] lg:aspect-[4/5] lg:max-w-[440px]">
+                <Image src={MAKER.photo} alt="The maker of Notion Creative Art patterns" fill sizes="(max-width: 1023px) 100vw, 440px" className="object-cover" />
               </div>
-              <Link href="/about" className="inline-block border-b-2 border-coral pb-[7px] text-[12px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
+            )}
+            <div className={MAKER.photo ? '' : 'lg:col-span-2 max-w-2xl'}>
+              <p className="eyebrow">Meet the maker</p>
+              <h2 className="my-4 font-heading text-[clamp(34px,4vw,48px)] font-normal leading-[1.08] tracking-[-0.035em] text-ink">
+                {MAKER.headline}
+              </h2>
+              <p className="mb-6 max-w-xl text-[15px] leading-[1.8] text-muted">{MAKER.story}</p>
+              {MAKER.stats.length > 0 && (
+                <div className="mb-6 flex flex-wrap gap-x-12 gap-y-4 border-t border-border pt-6">
+                  {MAKER.stats.map((st) => (
+                    <div key={st.l}>
+                      <p className="font-heading text-[40px] font-normal leading-none text-ink">{st.n}</p>
+                      <p className="mt-1.5 text-[13px] text-muted">{st.l}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Link href="/about" className="inline-flex min-h-11 items-center border-b-2 border-coral text-[13px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
                 Read our story ↗
               </Link>
             </div>
