@@ -336,12 +336,12 @@ export function Home({
           {heroTiles[0]?.href ? (
             <Link
               href={heroTiles[0].href}
-              className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-[3px] bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink shadow-[0_5px_18px_rgba(0,0,0,0.08)] hover:text-violet sm:bottom-[30px] sm:right-[25px] sm:text-[15px]"
+              className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-[3px] bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink shadow-[0_5px_18px_rgba(0,0,0,0.08)] hover:text-violet sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]"
             >
               Your next favourite make
             </Link>
           ) : (
-            <span className="absolute bottom-[30px] right-[25px] z-[3] rotate-3 rounded-[3px] bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink sm:text-[15px]">
+            <span className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-[3px] bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]">
               Your next favourite make
             </span>
           )}

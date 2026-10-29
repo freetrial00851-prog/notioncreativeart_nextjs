@@ -54,20 +54,21 @@ export function CookieConsent() {
       className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-4 py-2 md:bottom-4 md:left-4 md:right-auto md:max-w-[440px] md:rounded-xl md:border md:px-5 md:py-4 md:shadow-card"
     >
       <div className="max-w-site w-full mx-auto flex flex-col items-stretch gap-2 md:gap-3">
-        <p className="text-[13px] text-ink-soft flex-1 leading-snug md:leading-relaxed">
-          We use cookies for site analytics and to measure Pinterest ads, only if you accept. Declining does not affect shopping.{' '}
+        <p className="text-[12px] text-ink-soft flex-1 leading-snug md:text-[13px] md:leading-relaxed">
+          <span className="md:hidden">Cookies for analytics and Pinterest ads, only if you accept. </span>
+          <span className="hidden md:inline">We use cookies for site analytics and to measure Pinterest ads, only if you accept. Declining does not affect shopping. </span>
           <a href="/privacy" className="underline underline-offset-2 hover:text-ink">Privacy Policy</a>
         </p>
         <div className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto md:shrink-0 md:gap-3">
           <button
             onClick={() => choose('rejected')}
-            className="min-h-11 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-[3px] hover:opacity-85 transition-opacity"
+            className="min-h-10 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-[3px] hover:opacity-85 transition-opacity md:min-h-11"
           >
             REJECT
           </button>
           <button
             onClick={() => choose('accepted')}
-            className="min-h-11 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-[3px] hover:opacity-85 transition-opacity"
+            className="min-h-10 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-[3px] hover:opacity-85 transition-opacity md:min-h-11"
           >
             ACCEPT
           </button>
