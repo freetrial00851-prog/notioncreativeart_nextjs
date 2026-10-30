@@ -498,18 +498,18 @@ export function Home({
       <section className="bg-peach">
       <div suppressHydrationWarning className="reveal mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
         {storyPhotos.length > 0 ? (
-          <div className="relative mx-auto w-full max-w-[640px] pb-10 pr-8 md:pb-14 md:pr-12 lg:max-w-none">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-[5px] bg-surface-warm">
+          <div className="relative mx-auto w-full max-w-[400px] pb-10 pr-8 sm:max-w-[460px] md:pb-14 md:pr-12">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[5px] bg-surface-warm">
               <Image
                 src={deriveVariantUrl(storyPhotos[0].src, 'large')}
                 alt={storyPhotos[0].alt}
                 fill
-                sizes="(max-width:1023px) 90vw, 560px"
-                className="object-cover object-[50%_20%]"
+                sizes="(max-width:639px) 80vw, 460px"
+                className="object-cover object-center"
               />
             </div>
             {storyPhotos[1] ? (
-              <div className="absolute bottom-0 right-0 aspect-square w-[42%] overflow-hidden rounded-[5px] border-[6px] border-bg bg-surface-warm shadow-[0_14px_28px_rgba(0,0,0,0.14)]">
+              <div className="absolute bottom-0 right-0 aspect-[3/4] w-[40%] overflow-hidden rounded-[5px] border-[6px] border-bg bg-surface-warm shadow-[0_14px_28px_rgba(0,0,0,0.14)]">
                 <Image
                   src={deriveVariantUrl(storyPhotos[1].src, 'large')}
                   alt={storyPhotos[1].alt}
@@ -620,7 +620,7 @@ export function Home({
         <section className="bg-surface-warm">
           <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
             {MAKER.photo && (
-              <div className="relative aspect-[4/3] overflow-hidden rounded-[5px] lg:aspect-[4/5] lg:max-w-[440px]">
+              <div className="relative mx-auto aspect-[3/4] w-full max-w-[360px] overflow-hidden rounded-[5px] lg:mx-0 lg:max-w-[440px]">
                 <Image src={MAKER.photo} alt="The maker of Notion Creative Art patterns" fill sizes="(max-width: 1023px) 100vw, 440px" className="object-cover" />
               </div>
             )}
