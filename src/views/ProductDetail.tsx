@@ -721,7 +721,7 @@ export function ProductDetail({
           {/* Gallery */}
           <div className="min-w-0">
             <div
-              className="relative aspect-square w-full overflow-hidden rounded-2xl bg-surface-warm shadow-image select-none"
+              className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-surface-warm shadow-image select-none"
               ref={swipeContainerRef}
               style={{ touchAction: 'pan-y pinch-zoom' }}
               role="region"
@@ -825,7 +825,7 @@ export function ProductDetail({
                       onClick={() => setActiveImage(i)}
                       aria-label={`Show image ${i + 1}`}
                       aria-current={i === activeImage ? 'true' : undefined}
-                      className={`relative h-[86px] lg:h-[98px] shrink-0 basis-[calc((100%-36px)/4)] overflow-hidden rounded-[5px] bg-surface transition-colors ${i === activeImage ? 'border-2 border-primary' : 'border border-border hover:border-muted-light'}`}
+                      className={`relative aspect-[3/4] shrink-0 basis-[calc((100%-36px)/4)] overflow-hidden rounded-[5px] bg-surface transition-colors ${i === activeImage ? 'border-2 border-primary' : 'border border-border hover:border-muted-light'}`}
                     >
                       <Image
                         src={deriveVariantUrl(img, 'thumb')}

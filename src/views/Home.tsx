@@ -314,14 +314,14 @@ export function Home({
           <span aria-hidden className="absolute right-[10%] top-[8%] text-[46px] leading-none text-violet">✳</span>
           <span aria-hidden className="pointer-events-none absolute inset-4 z-[1] border-2 border-navy/20" />
           {heroTiles[0] ? (
-            <div className="relative z-[2] -mt-10 w-[70%] max-w-[440px] -rotate-2 rounded-[3px] bg-white p-2 shadow-[0_18px_30px_rgba(32,32,68,0.22)] sm:-mt-14">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-[2px]">
+            <div className="relative z-[2] -mt-10 w-[58%] max-w-[290px] -rotate-2 rounded-[3px] bg-white p-2 shadow-[0_18px_30px_rgba(32,32,68,0.22)] sm:-mt-14 sm:w-[44%]">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-[2px]">
                 <Image
                   src={deriveVariantUrl(heroTiles[0].src, 'large')}
                   alt={heroTiles[0].alt}
                   fill
                   priority
-                  sizes="(max-width:1023px) 70vw, 470px"
+                  sizes="(max-width:1023px) 58vw, 290px"
                   className="object-cover object-center"
                 />
               </div>
@@ -581,14 +581,14 @@ export function Home({
               <Link
                 href={`/pattern/${freeImages[0].slug}`}
                 aria-label={freeImages[0].title}
-                className="relative block w-[64%] max-w-[320px] rotate-2 rounded-[3px] bg-white p-2 shadow-[0_16px_26px_rgba(32,32,68,0.2)]"
+                className="relative my-6 block w-[50%] max-w-[240px] rotate-2 rounded-[3px] bg-white p-2 shadow-[0_16px_26px_rgba(32,32,68,0.2)]"
               >
-                <span className="relative block aspect-[4/3] overflow-hidden rounded-[2px]">
+                <span className="relative block aspect-[3/4] overflow-hidden rounded-[2px]">
                   <Image
                     src={deriveVariantUrl(freeImages[0].images[0], 'large')}
                     alt={freeImages[0].title}
                     fill
-                    sizes="(max-width:767px) 60vw, 320px"
+                    sizes="(max-width:767px) 50vw, 240px"
                     className="object-cover object-center"
                   />
                 </span>
