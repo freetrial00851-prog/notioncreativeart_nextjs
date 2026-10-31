@@ -15,6 +15,7 @@ import {
   virtualShopCategoryTitle,
 } from '@/lib/shopTitle'
 import { Shop } from '@/views/Shop'
+import { CategoryContent } from '@/components/CategoryContent'
 import { getShopSeed, getCategoryIntro } from '@/lib/data/products'
 
 type Props = {
@@ -162,6 +163,7 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
       <Suspense fallback={<ShopLoading title={title} />}>
         <Shop initialTitle={title} initialCategoryName={category?.name ?? null} initialProducts={seed?.products} initialCategories={seed?.categories} initialTotal={seed?.total} introText={intro} />
       </Suspense>
+      {onlyPage && pageNum === 1 && category ? <CategoryContent slug={categorySlug} /> : null}
     </>
   )
 }
