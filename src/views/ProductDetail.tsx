@@ -1128,6 +1128,29 @@ export function ProductDetail({
         </div>
       </section>
 
+      {/* Helpful guides: plain internal links that help buyers new to patterns, and give crawlers a path to the guides */}
+      <section aria-labelledby="helpful-guides" className="border-t border-border bg-bg">
+        <div className="max-w-site w-full mx-auto page-gutter py-8 md:py-10">
+          <h2 id="helpful-guides" className="type-h2 text-ink">Helpful guides</h2>
+          <ul className="mt-4 grid gap-3 md:grid-cols-3">
+            {[
+              { href: '/guides/how-to-read-a-crochet-pattern', title: 'How to read a crochet pattern', text: 'What the abbreviations, brackets and stitch counts mean.' },
+              { href: '/guides/crochet-abbreviations-us-vs-uk', title: 'US and UK crochet terms', text: 'The same stitch name can mean two different stitches.' },
+              free
+                ? { href: category ? shopLink : '/shop', title: category ? `More ${category.name} patterns` : 'Browse all patterns', text: 'See other crochet patterns from the shop.' }
+                : { href: '/free-crochet-patterns', title: 'Try a free pattern first', text: 'Free crochet PDF patterns you can download straight away.' },
+            ].map((g) => (
+              <li key={g.href}>
+                <Link href={g.href} className="block h-full rounded-[5px] border border-border bg-surface px-4 py-3.5 hover:border-muted-light">
+                  <span className="block text-[15px] font-semibold text-ink">{g.title}</span>
+                  <span className="mt-1 block text-[13px] leading-snug text-muted">{g.text}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* Customer reviews */}
       <section id="reviews" className="scroll-mt-24 border-t border-border bg-surface-warm">
         <div className="max-w-site w-full mx-auto page-gutter section-y">
