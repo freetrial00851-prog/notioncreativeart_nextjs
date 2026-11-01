@@ -149,6 +149,29 @@ export async function getFreeSeed(limit = 48): Promise<{ products: Product[]; ca
   }
 }
 
+/** Server seed for the beginners hub: beginner-level patterns, free ones and paid ones separately, newest first, with true totals. */
+export async function getBeginnerSeed(
+  limit = 24,
+): Promise<{ free: Product[]; paid: Product[]; freeTotal: number; paidTotal: number } | null> {
+  try {
+    const supabase = createStaticClient()
+    const base = () =>
+      supabase.from('products').select('*', { count: 'exact' }).eq('active', true).is('deleted_at', null).eq('skill_level', 'beginner')
+    const [free, paid] = await Promise.all([
+      base().eq('price', 0).order('created_at', { ascending: false }).limit(limit),
+      base().gt('price', 0).order('created_at', { ascending: false }).limit(limit),
+    ])
+    return {
+      free: (free.data as Product[]) ?? [],
+      paid: (paid.data as Product[]) ?? [],
+      freeTotal: free.count ?? (free.data?.length ?? 0),
+      paidTotal: paid.count ?? (paid.data?.length ?? 0),
+    }
+  } catch {
+    return null
+  }
+}
+
 /** Up to `n` other patterns: same category first, then the newest — server-rendered so every product page links to others. */
 export async function getRelatedProducts(p: { id: string; category_id: string | null }, n = 8): Promise<Product[]> {
   try {

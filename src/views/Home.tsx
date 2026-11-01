@@ -431,7 +431,7 @@ export function Home({
             <Link className="underline" href="/shop/no-sew-amigurumi">no-sew amigurumi</Link> and{' '}
             <Link className="underline" href="/shop/wearables">wearable crochet patterns</Link>, or start with a{' '}
             <Link className="underline" href="/free-crochet-patterns">free crochet pattern</Link>. New to crochet? Try our{' '}
-            <Link className="underline" href="/shop?level=beginner">beginner patterns</Link> first. Every pattern lists its skill level,
+            <Link className="underline" href="/crochet-patterns-for-beginners">crochet patterns for beginners</Link> first. Every pattern lists its skill level,
             materials and photos, and you can print the PDF or follow it on your phone.
           </p>
         </div>

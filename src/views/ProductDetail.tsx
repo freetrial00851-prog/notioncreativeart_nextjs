@@ -1132,8 +1132,9 @@ export function ProductDetail({
       <section aria-labelledby="helpful-guides" className="border-t border-border bg-bg">
         <div className="max-w-site w-full mx-auto page-gutter py-8 md:py-10">
           <h2 id="helpful-guides" className="type-h2 text-ink">Helpful guides</h2>
-          <ul className="mt-4 grid gap-3 md:grid-cols-3">
+          <ul className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {[
+              { href: '/crochet-patterns-for-beginners', title: 'Crochet patterns for beginners', text: 'Free and paid patterns marked beginner level.' },
               { href: '/guides/how-to-read-a-crochet-pattern', title: 'How to read a crochet pattern', text: 'What the abbreviations, brackets and stitch counts mean.' },
               { href: '/guides/crochet-abbreviations-us-vs-uk', title: 'US and UK crochet terms', text: 'The same stitch name can mean two different stitches.' },
               free

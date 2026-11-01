@@ -12,6 +12,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${SITE_URL}/`, changeFrequency: 'daily', priority: 1.0 },
   { url: `${SITE_URL}/shop`, changeFrequency: 'daily', priority: 0.9 },
   { url: `${SITE_URL}/free-crochet-patterns`, changeFrequency: 'weekly', priority: 0.8 },
+  { url: `${SITE_URL}/crochet-patterns-for-beginners`, changeFrequency: 'weekly', priority: 0.8 },
   { url: `${SITE_URL}/guides`, changeFrequency: 'weekly', priority: 0.6 },
   { url: `${SITE_URL}/faq`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.3 },
