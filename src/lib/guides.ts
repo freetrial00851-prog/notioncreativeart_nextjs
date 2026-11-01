@@ -1,5 +1,6 @@
 import { abbreviationsGuide } from '@/content/guides/crochet-abbreviations-us-vs-uk'
 import { readingPatternGuide } from '@/content/guides/how-to-read-a-crochet-pattern'
+import { magicRingGuide } from '@/content/guides/how-to-make-a-magic-ring-crochet'
 
 /** One piece of an article. Inline links use [text](/path) inside `text` / list items. */
 export type GuideBlock =
@@ -27,7 +28,7 @@ export type Guide = {
 }
 
 /** Explicit list (not a folder scan) so every route is known at build time. */
-const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide]
+const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide]
 
 export function getAllGuides(): Guide[] {
   return [...GUIDES].sort((a, b) => b.dateModified.localeCompare(a.dateModified))

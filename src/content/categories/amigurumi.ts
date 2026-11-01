@@ -103,7 +103,7 @@ export const amigurumiContent: CategoryContent = {
     },
     {
       type: 'p',
-      text: `New to the shorthand? Read [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern), and keep the [US vs UK abbreviations guide](/guides/crochet-abbreviations-us-vs-uk) open, since the same word can mean a different stitch in each system.`,
+      text: `New to the shorthand? Read [how to make a magic ring](/guides/how-to-make-a-magic-ring-crochet), then [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern), and keep the [US vs UK abbreviations guide](/guides/crochet-abbreviations-us-vs-uk) open, since the same word can mean a different stitch in each system.`,
     },
     { type: 'h2', text: `How to stuff amigurumi so it looks smooth, not lumpy` },
     {

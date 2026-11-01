@@ -92,7 +92,7 @@ export const beginnersContent: { body: GuideBlock[]; faq: { q: string; a: string
     { type: 'h2', text: `Magic ring for beginners` },
     {
       type: 'p',
-      text: `The magic ring has a reputation for being hard, and the first few attempts are usually clumsy. Make a loop, pull a second loop of yarn through it, chain once, then work six single crochets into the ring. Pull the tail and the center closes.`,
+      text: `The magic ring has a reputation for being hard, and the first few attempts are usually clumsy. Make a loop, pull a second loop of yarn through it, chain once, then work six single crochets into the ring. Pull the tail and the center closes. Our step-by-step guide shows [how to make a magic ring](/guides/how-to-make-a-magic-ring-crochet).`,
     },
     {
       type: 'p',
