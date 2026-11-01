@@ -19,6 +19,7 @@ import { crochetInTheRoundGuide } from '@/content/guides/how-to-crochet-in-the-r
 import { fastenOffGuide } from '@/content/guides/how-to-fasten-off-and-weave-in-ends'
 import { leftHandedGuide } from '@/content/guides/left-handed-crochet-guide'
 import { joinYarnGuide } from '@/content/guides/how-to-join-new-yarn-in-crochet'
+import { resizeAmigurumiGuide } from '@/content/guides/how-to-make-amigurumi-bigger-or-smaller'
 
 /** One piece of an article. Inline links use [text](/path) inside `text` / list items. */
 export type GuideBlock =
@@ -46,7 +47,7 @@ export type Guide = {
 }
 
 /** Explicit list (not a folder scan) so every route is known at build time. */
-const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide, changeColorsGuide, bestYarnGuide, fixMistakesGuide, gaugeSwatchGuide, crochetSymbolsGuide, crochetInTheRoundGuide, fastenOffGuide, leftHandedGuide, joinYarnGuide]
+const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide, changeColorsGuide, bestYarnGuide, fixMistakesGuide, gaugeSwatchGuide, crochetSymbolsGuide, crochetInTheRoundGuide, fastenOffGuide, leftHandedGuide, joinYarnGuide, resizeAmigurumiGuide]
 
 export function getAllGuides(): Guide[] {
   return [...GUIDES].sort((a, b) => b.dateModified.localeCompare(a.dateModified))
