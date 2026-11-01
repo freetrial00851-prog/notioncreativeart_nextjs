@@ -9,6 +9,7 @@ import { doubleCrochetGuide } from '@/content/guides/how-to-double-crochet'
 import { hookSizesGuide } from '@/content/guides/crochet-hook-sizes-chart'
 import { basicStitchesGuide } from '@/content/guides/basic-crochet-stitches-for-beginners'
 import { invisibleDecreaseGuide } from '@/content/guides/invisible-decrease-amigurumi'
+import { slipStitchGuide } from '@/content/guides/how-to-slip-stitch-and-slip-knot'
 
 /** One piece of an article. Inline links use [text](/path) inside `text` / list items. */
 export type GuideBlock =
@@ -36,7 +37,7 @@ export type Guide = {
 }
 
 /** Explicit list (not a folder scan) so every route is known at build time. */
-const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide]
+const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide]
 
 export function getAllGuides(): Guide[] {
   return [...GUIDES].sort((a, b) => b.dateModified.localeCompare(a.dateModified))
