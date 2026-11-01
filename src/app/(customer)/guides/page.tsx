@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { jsonLdString } from '@/lib/jsonLd'
 import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
-import { getAllGuides } from '@/lib/guides'
+import { getAllGuides, type Guide } from '@/lib/guides'
 
 const DESCRIPTION =
-  'Plain-English crochet guides: US vs UK terms, how to read a pattern and more, to help you start and finish your next project.'
+  'Plain-English crochet guides: how to start, every basic stitch, amigurumi finishing, yarn and hook choices and care, to help you start and finish your next project.'
 
 export const metadata = buildMetadata({
   title: 'Crochet Guides and Tutorials',
@@ -12,8 +12,93 @@ export const metadata = buildMetadata({
   path: '/guides',
 })
 
+/** Groups for the guides index. A guide that is not listed here still appears, under "More guides". */
+const GROUPS: { title: string; intro: string; slugs: string[] }[] = [
+  {
+    title: 'Start here',
+    intro: 'New to crochet? These explain the basics and how to read a pattern.',
+    slugs: [
+      'how-to-crochet-for-beginners',
+      'what-is-amigurumi',
+      'crochet-skill-levels-explained',
+      'crochet-vs-knitting',
+      'how-to-hold-yarn-and-hook-crochet',
+      'left-handed-crochet-guide',
+      'how-to-read-a-crochet-pattern',
+      'crochet-abbreviations-us-vs-uk',
+      'how-to-read-crochet-symbols-and-charts',
+    ],
+  },
+  {
+    title: 'Stitches and techniques',
+    intro: 'Step-by-step instructions for each basic stitch and the skills that go with them.',
+    slugs: [
+      'basic-crochet-stitches-for-beginners',
+      'how-to-slip-stitch-and-slip-knot',
+      'how-to-single-crochet',
+      'how-to-half-double-crochet',
+      'how-to-double-crochet',
+      'how-to-crochet-in-the-round',
+      'how-to-change-colors-in-crochet',
+      'how-to-join-new-yarn-in-crochet',
+      'how-to-fix-mistakes-in-crochet',
+      'how-to-fasten-off-and-weave-in-ends',
+      'granny-square-for-beginners',
+      'simple-crochet-blanket-for-beginners',
+    ],
+  },
+  {
+    title: 'Amigurumi',
+    intro: 'Everything for making stuffed toys: the magic ring, shaping, eyes and finishing.',
+    slugs: [
+      'how-to-make-a-magic-ring-crochet',
+      'invisible-decrease-amigurumi',
+      'how-to-stuff-and-assemble-amigurumi',
+      'safety-eyes-for-amigurumi',
+      'how-to-embroider-faces-on-amigurumi',
+      'how-to-make-amigurumi-bigger-or-smaller',
+    ],
+  },
+  {
+    title: 'Yarn, hooks and care',
+    intro: 'Choosing materials, checking your gauge and looking after what you make.',
+    slugs: [
+      'crochet-hook-sizes-chart',
+      'best-yarn-for-amigurumi',
+      'yarn-weight-chart',
+      'how-to-read-yarn-labels',
+      'crochet-gauge-swatch',
+      'how-to-block-crochet',
+      'how-to-wash-crochet-and-amigurumi',
+    ],
+  },
+]
+
+function GuideCard({ g }: { g: Guide }) {
+  return (
+    <li className="rounded-[5px] border border-border bg-surface p-5 transition-colors hover:bg-surface-warm">
+      <h3 className="font-heading text-[20px] leading-tight text-ink">
+        <Link href={`/guides/${g.slug}`} className="hover:underline">{g.title}</Link>
+      </h3>
+      <p className="mt-2 text-[14px] leading-relaxed text-muted">{g.description}</p>
+      <Link href={`/guides/${g.slug}`} className="mt-3 inline-flex min-h-11 items-center text-[14px] font-semibold text-primary hover:underline">
+        Read the guide
+      </Link>
+    </li>
+  )
+}
+
 export default function GuidesIndexPage() {
   const guides = getAllGuides()
+  const bySlug = new Map(guides.map((g) => [g.slug, g]))
+  const used = new Set<string>()
+  const sections = GROUPS.map((group) => {
+    const items = group.slugs.map((s) => bySlug.get(s)).filter((g): g is Guide => !!g)
+    items.forEach((g) => used.add(g.slug))
+    return { ...group, items }
+  }).filter((s) => s.items.length > 0)
+  const rest = guides.filter((g) => !used.has(g.slug))
+
   const collectionJsonLd = buildCollectionPageJsonLd({ name: 'Crochet guides', description: DESCRIPTION, path: '/guides' })
   const breadcrumbJsonLd = buildBreadcrumbListJsonLd([
     { name: 'Home', path: '/' },
@@ -36,22 +121,38 @@ export default function GuidesIndexPage() {
         </nav>
         <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Learn</p>
         <h1 className="type-h1 mb-4 text-ink">Crochet Guides and Tutorials</h1>
-        <p className="mb-10 max-w-[60ch] text-[15px] leading-relaxed text-muted md:text-[16px]">{DESCRIPTION}</p>
-        <ul className="space-y-4">
-          {guides.map((g) => (
-            <li key={g.slug} className="rounded-[5px] border border-border bg-surface p-5 transition-colors hover:bg-surface-warm">
-              <h2 className="font-heading text-[22px] leading-tight text-ink">
-                <Link href={`/guides/${g.slug}`} className="hover:underline">{g.title}</Link>
-              </h2>
-              <p className="mt-2 text-[14px] leading-relaxed text-muted">{g.description}</p>
-              <Link href={`/guides/${g.slug}`} className="mt-3 inline-flex min-h-11 items-center text-[14px] font-semibold text-primary hover:underline">
-                Read the guide
-              </Link>
-            </li>
+        <p className="mb-6 max-w-[60ch] text-[15px] leading-relaxed text-muted md:text-[16px]">{DESCRIPTION}</p>
+        <p className="mb-10 flex flex-wrap gap-x-5 gap-y-2 text-[14px] font-semibold">
+          {sections.map((s) => (
+            <a key={s.title} href={`#${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="text-primary hover:underline">
+              {s.title}
+            </a>
           ))}
-        </ul>
+        </p>
+        {sections.map((s) => (
+          <section key={s.title} id={s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="mb-12 scroll-mt-24">
+            <h2 className="font-heading text-[28px] leading-tight text-ink">{s.title}</h2>
+            <p className="mb-5 mt-2 max-w-[60ch] text-[14px] leading-relaxed text-muted md:text-[15px]">{s.intro}</p>
+            <ul className="space-y-4">
+              {s.items.map((g) => (
+                <GuideCard key={g.slug} g={g} />
+              ))}
+            </ul>
+          </section>
+        ))}
+        {rest.length > 0 && (
+          <section className="mb-12">
+            <h2 className="mb-5 font-heading text-[28px] leading-tight text-ink">More guides</h2>
+            <ul className="space-y-4">
+              {rest.map((g) => (
+                <GuideCard key={g.slug} g={g} />
+              ))}
+            </ul>
+          </section>
+        )}
         <p className="mt-10 text-[14px] text-muted">
-          Ready to make something? Browse <Link href="/free-crochet-patterns" className="text-primary underline underline-offset-4">free crochet patterns</Link> or the{' '}
+          Ready to make something? Browse <Link href="/crochet-patterns-for-beginners" className="text-primary underline underline-offset-4">crochet patterns for beginners</Link>,{' '}
+          <Link href="/free-crochet-patterns" className="text-primary underline underline-offset-4">free crochet patterns</Link> or the{' '}
           <Link href="/shop" className="text-primary underline underline-offset-4">full pattern shop</Link>.
         </p>
       </div>
