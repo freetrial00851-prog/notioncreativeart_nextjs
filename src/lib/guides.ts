@@ -13,6 +13,7 @@ import { slipStitchGuide } from '@/content/guides/how-to-slip-stitch-and-slip-kn
 import { changeColorsGuide } from '@/content/guides/how-to-change-colors-in-crochet'
 import { bestYarnGuide } from '@/content/guides/best-yarn-for-amigurumi'
 import { fixMistakesGuide } from '@/content/guides/how-to-fix-mistakes-in-crochet'
+import { gaugeSwatchGuide } from '@/content/guides/crochet-gauge-swatch'
 
 /** One piece of an article. Inline links use [text](/path) inside `text` / list items. */
 export type GuideBlock =
@@ -40,7 +41,7 @@ export type Guide = {
 }
 
 /** Explicit list (not a folder scan) so every route is known at build time. */
-const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide, changeColorsGuide, bestYarnGuide, fixMistakesGuide]
+const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide, changeColorsGuide, bestYarnGuide, fixMistakesGuide, gaugeSwatchGuide]
 
 export function getAllGuides(): Guide[] {
   return [...GUIDES].sort((a, b) => b.dateModified.localeCompare(a.dateModified))
