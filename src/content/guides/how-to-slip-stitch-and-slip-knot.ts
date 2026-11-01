@@ -5,8 +5,8 @@ export const slipStitchGuide: Guide = {
   title: 'How to Make a Slip Knot and a Slip Stitch in Crochet',
   description:
     'Learn how to make a crochet slip knot and a slip stitch (sl st) step by step, and how to use the slip stitch to join rounds, finish edges and move across stitches.',
-  datePublished: '2026-11-04',
-  dateModified: '2026-11-04',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['basic-crochet-stitches-for-beginners', 'how-to-crochet-for-beginners', 'how-to-single-crochet'],
   body: [

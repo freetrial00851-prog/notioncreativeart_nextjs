@@ -5,8 +5,8 @@ export const stuffAndAssembleGuide: Guide = {
   title: 'How to Stuff and Assemble Amigurumi: Eyes, Limbs and Finishing',
   description:
     'Learn how to stuff amigurumi evenly, close the last round, place safety eyes, sew on limbs and finish a toy neatly, with fixes for lumpy shapes.',
-  datePublished: '2026-11-03',
-  dateModified: '2026-11-03',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-make-a-magic-ring-crochet', 'how-to-single-crochet', 'how-to-read-a-crochet-pattern'],
   body: [

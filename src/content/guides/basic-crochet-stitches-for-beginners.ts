@@ -5,8 +5,8 @@ export const basicStitchesGuide: Guide = {
   title: 'Basic Crochet Stitches for Beginners: Names, Abbreviations and How They Work',
   description:
     'The basic crochet stitches in one place: chain, slip stitch, single, half double and double crochet, with abbreviations, US and UK names and when to use each.',
-  datePublished: '2026-11-03',
-  dateModified: '2026-11-03',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-single-crochet', 'how-to-half-double-crochet', 'how-to-double-crochet'],
   body: [

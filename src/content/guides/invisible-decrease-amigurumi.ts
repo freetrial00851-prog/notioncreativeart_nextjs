@@ -5,8 +5,8 @@ export const invisibleDecreaseGuide: Guide = {
   title: 'Invisible Decrease in Amigurumi: How to Decrease Without Gaps',
   description:
     'Learn the invisible decrease and the standard sc2tog for amigurumi: step-by-step instructions, how to count decreases and how to fix gaps and bumps.',
-  datePublished: '2026-11-04',
-  dateModified: '2026-11-04',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-single-crochet', 'how-to-make-a-magic-ring-crochet', 'how-to-stuff-and-assemble-amigurumi'],
   body: [

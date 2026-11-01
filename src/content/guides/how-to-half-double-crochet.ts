@@ -5,8 +5,8 @@ export const halfDoubleCrochetGuide: Guide = {
   title: 'How to Half Double Crochet (hdc): Step-by-Step Guide',
   description:
     'Learn the half double crochet (hdc) stitch step by step: foundation chain, first row, turning chains, how it compares with sc and dc, and common mistakes.',
-  datePublished: '2026-11-03',
-  dateModified: '2026-11-03',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-single-crochet', 'how-to-crochet-for-beginners', 'crochet-abbreviations-us-vs-uk'],
   body: [

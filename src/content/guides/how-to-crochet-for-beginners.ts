@@ -5,8 +5,8 @@ export const crochetForBeginnersGuide: Guide = {
   title: 'How to Crochet for Beginners: Your First Week, Step by Step',
   description:
     'A beginner crochet guide: what to buy, how to hold the hook and yarn, the slip knot, chains and slip stitch, a 7-day practice plan and your first project.',
-  datePublished: '2026-11-03',
-  dateModified: '2026-11-03',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-single-crochet', 'how-to-make-a-magic-ring-crochet', 'how-to-read-a-crochet-pattern'],
   body: [

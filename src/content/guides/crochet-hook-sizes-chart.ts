@@ -5,8 +5,8 @@ export const hookSizesGuide: Guide = {
   title: 'Crochet Hook Sizes Chart: mm, US Sizes and Which Hook for Your Yarn',
   description:
     'A crochet hook sizes chart with metric and US sizes, the usual hook for each yarn weight, and how to choose a smaller hook for amigurumi toys.',
-  datePublished: '2026-11-03',
-  dateModified: '2026-11-03',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-crochet-for-beginners', 'how-to-read-a-crochet-pattern', 'how-to-stuff-and-assemble-amigurumi'],
   body: [

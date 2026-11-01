@@ -5,8 +5,8 @@ export const doubleCrochetGuide: Guide = {
   title: 'How to Double Crochet (dc): Step-by-Step Guide for Beginners',
   description:
     'Learn the double crochet (dc) stitch step by step: the foundation chain, first row, turning chain of 3, counting stitches, and how to fix common mistakes.',
-  datePublished: '2026-11-03',
-  dateModified: '2026-11-03',
+  datePublished: '2026-11-02',
+  dateModified: '2026-11-02',
   author: 'Notion Creative Art',
   related: ['how-to-half-double-crochet', 'how-to-single-crochet', 'crochet-abbreviations-us-vs-uk'],
   body: [
