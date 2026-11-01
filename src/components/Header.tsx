@@ -26,6 +26,7 @@ import { Logo } from './Logo'
 const NAV_LINKS = [
   { href: '/#collections', label: 'Collections' },
   { href: '/free-crochet-patterns', label: 'Free patterns' },
+  { href: '/guides', label: 'Guides' },
   { href: '/about', label: 'Our story' },
 ] as const
 
@@ -429,6 +430,7 @@ export function Header() {
                     { href: '/shop?sort=newest', label: 'New arrivals' },
                     { href: '/free-crochet-patterns', label: 'Free patterns' },
                     { href: '/#collections', label: 'Collections' },
+                    { href: '/guides', label: 'Guides' },
                     { href: '/about', label: 'Our story' },
                   ].map((l) => (
                     <li key={l.href}>
