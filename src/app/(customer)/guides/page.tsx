@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { jsonLdString } from '@/lib/jsonLd'
 import { buildBreadcrumbListJsonLd, buildCollectionPageJsonLd, buildMetadata } from '@/lib/seo'
+import { SectionJumpLinks } from '@/components/SectionJumpLinks'
 import { getAllGuides, type Guide } from '@/lib/guides'
 
 const DESCRIPTION =
@@ -77,6 +78,8 @@ const GROUPS: { title: string; intro: string; slugs: string[] }[] = [
   },
 ]
 
+const sectionId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
 function GuideCard({ g }: { g: Guide }) {
   return (
     <li className="rounded-[5px] border border-border bg-surface p-5 transition-colors hover:bg-surface-warm">
@@ -125,15 +128,9 @@ export default function GuidesIndexPage() {
         <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Learn</p>
         <h1 className="type-h1 mb-4 text-ink">Crochet Guides and Tutorials</h1>
         <p className="mb-6 max-w-[60ch] text-[15px] leading-relaxed text-muted md:text-[16px]">{DESCRIPTION}</p>
-        <p className="mb-10 flex flex-wrap gap-x-5 gap-y-2 text-[14px] font-semibold">
-          {sections.map((s) => (
-            <a key={s.title} href={`#${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="text-primary hover:underline">
-              {s.title}
-            </a>
-          ))}
-        </p>
+        <SectionJumpLinks items={sections.map((s) => ({ id: sectionId(s.title), label: s.title }))} />
         {sections.map((s) => (
-          <section key={s.title} id={s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="mb-12 scroll-mt-24">
+          <section key={s.title} id={sectionId(s.title)} className="mb-12 scroll-mt-24">
             <h2 className="font-heading text-[28px] leading-tight text-ink">{s.title}</h2>
             <p className="mb-5 mt-2 max-w-[60ch] text-[14px] leading-relaxed text-muted md:text-[15px]">{s.intro}</p>
             <ul className="space-y-4">
