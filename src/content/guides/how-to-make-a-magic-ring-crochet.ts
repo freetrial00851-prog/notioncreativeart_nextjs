@@ -105,7 +105,7 @@ export const magicRingGuide: Guide = {
     },
     {
       type: 'p',
-      text: `Once the ring feels natural, you are ready for your first toy. Try a pattern from our [crochet patterns for beginners](/crochet-patterns-for-beginners), or download a [free crochet pattern](/free-crochet-patterns) and see how it starts. If you want more toys to practice on, browse the [amigurumi patterns](/shop/amigurumi).`,
+      text: `If the single crochet stitch itself is new to you, start with our guide on [how to single crochet](/guides/how-to-single-crochet). Once the ring feels natural, you are ready for your first toy. Try a pattern from our [crochet patterns for beginners](/crochet-patterns-for-beginners), or download a [free crochet pattern](/free-crochet-patterns) and see how it starts. If you want more toys to practice on, browse the [amigurumi patterns](/shop/amigurumi).`,
     },
   ],
   faq: [
