@@ -23,6 +23,7 @@ import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { PatternCard } from '../components/PatternCard'
 import { PatternGrid } from '../components/PatternGrid'
 import { ProductReviews } from '../components/ProductReviews'
+import { FaqAccordion, type FaqItem } from '../components/FaqAccordion'
 import { StarRating } from '../components/StarRating'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { DownloadIcon, FavoriteIcon, ShareIcon } from '../components/icons'
@@ -120,6 +121,52 @@ function DescriptionBlocks({ text }: { text: string }) {
     </div>
   )
 }
+
+const PDP_FAQ: FaqItem[] = [
+  {
+    question: 'How do I get the pattern?',
+    answer: 'The PDF is available to download right after payment, and a download link is also sent to your email. Free patterns download straight away.',
+  },
+  {
+    question: 'Can I print it or read it on my phone?',
+    answer: 'Yes. The pattern is a PDF, so you can print it or follow it on a phone or tablet.',
+  },
+  {
+    question: 'Is it suitable for my skill level?',
+    answer: (
+      <>
+        Every pattern lists its skill level and materials. New to crochet? Start with our{' '}
+        <Link href="/crochet-patterns-for-beginners" className="font-semibold text-primary underline underline-offset-4">patterns for beginners</Link>{' '}
+        and read{' '}
+        <Link href="/guides/how-to-read-a-crochet-pattern" className="font-semibold text-primary underline underline-offset-4">how to read a crochet pattern</Link>.
+      </>
+    ),
+  },
+  {
+    question: 'Which crochet terms does the pattern use?',
+    answer: (
+      <>
+        The Details tab on each listing states the terms used. If you usually crochet in UK terms, our guide to{' '}
+        <Link href="/guides/crochet-abbreviations-us-vs-uk" className="font-semibold text-primary underline underline-offset-4">US and UK crochet terms</Link>{' '}
+        explains how they differ.
+      </>
+    ),
+  },
+  {
+    question: 'Are the photos of real crocheted pieces?',
+    answer: 'The photos are AI-generated illustrations of the finished design, so your finished piece may vary slightly with your yarn, hook and tension.',
+  },
+  {
+    question: 'What if something is wrong with my order?',
+    answer: (
+      <>
+        Contact us within 14 days and we will make it right. See the{' '}
+        <Link href="/refund-policy" className="font-semibold text-primary underline underline-offset-4">refund policy</Link>{' '}
+        for the details.
+      </>
+    ),
+  },
+]
 
 function TickLine({ children }: { children: ReactNode }) {
   return (
@@ -1127,6 +1174,36 @@ export function ProductDetail({
                 </div>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* What's included + FAQ: facts that are true for every listing */}
+      <section aria-labelledby="pdp-included" className="border-t border-border bg-bg">
+        <div className="max-w-site w-full mx-auto page-gutter grid gap-8 py-8 md:py-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
+          <div>
+            <h2 id="pdp-included" className="type-h2 text-ink">What&apos;s included</h2>
+            <div className="mt-5 rounded-xl border border-border bg-surface-warm p-5 md:p-6">
+              <TickList
+                items={[
+                  free ? 'PDF pattern, free to download' : 'PDF pattern, instant download after payment',
+                  ...(product.pdf_pages ? [`${product.pdf_pages} printable pages`] : []),
+                  'Written, step-by-step instructions',
+                  ...(product.materials?.trim() ? ['Materials list'] : []),
+                  ...(skillLabel ? [`Skill level: ${skillLabel}`] : []),
+                  ...(!free ? ['Download link also sent to your email'] : []),
+                  ...(product.is_bundle && product.bundle_includes?.length
+                    ? product.bundle_includes.map((item) => `Includes: ${item}`)
+                    : []),
+                ]}
+              />
+            </div>
+          </div>
+          <div>
+            <h2 className="type-h2 text-ink">Common questions</h2>
+            <div className="mt-5">
+              <FaqAccordion items={PDP_FAQ} />
+            </div>
           </div>
         </div>
       </section>
