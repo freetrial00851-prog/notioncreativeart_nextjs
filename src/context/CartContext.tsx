@@ -8,6 +8,7 @@ import { startApiCheckout } from '../lib/lemonsqueezy'
 import { allProductsUsePaddle } from '../lib/paddle'
 import { trackPinterestAddToCart } from '../lib/pinterest'
 import { track } from '../lib/track'
+import { ga4AddToCart, ga4RemoveFromCart } from '../lib/ga4'
 import { profileDisplayName } from '../lib/profileName'
 import {
   GUEST_MERGE_DONE_EVENT,
@@ -192,6 +193,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         productName: product.title ?? undefined,
       })
       track('add_to_cart', { productId, props: { value: Number(product.price) } })
+      ga4AddToCart({ id: productId, title: product.title, price: product.price })
       return
     }
 
@@ -209,10 +211,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       productName: product.title ?? undefined,
     })
       track('add_to_cart', { productId, props: { value: Number(product.price) } })
+      ga4AddToCart({ id: productId, title: product.title, price: product.price })
   }
 
   const removeFromCart = async (productId: string) => {
     track('remove_from_cart', { productId })
+    ga4RemoveFromCart({ id: productId })
     if (!user) {
       removeGuestCartItem(productId)
       await loadGuest()

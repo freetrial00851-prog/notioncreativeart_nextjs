@@ -8,6 +8,7 @@ import { deriveVariantUrl } from '../lib/imageVariants'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadPaddle, paddleConfigured, removePaddleListener, PADDLE_ENVIRONMENT, type PaddleEvent } from '../lib/paddle'
 import { track } from '../lib/track'
+import { ga4BeginCheckout } from '../lib/ga4'
 import { clearGuestCart } from '../lib/guestStorage'
 
 type Phase = 'loading' | 'ready' | 'error' | 'blocked'
@@ -69,6 +70,8 @@ export function PaddleCheckout() {
       if (event.name === 'checkout.loaded') {
         setPhase('ready')
         track('begin_checkout', { props: { items: Array.isArray(data.items) ? data.items.length : 1 } })
+        const total = Number(data.totals?.total)
+        ga4BeginCheckout({ value: Number.isFinite(total) ? total : undefined, currency: data.currency_code })
       }
       // Paddle.js reports amounts in major units (5.99), not cents.
       if (data.totals?.total != null) setTotal(formatMoney(data.totals.total, data.currency_code))

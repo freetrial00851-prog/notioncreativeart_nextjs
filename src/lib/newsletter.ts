@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 import { track } from './track'
+import { ga4Newsletter } from './ga4'
 
 /**
  * Remembers (per browser) that this visitor subscribed, so every signup form
@@ -65,5 +66,6 @@ export async function subscribeToNewsletter(email: string): Promise<{ ok: boolea
   if (data?.error) return { ok: false, error: data.error }
   rememberSubscribed()
   track('newsletter_subscribe')
+  ga4Newsletter()
   return { ok: true, error: null }
 }

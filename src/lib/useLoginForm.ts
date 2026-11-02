@@ -6,6 +6,7 @@ import { useToast } from '../context/ToastContext'
 import { checkAuthRateLimit } from './authRateLimit'
 import { supabase } from './supabase'
 import { track } from './track'
+import { ga4Login } from './ga4'
 
 /**
  * All the state and handlers behind the sign-in form. Extracted so the
@@ -42,6 +43,7 @@ export function useLoginForm({ redirectTo, onSignedIn }: { redirectTo: string; o
       window.addEventListener('beforeunload', () => { supabase.auth.signOut() })
     }
     track('login')
+    ga4Login()
     onSignedIn()
   }
 

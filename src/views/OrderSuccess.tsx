@@ -16,6 +16,7 @@ import { triggerPdfDownload } from '../lib/downloads'
 import { downloadOrderReceipt } from '../lib/orderReceipt'
 import { trackPinterestPurchase } from '../lib/pinterest'
 import { track } from '../lib/track'
+import { ga4Purchase } from '../lib/ga4'
 import { GuestDownload } from './GuestDownload'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import type { Product } from '../lib/types'
@@ -133,6 +134,7 @@ function OrderSuccessAccount({ hideOwnerCopyPlaceholders = false }: { hideOwnerC
               if (!sessionStorage.getItem(k)) {
                 sessionStorage.setItem(k, '1')
                 track('purchase', { props: { order_id: data.id } })
+                ga4Purchase({ transactionId: data.id, value: Number(data.amount), currency: data.currency, itemIds: data.product_ids })
               }
             } catch {
               /* ignore */

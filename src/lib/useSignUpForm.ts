@@ -8,6 +8,7 @@ import { isPasswordValid } from '../components/PasswordStrength'
 import { waitForGuestMerge } from './guestStorage'
 import { subscribeToNewsletter } from './newsletter'
 import { track } from './track'
+import { ga4SignUp } from './ga4'
 
 type Options = {
   /** Called when signup creates an immediate session (autoconfirm on). */
@@ -60,6 +61,7 @@ export function useSignUpForm(options: Options = {}) {
       if (duplicateEmail) { setEmailTaken(true); return }
       if (error) { setError(error); return }
       track('sign_up')
+      ga4SignUp()
       if (newsletterOptIn) void subscribeToNewsletter(email.trim())
       if (session) {
         await waitForGuestMerge()

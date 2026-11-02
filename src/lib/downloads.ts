@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { track } from './track'
+import { ga4FreeDownload } from './ga4'
 import { env } from './env'
 
 function triggerBrowserDownload(signedUrl: string, filename: string): void {
@@ -44,6 +45,7 @@ export async function claimAndDownloadFreePattern(userId: string, productId: str
     return false
   }
   track('free_download', { productId })
+  ga4FreeDownload(productId)
   return triggerPdfDownload(productId, title)
 }
 
@@ -94,6 +96,7 @@ async function downloadFreePatternViaServer(productId: string, title?: string): 
   const filename = data.filename ?? `${(title ?? 'pattern').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`
   triggerBrowserDownload(data.signedUrl, filename)
   track('free_download', { productId })
+  ga4FreeDownload(productId)
   return { ok: true }
 }
 

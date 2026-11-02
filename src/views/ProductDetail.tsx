@@ -18,6 +18,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { downloadFreePattern, triggerPdfDownload } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
+import { ga4ViewItem } from '../lib/ga4'
 import { fetchProductReviewStats } from '../lib/reviews'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { PatternCard } from '../components/PatternCard'
@@ -435,9 +436,13 @@ export function ProductDetail({
 
   // First-party analytics: one view_item per product page load.
   const viewedId = product?.id
+  const viewedTitle = product?.title
+  const viewedPrice = product?.price
   useEffect(() => {
-    if (viewedId) track('view_item', { productId: viewedId })
-  }, [viewedId])
+    if (!viewedId) return
+    track('view_item', { productId: viewedId })
+    ga4ViewItem({ id: viewedId, title: viewedTitle, price: viewedPrice })
+  }, [viewedId, viewedTitle, viewedPrice])
 
   // Preload adjacent gallery stages so swipe/arrow doesn't wait on network.
   useEffect(() => {

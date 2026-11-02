@@ -6,6 +6,7 @@ import { useUpdateSearchParams } from '../lib/useUpdateSearchParams'
 import { supabase } from '../lib/supabase'
 import { searchProducts } from '../lib/productSearch'
 import { track } from '../lib/track'
+import { ga4Search } from '../lib/ga4'
 import type { Product } from '../lib/types'
 import { ProductCard } from '../components/ProductCard'
 import { ListingPagination } from '../components/ListingPagination'
@@ -70,6 +71,7 @@ export function Search() {
         if (cancelled) return
         setResults(data)
         track('search', { props: { q: q.trim().slice(0, 64), results: data.length } })
+        ga4Search(q.trim())
       })
       .catch((err) => {
         console.error('Search failed:', err)
