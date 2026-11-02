@@ -839,6 +839,9 @@ export function ProductDetail({
                 </div>
               </>
             )}
+            <p className="mt-3 text-[13px] leading-snug text-muted">
+              Photos are AI-generated illustrations of the finished design. Your piece may vary slightly with your yarn and tension.
+            </p>
           </div>
 
           {/* Buy box */}

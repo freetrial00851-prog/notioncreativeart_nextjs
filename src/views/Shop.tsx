@@ -386,9 +386,9 @@ export function Shop({
           ) : null}
         </p>
 
-        {/* Desktop category pills — laptop only */}
+        {/* Category pills — scroll sideways on phones and tablets too (real links, so they stay crawlable) */}
         <div
-          className="scrollbar-none -mx-1 mb-3 hidden gap-2 overflow-x-auto px-1 pb-1 pr-12 lg:flex"
+          className="scrollbar-none -mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1 pr-12"
           style={{
             WebkitMaskImage: 'linear-gradient(to right, #000 calc(100% - 56px), transparent)',
             maskImage: 'linear-gradient(to right, #000 calc(100% - 56px), transparent)',
