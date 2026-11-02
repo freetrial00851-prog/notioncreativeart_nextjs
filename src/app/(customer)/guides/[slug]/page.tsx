@@ -52,6 +52,7 @@ export default async function GuidePage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }} />
+      <div aria-hidden className="stitch-read" />
       <article className="mx-auto max-w-3xl px-5 py-14 md:px-8 md:py-20">
         <nav aria-label="Breadcrumb" className="mb-6 text-[13px] text-muted">
           <ol className="flex flex-wrap items-center gap-1.5">

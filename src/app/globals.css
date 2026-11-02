@@ -341,7 +341,13 @@ button, .btn { font-weight: 600; }
    Only responses to user actions + one subtle once-only reveal below the fold.
    transform/opacity only; 100–300ms; ease-out in, never linear. */
 :root {
+  --dur-instant: 100ms; /* press feedback */
+  --dur-fast: 160ms;    /* hover colour, chevrons */
+  --dur-base: 240ms;    /* panels, glyph swaps */
+  --dur-slow: 400ms;    /* image hover zoom */
+  --dur-reveal: 700ms;  /* scroll reveal only */
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -360,7 +366,7 @@ button, .btn { font-weight: 600; }
 }
 .js-reveal .reveal[data-armed]:not(.is-in) {
   opacity: 0;
-  translate: 0 48px;
+  translate: 0 24px;
 }
 /* Elements that already have their own transitions keep them. */
 .js-reveal .press-card.reveal[data-armed] {
@@ -401,6 +407,61 @@ button, .btn { font-weight: 600; }
 @media (hover: hover) {
   .card-lift { transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out); }
   .card-lift:hover { transform: translateY(-5px); }
+}
+
+/* ── Panels and overlays: enter-only (exits stay instant, so no input delay) ── */
+@keyframes panel-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.panel-in { animation: panel-in var(--dur-base) var(--ease-out) both; transform-origin: top; }
+@keyframes slide-r { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+.slide-in-right { animation: slide-r var(--dur-base) var(--ease-out) both; }
+
+/* Add-to-cart glyph swap (+ to check) */
+@keyframes atc-in { from { transform: scale(0.4) rotate(-20deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.atc-glyph { display: inline-block; animation: atc-in var(--dur-base) var(--ease-pop) both; }
+
+/* Wishlist heart: one-shot ring when saving */
+.heart-burst { position: relative; }
+.heart-burst::after {
+  content: ''; position: absolute; inset: 0; border-radius: 6px; pointer-events: none;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-sale) 45%, transparent);
+  animation: burst 420ms var(--ease-out) both;
+}
+@keyframes burst { to { box-shadow: 0 0 0 12px transparent; } }
+
+/* Skeleton shimmer (loading only) */
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skeleton-shimmer {
+  background: linear-gradient(100deg, var(--color-skeleton) 40%, #F8F1E6 50%, var(--color-skeleton) 60%) 0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* Craft touch: a thread underline that draws in on hover or focus */
+.yarn-link {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M0 3c2-3 4-3 8 0s6 3 8 0' fill='none' stroke='%23B9472F' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 0 6px;
+  padding-bottom: 5px;
+  transition: background-size var(--dur-base) var(--ease-out), color var(--dur-fast);
+}
+@media (hover: hover) { .yarn-link:hover { background-size: 100% 6px; } }
+.yarn-link:focus-visible { background-size: 100% 6px; }
+
+/* Reading progress for guides: dashed "stitch" bar, scroll-linked (hidden where unsupported) */
+.stitch-read { display: none; }
+@supports (animation-timeline: scroll()) {
+  .stitch-read {
+    display: block; position: fixed; inset: 0 0 auto 0; z-index: 45; height: 3px; transform-origin: left;
+    background: repeating-linear-gradient(90deg, var(--color-coral) 0 8px, transparent 8px 14px);
+    animation: stitch-grow linear both; animation-timeline: scroll(root block);
+  }
+  @keyframes stitch-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop, .atc-glyph, .heart-burst::after, .panel-in, .slide-in-right, .skeleton-shimmer { animation: none !important; }
+  .yarn-link { transition: none; }
+  .stitch-read { display: none !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {

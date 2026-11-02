@@ -39,7 +39,7 @@ const POPULAR_SEARCHES = [
 
 /** Nav label: sentence case, bold, 15px. */
 const NAV_LABEL =
-  'whitespace-nowrap text-[15px] font-bold tracking-[0.01em] text-ink transition-colors hover:text-coral'
+  'yarn-link whitespace-nowrap text-[15px] font-bold tracking-[0.01em] text-ink hover:text-coral'
 
 const TILE_COLORS = ['#F1E7D8', '#EADFF0', '#DDE9D8', '#F8E3D6'] as const
 
@@ -191,7 +191,7 @@ export function Header() {
                   viewBox="0 0 10 10"
                   fill="none"
                   aria-hidden
-                  className={`transition-transform ${shopOpen ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-[var(--dur-fast)] ${shopOpen ? 'rotate-180' : ''}`}
                 >
                   <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -293,7 +293,7 @@ export function Header() {
 
         {/* Search panel */}
         {searchOpen && (
-          <div className="absolute inset-x-0 top-full border-b border-border bg-bg shadow-[0_24px_40px_-24px_rgba(32,32,68,0.28)]">
+          <div className="panel-in absolute inset-x-0 top-full border-b border-border bg-bg shadow-[0_24px_40px_-24px_rgba(32,32,68,0.28)]">
             <div className="mx-auto max-w-site page-gutter py-6 lg:py-9">
               <form onSubmit={submitSearch} role="search" className="flex items-center gap-4 border-b-2 border-ink pb-3">
                 <MaterialIcon name="search" size={26} color="currentColor" className="shrink-0 text-ink" />
@@ -400,7 +400,7 @@ export function Header() {
           aria-label="Close search"
           tabIndex={-1}
           onClick={closeSearch}
-          className="fixed inset-0 z-30 cursor-default bg-navy/35"
+          className="page-in fixed inset-0 z-30 cursor-default bg-navy/35"
         />
       )}
 
@@ -409,8 +409,8 @@ export function Header() {
         typeof document !== 'undefined' &&
         createPortal(
           <div ref={menuRef} className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-            <button type="button" aria-label="Close menu" tabIndex={-1} onClick={closeMenu} className="absolute inset-0 bg-navy/45" />
-            <div className="absolute inset-y-0 right-0 flex w-[min(92vw,420px)] flex-col bg-bg shadow-2xl">
+            <button type="button" aria-label="Close menu" tabIndex={-1} onClick={closeMenu} className="page-in absolute inset-0 bg-navy/45" />
+            <div className="slide-in-right absolute inset-y-0 right-0 flex w-[min(92vw,420px)] flex-col bg-bg shadow-2xl">
               <div className="flex h-[67px] shrink-0 items-center justify-between border-b border-border page-gutter">
                 <Logo variant="compact" />
                 <button
@@ -551,8 +551,8 @@ function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]
   const row =
     'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (
-    <div className="absolute left-[-1rem] top-full z-50 pt-3">
-      <div className="w-[min(780px,calc(100vw-4rem))] rounded-2xl border-2 border-ink bg-bg p-7 shadow-[6px_6px_0_0_#111111]">
+    <div className="panel-in absolute left-[-1rem] top-full z-50 pt-3">
+      <div className="w-[min(780px,calc(100vw-4rem))] rounded-xl border border-border bg-bg p-7 shadow-card-hover">
         <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-9">
           <div>
             <p className={colHead}>Categories</p>
@@ -621,8 +621,8 @@ function AccountDropdown({
 }) {
   const item = 'flex min-h-11 items-center px-5 text-[13px] font-medium text-ink transition-colors hover:bg-surface-warm hover:text-violet'
   return (
-    <div className="absolute right-0 top-full z-50 pt-3">
-      <div className="w-[260px] overflow-hidden rounded-2xl border-2 border-ink bg-bg shadow-[6px_6px_0_0_#111111]">
+    <div className="panel-in absolute right-0 top-full z-50 pt-3">
+      <div className="w-[260px] overflow-hidden rounded-xl border border-border bg-bg shadow-card-hover">
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-violet text-[15px] font-semibold text-white">
             {profileInitial(profile, email)}

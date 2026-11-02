@@ -4,7 +4,7 @@ import { HOME_PRODUCT_GRID_CLASS } from '../lib/homeProductGrid'
 import { LISTING_PAGE_SIZE, LISTING_PRODUCT_GRID_CLASS } from '../lib/listingFilters'
 
 function Bone({ className = '' }: { className?: string }) {
-  return <div className={`bg-skeleton rounded animate-pulse ${className}`} />
+  return <div className={`skeleton-shimmer rounded ${className}`} />
 }
 
 /** Matches redesigned `ProductCard`: frameless square image + 2-line title + price/circle. */
