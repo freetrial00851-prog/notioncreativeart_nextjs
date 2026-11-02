@@ -23,7 +23,7 @@ export function Logo({ variant = 'full', className = '', light = false }: LogoPr
       aria-label="Notion Creative Art — home"
     >
       <span
-        className={`grid shrink-0 place-items-center rounded-[12px] bg-violet font-heading font-normal text-white ${
+        className={`grid shrink-0 place-items-center rounded-[12px] bg-violet font-heading font-semibold text-white ${
           compact ? 'size-8 text-[18px]' : 'size-[38px] text-[21px] max-[380px]:size-8 max-[380px]:text-[18px]'
         }`}
         aria-hidden
@@ -32,7 +32,7 @@ export function Logo({ variant = 'full', className = '', light = false }: LogoPr
       </span>
       <span className="flex flex-col">
         <span
-          className={`font-heading leading-none tracking-[-0.025em] ${onDark ? 'text-white' : 'text-ink'} ${
+          className={`font-heading leading-none tracking-[-0.01em] ${onDark ? 'text-white' : 'text-ink'} ${
             compact ? 'text-[18px]' : 'text-[20px] max-[380px]:text-[17px]'
           }`}
         >
@@ -80,7 +80,7 @@ export function LogoIcon({
     >
       N
       <span
-        className="absolute rounded-[3px]"
+        className="absolute rounded-lg"
         style={{
           background: 'var(--color-logo-accent)',
           width: dot,

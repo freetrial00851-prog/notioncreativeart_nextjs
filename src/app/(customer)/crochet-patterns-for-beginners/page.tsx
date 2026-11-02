@@ -64,7 +64,7 @@ export default async function BeginnersHubPage() {
           <Link href="/shop" className="hover:text-ink">Shop</Link> <span aria-hidden>›</span>{' '}
           <span className="font-semibold text-ink">Crochet Patterns for Beginners</span>
         </nav>
-        <h1 className="font-heading text-[clamp(34px,5vw,56px)] font-normal leading-[1.08] tracking-[-0.03em] text-ink">
+        <h1 className="font-heading text-[clamp(34px,5vw,56px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
           Crochet Patterns for Beginners
         </h1>
         <p className="mt-4 max-w-[68ch] text-[15px] leading-[1.75] text-muted md:text-[16px]">

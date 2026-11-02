@@ -44,7 +44,7 @@ export function ResendDownload() {
             <strong className="font-semibold">Check your inbox.</strong> If we found an order for {email.trim()}, a new link is on its way. It can take a few minutes. Look in spam or promotions too.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button type="button" onClick={() => setPhase('idle')} className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary hover:bg-primary-soft">
+            <button type="button" onClick={() => setPhase('idle')} className="inline-flex min-h-11 items-center justify-center rounded-md border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary hover:bg-primary-soft">
               Send to a different email
             </button>
             <Link href="/signup" className="inline-flex min-h-11 items-center px-1 font-semibold text-primary hover:underline">Create a free account</Link>
@@ -61,14 +61,14 @@ export function ResendDownload() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-[6px] border border-border bg-white px-4 py-3 text-[15px] text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-[15px] text-ink focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="you@example.com"
           />
           {message && <p role="alert" className="text-[14px] text-sale">{message}</p>}
           <button
             type="submit"
             disabled={phase === 'sending'}
-            className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60"
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60"
           >
             {phase === 'sending' ? 'Sending…' : 'Email me my download link'}
           </button>

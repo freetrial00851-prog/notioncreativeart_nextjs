@@ -17,7 +17,7 @@ const POLL_MS = 2000
 const POLL_MAX = 25 // ~50 s: the payment confirmation normally arrives within a few seconds
 
 const BTN =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60'
 
 /** Download page for a buyer who paid without an account. `token` is the private link from checkout or email. */
 export function GuestDownload({ token, justPaid = false }: { token: string; justPaid?: boolean }) {
@@ -148,13 +148,13 @@ export function GuestDownload({ token, justPaid = false }: { token: string; just
       )}
 
       {state.kind === 'ready' && (
-        <section aria-labelledby="keep-safe" className="mt-5 rounded-[5px] border border-border bg-surface-warm p-4 md:p-5">
+        <section aria-labelledby="keep-safe" className="mt-5 rounded-2xl border border-border bg-surface-warm p-4 md:p-5">
           <h2 id="keep-safe" className="text-[16px] font-bold text-ink">Keep your patterns safe</h2>
           <p className="mt-1 text-[15px] leading-relaxed text-muted md:text-[14px]">
             Make a free account with the email you paid with. Your patterns will always be in one place, with no link to lose.
           </p>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link href="/signup" className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary hover:bg-primary-soft">Create a free account</Link>
+            <Link href="/signup" className="inline-flex min-h-11 items-center justify-center rounded-md border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary hover:bg-primary-soft">Create a free account</Link>
             <Link href="/login" className="inline-flex min-h-11 items-center px-1 text-[15px] font-semibold text-primary hover:underline">I already have one</Link>
           </div>
         </section>

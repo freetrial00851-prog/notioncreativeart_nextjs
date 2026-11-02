@@ -77,7 +77,7 @@ const router = useRouter()
           <div className="max-w-sm">
             <h1 className="type-h2 text-ink mb-2">This link has expired</h1>
             <p className="text-[14px] text-ink-soft">Reset links work once and for a short time. Request a new one and we will email it right away.</p>
-            <Link href="/login" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
+            <Link href="/login" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
               Back to sign in
             </Link>
           </div>
@@ -129,7 +129,7 @@ const router = useRouter()
                 </p>
               )}
             </div>
-            <button disabled={submitting || !passwordValid || !passwordsMatch} type="submit" className="w-full min-h-11 text-white text-[15px] md:text-[14px] font-semibold rounded-[3px] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
+            <button disabled={submitting || !passwordValid || !passwordsMatch} type="submit" className="w-full min-h-11 text-white text-[15px] md:text-[14px] font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--color-accent)' }}>
               {submitting ? 'Updating…' : 'Update Password'}
             </button>
           </form>

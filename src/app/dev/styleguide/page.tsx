@@ -53,7 +53,7 @@ export default function StyleguidePage() {
       <AnnouncementBar />
       <div className="max-w-site mx-auto px-5 md:px-10 py-12 space-y-14">
         <header className="space-y-2">
-          <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-primary">Temporary</p>
+          <p className="text-[11px] font-semibold tracking-[0.06em] uppercase text-primary">Temporary</p>
           <h1 className="font-heading text-4xl font-bold">Design styleguide</h1>
           <p className="text-[14px] text-muted max-w-xl">
             Steps 1–2: tokens + shared components. Delete this route in the final QA pass.

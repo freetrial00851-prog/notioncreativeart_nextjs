@@ -66,7 +66,7 @@ export default async function GuidePage({ params }: Props) {
             <li aria-current="page" className="text-ink">{guide.title}</li>
           </ol>
         </nav>
-        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Guide</p>
+        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-primary">Guide</p>
         <h1 className="type-h1 mb-3 text-ink">{guide.title}</h1>
         <p className="mb-8 text-[13px] text-muted">
           By {guide.author} · Updated <time dateTime={guide.dateModified}>{formatDate(guide.dateModified)}</time>
@@ -101,14 +101,14 @@ export default async function GuidePage({ params }: Props) {
           </section>
         )}
 
-        <div className="mt-12 rounded-[5px] border border-border bg-surface-warm p-5">
+        <div className="mt-12 rounded-2xl border border-border bg-surface-warm p-5">
           <p className="font-semibold text-ink">Ready to start a project?</p>
           <p className="mt-1 text-[14px] text-muted">Download a free pattern, or browse the full shop.</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <Link href="/free-crochet-patterns" className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
+            <Link href="/free-crochet-patterns" className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-6 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
               Free crochet patterns
             </Link>
-            <Link href="/shop" className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary hover:bg-primary-soft">
+            <Link href="/shop" className="inline-flex min-h-11 items-center justify-center rounded-md border-[1.5px] border-primary bg-white px-6 text-[15px] font-semibold text-primary hover:bg-primary-soft">
               Browse all patterns
             </Link>
           </div>

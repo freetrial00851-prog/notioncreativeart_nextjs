@@ -8,7 +8,7 @@ export function CookieSettingsButton() {
     <button
       type="button"
       onClick={() => window.dispatchEvent(new Event(COOKIE_CONSENT_REOPEN_EVENT))}
-      className="inline-flex min-h-11 items-center px-1 hover:text-coral md:min-h-0"
+      className="inline-flex min-h-11 items-center px-1 hover:text-white md:min-h-0"
     >
       Cookie settings
     </button>

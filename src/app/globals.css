@@ -9,24 +9,24 @@
   --color-navy: #2A1B14;        /* cocoa — the one dark band + footer */
   --color-violet: #B4476C;      /* raspberry — small decorative marks */
   --color-coral: #B9472F;       /* tomato — accent text/underlines (4.9:1 on white) */
-  --color-sun: #F7E7BA;         /* marigold — hero/free panels, badges */
-  --color-pink: #F6DCD8;
-  --color-pink-soft: #FCF1EE;
+  --color-sun: #EFE0BC;         /* marigold — hero/free panels, badges */
+  --color-pink: #F2E5E0;
+  --color-pink-soft: #F8F1EE;
   --color-aqua: #E1ECF3;        /* powder blue */
   --color-lilac: #EAE3F3;
   --color-butter: #F9F0D3;
   --color-peach: #FBEEE6;
 
-  /* Sharp-ish geometry: 3-5px instead of pills and big radii */
-  --radius-md: 3px;
-  --radius-lg: 4px;
-  --radius-xl: 5px;
-  --radius-2xl: 5px;
-  --radius-3xl: 5px;
+  /* Refined geometry: small, consistent radii (6-12px) */
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
 
-  --color-primary: #B9472F;
-  --color-primary-hover: #9F3A25;
-  --color-primary-soft: #F8E9E4;
+  --color-primary: #2A1B14;
+  --color-primary-hover: #4A3326;
+  --color-primary-soft: #F3EEE8;
   --color-primary-contrast: #FFFFFF;
 
   /* Logo / star orange (DESIGN_SPEC "accent") — do NOT alias nav CTAs here;
@@ -37,16 +37,16 @@
   --color-background: #FFFFFF;
   --color-bg: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #FAF4F0;
+  --color-surface-warm: #F6F2EC;
   --color-surface-soft: #FCF9F7;
   --color-surface-card: #FFFFFF;
   --color-card: #FFFFFF;
-  --color-border: #E9E1DB;
+  --color-border: #E3DDD5;
   --color-footer: #2A1B14;
 
   --color-text: #2A1B14;
-  --color-muted: #6E5E55;
-  --color-text-muted: #6E5E55;
+  --color-muted: #5C524B;
+  --color-text-muted: #5C524B;
   --color-muted-light: #7D6E64;
   --color-field-border: #8F8077;
 
@@ -60,13 +60,16 @@
   --color-success-bg: #F5F5F5;
   --color-error: #B94A48;
   --color-error-dark: #963A38;
-  --color-skeleton: #ECECEC;
+  --color-skeleton: #EFE5D6;
+  --color-sage: #A9C3A0;
+  --color-sage-soft: #E3EEDD;
+  --color-sage-ink: #2F4A2D;
 
   /* Pattern card placeholder tints */
-  --color-tint-sage: #E1ECF3;
-  --color-tint-lavender: #EAE3F3;
-  --color-tint-cream: #F9F0D3;
-  --color-tint-peach: #FBEEE6;
+  --color-tint-sage: #DDE9D8;
+  --color-tint-lavender: #EADFF0;
+  --color-tint-cream: #F1E7D8;
+  --color-tint-peach: #F8E3D6;
 
   /* Legacy aliases — accent* = primary navy (historical CTA token) */
   --color-accent: var(--color-primary);
@@ -100,11 +103,11 @@
   --color-skill-advanced-soft: #2A1B14;
   --color-skill-advanced-ink: #FFFFFF;
 
-  /* Fonts — Manrope body/UI; Playfair headings; Baloo logo */
-  --font-display: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
-  --font-subheading: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
-  --font-body: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
-  --font-mono: 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  /* Fonts — Nunito body/UI; Fraunces headings and logo; Caveat notes */
+  --font-display: var(--font-nunito), 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-subheading: var(--font-nunito), 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-body: var(--font-nunito), 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: var(--font-nunito), 'Avenir Next', Avenir, 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
   --font-heading: var(--font-fraunces), Georgia, 'Times New Roman', serif;
   --font-logo: var(--font-fraunces), Georgia, serif;
   --font-hand: var(--font-caveat), 'Segoe Print', cursive;
@@ -113,7 +116,9 @@
   --max-width-site: 1600px;
 
   /* Soft card shadow (DESIGN_SPEC §2) */
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  --shadow-card: 0 1px 2px rgba(42,27,20,.05), 0 4px 14px rgba(42,27,20,.06);
+  --shadow-card-hover: 0 2px 4px rgba(42,27,20,.06), 0 12px 28px rgba(42,27,20,.12);
+  --shadow-btn: 0 2px 0 #8C321E;
   --shadow-image: 0 2px 8px rgba(0,0,0,0.08);
 
   /* Header layout: align with Tailwind md/lg (768 / 1024) per DESIGN_SPEC §1.
@@ -127,18 +132,18 @@
   --breakpoint-design-md: 768px;
   --breakpoint-design-lg: 1024px;
 
-  --radius-card: 5px;
-  --radius-image: 5px;
+  --radius-card: 8px;
+  --radius-image: 8px;
 
   /* Shared type + spacing scale (Home/chrome first; reuse on later pages) */
-  --text-body: 0.9375rem;
-  --text-meta: 0.8125rem;
-  --text-h1: 2.5rem;
-  --text-h1-lg: 3.5rem;
-  --text-h2: 2.125rem;
-  --text-h2-lg: 3.25rem;
-  --text-hero: 2.125rem;
-  --text-hero-lg: 3.5rem;
+  --text-body: 1rem;
+  --text-meta: 0.875rem;
+  --text-h1: 2.125rem;
+  --text-h1-lg: 3rem;
+  --text-h2: 1.75rem;
+  --text-h2-lg: 2.375rem;
+  --text-hero: 2.375rem;
+  --text-hero-lg: 3.75rem;
 }
 
 .mobile-nca-logo {
@@ -188,58 +193,59 @@ html {
 
 @utility type-h1 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 600;
   font-size: var(--text-h1);
-  line-height: 1.12;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
   @media (min-width: 1024px) {
     font-size: var(--text-h1-lg);
-    line-height: 1.06;
-    letter-spacing: -0.03em;
+    line-height: 1.1;
   }
 }
 
 @utility type-h2 {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 600;
   font-size: var(--text-h2);
   line-height: 1.2;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
   @media (min-width: 768px) {
     font-size: var(--text-h2-lg);
-    line-height: 1.1;
-    letter-spacing: -0.025em;
+    line-height: 1.15;
   }
 }
 
 @utility type-hero {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 600;
   font-size: var(--text-hero);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
   @media (min-width: 768px) {
     font-size: 3.25rem;
-    line-height: 1.04;
-    letter-spacing: -0.035em;
+    line-height: 1.08;
+    letter-spacing: -0.012em;
   }
   @media (min-width: 1024px) {
     font-size: var(--text-hero-lg);
-    line-height: 1;
-    letter-spacing: -0.04em;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
   }
 }
 
 @utility home-h2 {
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 2rem;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: 1.875rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
   @media (min-width: 1024px) {
-    font-size: 3rem;
-    line-height: 1.04;
-    letter-spacing: -0.03em;
+    font-size: 2.75rem;
+    line-height: 1.1;
   }
 }
 
@@ -249,7 +255,10 @@ body {
   font-family: var(--font-body);
   color: var(--color-ink);
   background: var(--color-background);
+  font-size: 1rem;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   overflow-x: clip;
   max-width: 100vw;
 }
@@ -508,6 +517,12 @@ button:not(:disabled):active,
 
 /* Fraunces character: soft, rounded terminals + the quirky "wonk" forms. */
 .font-heading, .font-logo {
-  font-variation-settings: 'SOFT' 100, 'WONK' 1;
-  font-optical-sizing: auto;
+  /* opsz pinned to the sturdy text cut at every size: the auto display cut is thin and tall. */
+  font-variation-settings: 'SOFT' 100, 'WONK' 0, 'opsz' 14;
+  font-optical-sizing: none;
+  font-weight: 600;
 }
+@media (min-width: 1024px) {
+  body { font-size: 1.0625rem; }
+}
+p { text-wrap: pretty; }

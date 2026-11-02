@@ -37,11 +37,11 @@ const POPULAR_SEARCHES = [
   { label: 'New arrivals', href: '/shop?sort=newest' },
 ] as const
 
-/** Small uppercase nav label — matches the reference header. */
+/** Nav label: sentence case, bold, 15px. */
 const NAV_LABEL =
-  'text-[12px] font-semibold uppercase tracking-[0.11em] text-ink transition-colors hover:text-coral'
+  'whitespace-nowrap text-[15px] font-bold tracking-[0.01em] text-ink transition-colors hover:text-coral'
 
-const TILE_COLORS = ['#F2F2F2', '#EDEDED', '#F5F5F5', '#EBEBEB'] as const
+const TILE_COLORS = ['#F1E7D8', '#EADFF0', '#DDE9D8', '#F8E3D6'] as const
 
 export function Header() {
   const { user, profile, signOut, loading: authLoading } = useAuth()
@@ -333,7 +333,7 @@ export function Header() {
                               className="group flex items-center gap-4 py-2 lg:flex-col lg:items-start lg:gap-3"
                             >
                               <span
-                                className="relative size-16 shrink-0 overflow-hidden rounded-[5px] lg:aspect-square lg:size-auto lg:w-full"
+                                className="relative size-16 shrink-0 overflow-hidden rounded-2xl lg:aspect-square lg:size-auto lg:w-full"
                                 style={{ background: TILE_COLORS[i % TILE_COLORS.length] }}
                               >
                                 {p.images?.[0] && (
@@ -361,7 +361,7 @@ export function Header() {
                       <button
                         type="button"
                         onClick={() => submitSearch()}
-                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[12px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+                        className="mt-5 inline-flex min-h-11 items-center border-b-2 border-coral text-[14px] font-bold tracking-[0.01em] text-ink hover:text-violet"
                       >
                         See all results for &ldquo;{query.trim()}&rdquo; ↗
                       </button>
@@ -376,13 +376,13 @@ export function Header() {
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-6">
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-muted">Popular</span>
+                  <span className="text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">Popular</span>
                   {POPULAR_SEARCHES.map((s) => (
                     <Link
                       key={s.href}
                       href={s.href}
                       onClick={closeSearch}
-                      className="inline-flex min-h-11 items-center rounded-[3px] border-2 border-ink px-4 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:bg-ink hover:text-white"
+                      className="inline-flex min-h-11 items-center rounded-md border-2 border-ink px-4 text-[14px] font-bold tracking-[0.01em] text-ink transition-colors hover:bg-ink hover:text-white"
                     >
                       {s.label}
                     </Link>
@@ -441,7 +441,7 @@ export function Header() {
                   ))}
                 </ul>
 
-                <p className="pb-1 pt-5 text-[12px] font-semibold uppercase tracking-[0.16em] text-muted">Categories</p>
+                <p className="pb-1 pt-5 text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">Categories</p>
                 <ul>
                   {categories.map((c) => {
                     const expanded = expandedCategory === c.id
@@ -530,7 +530,7 @@ export function Header() {
                     <button
                       type="button"
                       onClick={goSignIn}
-                      className="inline-flex min-h-11 items-center justify-center rounded-[3px] border-2 border-primary bg-primary px-6 text-[12px] font-semibold uppercase tracking-[0.12em] text-white hover:border-violet hover:bg-violet"
+                      className="inline-flex min-h-11 items-center justify-center rounded-md border-2 border-primary bg-primary px-6 text-[14px] font-bold tracking-[0.01em] text-white hover:border-violet hover:bg-violet"
                     >
                       Sign in
                     </button>
@@ -547,12 +547,12 @@ export function Header() {
 
 /** Desktop "Shop patterns" panel: categories, skill levels and quick links. */
 function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]; onClose: () => void }) {
-  const colHead = 'mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-violet'
+  const colHead = 'mb-3 text-[12px] font-extrabold uppercase tracking-[0.06em] text-violet'
   const row =
     'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (
     <div className="absolute left-[-1rem] top-full z-50 pt-3">
-      <div className="w-[min(780px,calc(100vw-4rem))] rounded-[5px] border-2 border-ink bg-bg p-7 shadow-[6px_6px_0_0_#111111]">
+      <div className="w-[min(780px,calc(100vw-4rem))] rounded-2xl border-2 border-ink bg-bg p-7 shadow-[6px_6px_0_0_#111111]">
         <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-9">
           <div>
             <p className={colHead}>Categories</p>
@@ -622,9 +622,9 @@ function AccountDropdown({
   const item = 'flex min-h-11 items-center px-5 text-[13px] font-medium text-ink transition-colors hover:bg-surface-warm hover:text-violet'
   return (
     <div className="absolute right-0 top-full z-50 pt-3">
-      <div className="w-[260px] overflow-hidden rounded-[5px] border-2 border-ink bg-bg shadow-[6px_6px_0_0_#111111]">
+      <div className="w-[260px] overflow-hidden rounded-2xl border-2 border-ink bg-bg shadow-[6px_6px_0_0_#111111]">
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-[5px] bg-violet text-[15px] font-semibold text-white">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-violet text-[15px] font-semibold text-white">
             {profileInitial(profile, email)}
           </span>
           <div className="min-w-0">

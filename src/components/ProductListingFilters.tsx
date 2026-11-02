@@ -16,20 +16,20 @@ const CHECKBOX_CLASS_PANEL =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
 
 const RADIO_CLASS_PANEL =
-  'listing-filter-radio shrink-0 w-5 h-5 rounded-[3px] border-2 border-ink/40 bg-white ' +
+  'listing-filter-radio shrink-0 w-5 h-5 rounded-lg border-2 border-ink/40 bg-white ' +
   'appearance-none cursor-pointer transition-colors ' +
   'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
 
 /** Mobile sheet — ~24px Etsy-scale controls, bold ink border. */
 const CHECKBOX_CLASS_SHEET =
-  'listing-filter-check shrink-0 w-6 h-6 rounded-[4px] border-2 border-ink bg-white ' +
+  'listing-filter-check shrink-0 w-6 h-6 rounded-2xl border-2 border-ink bg-white ' +
   'appearance-none cursor-pointer transition-colors ' +
   'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
 
 const RADIO_CLASS_SHEET =
-  'listing-filter-radio shrink-0 w-6 h-6 rounded-[3px] border-2 border-ink bg-white ' +
+  'listing-filter-radio shrink-0 w-6 h-6 rounded-lg border-2 border-ink bg-white ' +
   'appearance-none cursor-pointer transition-colors ' +
   'checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)] ' +
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]'
@@ -45,7 +45,7 @@ const ROW_CLASS_SHEET =
 
 /** Desktop: small muted caps. */
 const SECTION_TITLE_PANEL =
-  'text-[12px] font-normal uppercase tracking-[0.15em] text-ink-soft mb-1'
+  'text-[12px] font-normal uppercase tracking-[0.06em] text-ink-soft mb-1'
 
 /** Sheet: Etsy-style sentence case, bold, ~19–20px, full ink. */
 const SECTION_TITLE_SHEET =

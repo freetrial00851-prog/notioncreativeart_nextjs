@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
 const field =
-  'w-full min-h-12 rounded-[6px] border bg-white px-4 py-3 text-[16px] text-ink md:text-[15px]'
+  'w-full min-h-12 rounded-2xl border bg-white px-4 py-3 text-[16px] text-ink md:text-[15px]'
 
 /** Contact form: sends the message to the support mailbox through the contact-message function. */
 export function ContactForm() {
@@ -80,7 +80,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={phase === 'sending'}
-        className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60"
+        className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-6 text-[15px] font-semibold text-primary-contrast transition-colors hover:bg-primary-hover disabled:opacity-60"
       >
         {phase === 'sending' ? 'Sending…' : 'Send message'}
       </button>

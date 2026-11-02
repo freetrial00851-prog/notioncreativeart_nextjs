@@ -18,7 +18,7 @@ export function CopyEmailButton({ email }: { email: string }) {
     <button
       type="button"
       onClick={() => void copy()}
-      className="ml-3 inline-flex min-h-11 items-center rounded-[3px] border-[1.5px] border-primary bg-white px-4 text-[14px] font-semibold text-primary hover:bg-primary-soft"
+      className="ml-3 inline-flex min-h-11 items-center rounded-md border-[1.5px] border-primary bg-white px-4 text-[14px] font-semibold text-primary hover:bg-primary-soft"
     >
       {copied ? 'Copied ✓' : 'Copy email'}
     </button>

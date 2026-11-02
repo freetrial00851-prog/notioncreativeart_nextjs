@@ -177,7 +177,7 @@ export function PaddleCheckout() {
             <>
               <p role="alert">{message}</p>
               <p className="mt-3">
-                <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-11 items-center justify-center rounded-[3px] bg-primary px-5 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
+                <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-5 text-[15px] font-semibold text-primary-contrast hover:bg-primary-hover">
                   Try again
                 </button>
               </p>

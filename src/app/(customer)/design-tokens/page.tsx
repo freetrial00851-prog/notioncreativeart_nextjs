@@ -26,7 +26,7 @@ export default function DesignTokensPage() {
   return (
     <div className="max-w-site mx-auto px-6 md:px-16 py-12 space-y-10">
       <header className="space-y-2">
-        <p className="text-[11px] tracking-[0.15em] text-muted uppercase">Temporary review page</p>
+        <p className="text-[11px] tracking-[0.06em] text-muted uppercase">Temporary review page</p>
         <h1 className="font-heading text-3xl font-bold text-ink">Design tokens</h1>
         <p className="text-[14px] text-muted max-w-xl">
           Preview/local only — hidden in production. Prefer{' '}

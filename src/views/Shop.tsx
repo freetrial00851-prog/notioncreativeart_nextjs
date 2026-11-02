@@ -444,7 +444,7 @@ export function Shop({
                 key={level}
                 type="button"
                 onClick={() => onToggleLevel(level)}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3 text-[13px] font-medium ${skillPillClass(level, active)}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium ${skillPillClass(level, active)}`}
               >
                 {active ? <CheckIcon /> : null}
                 {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -457,7 +457,7 @@ export function Shop({
             <button
               type="button"
               onClick={toggleBundle}
-              className={`inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3 text-[13px] font-medium ${
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium ${
                 bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
               }`}
             >
@@ -470,12 +470,12 @@ export function Shop({
           <button
             type="button"
             onClick={openFilters}
-            className="inline-flex items-center gap-2 rounded-[3px] border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-warm"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-warm"
           >
             <FilterGlyph />
             More filters
           </button>
-          <label className="inline-flex items-center gap-2 rounded-[3px] border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink">
+          <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink">
             <span className="text-muted">Sort:</span>
             <select
               value={sort}
@@ -496,17 +496,17 @@ export function Shop({
           <button
             type="button"
             onClick={openFilters}
-            className="flex-1 inline-flex items-center justify-center gap-2 min-h-11 rounded-[3px] border border-border bg-surface text-[13px] font-semibold text-ink"
+            className="flex-1 inline-flex items-center justify-center gap-2 min-h-11 rounded-lg border border-border bg-surface text-[13px] font-semibold text-ink"
           >
             <FilterGlyph />
             Filters
             {activeFilterCount > 0 ? (
-              <span className="min-w-5 h-5 px-1 rounded-[3px] bg-primary text-white text-[12px] flex items-center justify-center">
+              <span className="min-w-5 h-5 px-1 rounded-lg bg-primary text-white text-[12px] flex items-center justify-center">
                 {activeFilterCount}
               </span>
             ) : null}
           </button>
-          <label className="flex-1 inline-flex items-center justify-center gap-2 min-h-11 rounded-[3px] border border-border bg-surface text-[13px] font-semibold text-ink px-3">
+          <label className="flex-1 inline-flex items-center justify-center gap-2 min-h-11 rounded-lg border border-border bg-surface text-[13px] font-semibold text-ink px-3">
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as ListingSort)}
@@ -531,7 +531,7 @@ export function Shop({
                 key={level}
                 type="button"
                 onClick={() => onToggleLevel(level)}
-                className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${skillPillClass(level, active)}`}
+                className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-medium whitespace-nowrap ${skillPillClass(level, active)}`}
               >
                 {active ? <CheckIcon /> : null}
                 {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -541,7 +541,7 @@ export function Shop({
           <button
             type="button"
             onClick={toggleFreeQuick}
-            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${
+            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-medium whitespace-nowrap ${
               isFreePill ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
             }`}
           >
@@ -551,7 +551,7 @@ export function Shop({
           <button
             type="button"
             onClick={toggleBundle}
-            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-[3px] border px-3.5 text-[13px] font-medium whitespace-nowrap ${
+            className={`shrink-0 inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-medium whitespace-nowrap ${
               bundleFilter ? 'border-transparent bg-primary-soft text-primary' : 'border-border bg-surface text-ink'
             }`}
           >
@@ -565,7 +565,7 @@ export function Shop({
             <ProductGridSkeleton variant="shop" count={8} />
           ) : sortedProducts.length === 0 ? (
             <div className="rounded-2xl border border-border bg-surface px-5 py-10 text-center max-w-xl mx-auto">
-              <div className="mx-auto w-11 h-11 rounded-[3px] bg-primary-soft flex items-center justify-center mb-4" aria-hidden>
+              <div className="mx-auto w-11 h-11 rounded-lg bg-primary-soft flex items-center justify-center mb-4" aria-hidden>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <circle cx="11" cy="11" r="7" stroke="var(--color-primary)" strokeWidth="2" />
                   <path d="M20 20l-3.5-3.5" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" />
@@ -653,7 +653,7 @@ function FilterPill({
   onNavigate?: (href: string) => void
   onClick?: () => void
 }) {
-  const className = `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[3px] border min-h-11 px-3.5 text-[13px] font-medium transition-colors ${
+  const className = `inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border min-h-11 px-3.5 text-[13px] font-medium transition-colors ${
     active ? 'border-transparent bg-primary text-white' : 'border-border bg-surface text-ink hover:bg-surface-warm'
   }`
   if (href && onNavigate) {

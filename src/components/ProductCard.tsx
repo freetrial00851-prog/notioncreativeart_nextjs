@@ -117,7 +117,7 @@ export function ProductCard({
     <article suppressHydrationWarning className="reveal card-lift group/card flex h-full flex-col">
       {/* Landscape card: the photo fills the whole tile (colour only shows while loading) */}
       <div
-        className="relative aspect-[3/4] overflow-hidden rounded-[5px]"
+        className="relative aspect-[3/4] overflow-hidden rounded-lg"
         style={{ background: tile }}
         onMouseEnter={prefetch}
         onTouchStart={prefetch}
@@ -140,7 +140,7 @@ export function ProductCard({
         </Link>
 
         {statusBadge && (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-[3px] bg-white px-[9px] py-[7px] text-[12px] font-bold uppercase leading-none tracking-[0.13em] text-ink">
+          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-md bg-white/95 px-3 py-[7px] text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-ink shadow-sm">
             {STATUS_LABEL[statusBadge]}
           </span>
         )}
@@ -152,7 +152,7 @@ export function ProductCard({
           aria-pressed={inWishlist}
           className="absolute right-1 top-1 z-10 inline-flex size-11 items-center justify-center"
         >
-          <span key={heartPop} className={`flex size-8 items-center justify-center rounded-[3px] bg-white ${heartPop > 0 ? 'animate-pop' : ''}`}>
+          <span key={heartPop} className={`flex size-9 items-center justify-center rounded-md bg-white/95 shadow-sm ${heartPop > 0 ? 'animate-pop' : ''}`}>
             <HeartIcon filled={inWishlist} />
           </span>
         </button>
@@ -163,7 +163,7 @@ export function ProductCard({
             onClick={free ? downloadFree : toggleCart}
             disabled={free && downloadingFree}
             aria-label={free ? `Download ${product.title} free` : addLabel}
-            className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-[3px] bg-navy text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
+            className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-md bg-navy text-[12px] font-bold uppercase tracking-[0.06em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
           >
             <span aria-hidden className="text-[18px] leading-none md:hidden">{free ? (downloadingFree ? '…' : '↓') : inCart ? '✓' : '+'}</span>
             <span className="hidden md:inline">{quickLabel}</span>
@@ -171,11 +171,11 @@ export function ProductCard({
         )}
       </div>
 
-      <div className="px-px pb-1 pt-[15px]">
+      <div className="flex flex-1 flex-col px-px pb-1 pt-[15px]">
         {skillLabel && (
-          <p className="mb-[7px] text-[12px] font-bold uppercase leading-none tracking-[0.13em] text-violet">{skillLabel}</p>
+          <p className="mb-2 w-fit text-[11px] font-extrabold uppercase leading-none tracking-[0.08em] text-muted">{skillLabel}</p>
         )}
-        <h3 className="mb-[9px] font-heading text-[17px] font-normal leading-[1.3] text-ink">
+        <h3 className="mb-[9px] font-heading text-[15px] font-semibold leading-[1.3] text-ink md:text-[17px]">
           <Link
             href={href}
             onMouseEnter={prefetch}
@@ -186,7 +186,7 @@ export function ProductCard({
             {product.title}
           </Link>
         </h3>
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[18px] font-extrabold leading-none text-ink">
+        <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[18px] font-extrabold leading-none tabular-nums text-ink">
           {free ? (
             <span className="font-extrabold text-ink">Free</span>
           ) : (
@@ -209,7 +209,7 @@ export function ProductCard({
   )
 }
 
-const TILE_COLORS = ['#F2F2F2', '#EDEDED', '#F5F5F5', '#EBEBEB'] as const
+const TILE_COLORS = ['#F1E7D8', '#EADFF0', '#DDE9D8', '#F8E3D6'] as const
 
 /** Stable colour per product (same card never changes colour between renders/pages). */
 function tileColor(id: string): string {
@@ -229,5 +229,5 @@ const STATUS_LABEL: Record<NonNullable<ReturnType<typeof getStatusBadge>>, strin
   sold_out: 'Sold out',
   sale: 'Sale',
   new: 'New arrival',
-  featured: 'Bestseller',
+  featured: 'Featured',
 }

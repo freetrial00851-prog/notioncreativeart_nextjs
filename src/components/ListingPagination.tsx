@@ -116,7 +116,7 @@ export function ListingPagination({
   if (pageCount <= 1) return null
 
   const btn =
-    'w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-[3px] border border-border hover:bg-surface-warm disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-ink'
+    'w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-lg border border-border hover:bg-surface-warm disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-ink'
 
   if (variant === 'simple') {
     return (
@@ -162,7 +162,7 @@ export function ListingPagination({
             label={`Page ${item}`}
             hrefFor={hrefFor}
             onPageChange={onPageChange}
-            className={`w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-[3px] text-[13px] transition-colors ${
+            className={`w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-lg text-[13px] transition-colors ${
               item === currentPage
                 ? 'bg-primary text-white'
                 : 'border border-border hover:bg-surface-warm text-ink'

@@ -75,13 +75,13 @@ export function GuideBody({ blocks }: { blocks: GuideBlock[] }) {
             )
           case 'note':
             return (
-              <p key={i} className="rounded-[5px] border border-border bg-surface-warm px-4 py-3 font-mono text-[14px] text-ink">
+              <p key={i} className="rounded-2xl border border-border bg-surface-warm px-4 py-3 font-mono text-[14px] text-ink">
                 {b.text}
               </p>
             )
           case 'table':
             return (
-              <div key={i} className="overflow-x-auto rounded-[5px] border border-border">
+              <div key={i} className="overflow-x-auto rounded-2xl border border-border">
                 <table className="w-full min-w-[420px] border-collapse text-left text-[14px]">
                   {b.caption && <caption className="px-4 py-2 text-left text-[13px] text-muted">{b.caption}</caption>}
                   <thead className="bg-surface-warm text-ink">

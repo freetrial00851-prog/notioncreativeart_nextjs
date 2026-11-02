@@ -27,7 +27,7 @@ export function CollapsibleContent({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={id}
-        className="mt-5 inline-flex min-h-11 items-center gap-1.5 border-b-2 border-coral text-[13px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+        className="mt-5 inline-flex min-h-11 items-center gap-1.5 border-b-2 border-coral text-[13px] font-bold uppercase tracking-[0.06em] text-ink hover:text-violet"
       >
         {open ? lessLabel : moreLabel}
         <span aria-hidden>{open ? '↑' : '↓'}</span>

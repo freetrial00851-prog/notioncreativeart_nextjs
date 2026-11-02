@@ -264,7 +264,7 @@ export function Home({
       <section className="mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-14 lg:grid-cols-[1fr_1.02fr] lg:gap-[5%] lg:py-[55px]">
         <div>
           <p className="eyebrow hero-rise">{copy.hero_eyebrow}</p>
-          <h1 className="hero-rise-y my-5 font-heading text-[clamp(48px,6.1vw,86px)] font-normal leading-[0.98] tracking-[-0.045em] text-ink md:my-6">
+          <h1 className="hero-rise-y my-5 font-heading text-[clamp(40px,5.2vw,68px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink md:my-6">
             {copy.hero_title.split('\n').map((line, i) => (
               <Fragment key={i}>
                 {i > 0 && <br />}
@@ -309,13 +309,13 @@ export function Home({
         </div>
 
         {/* Yellow art panel — real photo framed over a pink sun */}
-        <div className="hero-settle relative isolate grid min-h-[360px] place-items-center overflow-hidden rounded-[5px] bg-sun sm:min-h-[430px] lg:min-h-[470px]">
+        <div className="hero-settle relative isolate grid min-h-[360px] place-items-center overflow-hidden rounded-2xl bg-sun sm:min-h-[430px] lg:min-h-[470px]">
           <span aria-hidden className="absolute -z-0 size-[220px] rounded-full bg-pink sm:size-[280px]" style={{ top: 35, right: '10%' }} />
           <span aria-hidden className="absolute right-[10%] top-[8%] text-[46px] leading-none text-violet">✳</span>
           <span aria-hidden className="pointer-events-none absolute inset-4 z-[1] border-2 border-navy/20" />
           {heroTiles[0] ? (
-            <div className="relative z-[2] -mt-10 w-[58%] max-w-[290px] -rotate-2 rounded-[3px] bg-white p-2 shadow-[0_18px_30px_rgba(32,32,68,0.22)] sm:-mt-14 sm:w-[44%]">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-[2px]">
+            <div className="relative z-[2] -mt-10 w-[58%] max-w-[290px] -rotate-2 rounded-lg bg-white p-2 shadow-[0_18px_30px_rgba(32,32,68,0.22)] sm:-mt-14 sm:w-[44%]">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-md">
                 <Image
                   src={deriveVariantUrl(heroTiles[0].src, 'large')}
                   alt={heroTiles[0].alt}
@@ -329,19 +329,19 @@ export function Home({
           ) : null}
           <p className="absolute bottom-[26px] left-[29px] z-[3] hidden font-heading text-[19px] leading-tight text-ink sm:block">
             Make something amazing
-            <small className="mt-[7px] block font-sans text-[12px] font-semibold uppercase tracking-[0.18em]">
+            <small className="mt-[7px] block font-sans text-[12px] font-semibold uppercase tracking-[0.06em]">
               Patterns for your next project
             </small>
           </p>
           {heroTiles[0]?.href ? (
             <Link
               href={heroTiles[0].href}
-              className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-[3px] bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink shadow-[0_5px_18px_rgba(0,0,0,0.08)] hover:text-violet sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]"
+              className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-lg bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink shadow-[0_5px_18px_rgba(0,0,0,0.08)] hover:text-violet sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]"
             >
               Your next favourite make
             </Link>
           ) : (
-            <span className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-[3px] bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]">
+            <span className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-lg bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]">
               Your next favourite make
             </span>
           )}
@@ -373,7 +373,7 @@ export function Home({
         <div suppressHydrationWarning className="reveal mb-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Your next favourite project</p>
-            <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
+            <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
               Crochet patterns to fall for.
             </h2>
           </div>
@@ -383,7 +383,7 @@ export function Home({
             </p>
             <Link
               href="/shop"
-              className="inline-block whitespace-nowrap border-b-2 border-coral pb-[7px] text-[12px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet"
+              className="inline-block whitespace-nowrap border-b-2 border-coral pb-[7px] text-[12px] font-bold uppercase tracking-[0.06em] text-ink hover:text-violet"
             >
               Shop all patterns ↗
             </Link>
@@ -422,7 +422,7 @@ export function Home({
       <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
         <div className="max-w-3xl text-[14px] leading-[1.9] text-muted">
           <p className="eyebrow">Who we are</p>
-          <h2 className="mt-[13px] font-heading text-[clamp(26px,3vw,36px)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
+          <h2 className="mt-[13px] font-heading text-[clamp(26px,3vw,36px)] font-semibold leading-[1.1] tracking-[-0.01em] text-ink">
             Crochet patterns you can download in minutes
           </h2>
           <p className="mt-4">
@@ -442,7 +442,7 @@ export function Home({
         <div className="mx-auto max-w-site page-gutter">
           <p className="eyebrow text-white before:bg-white">Find your kind of making</p>
           <div suppressHydrationWarning className="reveal mb-8 mt-4 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <h2 className="font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
+            <h2 className="font-heading text-[clamp(35px,4vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em]">
               Crochet patterns
               <br />
               for every maker.
@@ -457,7 +457,7 @@ export function Home({
                 key={c.t}
                 href={c.href}
                 suppressHydrationWarning
-                className="reveal press-card group relative isolate flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[5px] bg-[#222] text-white md:aspect-[4/5] md:min-h-0"
+                className="reveal press-card group relative isolate flex min-h-[320px] flex-col justify-end overflow-hidden rounded-2xl bg-[#222] text-white md:aspect-[4/5] md:min-h-0"
               >
                 {c.img ? (
                   <Image
@@ -469,14 +469,14 @@ export function Home({
                   />
                 ) : null}
                 <span aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
-                <span className="absolute left-[22px] top-[22px] rounded-[3px] bg-white px-2.5 py-1.5 text-[12px] font-bold uppercase leading-none tracking-[0.12em] text-ink">
+                <span className="absolute left-[22px] top-[22px] rounded-lg bg-white px-2.5 py-1.5 text-[12px] font-bold uppercase leading-none tracking-[0.06em] text-ink">
                   {c.n}
                 </span>
                 <div className="p-[22px] md:p-6">
-                  <h3 className="font-heading text-[30px] font-normal leading-tight tracking-[-0.02em] md:text-[34px]">{c.t}</h3>
+                  <h3 className="font-heading text-[30px] font-semibold leading-tight tracking-[-0.01em] md:text-[34px]">{c.t}</h3>
                   <p className="mt-2 max-w-[300px] text-[13px] leading-[1.6] text-white/80">{c.d}</p>
                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/25 pt-4">
-                    <span className="text-[12px] font-semibold uppercase tracking-[0.13em]">
+                    <span className="text-[12px] font-semibold uppercase tracking-[0.06em]">
                       {c.go}
                       {c.count > 0 ? <span className="font-normal text-white/70"> · {c.count} {c.count === 1 ? 'pattern' : 'patterns'}</span> : null}
                     </span>
@@ -499,7 +499,7 @@ export function Home({
       <div suppressHydrationWarning className="reveal mx-auto grid max-w-site items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
         {storyPhotos.length > 0 ? (
           <div className="relative mx-auto w-full max-w-[400px] pb-10 pr-8 sm:max-w-[460px] md:pb-14 md:pr-12">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[5px] bg-surface-warm">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-surface-warm">
               <Image
                 src={deriveVariantUrl(storyPhotos[0].src, 'large')}
                 alt={storyPhotos[0].alt}
@@ -509,7 +509,7 @@ export function Home({
               />
             </div>
             {storyPhotos[1] ? (
-              <div className="absolute bottom-0 right-0 aspect-[3/4] w-[40%] overflow-hidden rounded-[5px] border-[6px] border-bg bg-surface-warm shadow-[0_14px_28px_rgba(0,0,0,0.14)]">
+              <div className="absolute bottom-0 right-0 aspect-[3/4] w-[40%] overflow-hidden rounded-2xl border-[6px] border-bg bg-surface-warm shadow-[0_14px_28px_rgba(0,0,0,0.14)]">
                 <Image
                   src={deriveVariantUrl(storyPhotos[1].src, 'large')}
                   alt={storyPhotos[1].alt}
@@ -523,7 +523,7 @@ export function Home({
         ) : null}
         <div>
           <p className="eyebrow">{copy.story_eyebrow}</p>
-          <h2 className="my-[18px] font-heading text-[clamp(38px,4vw,55px)] font-normal leading-[1.08] tracking-[-0.035em] text-ink">
+          <h2 className="my-[18px] font-heading text-[clamp(38px,4vw,55px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
             {copy.story_title}
           </h2>
           <p className="mb-3 max-w-[460px] text-[13px] leading-[1.9] text-muted">
@@ -546,7 +546,7 @@ export function Home({
         <div suppressHydrationWarning className="reveal mb-8 flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Simple from the very start</p>
-            <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
+            <h2 className="mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
               Your next crochet project, in three steps.
             </h2>
           </div>
@@ -575,15 +575,15 @@ export function Home({
 
       {/* 7 · Free feature */}
       <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
-        <div suppressHydrationWarning className="reveal grid min-h-[310px] overflow-hidden rounded-[5px] bg-coral text-white md:grid-cols-[1.1fr_1fr]">
+        <div suppressHydrationWarning className="reveal grid min-h-[310px] overflow-hidden rounded-2xl bg-coral text-white md:grid-cols-[1.1fr_1fr]">
           <div className="relative grid min-h-[230px] place-items-center overflow-hidden bg-sun">
             {freeImages[0]?.images?.[0] ? (
               <Link
                 href={`/pattern/${freeImages[0].slug}`}
                 aria-label={freeImages[0].title}
-                className="relative my-6 block w-[50%] max-w-[240px] rotate-2 rounded-[3px] bg-white p-2 shadow-[0_16px_26px_rgba(32,32,68,0.2)]"
+                className="relative my-6 block w-[50%] max-w-[240px] rotate-2 rounded-lg bg-white p-2 shadow-[0_16px_26px_rgba(32,32,68,0.2)]"
               >
-                <span className="relative block aspect-[3/4] overflow-hidden rounded-[2px]">
+                <span className="relative block aspect-[3/4] overflow-hidden rounded-md">
                   <Image
                     src={deriveVariantUrl(freeImages[0].images[0], 'large')}
                     alt={freeImages[0].title}
@@ -599,7 +599,7 @@ export function Home({
           </div>
           <div className="self-center p-[26px] md:p-12">
             <p className="eyebrow text-white before:bg-white">A little gift from us</p>
-            <h2 className="my-[17px] font-heading text-[clamp(34px,4vw,48px)] font-normal leading-[1.08] tracking-[-0.035em]">
+            <h2 className="my-[17px] font-heading text-[clamp(34px,4vw,48px)] font-semibold leading-[1.12] tracking-[-0.01em]">
               Free crochet patterns to try first.
             </h2>
             <p className="mb-2 max-w-[360px] text-[12px] leading-[1.8] text-white/90">
@@ -607,7 +607,7 @@ export function Home({
               yourself.
             </p>
             <Link href="/free-crochet-patterns" className="mt-3 inline-block">
-              <span className="inline-flex min-h-12 items-center justify-center rounded-[3px] border-2 border-white bg-white px-[22px] text-[12px] font-bold uppercase tracking-[0.12em] text-navy transition-colors hover:bg-navy hover:text-white">
+              <span className="inline-flex min-h-12 items-center justify-center rounded-md border-2 border-white bg-white px-[22px] text-[12px] font-bold uppercase tracking-[0.06em] text-navy transition-colors hover:bg-navy hover:text-white">
                 Explore free patterns ↗
               </span>
             </Link>
@@ -620,13 +620,13 @@ export function Home({
         <section className="bg-surface-warm">
           <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
             {MAKER.photo && (
-              <div className="relative mx-auto aspect-[3/4] w-full max-w-[360px] overflow-hidden rounded-[5px] lg:mx-0 lg:max-w-[440px]">
+              <div className="relative mx-auto aspect-[3/4] w-full max-w-[360px] overflow-hidden rounded-2xl lg:mx-0 lg:max-w-[440px]">
                 <Image src={MAKER.photo} alt="The maker of Notion Creative Art patterns" fill sizes="(max-width: 1023px) 100vw, 440px" className="object-cover" />
               </div>
             )}
             <div className={MAKER.photo ? '' : 'lg:col-span-2 max-w-2xl'}>
               <p className="eyebrow">Meet the maker</p>
-              <h2 className="my-4 font-heading text-[clamp(34px,4vw,48px)] font-normal leading-[1.08] tracking-[-0.035em] text-ink">
+              <h2 className="my-4 font-heading text-[clamp(34px,4vw,48px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
                 {MAKER.headline}
               </h2>
               <p className="mb-6 max-w-xl text-[15px] leading-[1.8] text-muted">{MAKER.story}</p>
@@ -634,13 +634,13 @@ export function Home({
                 <div className="mb-6 flex flex-wrap gap-x-12 gap-y-4 border-t border-border pt-6">
                   {MAKER.stats.map((st) => (
                     <div key={st.l}>
-                      <p className="font-heading text-[40px] font-normal leading-none text-ink">{st.n}</p>
+                      <p className="font-heading text-[40px] font-semibold leading-none text-ink">{st.n}</p>
                       <p className="mt-1.5 text-[13px] text-muted">{st.l}</p>
                     </div>
                   ))}
                 </div>
               )}
-              <Link href="/about" className="inline-flex min-h-11 items-center border-b-2 border-coral text-[13px] font-bold uppercase tracking-[0.14em] text-ink hover:text-violet">
+              <Link href="/about" className="inline-flex min-h-11 items-center border-b-2 border-coral text-[13px] font-bold uppercase tracking-[0.06em] text-ink hover:text-violet">
                 Read our story ↗
               </Link>
             </div>
@@ -652,7 +652,7 @@ export function Home({
       {makerReviews.length > 0 && (
         <section id="reviews" className="mx-auto max-w-site scroll-mt-20 page-gutter pt-[58px] pb-[58px] md:pt-[88px] md:pb-[88px]">
           <p className="eyebrow">What makers say</p>
-          <h2 className="mb-8 mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
+          <h2 className="mb-8 mt-[13px] font-heading text-[clamp(35px,4vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
             Kind words from makers.
           </h2>
           <div className={`grid gap-3 md:gap-4 ${makerReviews.length === 1 ? 'md:grid-cols-1' : makerReviews.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
@@ -660,7 +660,7 @@ export function Home({
               <figure
                 key={t.id}
                 suppressHydrationWarning
-                className={`reveal rounded-[5px] p-[25px] text-navy ${['bg-aqua', 'bg-pink', 'bg-butter'][i % 3]} ${i === 2 ? 'hidden md:block' : ''}`}
+                className={`reveal rounded-2xl p-[25px] text-navy border border-border bg-surface-warm ${i === 2 ? 'hidden md:block' : ''}`}
               >
                 <div className="mb-3 flex gap-0.5 text-navy" aria-label={`${t.rating} out of 5 stars`}>
                   {Array.from({ length: 5 }).map((_, si) => (
@@ -668,7 +668,7 @@ export function Home({
                   ))}
                 </div>
                 <blockquote className="mb-5 font-heading text-[22px] leading-[1.25]">&ldquo;{t.body}&rdquo;</blockquote>
-                <figcaption className="text-[12px] font-bold uppercase tracking-[0.13em]">
+                <figcaption className="text-[12px] font-bold uppercase tracking-[0.06em]">
                   {t.reviewerFirstName}
                   <span className="font-medium normal-case tracking-normal opacity-75"> · {t.patternTitle}</span>
                 </figcaption>
@@ -683,7 +683,7 @@ export function Home({
         <div suppressHydrationWarning className="reveal max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <p className="eyebrow">Questions, answered</p>
-            <h2 className="my-[13px] font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em] text-ink">
+            <h2 className="my-[13px] font-heading text-[clamp(35px,4vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
               The basics before you buy.
             </h2>
             {!hideOwnerCopyPlaceholders && (

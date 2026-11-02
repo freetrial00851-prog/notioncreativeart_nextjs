@@ -221,13 +221,13 @@ export function Search() {
               placeholder="Search by name or description"
               autoComplete="off"
               enterKeyHint="search"
-              className="min-h-11 w-full rounded-[3px] border border-border bg-surface px-5 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25"
+              className="min-h-11 w-full rounded-lg border border-border bg-surface px-5 text-[16px] md:text-[15px] text-ink placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-primary/25"
             />
           </label>
           <div className="flex items-center gap-2">
             <button
               type="submit"
-              className="inline-flex min-h-11 flex-1 items-center justify-center rounded-[3px] bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover sm:flex-none"
+              className="inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-primary px-6 text-[15px] md:text-[14px] font-semibold text-primary-contrast hover:bg-primary-hover sm:flex-none"
             >
               Search
             </button>
@@ -309,7 +309,7 @@ export function Search() {
                             router.push('/search')
                           }
                         }}
-                        className="px-6 py-3 rounded-[3px] border border-line text-[13px] font-semibold hover:bg-surface transition-colors"
+                        className="px-6 py-3 rounded-lg border border-line text-[13px] font-semibold hover:bg-surface transition-colors"
                       >
                         {results.length > 0 ? 'Clear filters' : 'Clear search'}
                       </button>
@@ -351,7 +351,7 @@ export function Search() {
                   type="button"
                   aria-label="Close filters"
                   onClick={() => setMobileFiltersOpen(false)}
-                  className="w-8 h-8 rounded-[3px] bg-surface flex items-center justify-center text-ink text-lg leading-none"
+                  className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center text-ink text-lg leading-none"
                 >
                   ✕
                 </button>
@@ -368,7 +368,7 @@ export function Search() {
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3 rounded-[3px] text-white text-[13px] font-semibold"
+                className="w-full py-3 rounded-lg text-white text-[13px] font-semibold"
                 style={{ background: 'var(--color-ink)' }}
               >
                 Show Results

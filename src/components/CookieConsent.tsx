@@ -62,13 +62,13 @@ export function CookieConsent() {
         <div className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto md:shrink-0 md:gap-3">
           <button
             onClick={() => choose('rejected')}
-            className="min-h-10 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-[3px] hover:opacity-85 transition-opacity md:min-h-11"
+            className="min-h-10 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-lg hover:opacity-85 transition-opacity md:min-h-11"
           >
             REJECT
           </button>
           <button
             onClick={() => choose('accepted')}
-            className="min-h-10 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-[3px] hover:opacity-85 transition-opacity md:min-h-11"
+            className="min-h-10 px-6 bg-ink text-canvas text-[12px] tracking-[0.1em] rounded-lg hover:opacity-85 transition-opacity md:min-h-11"
           >
             ACCEPT
           </button>

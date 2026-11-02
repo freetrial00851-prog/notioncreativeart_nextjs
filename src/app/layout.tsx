@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Fraunces, Caveat } from 'next/font/google'
+import { Fraunces, Nunito, Caveat } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/Providers'
@@ -15,7 +15,8 @@ import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoS
  * headings, the wordmark and product names (`font-heading`). SOFT + WONK axes give the
  * rounded, hand-cut character; opsz tunes it for big vs small sizes.
  * Caveat — a neat handwritten face, used ONLY for tiny personal notes (`font-hand`).
- * Body/UI text uses the platform system font (no download, native optical sizing).
+ * Body/UI text uses Nunito (`font-body`). Fraunces is pinned to its sturdy text optical size in CSS
+ * (`.font-heading`) so headings are wide and soft instead of tall and hairline-thin.
  */
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -23,6 +24,13 @@ const fraunces = Fraunces({
   // No italic file: nothing on the storefront uses it, so visitors do not download it.
   style: ['normal'],
   variable: '--font-fraunces',
+  display: 'swap',
+})
+// Body and UI text: a rounded, high x-height sans so the shop looks the same on every device.
+const nunito = Nunito({
+  subsets: ['latin'],
+  weight: ['400', '600', '700', '800'],
+  variable: '--font-nunito',
   display: 'swap',
 })
 const caveat = Caveat({
@@ -73,7 +81,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const siteJsonLd = buildWebSiteJsonLd()
 
   return (
-    <html lang="en" className={`${fraunces.variable} ${caveat.variable}`}>
+    <html lang="en" className={`${fraunces.variable} ${nunito.variable} ${caveat.variable}`}>
       <head>
         {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

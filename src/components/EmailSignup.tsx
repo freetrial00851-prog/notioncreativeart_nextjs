@@ -24,7 +24,7 @@ export function EmailSignup() {
     <section className="bg-pink-soft text-ink">
       <div className="mx-auto max-w-site page-gutter py-14 text-center md:py-[70px]">
         <p className="eyebrow justify-center text-ink">Notes from our creative corner</p>
-        <h2 className="mx-auto my-4 max-w-3xl font-heading text-[clamp(35px,4vw,52px)] font-normal leading-[1.06] tracking-[-0.035em]">
+        <h2 className="mx-auto my-4 max-w-3xl font-heading text-[clamp(35px,4vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em]">
           {subscribed ? "You're on the list." : 'A little inspiration in your inbox.'}
         </h2>
         <p className="mx-auto max-w-md text-[13px] leading-[1.8] text-muted">
@@ -34,7 +34,7 @@ export function EmailSignup() {
         </p>
 
         {subscribed ? (
-          <p role="status" className="mx-auto mt-6 inline-flex items-center gap-3 rounded-[3px] bg-ink px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-white">
+          <p role="status" className="mx-auto mt-6 inline-flex items-center gap-3 rounded-md bg-ink px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-white">
             <span aria-hidden>✓</span> Subscribed
           </p>
         ) : (
@@ -57,7 +57,7 @@ export function EmailSignup() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:text-violet disabled:opacity-50"
+              className="inline-flex min-h-11 shrink-0 items-center px-2 text-[12px] font-bold uppercase tracking-[0.06em] text-ink transition-colors hover:text-violet disabled:opacity-50"
             >
               {submitting ? 'Joining…' : 'Join the list ↗'}
             </button>

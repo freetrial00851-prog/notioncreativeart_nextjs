@@ -82,7 +82,7 @@ const sectionId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, 
 
 function GuideCard({ g }: { g: Guide }) {
   return (
-    <li className="rounded-[5px] border border-border bg-surface p-5 transition-colors hover:bg-surface-warm">
+    <li className="rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-surface-warm">
       <h3 className="font-heading text-[20px] leading-tight text-ink">
         <Link href={`/guides/${g.slug}`} className="hover:underline">{g.title}</Link>
       </h3>
@@ -125,7 +125,7 @@ export default function GuidesIndexPage() {
             <li aria-current="page" className="text-ink">Guides</li>
           </ol>
         </nav>
-        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary">Learn</p>
+        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-primary">Learn</p>
         <h1 className="type-h1 mb-4 text-ink">Crochet Guides and Tutorials</h1>
         <p className="mb-6 max-w-[60ch] text-[15px] leading-relaxed text-muted md:text-[16px]">{DESCRIPTION}</p>
         <SectionJumpLinks items={sections.map((s) => ({ id: sectionId(s.title), label: s.title }))} />
