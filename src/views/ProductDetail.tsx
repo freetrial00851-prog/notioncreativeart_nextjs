@@ -721,7 +721,7 @@ export function ProductDetail({
           {/* Gallery */}
           <div className="min-w-0">
             <div
-              className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-surface-warm shadow-image select-none"
+              className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-surface-warm select-none"
               ref={swipeContainerRef}
               style={{ touchAction: 'pan-y pinch-zoom' }}
               role="region"
@@ -743,7 +743,7 @@ export function ProductDetail({
                         loading={idx === 0 && off === 0 ? undefined : 'eager'}
                         decoding="async"
                         sizes={GALLERY_LCP_SIZES}
-                        className="object-contain pointer-events-none select-none"
+                        className="object-cover pointer-events-none select-none"
                         draggable={false}
                       />
                     </div>
@@ -825,7 +825,7 @@ export function ProductDetail({
                       onClick={() => setActiveImage(i)}
                       aria-label={`Show image ${i + 1}`}
                       aria-current={i === activeImage ? 'true' : undefined}
-                      className={`relative aspect-[3/4] shrink-0 basis-[calc((100%-36px)/4)] overflow-hidden rounded-2xl bg-surface transition-colors ${i === activeImage ? 'border-2 border-primary' : 'border border-border hover:border-muted-light'}`}
+                      className={`relative aspect-[3/4] shrink-0 basis-[calc((100%-36px)/4)] overflow-hidden rounded-lg bg-surface transition-colors ${i === activeImage ? 'border-2 border-primary' : 'border border-border hover:border-muted-light'}`}
                     >
                       <Image
                         src={deriveVariantUrl(img, 'thumb')}
@@ -842,7 +842,7 @@ export function ProductDetail({
           </div>
 
           {/* Buy box */}
-          <div className="min-w-0 lg:rounded-2xl lg:bg-surface lg:p-7 lg:shadow-card">
+          <div className="min-w-0">
             <div className="flex flex-wrap gap-2 mb-3">
               {skillLabel && product.skill_level && (
                 <Chip style={SKILL_PILL_STYLES[product.skill_level]}>{skillLabel}</Chip>
