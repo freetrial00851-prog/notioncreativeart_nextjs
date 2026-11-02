@@ -24,7 +24,7 @@ import { MaterialIcon } from './MaterialIcon'
 import { Logo } from './Logo'
 
 const NAV_LINKS = [
-  { href: '/#collections', label: 'Collections' },
+  { href: '/crochet-patterns-for-beginners', label: 'Beginner' },
   { href: '/free-crochet-patterns', label: 'Free patterns' },
   { href: '/guides', label: 'Guides' },
   { href: '/about', label: 'Our story' },
@@ -169,7 +169,7 @@ export function Header() {
   return (
     <>
       <header className="glass sticky top-0 z-40 border-b border-border">
-        <div className="mx-auto flex h-[67px] max-w-site items-center justify-between gap-6 page-gutter lg:h-[78px]">
+        <div className="mx-auto flex h-[67px] max-w-site items-center justify-between gap-2 page-gutter sm:gap-6 lg:h-[78px]">
           <Logo variant="full" />
 
           {/* Primary nav (desktop) */}
@@ -178,6 +178,8 @@ export function Header() {
               <button
                 type="button"
                 aria-expanded={shopOpen}
+                aria-haspopup="true"
+                aria-controls="shop-menu"
                 onClick={() => {
                   setSearchOpen(false)
                   setShopOpen((v) => !v)
@@ -221,7 +223,7 @@ export function Header() {
               type="button"
               aria-label="Wishlist"
               onClick={() => router.push('/account/wishlist')}
-              className="hidden size-11 items-center justify-center transition-colors hover:text-coral lg:inline-flex"
+              className="hidden size-11 items-center justify-center transition-colors hover:text-coral min-[480px]:inline-flex"
             >
               <MaterialIcon name="favorite" size={21} color="currentColor" />
             </button>
@@ -305,6 +307,15 @@ export function Header() {
                     setQuery(e.target.value)
                     if (!e.target.value.trim()) setSuggestions([])
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown') {
+                      const first = document.querySelector<HTMLAnchorElement>('[data-suggest]')
+                      if (first) {
+                        e.preventDefault()
+                        first.focus()
+                      }
+                    }
+                  }}
                   placeholder="Search patterns"
                   aria-label="Search patterns"
                   autoComplete="off"
@@ -324,11 +335,27 @@ export function Header() {
                 <div className="pt-6">
                   {suggestions.length > 0 ? (
                     <>
-                      <ul className="grid grid-cols-1 gap-x-8 gap-y-1 md:grid-cols-2 lg:grid-cols-5 lg:gap-x-5">
+                      <p className="sr-only" role="status" aria-live="polite">
+                        {suggestions.length} {suggestions.length === 1 ? 'suggestion' : 'suggestions'}. Press the down arrow to browse them.
+                      </p>
+                      <ul aria-label="Search suggestions" className="grid grid-cols-1 gap-x-8 gap-y-1 md:grid-cols-2 lg:grid-cols-5 lg:gap-x-5">
                         {suggestions.map((p, i) => (
                           <li key={p.id}>
                             <Link
                               href={`/pattern/${p.slug}`}
+                              data-suggest=""
+                              onKeyDown={(e) => {
+                                const all = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-suggest]'))
+                                const at = all.indexOf(e.currentTarget)
+                                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                                  e.preventDefault()
+                                  all[Math.min(all.length - 1, at + 1)]?.focus()
+                                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                                  e.preventDefault()
+                                  if (at <= 0) searchInputRef.current?.focus()
+                                  else all[at - 1]?.focus()
+                                }
+                              }}
                               onClick={closeSearch}
                               className="group flex items-center gap-4 py-2 lg:flex-col lg:items-start lg:gap-3"
                             >
@@ -429,7 +456,7 @@ export function Header() {
                     { href: '/shop', label: 'Shop patterns' },
                     { href: '/shop?sort=newest', label: 'New arrivals' },
                     { href: '/free-crochet-patterns', label: 'Free patterns' },
-                    { href: '/#collections', label: 'Collections' },
+                    { href: '/crochet-patterns-for-beginners', label: 'Beginner patterns' },
                     { href: '/guides', label: 'Guides' },
                     { href: '/about', label: 'Our story' },
                   ].map((l) => (
@@ -551,7 +578,7 @@ function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]
   const row =
     'flex min-h-11 items-center border-b border-border text-[14px] text-ink transition-colors hover:text-violet'
   return (
-    <div className="panel-in absolute left-[-1rem] top-full z-50 pt-3">
+    <div id="shop-menu" className="panel-in absolute left-[-1rem] top-full z-50 pt-3">
       <div className="w-[min(780px,calc(100vw-4rem))] rounded-xl border border-border bg-bg p-7 shadow-card-hover">
         <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-9">
           <div>

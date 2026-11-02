@@ -250,6 +250,12 @@ html {
 }
 
 
+html {
+  /* Anchors and keyboard focus must never end up under the sticky header or the mobile buy bar. */
+  scroll-padding-top: 96px;
+  scroll-padding-bottom: 96px;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);

@@ -102,6 +102,23 @@ export function Shop({
   const [filterDraft, setFilterDraft] = useState<ShopFilterDraft>(emptyDraft)
   useBodyScrollLock(filtersOpen)
 
+  // Light-weight copy of every active pattern (only the fields filters need), so category counts and the
+  // "Show N" button count the whole catalogue instead of the already-filtered list.
+  const [facets, setFacets] = useState<Product[] | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('products')
+      .select('id, category_id, skill_level, price, compare_at_price, is_bundle')
+      .eq('active', true)
+      .then(({ data }) => {
+        if (!cancelled && data) setFacets(data as unknown as Product[])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const currentCategory = categories.find((c) => c.slug === categorySlug)
   const parentCategories = useMemo(
     () => categories.filter((c) => !c.parent_id),
@@ -112,10 +129,10 @@ export function Shop({
       parentCategories.map((c) => {
         const subIds = categories.filter((s) => s.parent_id === c.id).map((s) => s.id)
         const ids = new Set([c.id, ...subIds])
-        const count = products.filter((p) => p.category_id && ids.has(p.category_id)).length
+        const count = (facets ?? products).filter((p) => p.category_id && ids.has(p.category_id)).length
         return { id: c.id, name: c.name, slug: c.slug, count }
       }),
-    [parentCategories, categories, products],
+    [parentCategories, categories, products, facets],
   )
 
   const categoriesKey = useMemo(
@@ -317,18 +334,21 @@ export function Shop({
   }
 
   const draftResultCount = useMemo(() => {
-    // Approximate from currently loaded unfiltered-by-draft products is imperfect;
-    // recompute against last fetch by applying draft client-side on a wider set.
-    // Use current products + reverse isn't available; count against products with
-    // draft skill/price/sale/bundle only (category applied via navigation on Apply).
-    return filterProductsByListingParams(products, {
+    // Counted against the whole catalogue (facets), including the category picked in the draft.
+    const pool = facets ?? products
+    const draftCategory = filterDraft.categorySlug ? categories.find((c) => c.slug === filterDraft.categorySlug) : undefined
+    const categoryIds = draftCategory
+      ? new Set([draftCategory.id, ...categories.filter((c) => c.parent_id === draftCategory.id).map((c) => c.id)])
+      : null
+    const inCategory = categoryIds ? pool.filter((p) => p.category_id && categoryIds.has(p.category_id)) : pool
+    return filterProductsByListingParams(inCategory, {
       levels: filterDraft.levels,
       free: filterDraft.price === 'free',
       paid: filterDraft.price === 'paid',
       sale: filterDraft.sale,
       bundle: filterDraft.bundle,
     }).length
-  }, [products, filterDraft])
+  }, [facets, products, categories, filterDraft])
 
   const applyDraft = () => {
     const qs = new URLSearchParams()

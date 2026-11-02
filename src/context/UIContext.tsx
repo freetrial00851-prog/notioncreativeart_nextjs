@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
-import { hasBeenNewsletterPrompted } from '../lib/newsletterPrompt'
+import { hasBeenNewsletterPrompted, markNewsletterPrompted } from '../lib/newsletterPrompt'
+import { useToast } from './ToastContext'
 
 type RequireAuthAction = { type: 'buy' | 'wishlist' | 'cart'; productId: string }
 type AuthSheetView = 'login' | 'signup'
@@ -31,6 +32,7 @@ const UIContext = createContext<UIContextValue | null>(null)
 
 export function UIProvider({ children }: { children: ReactNode }) {
   const { user, setPendingAction } = useAuth()
+  const { showToast } = useToast()
   const [authSheetOpen, setAuthSheetOpen] = useState(false)
   const [authSheetView, setAuthSheetView] = useState<AuthSheetView>('login')
   const [newsletterPromptOpen, setNewsletterPromptOpen] = useState(false)
@@ -52,10 +54,18 @@ export function UIProvider({ children }: { children: ReactNode }) {
     return false
   }
 
+  // After a free download: a quiet offer in a toast instead of a modal that interrupts the moment.
+  // Asked at most once per visit; the form only opens if the visitor taps the button.
   const maybeOpenNewsletterPrompt = useCallback(() => {
     if (hasBeenNewsletterPrompted()) return
-    setNewsletterPromptOpen(true)
-  }, [])
+    markNewsletterPrompted()
+    showToast(
+      'Want the next free pattern by email?',
+      'info',
+      { label: 'Yes, email me', onClick: () => setNewsletterPromptOpen(true) },
+      9000,
+    )
+  }, [showToast])
 
   const closeNewsletterPrompt = useCallback(() => setNewsletterPromptOpen(false), [])
 
