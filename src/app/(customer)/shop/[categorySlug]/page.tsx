@@ -15,7 +15,9 @@ import {
   virtualShopCategoryTitle,
 } from '@/lib/shopTitle'
 import { Shop } from '@/views/Shop'
+import Link from 'next/link'
 import { CategoryContent } from '@/components/CategoryContent'
+import { CATEGORY_CROSS_LINKS } from '@/lib/categoryCrossLinks'
 import { getShopSeed, getCategoryIntro } from '@/lib/data/products'
 
 type Props = {
@@ -163,6 +165,26 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
       <Suspense fallback={<ShopLoading title={title} />}>
         <Shop initialTitle={title} initialCategoryName={category?.name ?? null} initialProducts={seed?.products} initialCategories={seed?.categories} initialTotal={seed?.total} introText={intro} />
       </Suspense>
+      {seed && seed.total === 0 && CATEGORY_CROSS_LINKS[categorySlug] ? (
+        <section aria-label="Where to find these patterns" className="mx-auto max-w-site page-gutter pb-10">
+          <div className="rounded-xl border border-border bg-surface-warm p-6 md:p-8">
+            <h2 className="font-heading text-[22px] font-semibold leading-snug text-ink md:text-[26px]">Where to find these patterns</h2>
+            <p className="mt-3 max-w-[62ch] text-[15px] leading-relaxed text-muted md:text-[16px]">{CATEGORY_CROSS_LINKS[categorySlug].lead}</p>
+            <ul className="mt-5 flex flex-wrap gap-3">
+              {CATEGORY_CROSS_LINKS[categorySlug].links.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="inline-flex min-h-11 items-center rounded-lg border-2 border-ink px-4 text-[14px] font-bold text-ink transition-colors hover:bg-ink hover:text-white"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
       {onlyPage && pageNum === 1 && category ? <CategoryContent slug={categorySlug} /> : null}
     </>
   )

@@ -26,4 +26,19 @@ export const HOME_FAQ: { question: string; answer: string }[] = [
     answer:
       'Beginner crochet patterns use basic stitches and short steps. Intermediate and Advanced add shaping and finer details. Each product page shows the level.',
   },
+  {
+    question: 'What does amigurumi mean?',
+    answer:
+      'Amigurumi is the Japanese art of crocheting or knitting small stuffed toys, such as animals and characters. Most of our crochet patterns are amigurumi, worked in rounds and stuffed as you finish.',
+  },
+  {
+    question: 'What yarn and hook do I need for these patterns?',
+    answer:
+      'Each pattern lists the yarn and hook size it was written for. Toys are usually crocheted with a smaller hook than the yarn label suggests, so the stuffing does not show through the stitches.',
+  },
+  {
+    question: 'Do the patterns use US or UK crochet terms?',
+    answer:
+      'The Details tab on each listing states the terms used. Our chart of US and UK crochet abbreviations shows how the stitch names differ.',
+  },
 ]

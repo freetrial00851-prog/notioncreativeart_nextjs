@@ -6,13 +6,13 @@ export const abbreviationsGuide: Guide = {
   description:
     'A plain chart of common crochet abbreviations and the US vs UK name for each stitch, so you never work the wrong stitch from a pattern.',
   datePublished: '2026-10-25',
-  dateModified: '2026-10-25',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-read-a-crochet-pattern'],
+  related: ['how-to-read-a-crochet-pattern', 'how-to-read-crochet-symbols-and-charts', 'basic-crochet-stitches-for-beginners'],
   body: [
     {
       type: 'p',
-      text: 'Crochet patterns are written in abbreviations, and the same word can mean a different stitch depending on where the pattern was written. The most common mix-up is "double crochet": in US terms it is one stitch, in UK terms it is a smaller, shorter one. Check which terms your pattern uses before you start, and this chart will help you translate.',
+      text: 'Crochet patterns are written in abbreviations, and the same word can mean a different stitch depending on where the pattern was written. The most common mix-up is "double crochet": in US terms it is one stitch, in UK terms it is a smaller, shorter one. Check which terms your pattern uses before you start, and this chart will help you translate every abbreviation you meet.',
     },
     { type: 'h2', text: 'The one thing to check first' },
     {
@@ -31,10 +31,14 @@ export const abbreviationsGuide: Guide = {
         ['Double crochet', 'dc', 'Treble', 'tr'],
         ['Treble crochet', 'tr', 'Double treble', 'dtr'],
         ['Double treble', 'dtr', 'Triple treble', 'trtr'],
-        ['Skip', 'skip', 'Miss', 'miss'],
+        ['Skip', 'sk', 'Miss', 'miss'],
         ['Yarn over', 'yo', 'Yarn round hook', 'yrh'],
         ['Gauge', 'gauge', 'Tension', 'tension'],
       ],
+    },
+    {
+      type: 'note',
+      text: 'Quick rule: a US stitch name is one step shorter than the UK name with the same letters. US single crochet is UK double crochet, and US double crochet is UK treble.',
     },
     { type: 'h2', text: 'Common abbreviations in any pattern' },
     {
@@ -55,19 +59,58 @@ export const abbreviationsGuide: Guide = {
         ['*  *', 'repeat the part between the asterisks as many times as the pattern says'],
       ],
     },
+    { type: 'h2', text: 'Shaping and position terms' },
+    {
+      type: 'table',
+      head: ['Abbreviation', 'Meaning'],
+      rows: [
+        ['tog', 'together, for example "dc2tog" is two double crochet worked together'],
+        ['inv dec', 'invisible decrease, worked through the front loops only'],
+        ['sp / ch-sp', 'space / chain space, the gap made by one or more chains'],
+        ['beg', 'beginning'],
+        ['rem', 'remaining'],
+        ['pm', 'place marker'],
+        ['lp / lps', 'loop / loops'],
+        ['RS / WS', 'right side / wrong side of the work'],
+        ['FPdc / BPdc', 'front post double crochet / back post double crochet, worked around the post of a stitch'],
+        ['cl', 'cluster, several unfinished stitches closed together'],
+      ],
+    },
+    { type: 'h2', text: 'How to read the brackets, asterisks and counts' },
+    {
+      type: 'p',
+      text: 'Brackets and asterisks save space by telling you to repeat a group. A line such as "Rnd 3: (sc, inc) x 6 (18)" means: work one single crochet, then an increase, and repeat that pair six times. The number in the last brackets, (18), is the total stitches you should have at the end of the round.',
+    },
+    {
+      type: 'p',
+      text: 'Check the arithmetic once and it makes sense. Starting from 12 stitches, each repeat of "sc, inc" uses two stitches and makes three, so six repeats give 18. A decrease line works the opposite way: "Rnd 5: (sc, dec) x 6 (12)" starts with 18 stitches and ends with 12. If your count does not match the number in brackets, stop and recount before the mistake spreads.',
+    },
     { type: 'h2', text: 'Amigurumi: a few terms worth knowing' },
     {
       type: 'ul',
       items: [
         'Amigurumi is usually worked in a continuous spiral, so rounds are not joined and you mark the first stitch of each round with a stitch marker.',
-        'An invisible decrease works through the front loops only, which closes shaping without leaving a gap. Many patterns abbreviate it as "inv dec".',
+        'An invisible decrease works through the front loops only, which closes shaping without leaving a gap. Many patterns abbreviate it as "inv dec". Our guide to the [invisible decrease](/guides/invisible-decrease-amigurumi) shows it step by step.',
         'The number in brackets at the end of a round, for example (18), is the total stitches you should have. Count it each round to catch mistakes early.',
+        'Round 1 of a toy often starts in a magic ring ("MR"), a loop that pulls tight so there is no hole at the center.',
+      ],
+    },
+    { type: 'h2', text: 'Common problems and fixes' },
+    {
+      type: 'table',
+      caption: 'Troubleshooting abbreviations',
+      head: ['What you see', 'Why', 'What to do'],
+      rows: [
+        ['The piece comes out too big and loose', 'A US pattern was worked with UK terms, so every stitch is taller', 'Check the terms at the top of the pattern, then use this chart to translate before you start again'],
+        ['A stitch count does not match the brackets', 'A repeat was missed, or an inc or dec was swapped', 'Recount the round, find where the count went wrong and rework from there'],
+        ['You do not know an abbreviation', 'It is not in the standard list, or it is a designer shorthand', 'Look for the pattern key, usually near the start of the PDF, before you guess'],
+        ['A stitch looks different from the photo', 'The pattern may use post stitches or loops-only stitches', 'Check for BLO, FLO, FPdc or BPdc in that round'],
       ],
     },
     { type: 'h2', text: 'How our patterns are written' },
     {
       type: 'p',
-      text: 'Each pattern states its terms and skill level on its page. If you are new to reading patterns, start with our [guide to reading a crochet pattern](/guides/how-to-read-a-crochet-pattern), then pick a beginner-friendly project from the [free crochet patterns](/free-crochet-patterns) or browse [amigurumi patterns](/shop/amigurumi).',
+      text: 'Each pattern states its terms and skill level on its page. If you are new to reading patterns, start with our [guide to reading a crochet pattern](/guides/how-to-read-a-crochet-pattern), and learn the picture version in [crochet symbols and charts](/guides/how-to-read-crochet-symbols-and-charts). Then pick a beginner-friendly project from the [free crochet patterns](/free-crochet-patterns) or browse [amigurumi patterns](/shop/amigurumi).',
     },
   ],
   faq: [
@@ -78,6 +121,18 @@ export const abbreviationsGuide: Guide = {
     {
       q: 'What happens if I work a US pattern with UK terms?',
       a: 'You will work taller stitches than intended and the piece will come out bigger and looser. For amigurumi the stuffing can show through, so confirm the terms before you start.',
+    },
+    {
+      q: 'What does "inc" mean in a crochet pattern?',
+      a: 'It stands for increase: you work two stitches into the same stitch, which adds one stitch to the round. Increases are how a flat circle grows and how toys get their round shape.',
+    },
+    {
+      q: 'What does "dec" or "sc2tog" mean?',
+      a: 'Both mean a decrease. You work two stitches together so they become one, which removes a stitch from the round. Toys use decreases to close the shape before stuffing.',
+    },
+    {
+      q: 'Where do I find the abbreviation key for a pattern?',
+      a: 'Most written patterns list their abbreviations near the start of the PDF. If a term is missing from the key, check this chart before you guess.',
     },
   ],
 }
