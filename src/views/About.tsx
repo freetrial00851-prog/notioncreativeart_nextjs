@@ -69,6 +69,15 @@ export function About() {
             <Link href="/crochet-patterns-for-beginners" className={LINK_CLASS}>beginner patterns</Link> and our{' '}
             <Link href="/guides" className={LINK_CLASS}>crochet guides</Link>.
           </p>
+          <p>
+            You can also browse the{' '}
+            <Link href="/shop/amigurumi" className={LINK_CLASS}>amigurumi crochet patterns</Link>, the{' '}
+            <Link href="/shop/no-sew-amigurumi" className={LINK_CLASS}>no-sew amigurumi patterns</Link> and the{' '}
+            <Link href="/free-crochet-patterns" className={LINK_CLASS}>free crochet patterns</Link>, which download without an account.
+            For help with a stitch or a term, see{' '}
+            <Link href="/guides/crochet-abbreviations-us-vs-uk" className={LINK_CLASS}>US and UK crochet terms</Link> and{' '}
+            <Link href="/guides/what-is-in-a-pdf-crochet-pattern" className={LINK_CLASS}>how a PDF crochet pattern works</Link>.
+          </p>
         </div>
       </section>
 

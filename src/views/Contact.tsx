@@ -14,6 +14,11 @@ export function Contact() {
         </a>
         <CopyEmailButton email="patterns@notioncreativeart.com" />
       </p>
+      <p>
+        Many questions are already answered: see the <Link href="/faq">FAQ</Link> for orders, downloads and the patterns, the{' '}
+        <Link href="/guides">crochet guides</Link> for stitches and terms, and the <Link href="/refund-policy">refund policy</Link>{' '}
+        if something is not right with an order.
+      </p>
       <h2 className="pt-2 font-heading text-[24px] leading-tight text-ink">Send us a message</h2>
       <ContactForm />
       <p>We typically reply within 1–2 days. Please include your order number if your question is about a purchase.</p>

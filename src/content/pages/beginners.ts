@@ -218,6 +218,11 @@ export const beginnersContent: { body: GuideBlock[]; faq: { q: string; a: string
       type: 'p',
       text: `Paid patterns add what the listing says they do. That can mean more photos, a longer pattern or a bigger finished toy, so read the description for each one. Neither kind is better in every case. Pick the animal you want to make.`,
     },
+    { type: 'h2', text: `Beginner guides to read in order` },
+    {
+      type: 'p',
+      text: `If you want a path to follow, read these guides in this order. Start with [how to crochet for beginners](/guides/how-to-crochet-for-beginners), then learn [how to hold the yarn and hook](/guides/how-to-hold-yarn-and-hook-crochet) and [how to make a slip knot](/guides/how-to-slip-stitch-and-slip-knot). Practice the [single crochet](/guides/how-to-single-crochet), learn the [magic ring](/guides/how-to-make-a-magic-ring-crochet), and keep the [abbreviations chart](/guides/crochet-abbreviations-us-vs-uk) beside you while you read your first pattern. [What is a PDF crochet pattern](/guides/what-is-in-a-pdf-crochet-pattern) explains how to use the file you download, and the guide to [amigurumi sizes](/guides/amigurumi-sizes-mini-small-plush) helps you choose the size of your first toy.`,
+    },
     { type: 'h2', text: `How buying works` },
     {
       type: 'p',

@@ -11,6 +11,7 @@ import {
 } from '@/lib/seo'
 import { getFreeSeed } from '@/lib/data/products'
 import { Shop } from '@/views/Shop'
+import { CategoryContent } from '@/components/CategoryContent'
 
 const PATH = '/free-crochet-patterns'
 const TITLE = 'Free Crochet Patterns (PDF), Instant Download'
@@ -78,6 +79,7 @@ export default async function FreeCrochetPatternsPage({ searchParams }: Props) {
           introText={intro}
         />
       </Suspense>
+      {Object.keys(sp).every((k) => k === 'page') && listingPageFromParams(sp) === 1 ? <CategoryContent slug="free-patterns" /> : null}
     </>
   )
 }

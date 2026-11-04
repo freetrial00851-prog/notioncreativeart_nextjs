@@ -37,6 +37,11 @@ import { amigurumiSizesGuide } from '@/content/guides/amigurumi-sizes-mini-small
 import { joinLimbsGuide } from '@/content/guides/how-to-join-limbs-and-sew-on-parts-amigurumi'
 import { pdfCrochetPatternGuide } from '@/content/guides/what-is-in-a-pdf-crochet-pattern'
 import { amigurumiStuffingGuide } from '@/content/guides/amigurumi-stuffing-fiberfill-and-alternatives'
+import { ukToUsTermsGuide } from '@/content/guides/uk-to-us-crochet-terms-conversion'
+import { frontBackLoopGuide } from '@/content/guides/front-loop-only-and-back-loop-only-crochet'
+import { amigurumiPoseGuide } from '@/content/guides/make-amigurumi-sit-stand-or-pose'
+import { faceplacementGuide } from '@/content/guides/amigurumi-face-placement-and-expression'
+import { yarnAmountGuide } from '@/content/guides/how-much-yarn-for-amigurumi'
 
 /** One piece of an article. Inline links use [text](/path) inside `text` / list items. */
 export type GuideBlock =
@@ -64,7 +69,7 @@ export type Guide = {
 }
 
 /** Explicit list (not a folder scan) so every route is known at build time. */
-const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide, changeColorsGuide, bestYarnGuide, fixMistakesGuide, gaugeSwatchGuide, crochetSymbolsGuide, crochetInTheRoundGuide, fastenOffGuide, leftHandedGuide, joinYarnGuide, resizeAmigurumiGuide, safetyEyesGuide, embroideredFacesGuide, blockingGuide, washCrochetGuide, yarnLabelsGuide, yarnWeightGuide, grannySquareGuide, skillLevelsGuide, crochetVsKnittingGuide, whatIsAmigurumiGuide, holdYarnGuide, simpleBlanketGuide, yarnOverUnderGuide, amigurumiSizesGuide, joinLimbsGuide, pdfCrochetPatternGuide, amigurumiStuffingGuide]
+const GUIDES: Guide[] = [abbreviationsGuide, readingPatternGuide, magicRingGuide, singleCrochetGuide, crochetForBeginnersGuide, stuffAndAssembleGuide, halfDoubleCrochetGuide, doubleCrochetGuide, hookSizesGuide, basicStitchesGuide, invisibleDecreaseGuide, slipStitchGuide, changeColorsGuide, bestYarnGuide, fixMistakesGuide, gaugeSwatchGuide, crochetSymbolsGuide, crochetInTheRoundGuide, fastenOffGuide, leftHandedGuide, joinYarnGuide, resizeAmigurumiGuide, safetyEyesGuide, embroideredFacesGuide, blockingGuide, washCrochetGuide, yarnLabelsGuide, yarnWeightGuide, grannySquareGuide, skillLevelsGuide, crochetVsKnittingGuide, whatIsAmigurumiGuide, holdYarnGuide, simpleBlanketGuide, yarnOverUnderGuide, amigurumiSizesGuide, joinLimbsGuide, pdfCrochetPatternGuide, amigurumiStuffingGuide, ukToUsTermsGuide, frontBackLoopGuide, amigurumiPoseGuide, faceplacementGuide, yarnAmountGuide]
 
 export function getAllGuides(): Guide[] {
   return [...GUIDES].sort((a, b) => b.dateModified.localeCompare(a.dateModified))
