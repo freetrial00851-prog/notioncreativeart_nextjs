@@ -16,11 +16,14 @@ import { MaterialIcon } from './MaterialIcon'
  */
 export function GalleryLightbox({
   images,
+  alts,
   startIndex,
   title,
   onClose,
 }: {
   images: string[]
+  /** Written alt text per image (same order); falls back to the title and photo number. */
+  alts?: string[] | null
   startIndex: number
   title: string
   onClose: () => void
@@ -108,7 +111,7 @@ export function GalleryLightbox({
                 src={deriveVariantUrl(images[idx], 'large')}
                 decoding="async"
                 fetchPriority={off === 0 ? 'high' : 'low'}
-                alt={off === 0 ? `${title}, photo ${idx + 1} of ${count}` : ''}
+                alt={off === 0 ? alts?.[idx]?.trim() || `${title}, photo ${idx + 1} of ${count}` : ''}
                 aria-hidden={off !== 0 || undefined}
                 className="max-h-[92dvh] max-w-[96vw] select-none object-contain"
                 draggable={false}

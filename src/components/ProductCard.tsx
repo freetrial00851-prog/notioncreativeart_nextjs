@@ -14,6 +14,7 @@ import { useToast } from '../context/ToastContext'
 import { getStatusBadge, skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
 import { preloadCartDrawer } from '../lib/overlayChunks'
+import { productImageAlt } from '../lib/productImages'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 
@@ -133,7 +134,7 @@ export function ProductCard({
             <span className="absolute inset-0 block overflow-hidden">
               <Image
                 src={product.images[0]}
-                alt={product.title}
+                alt={productImageAlt(product, 0)}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 priority={priority}

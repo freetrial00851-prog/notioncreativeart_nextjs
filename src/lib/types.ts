@@ -19,6 +19,8 @@ export type Product = {
   compare_at_price: number | null
   category_id: string | null
   images: string[]
+  /** Written alt text, one per image in the same order (null until written). */
+  image_alts?: string[] | null
   pdf_pages: number | null
   materials: string | null
   wishlist_count: number

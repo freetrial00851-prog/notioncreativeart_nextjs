@@ -20,6 +20,7 @@ import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { useSwipeCarousel } from '../lib/useSwipeCarousel'
 import { ProductCardMeta } from './ProductCardMeta'
 import { ProductTagPill } from './ProductTagPill'
+import { productImageAlt } from '../lib/productImages'
 import { skillLevelTagLabel } from '../lib/productCardMeta'
 
 export function QuickView({
@@ -141,7 +142,7 @@ export function QuickView({
                     src={images[idx]}
                     srcSet={`${images[idx]} 640w, ${deriveVariantUrl(images[idx], 'large')} 1000w`}
                     sizes="(max-width: 768px) 100vw, 480px"
-                    alt={off === 0 ? product.title : ''}
+                    alt={off === 0 ? productImageAlt(product, idx) : ''}
                     aria-hidden={off !== 0 || undefined}
                     loading="eager"
                     decoding="async"

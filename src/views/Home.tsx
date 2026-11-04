@@ -25,6 +25,7 @@ import { ProductGridSkeleton } from '../components/Skeleton'
 import { fetchMakerReviewsForHome, type MakerReviewCard } from '../lib/reviews'
 import { HOME_FAQ } from '../lib/homeFaq'
 import { deriveVariantUrl } from '../lib/imageVariants'
+import { productImageAlt } from '../lib/productImages'
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
@@ -160,7 +161,7 @@ export function Home({
     .slice(4)
     .filter((p) => p.images?.[0])
     .slice(0, 2)
-    .map((p) => ({ src: p.images[0], alt: p.title }))
+    .map((p) => ({ src: p.images[0], alt: productImageAlt(p, 0) }))
   const heroTiles = ((): (HeroPhoto | null)[] => {
     const tiles: HeroPhoto[] = []
     const seen = new Set<string>()

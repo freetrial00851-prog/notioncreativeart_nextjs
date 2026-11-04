@@ -19,6 +19,7 @@ import { useToast } from '../context/ToastContext'
 import { downloadFreePattern, triggerPdfDownload } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 import { ga4ViewItem } from '../lib/ga4'
+import { productImageAlt } from '../lib/productImages'
 import { preloadCartDrawer } from '../lib/overlayChunks'
 import { fetchProductReviewStats } from '../lib/reviews'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
@@ -743,7 +744,7 @@ export function ProductDetail({
   return (
     <div className="pb-24 md:pb-0">
       {lightboxOpen && images.length > 0 && (
-        <GalleryLightbox images={images} startIndex={activeImage} title={product.title} onClose={() => setLightboxOpen(false)} />
+        <GalleryLightbox images={images} alts={product.image_alts} startIndex={activeImage} title={product.title} onClose={() => setLightboxOpen(false)} />
       )}
       {/* Hero: gallery + buy box */}
       <section className="max-w-site w-full mx-auto page-gutter pt-4 md:pt-5 pb-8 md:pb-10">
@@ -788,7 +789,7 @@ export function ProductDetail({
                     <div key={idx} className="absolute inset-0" style={{ transform: `translate3d(${off * 100}%,0,0)` }}>
                       <Image
                         src={deriveVariantUrl(images[idx], 'large')}
-                        alt={off === 0 ? (images.length > 1 ? `${product.title}, photo ${idx + 1} of ${images.length}` : product.title) : ''}
+                        alt={off === 0 ? productImageAlt(product, idx) : ''}
                         aria-hidden={off !== 0 || undefined}
                         fill
                         priority={idx === 0 && off === 0}
@@ -882,7 +883,7 @@ export function ProductDetail({
                     >
                       <Image
                         src={deriveVariantUrl(img, 'thumb')}
-                        alt={images.length > 1 ? `${product.title}, photo ${i + 1} of ${images.length}` : product.title}
+                        alt={productImageAlt(product, i)}
                         fill
                         sizes="(max-width: 1023px) 25vw, 140px"
                         className="object-cover"
