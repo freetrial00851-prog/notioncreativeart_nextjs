@@ -6,9 +6,9 @@ export const crochetForBeginnersGuide: Guide = {
   description:
     'A beginner crochet guide: what to buy, how to hold the hook and yarn, the slip knot, chains and slip stitch, a 7-day practice plan and your first project.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'how-to-make-a-magic-ring-crochet', 'how-to-read-a-crochet-pattern'],
+  related: ['how-to-single-crochet', 'how-to-make-a-magic-ring-crochet', 'how-to-read-a-crochet-pattern', 'how-to-fix-mistakes-in-crochet', 'left-handed-crochet-guide'],
   body: [
     {
       type: 'p',
@@ -91,6 +91,22 @@ export const crochetForBeginnersGuide: Guide = {
       type: 'p',
       text: `Tension is how tightly you pull the yarn. If your stitches are very tight, the hook will be hard to push in, and your hands will tire. If they are loose and floppy, the fabric will have holes. Beginners usually start tight. Relax your grip, let the yarn slide through your fingers, and try a hook one size larger while you learn. When your stitches become even, go back to the size the pattern asks for. Changing hook size also changes the size of the finished piece, which is why patterns for fitted clothes ask you to check your gauge.`,
     },
+    { type: 'h2', text: `Words you will meet in your first week` },
+    {
+      type: 'ul',
+      items: [
+        `Working yarn: the strand that leads from your hook to the ball. The tail is the loose end you started with.`,
+        `Yarn over (yo): wrapping the working yarn around the hook once.`,
+        `Turning chain: the chains you make at the end of a row to bring the yarn up to the height of the next row.`,
+        `Right side and wrong side: the front and back of the fabric. Rows alternate direction, so the sides swap as you turn.`,
+        `Foundation chain: the first chain, which every stitch of row 1 is worked into.`,
+        `Frogging: pulling out stitches to redo them. The word comes from "rip it, rip it". Our guide on [how to fix mistakes in crochet](/guides/how-to-fix-mistakes-in-crochet) shows how to do it cleanly.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `If you are left-handed, you can mirror every step in this guide. The [left-handed crochet guide](/guides/left-handed-crochet-guide) explains how to follow right-handed instructions.`,
+    },
     { type: 'h2', text: `Mistakes everyone makes` },
     {
       type: 'ul',
@@ -123,6 +139,14 @@ export const crochetForBeginnersGuide: Guide = {
     },
   ],
   faq: [
+    {
+      q: `Can left-handed people learn to crochet the same way?`,
+      a: `Yes. Hold the hook in your left hand and the yarn in your right, and mirror the steps. Our left-handed crochet guide explains how to follow right-handed instructions.`,
+    },
+    {
+      q: `Why do my crochet edges keep getting wider or narrower?`,
+      a: `Usually a stitch was added or skipped at the start or end of a row. Count your stitches after every row, and remember that the turning chain often does not count as a stitch.`,
+    },
     {
       q: `How long does it take to learn to crochet?`,
       a: `Most people can make a chain and a simple stitch within an hour, and a small flat project within a week of short practice. Toys with increases and shaping take a little longer. Everyone learns at a different speed.`,

@@ -6,13 +6,13 @@ export const joinYarnGuide: Guide = {
   description:
     'Learn how to join a new ball of yarn in crochet: the simple stitch join, the Russian join and the wet splice, plus when to join and how to hide the ends.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-change-colors-in-crochet', 'how-to-fasten-off-and-weave-in-ends', 'how-to-crochet-for-beginners'],
+  related: ['how-to-change-colors-in-crochet', 'how-to-fasten-off-and-weave-in-ends', 'how-to-crochet-for-beginners', 'how-to-crochet-in-the-round', 'how-to-read-yarn-labels'],
   body: [
     {
       type: 'p',
-      text: `Sooner or later your ball of yarn runs out, and you need to join a new one. A good join is almost invisible, strong enough to survive washing and does not leave a lump. There are three common methods: joining in the middle of a stitch, the Russian join, and the wet splice. This guide explains each one, when to use it and how to hide the ends.`,
+      text: `Sooner or later your ball of yarn runs out, and you need to join a new one. A good join is almost invisible, strong enough to survive washing and does not leave a lump. There are three common methods: joining in the middle of a stitch, the Russian join, and the wet splice. This guide explains each one, when to use it and how to hide the ends. These joins work with cotton, acrylic and wool in any stitch, such as single crochet or double crochet, except where noted.`,
     },
     { type: 'h2', text: `When to join` },
     {
@@ -87,6 +87,20 @@ export const joinYarnGuide: Guide = {
         [`Wet splice`, `Untreated wool and animal fibers`, `None`, `Not for superwash, acrylic or cotton.`],
       ],
     },
+    { type: 'h2', text: `Joining yarn in amigurumi and other work in the round` },
+    {
+      type: 'p',
+      text: `In a toy worked in a spiral, there is no row end, so join at the end of a round and keep the join at the back of the body. The tails can then be run inside the stuffed shape, as described in our guide on [how to stuff and assemble amigurumi](/guides/how-to-stuff-and-assemble-amigurumi). If you work in the round, see [how to crochet in the round](/guides/how-to-crochet-in-the-round) for how rounds are counted.`,
+    },
+    {
+      type: 'p',
+      text: `Small parts such as ears and limbs use very little yarn, so check the ball before you start a part rather than in the middle of it. Most amigurumi patterns state the colors and approximate amounts, and the [amigurumi patterns](/shop/amigurumi) in our shop list their materials on each page.`,
+    },
+    { type: 'h2', text: `Check that the yarn matches` },
+    {
+      type: 'p',
+      text: `A join is only invisible if the two yarns are the same. Compare the fiber, weight and dye lot on the labels, as shown in our guide on [how to read yarn labels](/guides/how-to-read-yarn-labels). If you have to change to a slightly different shade, do it at a color change or a seam, where the difference looks planned.`,
+    },
     { type: 'h2', text: `Mistakes to avoid` },
     {
       type: 'ul',
@@ -122,6 +136,18 @@ export const joinYarnGuide: Guide = {
     {
       q: `Is a Russian join strong enough for washing?`,
       a: `It is strong when it is done with plied yarn and the strands are run for 7 to 8 cm inside each other. It is not suited to very thin, fluffy or single-ply yarns.`,
+    },
+    {
+      q: `How do I join yarn in amigurumi?`,
+      a: `Join at the end of a round, using the same method as a color change, and keep the join at the back of the toy. Run the tails inside the stuffed body.`,
+    },
+    {
+      q: `Can I join new yarn in the middle of a row?`,
+      a: `Yes, with the last-stitch method, but the join is easier to hide at the edge. If you must join mid-row, leave longer tails and weave them in well.`,
+    },
+    {
+      q: `How long should the tails be when I join yarn?`,
+      a: `About 10 cm (4 in) is a comfortable length. Shorter tails can pull out before you weave them in.`,
     },
   ],
 }

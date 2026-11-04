@@ -6,9 +6,9 @@ export const resizeAmigurumiGuide: Guide = {
   description:
     'Learn how to resize an amigurumi toy by changing yarn and hook, estimate the new size from your gauge, and adjust eyes and stuffing so the toy still looks right.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['best-yarn-for-amigurumi', 'crochet-hook-sizes-chart', 'crochet-gauge-swatch'],
+  related: ['best-yarn-for-amigurumi', 'crochet-hook-sizes-chart', 'crochet-gauge-swatch', 'amigurumi-sizes-mini-small-plush'],
   body: [
     {
       type: 'p',
@@ -66,6 +66,15 @@ export const resizeAmigurumiGuide: Guide = {
         `Time and yarn: a bigger toy takes longer and needs more yarn. Check the amount before you buy.`,
       ],
     },
+    { type: 'h2', text: `How much more yarn a bigger toy needs` },
+    {
+      type: 'p',
+      text: `The same stitch count uses more yarn when each stitch is bigger. As a rough guide, the length of yarn grows with the size factor, so a toy that comes out about 1.33 times bigger needs roughly a third more yarn by length. Thicker yarn also weighs more per meter, so the weight grows faster than the length. Buy a little extra, because it is easier than finding the same dye lot later.`,
+    },
+    {
+      type: 'p',
+      text: `Check the meters on the label, as explained in our guide to [reading yarn labels](/guides/how-to-read-yarn-labels), and see [how much yarn amigurumi needs](/guides/how-much-yarn-for-amigurumi). For typical finished heights, read [amigurumi sizes: mini, small and plush](/guides/amigurumi-sizes-mini-small-plush).`,
+    },
     { type: 'h2', text: `What not to change` },
     {
       type: 'p',
@@ -97,6 +106,10 @@ export const resizeAmigurumiGuide: Guide = {
     {
       q: `Do I need different eyes for a bigger or smaller toy?`,
       a: `Usually yes. Pick eyes in proportion to the head, pin them and check from a distance before you fix them.`,
+    },
+    {
+      q: `Does a bigger toy need a lot more yarn?`,
+      a: `Yes, somewhat. Each stitch is longer, so the length of yarn grows roughly with the size factor, and thicker yarn is heavier per meter. Check the meters on the label and buy a little extra.`,
     },
     {
       q: `Can I make a toy smaller for a keychain?`,

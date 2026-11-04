@@ -6,9 +6,9 @@ export const halfDoubleCrochetGuide: Guide = {
   description:
     'Learn the half double crochet (hdc) stitch step by step: foundation chain, first row, turning chains, how it compares with sc and dc, and common mistakes.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'how-to-crochet-for-beginners', 'crochet-abbreviations-us-vs-uk'],
+  related: ['how-to-single-crochet', 'how-to-crochet-for-beginners', 'crochet-abbreviations-us-vs-uk', 'how-to-double-crochet', 'front-loop-only-and-back-loop-only-crochet'],
   body: [
     {
       type: 'p',
@@ -85,6 +85,15 @@ export const halfDoubleCrochetGuide: Guide = {
         [`The stitches lean`, `Your tension changes between the loops`, `Keep your hand position steady, and hold the yarn the same way each time.`],
       ],
     },
+    { type: 'h2', text: `Half double crochet texture: the third loop` },
+    {
+      type: 'p',
+      text: `Look at the top of a finished hdc and you can see a third loop, a horizontal bar just below the top V on the side facing you. Working into that bar only is called third loop hdc. It gives a knit-like ribbed texture and is used for hat brims and cuffs, because the fabric stretches across the rows. It is a good next skill once the basic stitch feels steady. The same idea of choosing a loop is covered in [front loop only and back loop only crochet](/guides/front-loop-only-and-back-loop-only-crochet).`,
+    },
+    {
+      type: 'p',
+      text: `Hdc also sits beside the [double crochet](/guides/how-to-double-crochet) when you want a fabric that is quicker than single crochet but less open than double crochet. Swatch both with your yarn and hook, then pick the one that drapes the way you like.`,
+    },
     { type: 'h2', text: `Half double crochet in the round` },
     {
       type: 'p',
@@ -125,6 +134,18 @@ export const halfDoubleCrochetGuide: Guide = {
     {
       q: `Is half double crochet good for beginners?`,
       a: `Yes, once you are comfortable with the chain and the single crochet. It uses the same motions with one extra yarn over, and it is useful for hats, scarves and blankets.`,
+    },
+    {
+      q: `What is the third loop in half double crochet?`,
+      a: `It is the horizontal bar below the top V on the side facing you. Working into it instead of the V creates a ribbed texture with more stretch, which suits hat brims and cuffs.`,
+    },
+    {
+      q: `Why do I get 3 loops on the hook in hdc?`,
+      a: `The first yarn over adds one loop, and pulling up a loop through the stitch adds another, so with the loop already there you have three. Pull through all 3 at once.`,
+    },
+    {
+      q: `Is hdc a good stitch for amigurumi?`,
+      a: `It can be used for larger, softer toys, but most amigurumi uses single crochet because it is denser. Use the stitch your pattern lists.`,
     },
   ],
 }

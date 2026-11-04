@@ -6,9 +6,9 @@ export const holdYarnGuide: Guide = {
   description:
     'Learn how to hold a crochet hook and yarn: pencil and knife grip, three yarn tension methods, a fix-it table and a one-week practice plan.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'crochet-gauge-swatch', 'left-handed-crochet-guide'],
+  related: ['how-to-single-crochet', 'crochet-gauge-swatch', 'left-handed-crochet-guide', 'how-to-crochet-in-the-round', 'how-to-read-yarn-labels'],
   body: [
     {
       type: 'p',
@@ -108,6 +108,16 @@ export const holdYarnGuide: Guide = {
         `Stop if you feel pain, tingling or numbness. If it comes back or does not go away, take a longer break and see a doctor or other health professional.`,
       ],
     },
+    { type: 'h2', text: `How your hook and yarn affect grip` },
+    {
+      type: 'p',
+      text: `The tools change how a grip feels. Hooks come in metal, plastic, bamboo and wood, and some have a thicker or cushioned handle. Smooth metal lets yarn glide, which suits a firm tension, while bamboo and wood grip the yarn a little more and can help if your stitches slip. A thicker handle can ease a tired hand during long sessions. Yarn matters too: slippery or fuzzy fibers behave differently under the same finger wrap, and our [guide to reading yarn labels](/guides/how-to-read-yarn-labels) explains weight and recommended hook size.`,
+    },
+    { type: 'h2', text: `Tension for flat work and for rounds` },
+    {
+      type: 'p',
+      text: `A blanket or scarf can have relaxed, drapey tension. Work in the round for toys, and you want it firmer, because loose stitches let stuffing show. Try your usual hold on a small circle first. If the fabric looks gappy, tighten your yarn wrap or drop a hook size rather than squeezing the hook harder. The steps are in our guide to [crocheting in the round](/guides/how-to-crochet-in-the-round).`,
+    },
     { type: 'h2', text: `Common tension problems and fixes` },
     {
       type: 'table',
@@ -160,6 +170,14 @@ export const holdYarnGuide: Guide = {
     {
       q: `How long does it take to get even tension?`,
       a: `It varies by person, but many people see steadier stitches after a few weeks. Short daily sessions work better than one long one.`,
+    },
+    {
+      q: `How tight should my tension be for amigurumi?`,
+      a: `Firm enough that you cannot see the stuffing through the stitches, but not so tight that the hook is hard to insert. A smaller hook usually helps more than a stronger grip.`,
+    },
+    {
+      q: `Does the hook material change my tension?`,
+      a: `It can. Smooth metal hooks let yarn glide, while bamboo and wood hold it a little more. Try a few and keep the one that suits your hands.`,
     },
     {
       q: `Can I change how I hold the yarn halfway through a project?`,

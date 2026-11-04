@@ -6,9 +6,9 @@ export const doubleCrochetGuide: Guide = {
   description:
     'Learn the double crochet (dc) stitch step by step: the foundation chain, first row, turning chain of 3, counting stitches, and how to fix common mistakes.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-half-double-crochet', 'how-to-single-crochet', 'crochet-abbreviations-us-vs-uk'],
+  related: ['how-to-half-double-crochet', 'how-to-single-crochet', 'crochet-abbreviations-us-vs-uk', 'basic-crochet-stitches-for-beginners', 'how-to-crochet-in-the-round'],
   body: [
     {
       type: 'p',
@@ -89,6 +89,20 @@ export const doubleCrochetGuide: Guide = {
         [`You cannot find the 3 loops`, `The yarn over was dropped`, `Slow down, and check that the yarn is over the hook before you put it into the stitch.`],
       ],
     },
+    { type: 'h2', text: `Increasing and decreasing in double crochet` },
+    {
+      type: 'p',
+      text: `To increase, work 2 double crochets into the same stitch. Patterns write this as "2 dc in next st" or "dc inc". To decrease, use dc2tog (double crochet 2 together): work a double crochet until 2 loops remain on the hook, work a second one into the next stitch the same way, and you have 3 loops on the hook. Then yarn over and pull through all 3 loops. Two stitches become one, so the row gets 1 stitch shorter.`,
+    },
+    {
+      type: 'p',
+      text: `Increases and decreases are how you shape a shawl edge, a hat or a flat circle. For a circle, see [how to crochet in the round](/guides/how-to-crochet-in-the-round), which lists the 12 stitches per round that double crochet needs to stay flat.`,
+    },
+    { type: 'h2', text: `Where to go after double crochet` },
+    {
+      type: 'p',
+      text: `Once the stitch feels easy, two natural next steps are the treble crochet, which has an extra yarn over at the start and so is taller still, and post stitches, where you work around the post of a stitch instead of under its top V. You can read about the stitch just below it in height in [how to half double crochet](/guides/how-to-half-double-crochet), and see more stitches in one place in [basic crochet stitches for beginners](/guides/basic-crochet-stitches-for-beginners).`,
+    },
     { type: 'h2', text: `What you can make with double crochet` },
     {
       type: 'ul',
@@ -120,6 +134,14 @@ export const doubleCrochetGuide: Guide = {
     {
       q: `Why are my double crochet edges uneven?`,
       a: `Usually because the first or the last stitch is missed or doubled. Skip the stitch under the turning chain at the start of the row, and put the last stitch in the top of the turning chain at the end.`,
+    },
+    {
+      q: `How do I decrease in double crochet?`,
+      a: `Use dc2tog: start a double crochet in one stitch and stop with 2 loops on the hook, start another in the next stitch, then yarn over and pull through all 3 loops.`,
+    },
+    {
+      q: `Can I use double crochet for amigurumi?`,
+      a: `Rarely. Toy patterns mostly use single crochet because it makes a dense fabric that holds stuffing. The tall, open fabric of double crochet can let stuffing show through.`,
     },
     {
       q: `Is double crochet harder than single crochet?`,

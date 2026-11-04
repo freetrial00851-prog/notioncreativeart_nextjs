@@ -230,3 +230,24 @@ export async function getCategoryIntro(slug: string): Promise<string | null> {
 export const getShopSeed = unstable_cache(getShopSeedUncached, ['shop-seed-v1'], { revalidate: 60, tags: ['products'] })
 export const getFreeSeed = unstable_cache(getFreeSeedUncached, ['free-seed-v1'], { revalidate: 60, tags: ['products'] })
 export const getBeginnerSeed = unstable_cache(getBeginnerSeedUncached, ['beginner-seed-v1'], { revalidate: 60, tags: ['products'] })
+
+/** Active patterns whose title contains any of the given words, newest first (used by the animal and keychain hubs). */
+async function getProductsByTermsUncached(terms: string[], limit: number): Promise<Product[]> {
+  try {
+    const supabase = createStaticClient()
+    const clauses = terms.map((t) => `title.ilike.%${t.replace(/[%,()]/g, '')}%`).join(',')
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .eq('active', true)
+      .is('deleted_at', null)
+      .or(clauses)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+    return (data as Product[]) ?? []
+  } catch {
+    return []
+  }
+}
+
+export const getProductsByTerms = unstable_cache(getProductsByTermsUncached, ['products-by-terms-v1'], { revalidate: 300, tags: ['products'] })

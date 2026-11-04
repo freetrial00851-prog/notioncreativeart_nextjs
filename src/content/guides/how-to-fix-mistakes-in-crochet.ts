@@ -6,9 +6,9 @@ export const fixMistakesGuide: Guide = {
   description:
     'Learn how to fix crochet mistakes: rip back (frog) neatly, find a wrong stitch count, use a lifeline, and decide when a small mistake can be left alone.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'how-to-crochet-for-beginners', 'how-to-read-a-crochet-pattern'],
+  related: ['how-to-single-crochet', 'how-to-crochet-for-beginners', 'how-to-read-a-crochet-pattern', 'how-to-crochet-in-the-round', 'how-to-fasten-off-and-weave-in-ends'],
   body: [
     {
       type: 'p',
@@ -70,6 +70,24 @@ export const fixMistakesGuide: Guide = {
         `If you have to rip back, undo the work down to the lifeline. Then put your hook back into the stitches the thread is holding, one at a time.`,
       ],
     },
+    { type: 'h2', text: `Fixing holes, loose stitches and a dropped loop` },
+    {
+      type: 'p',
+      text: `Sometimes the loop falls off the hook and the row above it starts to loosen. Do not panic. Put the hook back into the loop that is now the last stitch, with the yarn coming from the back, and tighten it to the size of its neighbors. Check that the loop sits the same way as the others, not twisted.`,
+    },
+    {
+      type: 'ul',
+      items: [
+        `A small hole between stitches: usually a skipped stitch or a loose tension. If the work is a toy, weave the nearby yarn tail across the gap with a yarn needle to pull it closed.`,
+        `A hole where you changed yarn or joined a round: tighten the stitches on each side with the tip of the needle, then weave the tail in two directions. See [how to fasten off and weave in ends](/guides/how-to-fasten-off-and-weave-in-ends).`,
+        `One loose stitch in a finished piece: pull the slack through the neighboring stitches with a hook or needle until it matches.`,
+      ],
+    },
+    { type: 'h2', text: `Reading your stitches to catch errors early` },
+    {
+      type: 'p',
+      text: `Learn to recognize the V shape of a single crochet from the front. If a V is missing or doubled, you can see it a row later, when it is easy to fix. In the round, use the same check every round. Count against the number in brackets, as explained in [how to crochet in the round](/guides/how-to-crochet-in-the-round), and a wrong count shows before the shape is lost.`,
+    },
     { type: 'h2', text: `When to leave a mistake` },
     {
       type: 'p',
@@ -107,6 +125,14 @@ export const fixMistakesGuide: Guide = {
     {
       q: `Should I fix every mistake?`,
       a: `No. If a mistake does not change the size, shape or strength of the piece, and you are happy with how it looks, you can leave it. Fix mistakes that change the stitch count, the fit or the shape.`,
+    },
+    {
+      q: `How do I pick up a dropped stitch in crochet?`,
+      a: `Put the hook into the loop that is now the last stitch, from front to back, and tighten it to match the neighbors. If several stitches have come undone, rip back to the last correct stitch.`,
+    },
+    {
+      q: `Why does my crochet have holes?`,
+      a: `Common causes are skipped stitches, a loose turning chain, or a hook that is too big for the yarn. Count the stitches, even out the tension, and try a smaller hook if the fabric is too open.`,
     },
     {
       q: `How do I stop the yarn from tangling when I rip back?`,

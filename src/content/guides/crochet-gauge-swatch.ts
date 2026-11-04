@@ -6,9 +6,9 @@ export const gaugeSwatchGuide: Guide = {
   description:
     'Learn how to make and measure a crochet gauge swatch, work out the right hook size, and see why gauge matters for hats, clothes and anything that must fit.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['crochet-hook-sizes-chart', 'how-to-single-crochet', 'how-to-read-a-crochet-pattern'],
+  related: ['crochet-hook-sizes-chart', 'how-to-single-crochet', 'how-to-read-a-crochet-pattern', 'yarn-weight-chart', 'how-to-crochet-in-the-round'],
   body: [
     {
       type: 'p',
@@ -71,6 +71,15 @@ export const gaugeSwatchGuide: Guide = {
       type: 'p',
       text: `Patterns for clothes list the finished measurements and the number of stitches for each size. If your gauge is slightly different, you can choose a size that matches your own gauge by dividing the finished width by your stitches per 10 cm. When in doubt, choose the size that matches your measurement, and then check the fit as you work, which is easy with crochet because you can try the piece on and rip back if you need to. Our guide on [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern) explains the notation.`,
     },
+    { type: 'h2', text: `Swatching in the round and common gauge terms` },
+    {
+      type: 'p',
+      text: `If your project is worked in the round, such as a hat, make a small tube or a flat circle instead of a flat square, because working in rounds changes the way the stitches sit. Count stitches per 10 cm along a round and rows or rounds per 10 cm up the side. In patterns, you may see "gauge", "tension" and "stitch count" used for the same idea. Gauge also depends on the stitch, so a swatch in single crochet will not match one in half double crochet. See [how to crochet in the round](/guides/how-to-crochet-in-the-round) and [how to half double crochet](/guides/how-to-half-double-crochet).`,
+    },
+    {
+      type: 'p',
+      text: `Write down the hook, yarn and counts you got on a tag, and keep the swatch with your yarn. Then you can see later why one hook worked and another did not, and the [yarn weight chart](/guides/yarn-weight-chart) helps you pick a starting hook.`,
+    },
     { type: 'h2', text: `Swatches for toys` },
     {
       type: 'p',
@@ -101,6 +110,18 @@ export const gaugeSwatchGuide: Guide = {
     {
       q: `Which hook should I use if my swatch has too many stitches?`,
       a: `A bigger one. More stitches in 10 cm means your stitches are smaller than the pattern's, so go up a hook size and test again.`,
+    },
+    {
+      q: `Is gauge the same as tension?`,
+      a: `The words are often used for the same thing. Tension is how tightly you pull the yarn, and gauge is the resulting stitches and rows per 10 cm (4 in).`,
+    },
+    {
+      q: `How big should a gauge swatch be?`,
+      a: `At least 15 cm (6 in) square if you measure over 10 cm (4 in), so the edge stitches do not affect your count.`,
+    },
+    {
+      q: `Do I need a gauge swatch for amigurumi?`,
+      a: `Not for an exact size, but work a few rounds and check that the stuffing does not show through. If it does, use a smaller hook.`,
     },
   ],
 }

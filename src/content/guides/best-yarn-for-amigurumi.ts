@@ -6,9 +6,9 @@ export const bestYarnGuide: Guide = {
   description:
     'How to choose yarn for amigurumi: cotton, acrylic, blends and plush yarn compared, which weight to pick, what to avoid and how to test a yarn before you start.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['crochet-hook-sizes-chart', 'how-to-stuff-and-assemble-amigurumi', 'how-to-crochet-for-beginners'],
+  related: ['crochet-hook-sizes-chart', 'how-to-stuff-and-assemble-amigurumi', 'how-to-crochet-for-beginners', 'yarn-weight-chart', 'how-to-read-yarn-labels'],
   body: [
     {
       type: 'p',
@@ -83,6 +83,21 @@ export const bestYarnGuide: Guide = {
       type: 'p',
       text: `A small toy uses only a little yarn, often less than one ball. The pattern lists the amount, or the main colors needed, in the materials section. If it does not, buy a little more than you think you need for the main color, because a second ball of the same dye lot can be hard to match later. Our [crochet patterns for beginners](/crochet-patterns-for-beginners) list the materials before you download.`,
     },
+    { type: 'h2', text: `Choosing yarn for the look you want` },
+    {
+      type: 'ul',
+      items: [
+        `Crisp, defined shapes: smooth plied cotton or acrylic, which shows each single crochet stitch clearly.`,
+        `Soft, cuddly toys: a plush or chenille yarn, with a hook a little larger than for smooth yarn.`,
+        `Fur or fluffy details: use a fuzzy yarn only for small parts such as tails or ears, and keep the body in smooth yarn.`,
+        `Color work: solid colors show stripes and patches clearly, while variegated yarn blurs the shaping and the face.`,
+        `Tiny details and mini toys: a thinner yarn such as fingering or sport, with a small hook.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `Check the label for the weight number, and see our [yarn weight chart](/guides/yarn-weight-chart) to compare categories. For the face, [safety eyes](/guides/safety-eyes-for-amigurumi) and embroidery both work with smooth yarn, and our guide to [how much yarn for amigurumi](/guides/how-much-yarn-for-amigurumi) helps you plan the amount.`,
+    },
     { type: 'h2', text: `Mistakes to avoid` },
     {
       type: 'ul',
@@ -119,6 +134,18 @@ export const bestYarnGuide: Guide = {
     {
       q: `Do I need a special yarn for toys for children?`,
       a: `Choose a soft, washable yarn and check the label. For babies, embroider the eyes, and check the toy safety rules for your country.`,
+    },
+    {
+      q: `What is mercerized cotton and is it good for amigurumi?`,
+      a: `Mercerized cotton is cotton treated to make it smoother and shinier. Many makers like it for amigurumi because the stitches look crisp and the surface has little fuzz.`,
+    },
+    {
+      q: `Can I use leftover yarn for amigurumi?`,
+      a: `Yes, if the pieces are the same weight and fiber type, so they wash and wear alike. Leftovers are well suited to small toys, accents and keychains.`,
+    },
+    {
+      q: `Why does my amigurumi look fuzzy?`,
+      a: `Loosely spun or brushed yarn, or a rough hook head, can raise fuzz, and some acrylics pill with handling. A smooth, tightly plied yarn gives a cleaner surface.`,
     },
   ],
 }

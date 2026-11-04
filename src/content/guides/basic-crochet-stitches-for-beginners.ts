@@ -6,13 +6,13 @@ export const basicStitchesGuide: Guide = {
   description:
     'The basic crochet stitches in one place: chain, slip stitch, single, half double and double crochet, with abbreviations, US and UK names and when to use each.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'how-to-half-double-crochet', 'how-to-double-crochet'],
+  related: ['how-to-single-crochet', 'how-to-half-double-crochet', 'how-to-double-crochet', 'how-to-slip-stitch-and-slip-knot', 'crochet-hook-sizes-chart'],
   body: [
     {
       type: 'p',
-      text: `Almost everything in crochet is made from a small set of basic stitches. If you learn the chain, the slip stitch, the single crochet, the half double crochet and the double crochet, you can follow most beginner patterns. This page lists each stitch with its abbreviation, a short description of how it is made, and the projects it suits. For the full step-by-step instructions, follow the link under each stitch.`,
+      text: `Almost everything in crochet is made from a small set of basic stitches. If you learn the chain, the slip stitch, the single crochet, the half double crochet and the double crochet, you can follow most beginner patterns. This page lists each stitch with its abbreviation, a short description of how it is made, and the projects it suits. For the full step-by-step instructions, follow the link under each stitch. Whatever the stitch, the tools are the same: a crochet hook, a ball of yarn, scissors and a yarn needle for weaving in ends.`,
     },
     { type: 'h2', text: `The basic stitches at a glance` },
     {
@@ -79,6 +79,25 @@ export const basicStitchesGuide: Guide = {
       type: 'p',
       text: `The top of every stitch has a V made of two loops: a front loop closest to you, and a back loop farther away. Unless a pattern says otherwise, you put the hook under both loops. Some patterns ask you to work in the back loop only (blo) or the front loop only (flo). Working in one loop creates a ridge, which is used for ribbing, textured fabric and for turning a flat shape into a corner.`,
     },
+    { type: 'h2', text: `Turning chains and stitch height` },
+    {
+      type: 'p',
+      text: `When you work in rows, you chain a few stitches at the end of each row to lift the yarn to the height of the next row. This is the turning chain, and the taller the stitch, the longer the chain. Patterns often tell you whether it counts as a stitch, so read that note before you count.`,
+    },
+    {
+      type: 'table',
+      caption: `Typical turning chain by stitch (US terms)`,
+      head: [`Stitch`, `Turning chain`, `Yarn overs before the hook enters the stitch`],
+      rows: [
+        [`Single crochet`, `1`, `0`],
+        [`Half double crochet`, `2`, `1`],
+        [`Double crochet`, `3`, `1`],
+      ],
+    },
+    {
+      type: 'p',
+      text: `Past the double crochet there are taller stitches, such as the treble crochet (tr in US terms), which wraps the yarn twice before entering the stitch. They are used in lace, shells and shawls. Most beginner and amigurumi patterns need only the stitches above. A hook that suits your yarn matters as much as the stitch, so see the [crochet hook sizes chart](/guides/crochet-hook-sizes-chart).`,
+    },
     { type: 'h2', text: `Which stitch for which project` },
     {
       type: 'table',
@@ -128,6 +147,18 @@ export const basicStitchesGuide: Guide = {
     {
       q: `How long does it take to learn all the basic stitches?`,
       a: `Most people can make all five within a week of short practice sessions. It takes longer to make them smooth and even, which comes with practice.`,
+    },
+    {
+      q: `What is a turning chain in crochet?`,
+      a: `It is a short chain worked at the end of a row to bring the yarn up to the height of the next row. Single crochet usually uses 1, half double crochet 2 and double crochet 3. Your pattern says whether it counts as a stitch.`,
+    },
+    {
+      q: `Can I make amigurumi with only single crochet?`,
+      a: `Yes. Many toy patterns use only single crochet, increases and decreases, plus a magic ring to start. Some also add a slip stitch to finish a round or a chain for small parts.`,
+    },
+    {
+      q: `What is the easiest crochet stitch for a complete beginner?`,
+      a: `The chain is the simplest motion, and the single crochet is the easiest stitch to make a fabric with. Learn those two first, then move to the taller stitches.`,
     },
   ],
 }

@@ -6,9 +6,9 @@ export const crochetVsKnittingGuide: Guide = {
   description:
     'Crochet vs knitting compared: tools, how the fabric is made, look and feel, speed, yarn use and fixing mistakes, plus which craft to learn first.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-crochet-for-beginners', 'what-is-amigurumi', 'how-to-fix-mistakes-in-crochet'],
+  related: ['how-to-crochet-for-beginners', 'what-is-amigurumi', 'how-to-fix-mistakes-in-crochet', 'crochet-abbreviations-us-vs-uk'],
   body: [
     {
       type: 'p',
@@ -62,6 +62,15 @@ export const crochetVsKnittingGuide: Guide = {
       type: 'p',
       text: `Crochet is generally easier to undo. Because only one loop is live, you can pull the yarn and unravel stitches back to the error, then put the hook back into the last loop. In knitting a dropped stitch can run down several rows if it is not caught, and fixing it takes a crochet hook or a little practice. That is one reason many knitters keep a hook nearby. Our guide on [how to fix mistakes in crochet](/guides/how-to-fix-mistakes-in-crochet) covers frogging and repairs.`,
     },
+    { type: 'h2', text: `Terms, stitches and pattern language` },
+    {
+      type: 'p',
+      text: `The two crafts use different vocabulary. Knitters cast on, knit, purl and bind off, and produce stockinette or garter stitch. Crocheters make a foundation chain and work single crochet, half double crochet, double crochet and slip stitch. Crochet patterns also come in US and UK terminology, where the same name can mean a different stitch, so check which one a pattern uses. Our [US vs UK crochet abbreviations](/guides/crochet-abbreviations-us-vs-uk) guide lists the differences, and [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern) explains the notation.`,
+    },
+    {
+      type: 'p',
+      text: `Both crafts use yarn, so the same yarn weights and fibers work for either, though the recommended hook or needle size differs. Crochet also pairs well with knitting: many knitters add a crocheted edge or a cast-off with a hook.`,
+    },
     { type: 'h2', text: `Best uses of each craft` },
     {
       type: 'ul',
@@ -104,6 +113,14 @@ export const crochetVsKnittingGuide: Guide = {
     {
       q: `Does crochet use more yarn than knitting?`,
       a: `Generally yes, because crochet stitches are thicker and loop back on themselves, so the same area of fabric takes more yarn. The difference depends on the stitch pattern, so buy a little extra for garments.`,
+    },
+    {
+      q: `Which is better for stuffed toys, crochet or knitting?`,
+      a: `Crochet is more common for toys because the dense fabric holds stuffing well and shapes are easy to build in the round. This style of stuffed toy is called amigurumi.`,
+    },
+    {
+      q: `Do crochet and knitting use the same yarn?`,
+      a: `Yes, the same yarn weights and fibers work for both. The hook or needle size changes, so check the yarn label and your pattern.`,
     },
     {
       q: `Can I do both crochet and knitting?`,

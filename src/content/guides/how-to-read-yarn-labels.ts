@@ -6,9 +6,9 @@ export const yarnLabelsGuide: Guide = {
   description:
     'Learn how to read a yarn label: weight number, fiber, grams, yardage, hook size, gauge, care symbols and dye lot, plus how many balls a project needs.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['best-yarn-for-amigurumi', 'crochet-gauge-swatch', 'how-to-read-a-crochet-pattern'],
+  related: ['best-yarn-for-amigurumi', 'crochet-gauge-swatch', 'how-to-read-a-crochet-pattern', 'yarn-weight-chart', 'how-to-wash-crochet-and-amigurumi'],
   body: [
     {
       type: 'p',
@@ -115,6 +115,21 @@ export const yarnLabelsGuide: Guide = {
         `Wind the yarn into a ball around your fingers, turning the ball often and winding loosely so the yarn keeps its stretch.`,
       ],
     },
+    { type: 'h2', text: `What to check on a label for amigurumi` },
+    {
+      type: 'ul',
+      items: [
+        `Weight category: match the one your pattern names, usually 3 or 4, so the toy comes out the size shown.`,
+        `Fiber: a smooth, plied cotton or acrylic keeps stitches crisp, while a fuzzy or loosely spun yarn can split and hide the stitches.`,
+        `Care symbols: toys get handled, so choose yarn you can wash. Cotton and acrylic usually tolerate more washing than wool.`,
+        `Yardage: small toys often need only part of a ball, so compare the length with the amount in your pattern's materials list.`,
+        `Dye lot: buy the main color for one toy in one lot, since a visible band across a head or body is hard to hide.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `Our guide to [how much yarn for amigurumi](/guides/how-much-yarn-for-amigurumi) helps with the amount, and [how to wash crochet and amigurumi](/guides/how-to-wash-crochet-and-amigurumi) explains what the care symbols mean in practice.`,
+    },
     { type: 'h2', text: `Common problems and fixes` },
     {
       type: 'table',
@@ -152,6 +167,18 @@ export const yarnLabelsGuide: Guide = {
     {
       q: `Do I have to use the hook size on the label?`,
       a: `No. It is a suggestion for general crochet. Use the hook your pattern names, and for amigurumi go smaller than the label suggests so the stitches are tight.`,
+    },
+    {
+      q: `How do I convert yards to meters on a yarn label?`,
+      a: `Multiply yards by 0.9144 to get meters, or divide meters by 0.9144 to get yards. For a quick estimate, meters are about 10 percent less than yards.`,
+    },
+    {
+      q: `What does the crochet hook symbol on a yarn label mean?`,
+      a: `It shows the suggested hook size for general crochet, usually in mm and US sizes. It is a starting point, so swatch and adjust for your own tension.`,
+    },
+    {
+      q: `Can I use yarn with no label?`,
+      a: `Yes, but you lose the weight, yardage and care information. Estimate the weight with a wraps-per-inch check, make a swatch, and wash a swatch before you wash a finished piece.`,
     },
   ],
 }

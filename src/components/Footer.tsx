@@ -8,6 +8,8 @@ const EXPLORE = [
   { label: 'Bundles', to: '/shop/bundles' },
   { label: 'Free patterns', to: '/free-crochet-patterns' },
   { label: 'Beginner patterns', to: '/crochet-patterns-for-beginners' },
+  { label: 'Amigurumi animals', to: '/amigurumi-animals' },
+  { label: 'Keychains and minis', to: '/mini-amigurumi-and-keychains' },
   { label: 'Crochet guides', to: '/guides' },
 ]
 

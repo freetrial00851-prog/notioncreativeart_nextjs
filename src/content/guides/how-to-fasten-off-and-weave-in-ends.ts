@@ -6,9 +6,9 @@ export const fastenOffGuide: Guide = {
   description:
     'Learn how to fasten off a crochet project, weave in yarn tails so they do not come loose, and hide ends in flat work and in stuffed amigurumi toys.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-stuff-and-assemble-amigurumi', 'how-to-change-colors-in-crochet', 'how-to-crochet-for-beginners'],
+  related: ['how-to-stuff-and-assemble-amigurumi', 'how-to-change-colors-in-crochet', 'how-to-crochet-for-beginners', 'how-to-join-limbs-and-sew-on-parts-amigurumi', 'how-to-wash-crochet-and-amigurumi'],
   body: [
     {
       type: 'p',
@@ -55,6 +55,15 @@ export const fastenOffGuide: Guide = {
     {
       type: 'p',
       text: `In a stuffed toy, tails can be hidden inside the body, which is faster and neater. Thread the tail onto the needle, and push the needle in at the end of the piece, then bring it out several stitches away through the body. Pull the yarn gently, trim it close to the surface and let the fabric spring back so the end vanishes into the stuffing. For small pieces such as ears and limbs, use the long tail to sew the piece on, and then hide the end in the body. The finishing steps for toys are in our guide on [how to stuff and assemble amigurumi](/guides/how-to-stuff-and-assemble-amigurumi).`,
+    },
+    { type: 'h2', text: `Making ends secure on stuffed pieces` },
+    {
+      type: 'p',
+      text: `A toy gets squeezed and handled, so its ends need a firmer lock than a flat scarf. Before you stuff the last section, weave the tail through the inside of the piece in one direction, then back in another, for at least 6 to 8 stitches in all. A tail that runs through several stitches grips the fibers and is much harder to pull out than one passed through a single stitch.`,
+    },
+    {
+      type: 'p',
+      text: `For a closed amigurumi piece, you can also pass the needle through the front loops of the last round, pull gently to close the opening, and then take the tail into the body. Small items such as keychains and charms are pulled on more than most, so give them extra stitches of weaving, and check that the loop or ring is sewn on firmly. The [invisible decrease](/guides/invisible-decrease-amigurumi) helps here, because a neat closure leaves less to hide. For sewing pieces on with those long tails, see [how to join limbs and sew on parts](/guides/how-to-join-limbs-and-sew-on-parts-amigurumi), and for care afterward, [how to wash crochet and amigurumi](/guides/how-to-wash-crochet-and-amigurumi).`,
     },
     { type: 'h2', text: `Ends at a color change` },
     {
@@ -104,6 +113,14 @@ export const fastenOffGuide: Guide = {
     {
       q: `How do I hide the ends in a toy?`,
       a: `Run the tail inside the stuffed body, bring the needle out a few stitches away, pull gently and trim close to the surface. The fabric springs back and hides the end.`,
+    },
+    {
+      q: `Do I need to fasten off between pieces of an amigurumi?`,
+      a: `Yes. Each piece, such as an ear, arm or leg, is fastened off when it is finished, and the tail is left long enough to sew it to the body. Check the pattern for the tail length.`,
+    },
+    {
+      q: `Can I weave in ends before I wash a crochet piece?`,
+      a: `Yes, and you should. Weave them in first, in two directions, then wash the piece as the yarn label says.`,
     },
     {
       q: `Why do the tails come out after I wash my project?`,

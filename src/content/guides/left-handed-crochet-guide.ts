@@ -6,13 +6,13 @@ export const leftHandedGuide: Guide = {
   description:
     'A guide to left-handed crochet: how to hold the hook and yarn, why most patterns work as written, how to mirror charts and shaping, and tips for learning.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-crochet-for-beginners', 'how-to-read-crochet-symbols-and-charts', 'how-to-single-crochet'],
+  related: ['how-to-crochet-for-beginners', 'how-to-read-crochet-symbols-and-charts', 'how-to-single-crochet', 'how-to-hold-yarn-and-hook-crochet', 'how-to-crochet-in-the-round'],
   body: [
     {
       type: 'p',
-      text: `If you are left-handed, you can learn crochet just as well as anyone else. The craft is about the same movements of a hook and yarn, and those can be done with either hand. The main difficulty is that almost every tutorial and pattern is written and filmed for right-handed crocheters. This guide explains how to hold the hook and yarn, why most written patterns work without changes, and what to flip when a pattern or a chart is directional.`,
+      text: `If you are left-handed, you can learn crochet just as well as anyone else. The craft is about the same movements of a hook and yarn, and those can be done with either hand. The main difficulty is that almost every tutorial and pattern is written and filmed for right-handed crocheters. This guide explains how to hold the hook and yarn, why most written patterns work without changes, and what to flip when a pattern or a chart is directional. It also covers the grip, tension and stitch markers that make amigurumi worked in the round feel natural in your hand.`,
     },
     { type: 'h2', text: `Do I need to crochet left-handed?` },
     {
@@ -62,6 +62,15 @@ export const leftHandedGuide: Guide = {
         `Start with a simple swatch before a project, so the movements become automatic.`,
       ],
     },
+    { type: 'h2', text: `Amigurumi in the round as a left-handed crocheter` },
+    {
+      type: 'p',
+      text: `Toys are a friendly place to start, because they are worked in a spiral and most are symmetrical. You still hold the hook in your left hand, and the work turns in the opposite direction from the usual photos. Put a stitch marker in the first stitch of each round, since a mirrored spiral can make it harder to spot where a round begins. Our guide on [crocheting in the round](/guides/how-to-crochet-in-the-round) explains the spiral, and the page on [how to hold yarn and hook](/guides/how-to-hold-yarn-and-hook-crochet) shows grips and ways to wrap the yarn for steady tension.`,
+    },
+    {
+      type: 'p',
+      text: `For the ring that starts most toys, follow the [magic ring guide](/guides/how-to-make-a-magic-ring-crochet) and mirror each step. Take it slowly the first few times, because the loop is easier to learn once your hands know the mirrored path.`,
+    },
     { type: 'h2', text: `Common questions and problems` },
     {
       type: 'table',
@@ -100,6 +109,18 @@ export const leftHandedGuide: Guide = {
     {
       q: `How can I follow a right-handed video?`,
       a: `Look for a left-handed one first. Otherwise, watch the video in a mirror, or use a mirror feature on your player, so the movements match your hands.`,
+    },
+    {
+      q: `Is it harder to learn crochet left-handed?`,
+      a: `It can feel slower at first, because most lessons are shown right-handed. Mirrored videos and a little patience help. The stitches themselves are no harder for a left-handed person.`,
+    },
+    {
+      q: `Can I make amigurumi if I am left-handed?`,
+      a: `Yes. Toy patterns are written in rounds with stitch counts, so you can follow them as written. The finished toy is a mirror image, which rarely shows on a symmetrical design.`,
+    },
+    {
+      q: `Do left-handed crocheters read patterns differently?`,
+      a: `Not for written patterns. The abbreviations and stitch counts are the same. Only charts and left or right shaping need to be mirrored.`,
     },
   ],
 }

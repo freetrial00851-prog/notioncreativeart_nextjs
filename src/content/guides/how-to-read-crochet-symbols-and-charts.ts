@@ -6,9 +6,9 @@ export const crochetSymbolsGuide: Guide = {
   description:
     'Learn what crochet symbols mean and how to read a crochet chart for rows and rounds: the common stitch symbols, reading direction, and how charts match written patterns.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-read-a-crochet-pattern', 'basic-crochet-stitches-for-beginners', 'crochet-abbreviations-us-vs-uk'],
+  related: ['how-to-read-a-crochet-pattern', 'basic-crochet-stitches-for-beginners', 'crochet-abbreviations-us-vs-uk', 'granny-square-for-beginners', 'front-loop-only-and-back-loop-only-crochet'],
   body: [
     {
       type: 'p',
@@ -67,6 +67,20 @@ export const crochetSymbolsGuide: Guide = {
       type: 'p',
       text: `Many patterns give both a chart and written instructions. They should match. If you are not sure about a symbol, compare the chart with the written line, which uses the abbreviations explained in our guide on [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern). Written patterns that use UK terms and charts that use US terms (or the other way around) can look different, so check the system the pattern uses. Our [US and UK crochet terms chart](/guides/crochet-abbreviations-us-vs-uk) shows both.`,
     },
+    { type: 'h2', text: `Special marks you may see on a chart` },
+    {
+      type: 'ul',
+      items: [
+        `Increases are drawn as two or more stems joined at the bottom, meaning several stitches in the same stitch. Decreases are drawn as stems joined at the top.`,
+        `Turning chains at the start of a row are often drawn as ovals at the edge. Check the key to see whether they count as a stitch.`,
+        `Repeat brackets or colored boxes mark a pattern repeat. Work the marked part as many times as the instructions say.`,
+        `Color-coded symbols can show a color change. A [granny square chart](/guides/granny-square-for-beginners) often uses colors for each round.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `Charts for toys are rarer than written ones, but you may see a round of single crochet shown as a ring of plus signs. A symbol with a curved line is a front or back loop stitch, which our page on [front loop only and back loop only](/guides/front-loop-only-and-back-loop-only-crochet) explains.`,
+    },
     { type: 'h2', text: `Tips for following a chart` },
     {
       type: 'ul',
@@ -103,6 +117,18 @@ export const crochetSymbolsGuide: Guide = {
     {
       q: `What if a symbol is not in the key?`,
       a: `Compare it with the written instructions, if there are any, or contact the designer. Charts should always come with a key that explains every symbol.`,
+    },
+    {
+      q: `How do I read an increase or a decrease on a crochet chart?`,
+      a: `An increase is usually drawn as stems that share one bottom point, and a decrease as stems that share one top point. Check the key, as designers can vary.`,
+    },
+    {
+      q: `Do I read a round chart clockwise or counterclockwise?`,
+      a: `Right-handed crocheters usually work counterclockwise, left-handed crocheters clockwise. Check the numbers on the chart. See our [left-handed crochet guide](/guides/left-handed-crochet-guide).`,
+    },
+    {
+      q: `Is a chart or a written pattern easier for beginners?`,
+      a: `Many beginners prefer written patterns with stitch counts, while others like the visual picture of a chart. Using both together is a good way to learn.`,
     },
   ],
 }

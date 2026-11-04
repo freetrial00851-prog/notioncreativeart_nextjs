@@ -6,9 +6,9 @@ export const whatIsAmigurumiGuide: Guide = {
   description:
     'What is amigurumi? Learn the meaning of the word, how to pronounce it, how it differs from other crochet, the skills and materials you need.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-make-a-magic-ring-crochet', 'how-to-stuff-and-assemble-amigurumi', 'best-yarn-for-amigurumi'],
+  related: ['how-to-make-a-magic-ring-crochet', 'how-to-stuff-and-assemble-amigurumi', 'best-yarn-for-amigurumi', 'amigurumi-sizes-mini-small-plush', 'safety-eyes-for-amigurumi'],
   body: [
     {
       type: 'p',
@@ -81,6 +81,22 @@ export const whatIsAmigurumiGuide: Guide = {
         `No-sew amigurumi: toys worked in one piece, so you do not have to attach limbs. Browse our [no-sew amigurumi patterns](/shop/no-sew-amigurumi).`,
       ],
     },
+    { type: 'h2', text: `Amigurumi words you will see in patterns` },
+    {
+      type: 'ul',
+      items: [
+        `MR: magic ring, the adjustable loop that starts most pieces.`,
+        `sc, inc, dec: single crochet, increase (two stitches in one) and decrease (two stitches worked together).`,
+        `FLO and BLO: front loop only and back loop only, used for edges, ridges and shaping. See [front loop only and back loop only](/guides/front-loop-only-and-back-loop-only-crochet).`,
+        `Safety eyes: plastic eyes with a locking back, fitted before the piece is closed. Read about them in our [safety eyes guide](/guides/safety-eyes-for-amigurumi).`,
+        `Fiberfill: the polyester stuffing most patterns use.`,
+        `Fasten off: cutting the yarn and pulling the tail through the last loop so the work cannot unravel.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `Sizes range from a mini keychain to a plush you can hug. Our guide to [amigurumi sizes](/guides/amigurumi-sizes-mini-small-plush) explains how yarn weight and hook size change the finished height, and the [mini amigurumi and keychains](/mini-amigurumi-and-keychains) page shows small projects.`,
+    },
     { type: 'h2', text: `What beginners should start with` },
     {
       type: 'p',
@@ -125,6 +141,14 @@ export const whatIsAmigurumiGuide: Guide = {
     {
       q: `Can amigurumi be knitted?`,
       a: `Yes. The word covers both crocheted and knitted stuffed toys, although most amigurumi patterns you will find are crochet. Our patterns are crochet.`,
+    },
+    {
+      q: `What hook size is used for amigurumi?`,
+      a: `Many patterns use a hook between 2 mm and 3.5 mm, often smaller than the yarn label suggests, so the fabric stays tight. Each pattern lists the hook it needs.`,
+    },
+    {
+      q: `Is amigurumi safe for babies and small children?`,
+      a: `Small parts such as plastic eyes can be a hazard for young children. Embroidered features and firmly sewn parts are common choices, and rules differ by country, so check the guidance where you live.`,
     },
     {
       q: `Do I need to sew amigurumi?`,

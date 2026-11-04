@@ -6,13 +6,13 @@ export const changeColorsGuide: Guide = {
   description:
     'Learn how to change yarn colors in crochet: the neat way to switch in a row or a round, where to hide the ends, and how to fix jogs, gaps and bulky knots.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'how-to-stuff-and-assemble-amigurumi', 'how-to-read-a-crochet-pattern'],
+  related: ['how-to-single-crochet', 'how-to-stuff-and-assemble-amigurumi', 'how-to-read-a-crochet-pattern', 'how-to-join-new-yarn-in-crochet', 'how-to-crochet-in-the-round'],
   body: [
     {
       type: 'p',
-      text: `Changing colors is how crocheters make stripes, spots, clothing on a toy, a different colored belly or a pair of mittens on a bear. The method is simple: you finish the last step of the old color with the new color. Done this way, the change is tidy and the new color starts cleanly. This guide shows how to do it in rows and in rounds, how to deal with the loose ends and how to fix the common problems.`,
+      text: `Changing colors is how crocheters make stripes, spots, clothing on a toy, a different colored belly or a pair of mittens on a bear. The method is simple: you finish the last step of the old color with the new color. Done this way, the change is tidy and the new color starts cleanly. This guide shows how to do it in rows and in rounds, how to deal with the loose ends and how to fix the common problems. The same method works for single crochet, half double crochet and double crochet, and for cotton, acrylic and wool.`,
     },
     { type: 'h2', text: `The key idea: change on the last pull-through` },
     {
@@ -48,6 +48,15 @@ export const changeColorsGuide: Guide = {
         `For a small spot, such as a cheek patch or a paw, do not carry the yarn far. Cut it and use a new strand.`,
         `Decide where the change is before you start the round, and mark it with a stitch marker.`,
       ],
+    },
+    { type: 'h2', text: `Planning stripes and patches of color` },
+    {
+      type: 'p',
+      text: `Before you start, decide how many rows or rounds each color lasts, and write the repeat down, for example 2 rounds of white and 1 round of pink. Even stripes look deliberate, and a written repeat stops you from losing your place. For a stripe worked in the round, see [how to crochet in the round](/guides/how-to-crochet-in-the-round).`,
+    },
+    {
+      type: 'p',
+      text: `For a patch of color in the middle of a row or round, such as a belly or a spot, there are two common ways. In tapestry crochet, the unused color is carried along the top of the stitches and worked over. For a larger patch, use a separate small length of yarn for the patch, and drop it when you change back. Either way, change colors on the last pull-through, as above. Many [amigurumi patterns](/shop/amigurumi) use small color patches like this for faces and markings.`,
     },
     { type: 'h2', text: `What to do with the ends` },
     {
@@ -98,6 +107,18 @@ export const changeColorsGuide: Guide = {
     {
       q: `Do I need to tie a knot when I join a new color?`,
       a: `No. Leave a tail, and weave it in after. Knots on the outside can show and make bumps. If you tie one, make it small and put it inside.`,
+    },
+    {
+      q: `How do I make stripes in crochet?`,
+      a: `Change colors on the last pull-through of the last stitch of a row or round, and repeat a set number of rows per color. Write the repeat down so you can keep count.`,
+    },
+    {
+      q: `Can I carry yarn across a gap in the middle of a round?`,
+      a: `For a short gap of a few stitches, you can carry the unused yarn along the top of the stitches and work over it. For a long gap, cut the yarn and use a new strand.`,
+    },
+    {
+      q: `How is changing colors different from joining a new ball?`,
+      a: `The method is the same, but a color change adds a different shade, while a join adds more of the same yarn.`,
     },
   ],
 }

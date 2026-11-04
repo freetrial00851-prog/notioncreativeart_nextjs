@@ -6,13 +6,13 @@ export const readingPatternGuide: Guide = {
   description:
     'Learn how to read a crochet pattern step by step: the materials list, abbreviations, round counts, brackets and asterisks, explained for beginners.',
   datePublished: '2026-10-25',
-  dateModified: '2026-10-25',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['crochet-abbreviations-us-vs-uk'],
+  related: ['crochet-abbreviations-us-vs-uk', 'how-to-read-crochet-symbols-and-charts', 'crochet-skill-levels-explained'],
   body: [
     {
       type: 'p',
-      text: 'A crochet pattern looks like code the first time you see it. It is really a recipe, written in a short, repeating style. Once you know the parts, you can read almost any pattern. This guide goes through a typical pattern from top to bottom.',
+      text: 'A crochet pattern looks like code the first time you see it. It is really a recipe, written in a short, repeating style. Once you know the parts, you can read almost any pattern. This guide goes through a typical pattern from top to bottom, including stitch counts, repeats, written instructions versus charts, and special terms like "mr", "sl st" and "fo".',
     },
     { type: 'h2', text: '1. Start with the information at the top' },
     {
@@ -61,6 +61,21 @@ export const readingPatternGuide: Guide = {
       type: 'p',
       text: 'Toy patterns list the body parts one at a time (head, ears, arms, legs) and then say how to join them. Work the pieces in order, leave a long tail of yarn where the pattern says "leave a long tail", and stuff each piece before closing it. Small details like eyes and noses are usually added last.',
     },
+    { type: 'h2', text: 'Common amigurumi terms you will meet' },
+    {
+      type: 'ul',
+      items: [
+        '"mr" or "magic ring" is the adjustable loop that starts most toys. See [how to make a magic ring](/guides/how-to-make-a-magic-ring-crochet).',
+        '"BLO" and "FLO" mean back loop only and front loop only. They change where the hook goes, not the stitch.',
+        '"inc" is two stitches in one stitch, and "dec" joins two stitches into one. The [invisible decrease](/guides/invisible-decrease-amigurumi) is a neater version.',
+        '"Fo" or "fasten off" means cut the yarn and pull the tail through the last loop. "Sl st" is a slip stitch, often used to finish a round.',
+        '"Stuff" tells you when to add fiberfill, usually before the opening gets too small to reach.',
+      ],
+    },
+    {
+      type: 'p',
+      text: 'Some designers write a stitch count for every round and some write only the changes, so a pattern may say "Rnds 6-10: sc around (24)". That means five rounds of 24 single crochets. Charts show the same instructions as symbols, and our guide to [reading crochet symbols and charts](/guides/how-to-read-crochet-symbols-and-charts) explains them.',
+    },
     { type: 'h2', text: 'Tips that save time' },
     {
       type: 'ul',
@@ -84,6 +99,18 @@ export const readingPatternGuide: Guide = {
     {
       q: 'Do I need to know every abbreviation before I start?',
       a: 'No. Most patterns list the abbreviations they use at the top. Keep that list beside you and the common ones will stick quickly.',
+    },
+    {
+      q: 'What does "work in the round" mean in a crochet pattern?',
+      a: 'It means you crochet in a continuous circle or spiral instead of turning the work. Toys are usually worked this way. See [how to crochet in the round](/guides/how-to-crochet-in-the-round).',
+    },
+    {
+      q: 'How do I know if a pattern uses US or UK terms?',
+      a: 'Check the top of the pattern, where a good pattern states it. In UK terms, "dc" means double crochet, which is the US single crochet, so the same abbreviation can mean different stitches. Our [UK to US conversion guide](/guides/uk-to-us-crochet-terms-conversion) helps.',
+    },
+    {
+      q: 'Can a beginner follow any crochet pattern?',
+      a: 'A beginner can follow a pattern at their own level. Check the skill level in the listing, and see [crochet skill levels explained](/guides/crochet-skill-levels-explained).',
     },
   ],
 }

@@ -6,9 +6,9 @@ export const hookSizesGuide: Guide = {
   description:
     'A crochet hook sizes chart with metric and US sizes, the usual hook for each yarn weight, and how to choose a smaller hook for amigurumi toys.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-crochet-for-beginners', 'how-to-read-a-crochet-pattern', 'how-to-stuff-and-assemble-amigurumi'],
+  related: ['how-to-crochet-for-beginners', 'how-to-read-a-crochet-pattern', 'how-to-stuff-and-assemble-amigurumi', 'yarn-weight-chart', 'crochet-gauge-swatch'],
   body: [
     {
       type: 'p',
@@ -90,6 +90,15 @@ export const hookSizesGuide: Guide = {
         `Start with one size for practice, such as 5 mm, before you buy a full set.`,
       ],
     },
+    { type: 'h2', text: `Parts of a hook and hook shapes` },
+    {
+      type: 'p',
+      text: `A crochet hook has a tip, a throat (the notch that catches the yarn), a shaft, a thumb rest and a handle. The size is measured on the shaft, just behind the throat. Tapered hooks have a rounded, sloping head, and inline hooks have a flat-cut throat with a sharper edge. Tapered hooks tend to slide through stitches easily, and inline hooks hold the yarn more firmly. Neither is wrong, so pick whichever feels smoother in your hand.`,
+    },
+    {
+      type: 'p',
+      text: `Hooks are the same for right-handed and left-handed crocheters. Only the way you hold the work changes, and our [left-handed crochet guide](/guides/left-handed-crochet-guide) covers it. In the old UK numbering, a bigger number means a smaller hook, which is the opposite of the US letters, so convert to mm first.`,
+    },
     { type: 'h2', text: `Why the same hook gives different results` },
     {
       type: 'p',
@@ -98,7 +107,7 @@ export const hookSizesGuide: Guide = {
     { type: 'h2', text: `How to read the hook size in a pattern` },
     {
       type: 'p',
-      text: `Patterns list the hook near the top, in the materials section, often with both mm and US sizes. If a pattern gives only a US letter and you work in metric, use the chart above. If it says "hook size to suit your yarn", check the yarn label, and then go down one size for toys. Our guide on [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern) explains the rest of the pattern information.`,
+      text: `Patterns list the hook near the top, in the materials section, often with both mm and US sizes. If a pattern gives only a US letter and you work in metric, use the chart above. If it says "hook size to suit your yarn", check the yarn label, and then go down one size for toys. Our guide on [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern) explains the rest of the pattern information, and the [yarn weight chart](/guides/yarn-weight-chart) shows which weight each hook range suits.`,
     },
     {
       type: 'p',
@@ -125,6 +134,18 @@ export const hookSizesGuide: Guide = {
     {
       q: `Does the hook size change the finished size of a toy?`,
       a: `Yes. The same pattern made with thicker yarn and a bigger hook gives a bigger toy, and finer yarn with a smaller hook gives a smaller one.`,
+    },
+    {
+      q: `What is a steel crochet hook used for?`,
+      a: `Steel hooks are very small, usually 0.5 to 2.0 mm, and are used with thread and lace yarn for doilies, fine lace and tiny amigurumi. Their sizes are listed in mm.`,
+    },
+    {
+      q: `Does the hook material change my tension?`,
+      a: `It can. Smooth metal hooks let yarn slide fast, which can loosen stitches, while wood or bamboo grip the yarn a little more. If your fabric feels too loose or too tight, try another material before changing the size.`,
+    },
+    {
+      q: `How do I know if my hook is too big for amigurumi?`,
+      a: `Look at the fabric in good light. If you can see gaps, or the stuffing shows through when you press it behind the stitches, go down one hook size and test again.`,
     },
   ],
 }

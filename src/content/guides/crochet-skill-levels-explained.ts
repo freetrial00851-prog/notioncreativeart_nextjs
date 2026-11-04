@@ -6,13 +6,13 @@ export const skillLevelsGuide: Guide = {
   description:
     'What crochet skill levels really mean, why labels differ between designers, and how to tell if an amigurumi pattern is too hard before you buy or start.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-read-a-crochet-pattern', 'how-to-crochet-for-beginners', 'best-yarn-for-amigurumi'],
+  related: ['how-to-read-a-crochet-pattern', 'how-to-crochet-for-beginners', 'best-yarn-for-amigurumi', 'invisible-decrease-amigurumi', 'amigurumi-sizes-mini-small-plush'],
   body: [
     {
       type: 'p',
-      text: `Crochet skill levels are the labels you see on a pattern: beginner, easy, intermediate and advanced. They help you choose a project, but they are not measured by any standard body, so one designer's "easy" can be another's "intermediate". This guide explains what each label usually means for amigurumi, how to read a listing for clues, and how to move up one step at a time.`,
+      text: `Crochet skill levels are the labels you see on a pattern: beginner, easy, intermediate and advanced. They help you choose a project, but they are not measured by any standard body, so one designer's "easy" can be another's "intermediate". This guide explains what each label usually means for amigurumi, how to read a listing for clues, and how to move up one step at a time. Along the way it mentions the skills that usually separate the levels, such as the magic ring, invisible decreases, colorwork and joining limbs.`,
     },
     { type: 'h2', text: `What the four labels usually mean` },
     {
@@ -140,6 +140,20 @@ export const skillLevelsGuide: Guide = {
         ],
       ],
     },
+    { type: 'h2', text: `Skills that often move a pattern up a level` },
+    {
+      type: 'ul',
+      items: [
+        `Invisible decreases. They keep the fabric smooth, but they take a little practice. See [invisible decrease](/guides/invisible-decrease-amigurumi).`,
+        `Joining limbs. Placing arms, legs and ears evenly takes planning. See [how to join limbs and sew on parts](/guides/how-to-join-limbs-and-sew-on-parts-amigurumi).`,
+        `Colorwork. Stripes, patches and color changes in the round add yarn management.`,
+        `Small size. A mini toy has few stitches per round, so each part is quick but fiddly. Our guide on [amigurumi sizes](/guides/amigurumi-sizes-mini-small-plush) explains what to expect.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `Time is a separate matter. A small, simple toy may take an evening, while a large or detailed one can take many sessions. Slow is not the same as hard, so judge a pattern by its techniques first and its length second.`,
+    },
     { type: 'h2', text: `How levels work on this shop` },
     {
       type: 'p',
@@ -171,6 +185,18 @@ export const skillLevelsGuide: Guide = {
     {
       q: `What if I buy a pattern and it feels too hard?`,
       a: `Put it aside, practice the techniques that stopped you, and come back later. You can also read our [refund policy](/refund-policy) or [contact us](/contact) if you have a question about a purchase.`,
+    },
+    {
+      q: `How do I know if I am still a beginner or ready for intermediate?`,
+      a: `If you can work the magic ring, increases and decreases, change colors and sew pieces together without a guide, you are likely at an easy to intermediate level. Try one pattern that adds a single new skill.`,
+    },
+    {
+      q: `Is amigurumi easier than a blanket or a sweater?`,
+      a: `It depends. Toys need counting and assembly but no sizing. Blankets are repetitive and simple, while garments need gauge and fit. Neither is always easier.`,
+    },
+    {
+      q: `How long does it take to move from beginner to intermediate?`,
+      a: `There is no fixed time. It depends on how often you practice and which techniques you try. Finishing a few projects that each add one new skill is a steady path.`,
     },
   ],
 }

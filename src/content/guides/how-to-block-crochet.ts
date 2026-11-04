@@ -6,7 +6,7 @@ export const blockingGuide: Guide = {
   description:
     'Learn how to block crochet with the wet, spray and steam methods, which fibers suit each one, how to pin to size, drying times and common mistakes.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
   related: ['how-to-fasten-off-and-weave-in-ends', 'crochet-gauge-swatch', 'granny-square-for-beginners'],
   body: [
@@ -126,6 +126,20 @@ export const blockingGuide: Guide = {
         [`Blends`, `Follow the more delicate fiber`, `Usually fine`, `Test a swatch first`],
       ],
     },
+    { type: 'h2', text: `Block before you seam or add an edging` },
+    {
+      type: 'p',
+      text: `Block panels, squares and motifs before you join them or work a border. Pieces of equal size are much easier to whipstitch or crochet together, and a border worked on a flat edge stays flat. Our guide to [reading yarn labels](/guides/how-to-read-yarn-labels) explains the fiber and care symbols that decide which method is safe.`,
+    },
+    { type: 'h2', text: `Blocking blankets and large pieces` },
+    {
+      type: 'p',
+      text: `A blanket is too big for one mat, so work in sections. Lay one part flat, pin it, and move on once that area is dry, or spread the whole piece on a clean bed or carpet covered with a sheet. Thick fabric holds a lot of water, so roll it in towels first. For long straight edges, a flexible blocking wire threaded along the edge gives a cleaner line than many pins.`,
+    },
+    {
+      type: 'p',
+      text: `Blocking is also not the same as washing. If you want the full cleaning routine, read how to [wash crochet and amigurumi](/guides/how-to-wash-crochet-and-amigurumi).`,
+    },
     { type: 'h2', text: `Drying time` },
     {
       type: 'p',
@@ -175,6 +189,18 @@ export const blockingGuide: Guide = {
     },
   ],
   faq: [
+    {
+      q: `Should I block crochet before or after seaming?`,
+      a: `Before. Matching pieces join more neatly, and you can block the finished item again lightly if the seams need to settle.`,
+    },
+    {
+      q: `Can I block crochet with just an iron?`,
+      a: `Only with steam and only if the fiber allows it. Hold the iron above the fabric without touching it, since pressing flattens stitches. Never use heat on acrylic without testing a swatch.`,
+    },
+    {
+      q: `How much can blocking stretch a piece?`,
+      a: `Only a little. Blocking evens out stitches and sets the size you pin to, but it will not turn a swatch that is too small into the right size. Fix gauge first.`,
+    },
     {
       q: `Do I have to block my crochet?`,
       a: `No, it is not required for every project. It makes the biggest difference on flat pieces, lace, garments and motifs that need to match. Stuffed toys usually do not need it.`,

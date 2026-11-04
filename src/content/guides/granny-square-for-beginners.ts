@@ -6,9 +6,9 @@ export const grannySquareGuide: Guide = {
   description:
     'Learn how to crochet a classic granny square in US terms, with exact stitch counts for rounds 1 to 4, fixes for wavy edges, and two ways to join squares.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-double-crochet', 'how-to-change-colors-in-crochet', 'simple-crochet-blanket-for-beginners'],
+  related: ['how-to-double-crochet', 'how-to-change-colors-in-crochet', 'simple-crochet-blanket-for-beginners', 'uk-to-us-crochet-terms-conversion', 'how-to-crochet-in-the-round'],
   body: [
     {
       type: 'p',
@@ -132,6 +132,20 @@ export const grannySquareGuide: Guide = {
       type: 'p',
       text: `For a larger project, our [simple crochet blanket guide](/guides/simple-crochet-blanket-for-beginners) is a good next step.`,
     },
+    { type: 'h2', text: `What to make with granny squares` },
+    {
+      type: 'p',
+      text: `One square is a coaster or a small motif, and a handful sewn together make a cushion cover, a bag or a scarf. A blanket is just many squares joined in a grid. To plan one, divide the width you want by the size of your finished square. For example, squares that measure 15 cm across need about 7 across for a width of 100 cm. Measure your own square first, because yarn and tension change the size.`,
+    },
+    {
+      type: 'p',
+      text: `If a pattern uses UK terms, its treble crochet is the US double crochet, as shown in our [UK to US crochet terms conversion](/guides/uk-to-us-crochet-terms-conversion).`,
+    },
+    { type: 'h2', text: `Classic and solid squares` },
+    {
+      type: 'p',
+      text: `This guide makes the classic square, with chain-1 gaps between the groups. A solid granny square is worked without those gaps, so the fabric is denser and has no holes. It is made from the same double crochet stitch, but the counts are different, so follow its own pattern.`,
+    },
     { type: 'h2', text: `Practice and next steps` },
     {
       type: 'p',
@@ -158,6 +172,18 @@ export const grannySquareGuide: Guide = {
     {
       q: `Can I make a granny square with any yarn?`,
       a: `Yes, but smooth medium weight yarn in a light color is easiest to see while you learn. Fuzzy or dark yarn hides the chain spaces.`,
+    },
+    {
+      q: `Is a granny square good for beginners?`,
+      a: `Yes. It uses only chain, slip stitch and double crochet, and the round-by-round counts let you check your work. It also teaches you to work in the round without a magic ring.`,
+    },
+    {
+      q: `How many granny squares do I need for a blanket?`,
+      a: `Divide the blanket width by your square size, and do the same for the length, then multiply the two numbers. Measure a finished square first, since sizes vary.`,
+    },
+    {
+      q: `What is the difference between a granny square and a granny stitch blanket?`,
+      a: `A granny square is a motif worked in rounds and joined later. A granny stitch blanket is worked in rows with the same groups of 3 dc and chain spaces, so it needs no joining.`,
     },
   ],
 }

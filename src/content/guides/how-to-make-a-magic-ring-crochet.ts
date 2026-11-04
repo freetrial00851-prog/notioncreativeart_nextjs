@@ -6,9 +6,9 @@ export const magicRingGuide: Guide = {
   description:
     'Learn how to make a magic ring (also called a magic circle) step by step, close it tight, fix a ring that opens, and use a chain ring instead.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-read-a-crochet-pattern', 'crochet-abbreviations-us-vs-uk'],
+  related: ['how-to-read-a-crochet-pattern', 'crochet-abbreviations-us-vs-uk', 'how-to-crochet-in-the-round'],
   body: [
     {
       type: 'p',
@@ -87,6 +87,15 @@ export const magicRingGuide: Guide = {
         [`You lost count of the stitches`, `All stitches look the same in a tiny ring`, `Count the stitches after the round, and put a marker in the first one before you tighten.`],
       ],
     },
+    { type: 'h2', text: `Magic ring for ears, noses and other tiny parts` },
+    {
+      type: 'p',
+      text: `Small pieces such as ears, noses, paws and tails also start with a magic ring, and some patterns use only 4 or 5 stitches in the first round instead of 6. Patterns shorten the start to "MR", so "sc 6 in MR" means the same as "6 sc in magic ring". Tiny parts are easy to pull too hard, so tighten the ring evenly and check that the stitches still lie in a neat circle.`,
+    },
+    {
+      type: 'p',
+      text: `The shaping that follows uses increases and decreases, which you can learn in our guide to the [invisible decrease](/guides/invisible-decrease-amigurumi). When the piece is done, [stuff and assemble it](/guides/how-to-stuff-and-assemble-amigurumi) with small pieces of fiberfill.`,
+    },
     { type: 'h2', text: `A simpler option: the chain ring` },
     {
       type: 'p',
@@ -124,6 +133,14 @@ export const magicRingGuide: Guide = {
     {
       q: `How many stitches go into a magic ring?`,
       a: `The pattern tells you. Six is the most common number for amigurumi, because six stitches in the first round, then six more in each round, keeps a flat circle flat.`,
+    },
+    {
+      q: `What does MR mean in a crochet pattern?`,
+      a: `MR stands for magic ring. A line such as "Rnd 1: 6 sc in MR (6)" means: make a magic ring, work 6 single crochets into it, and end with 6 stitches.`,
+    },
+    {
+      q: `How big should the loop be before I start stitching?`,
+      a: `Big enough that you can push the hook in and work the stitches without struggling. You pull the ring tight after the first round, so a loop that is too small only makes the first stitches harder to work.`,
     },
     {
       q: `Can I make a magic ring with thick or fuzzy yarn?`,

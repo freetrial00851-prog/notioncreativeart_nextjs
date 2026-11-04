@@ -6,9 +6,9 @@ export const embroideredFacesGuide: Guide = {
   description:
     'Learn how to embroider an amigurumi face: thread, needle, pin placement, straight, satin, back and French knot stitches, hiding ends and fixing mistakes.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['safety-eyes-for-amigurumi', 'how-to-stuff-and-assemble-amigurumi', 'how-to-fasten-off-and-weave-in-ends'],
+  related: ['safety-eyes-for-amigurumi', 'how-to-stuff-and-assemble-amigurumi', 'how-to-fasten-off-and-weave-in-ends', 'amigurumi-face-placement-and-expression'],
   body: [
     {
       type: 'p',
@@ -86,6 +86,20 @@ export const embroideredFacesGuide: Guide = {
       type: 'p',
       text: `Two wraps give a small bead, and more wraps or strands give a bigger one.`,
     },
+    { type: 'h2', text: `Noses, mouths, cheeks and whiskers` },
+    {
+      type: 'ul',
+      items: [
+        `Triangle nose: outline a small triangle with pins, then fill it with satin stitch, working from side to side.`,
+        `Smile: from the bottom of the nose, stitch a short vertical line, then a gentle curve to each side, like an upside-down Y. Keep the curves small on a small face.`,
+        `Cheeks: stitch a small circle of satin stitch in a pink or peach thread, or fill the shape with several short straight stitches. Place the cheeks just below and outside the eyes.`,
+        `Whiskers: take a long straight stitch through the cheek area, leave the thread ends visible on the surface and trim them short, or bury the ends if the toy is for a young child.`,
+      ],
+    },
+    {
+      type: 'p',
+      text: `For ideas on how each placement changes the mood, read our guide to [amigurumi face placement and expression](/guides/amigurumi-face-placement-and-expression). The [stuffing and assembly guide](/guides/how-to-stuff-and-assemble-amigurumi) explains why the head should be firm before you start.`,
+    },
     { type: 'h2', text: `Finish and bury the thread` },
     {
       type: 'p',
@@ -139,6 +153,14 @@ export const embroideredFacesGuide: Guide = {
     {
       q: `Are embroidered eyes completely safe for babies?`,
       a: `They have no hard parts that can detach, which is why many makers choose them for young children. Stitches can still wear, so check the face from time to time and follow the toy safety rules for your country.`,
+    },
+    {
+      q: `How do I embroider a smile on an amigurumi?`,
+      a: `Mark the ends of the smile with pins, then stitch a small curve with stem stitch or back stitch. Keep it short and slightly upward, and compare it with the position of the eyes before you pull the last stitch tight.`,
+    },
+    {
+      q: `How do I make cheeks on a crochet toy?`,
+      a: `Embroider a small circle in pink or peach thread with satin stitch, placed just below and outside the eyes. Stitches stay flat and have no hard parts, which suits toys for young children.`,
     },
     {
       q: `Can I undo embroidery without damaging the toy?`,

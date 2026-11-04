@@ -6,9 +6,9 @@ export const yarnWeightGuide: Guide = {
   description:
     'A clear yarn weight chart for crochet: weights 0 to 7, common names, typical hook sizes, uses, UK versus US names and how to substitute yarn safely.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['best-yarn-for-amigurumi', 'crochet-hook-sizes-chart', 'how-to-read-yarn-labels'],
+  related: ['best-yarn-for-amigurumi', 'crochet-hook-sizes-chart', 'how-to-read-yarn-labels', 'amigurumi-sizes-mini-small-plush', 'how-much-yarn-for-amigurumi'],
   body: [
     {
       type: 'p',
@@ -108,6 +108,16 @@ export const yarnWeightGuide: Guide = {
         `Adjust the hook size up or down until your swatch matches the pattern gauge.`,
       ],
     },
+    { type: 'h2', text: `Weight, ply and fiber are different things` },
+    {
+      type: 'p',
+      text: `Ply is how many strands are twisted together, and fiber is what the yarn is made of. Neither one sets the weight. A 4-ply yarn can be thin or thick, and a cotton and an acrylic yarn can both be worsted weight yet feel very different in the hand. Use the weight category and the yardage per 100 g to compare yarns, and use the fiber to judge stretch, softness and washing. For toys, [amigurumi sizes](/guides/amigurumi-sizes-mini-small-plush) shows how weight and hook change the finished height, and [how much yarn for amigurumi](/guides/how-much-yarn-for-amigurumi) helps you plan the amount.`,
+    },
+    { type: 'h2', text: `How to estimate weight with wraps per inch` },
+    {
+      type: 'p',
+      text: `If a label is missing, wrap the yarn around a ruler so the strands sit side by side without overlapping or squeezing. Count the wraps in one inch (2.5 cm). More wraps per inch means a thinner yarn, and fewer wraps means a thicker one. It is a rough check, so confirm with a small swatch and a look at the [crochet hook sizes chart](/guides/crochet-hook-sizes-chart) for a starting hook.`,
+    },
     { type: 'h2', text: `Common problems and fixes` },
     {
       type: 'table',
@@ -161,6 +171,18 @@ export const yarnWeightGuide: Guide = {
     {
       q: `How do I find the weight of a yarn with no label?`,
       a: `Wrap the yarn around a ruler for one inch or two centimeters and count the wraps, then compare to a wraps-per-inch chart. You can also crochet a swatch and compare it to a labeled yarn. These are rough methods, so treat the result as an estimate.`,
+    },
+    {
+      q: `Is chunky the same as bulky?`,
+      a: `They are close. Chunky is the UK name and bulky is the US category name, and both sit at number 5. Check the label and swatch, because brands vary a little.`,
+    },
+    {
+      q: `Which yarn weight should a beginner start with?`,
+      a: `Medium (worsted, number 4) in a smooth, light color. The stitches are easy to see and count, and many beginner patterns use it.`,
+    },
+    {
+      q: `How does yarn weight change the size of an amigurumi toy?`,
+      a: `The same pattern in a thicker yarn with a larger hook makes a bigger toy, and a thinner yarn with a smaller hook makes a smaller one. Mini, small and plush toys are different size groups.`,
     },
   ],
 }

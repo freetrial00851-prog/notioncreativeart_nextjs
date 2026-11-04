@@ -6,9 +6,9 @@ export const singleCrochetGuide: Guide = {
   description:
     'Learn the single crochet stitch step by step: chain, first row, turning, counting stitches, increases and decreases, plus the most common mistakes.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-make-a-magic-ring-crochet', 'how-to-read-a-crochet-pattern'],
+  related: ['how-to-make-a-magic-ring-crochet', 'how-to-read-a-crochet-pattern', 'crochet-gauge-swatch', 'invisible-decrease-amigurumi'],
   body: [
     {
       type: 'p',
@@ -100,6 +100,15 @@ export const singleCrochetGuide: Guide = {
       type: 'p',
       text: `A circle that stays flat has 6 more stitches in each round: 6, 12, 18, 24. If you want to see how these numbers look in a real pattern, our [guide to reading a crochet pattern](/guides/how-to-read-a-crochet-pattern) explains the notation, with the number in brackets at the end of each line.`,
     },
+    { type: 'h2', text: `Single crochet gauge and hook choice` },
+    {
+      type: 'p',
+      text: `Single crochet is also the stitch many designers use to measure gauge, because it gives a clear grid of stitches to count. Work a swatch of about 15 stitches and 15 rows, then count the stitches across 10 cm (4 in). If you have too many, your tension is tight and a larger hook helps. If you have too few, try a smaller hook. See [how to make a gauge swatch](/guides/crochet-gauge-swatch) and the [crochet hook sizes chart](/guides/crochet-hook-sizes-chart).`,
+    },
+    {
+      type: 'p',
+      text: `For amigurumi, a smaller hook than the yarn label suggests keeps the stitches tight so the stuffing does not show. The [invisible decrease](/guides/invisible-decrease-amigurumi) is the usual way to close up the shape.`,
+    },
     { type: 'h2', text: `Practice plan` },
     {
       type: 'ol',
@@ -135,6 +144,18 @@ export const singleCrochetGuide: Guide = {
     {
       q: `Is single crochet good for amigurumi?`,
       a: `Yes. It makes a dense fabric that hides the stuffing, and it is easy to increase and decrease evenly, which is how round toy shapes are made.`,
+    },
+    {
+      q: `What is the difference between a single crochet and a slip stitch?`,
+      a: `A single crochet has two steps and builds a short stitch with some height. A slip stitch is pulled through in one motion and adds almost no height.`,
+    },
+    {
+      q: `Is single crochet the same as double crochet?`,
+      a: `Not in US patterns. A US single crochet is a UK double crochet, so a UK pattern that says dc means the stitch this guide teaches. Check your pattern's terms.`,
+    },
+    {
+      q: `How do I keep the edges of single crochet straight?`,
+      a: `Count every row, skip the turning chain, and put your last stitch into the last real stitch. Keeping the same hand position also helps the edges stay even.`,
     },
   ],
 }

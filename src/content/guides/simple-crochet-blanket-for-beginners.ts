@@ -6,9 +6,9 @@ export const simpleBlanketGuide: Guide = {
   description:
     'Plan an easy crochet blanket for beginners: sizes, the best stitches, yarn, how to work out your foundation chain from a swatch, edges and a simple border.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['crochet-gauge-swatch', 'how-to-half-double-crochet', 'how-to-block-crochet'],
+  related: ['crochet-gauge-swatch', 'how-to-half-double-crochet', 'how-to-block-crochet', 'granny-square-for-beginners', 'how-to-wash-crochet-and-amigurumi'],
   body: [
     {
       type: 'p',
@@ -133,6 +133,16 @@ export const simpleBlanketGuide: Guide = {
         ],
       ],
     },
+    { type: 'h2', text: `Other ways to build a blanket` },
+    {
+      type: 'p',
+      text: `Rows are not the only route. A blanket can also be made from motifs. Our [granny square guide](/guides/granny-square-for-beginners) shows a square you can repeat and join, which is a good option if you prefer small pieces you can carry around. Once you are confident, you can try textured stitches such as the granny stitch or a ripple (chevron) pattern, which change the look but use the same basic stitches. Check the stitch counts in the pattern, because a ripple needs a starting chain that is a multiple of the repeat.`,
+    },
+    { type: 'h2', text: `Washing your finished blanket` },
+    {
+      type: 'p',
+      text: `Check the care symbols on the yarn label and wash the blanket the way the label says. Our guide on [how to wash crochet and amigurumi](/guides/how-to-wash-crochet-and-amigurumi) covers the general steps. A large blanket gets heavy when wet, so support its weight when you lift it, or it may stretch.`,
+    },
     { type: 'h2', text: `A note on safe sleep` },
     {
       type: 'note',
@@ -164,6 +174,18 @@ export const simpleBlanketGuide: Guide = {
     {
       q: `Do I need to block a crochet blanket?`,
       a: `It is not required, but it usually helps. Blocking evens out the stitches and edges and helps the corners lie flat, especially if the edges are a little wavy.`,
+    },
+    {
+      q: `Can I make a crochet blanket from granny squares?`,
+      a: `Yes. Make the squares the same size, lay them out, and join them with a slip stitch seam or whip stitch. Divide the blanket width by your square size to plan how many you need.`,
+    },
+    {
+      q: `How long does it take to crochet a blanket?`,
+      a: `It depends on the size, the stitch, the yarn weight and how much time you spend each day, so there is no single answer. A baby blanket takes less time than a throw.`,
+    },
+    {
+      q: `Which yarn weight should I use for a beginner blanket?`,
+      a: `Medium (worsted) weight is a good start. It is thick enough to grow at a steady pace, and it is easy to find in machine washable fibers.`,
     },
   ],
 }

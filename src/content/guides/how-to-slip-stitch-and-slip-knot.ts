@@ -6,13 +6,13 @@ export const slipStitchGuide: Guide = {
   description:
     'Learn how to make a crochet slip knot and a slip stitch (sl st) step by step, and how to use the slip stitch to join rounds, finish edges and move across stitches.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['basic-crochet-stitches-for-beginners', 'how-to-crochet-for-beginners', 'how-to-single-crochet'],
+  related: ['basic-crochet-stitches-for-beginners', 'how-to-crochet-for-beginners', 'how-to-single-crochet', 'how-to-crochet-in-the-round', 'front-loop-only-and-back-loop-only-crochet'],
   body: [
     {
       type: 'p',
-      text: `The slip knot is how every crochet project begins, and the slip stitch is the quiet helper that joins rounds, finishes edges and moves your yarn across a row without adding height. Neither is hard, but both are easy to do badly if nobody shows you the details. This guide covers both, with the mistakes to avoid.`,
+      text: `The slip knot is how every crochet project begins, and the slip stitch is the quiet helper that joins rounds, finishes edges and moves your yarn across a row without adding height. Neither is hard, but both are easy to do badly if nobody shows you the details. This guide covers both, with the mistakes to avoid. Keep a crochet hook, a ball of yarn and a stitch marker within reach, and you can practice every step below.`,
     },
     { type: 'h2', text: `How to make a slip knot` },
     {
@@ -72,6 +72,19 @@ export const slipStitchGuide: Guide = {
       type: 'p',
       text: `Amigurumi toys often skip joining and work in a continuous spiral with a stitch marker instead, so the slip stitch is used less in toys than in hats and flat circles. The pattern tells you which method to use. If you are not sure how to read the instructions, see our guide on [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern).`,
     },
+    { type: 'h2', text: `Slip stitch chain ring and slip stitch in one loop` },
+    {
+      type: 'p',
+      text: `To make a chain ring, chain the number the pattern asks for, put the hook into the first chain you made, and work a slip stitch. You now have a ring to work stitches into. It is an alternative to the [magic ring](/guides/how-to-make-a-magic-ring-crochet), a little less tidy in the center but easier to learn.`,
+    },
+    {
+      type: 'p',
+      text: `A slip stitch can also be worked into just one loop of the top V, the front loop or the back loop. Slip stitching in the back loop only gives a flat, slightly ribbed line, which is why it appears on cuffs and edges. Read more in our guide to [front loop only and back loop only crochet](/guides/front-loop-only-and-back-loop-only-crochet).`,
+    },
+    {
+      type: 'p',
+      text: `When you reach the end of a piece, a slip stitch is also often the last stitch before you cut the yarn. See [how to fasten off and weave in ends](/guides/how-to-fasten-off-and-weave-in-ends) for what comes next.`,
+    },
     { type: 'h2', text: `Common mistakes and how to fix them` },
     {
       type: 'table',
@@ -110,6 +123,18 @@ export const slipStitchGuide: Guide = {
     {
       q: `How tight should a slip knot be?`,
       a: `Snug enough that it does not fall off the hook, but loose enough to slide along the hook. A free loop makes the first row of stitches easier.`,
+    },
+    {
+      q: `Is a slip stitch the same as a slip knot?`,
+      a: `No. The slip knot is the adjustable loop that starts a project. The slip stitch is a stitch worked into fabric or a chain, and it adds almost no height.`,
+    },
+    {
+      q: `Do I chain after a slip stitch join?`,
+      a: `Often yes, but it depends on the pattern. Many patterns say chain 1 after the join, and some say to start the next round with no chain. Follow the line in your pattern.`,
+    },
+    {
+      q: `Can I use slip stitches to make a seam?`,
+      a: `Yes. Slip stitching two edges together makes a firm, flat seam. It has little stretch, so use another joining method where the fabric needs to give.`,
     },
   ],
 }

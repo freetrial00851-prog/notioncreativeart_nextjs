@@ -6,9 +6,9 @@ export const safetyEyesGuide: Guide = {
   description:
     'A guide to safety eyes for amigurumi: how to pick a size, where to place them, how to fit the washer, and safe alternatives such as embroidered eyes for children.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-stuff-and-assemble-amigurumi', 'how-to-make-amigurumi-bigger-or-smaller', 'best-yarn-for-amigurumi'],
+  related: ['how-to-stuff-and-assemble-amigurumi', 'how-to-make-amigurumi-bigger-or-smaller', 'best-yarn-for-amigurumi', 'amigurumi-face-placement-and-expression'],
   body: [
     {
       type: 'p',
@@ -48,6 +48,15 @@ export const safetyEyesGuide: Guide = {
         `Both eyes must be on the same round, with the same number of stitches between each eye and the center of the face.`,
         `Pin them in place on the finished head and look at the toy from a few steps back before you fix them.`,
       ],
+    },
+    { type: 'h2', text: `Eye spacing, eye styles and safety noses` },
+    {
+      type: 'p',
+      text: `A common starting point is a gap of about one eye width between the two eyes, then you move them by a stitch or two until the face looks right. Eyes come in round, half-round and cat-style shapes, and with or without colored rims. Plain black round eyes suit most animals.`,
+    },
+    {
+      type: 'p',
+      text: `Safety noses are fitted the same way, with a post and a washer, and the same cautions apply. Place the nose in the middle of the face, a little below and between the eyes. More ideas are in our guide to [amigurumi face placement and expression](/guides/amigurumi-face-placement-and-expression).`,
     },
     { type: 'h2', text: `How to fit safety eyes` },
     {
@@ -91,7 +100,7 @@ export const safetyEyesGuide: Guide = {
     },
     {
       type: 'p',
-      text: `The rest of the finishing steps, including stuffing and sewing on parts, are in our guide on [how to stuff and assemble amigurumi](/guides/how-to-stuff-and-assemble-amigurumi). To try it on a real toy, browse the [crochet patterns for beginners](/crochet-patterns-for-beginners), or download a [free crochet pattern](/free-crochet-patterns). Choosing a smooth yarn helps too, as explained in [the best yarn for amigurumi](/guides/best-yarn-for-amigurumi).`,
+      text: `For washing steps, see how to [wash crochet and amigurumi](/guides/how-to-wash-crochet-and-amigurumi). The rest of the finishing steps, including stuffing and sewing on parts, are in our guide on [how to stuff and assemble amigurumi](/guides/how-to-stuff-and-assemble-amigurumi). To try it on a real toy, browse the [crochet patterns for beginners](/crochet-patterns-for-beginners), or download a [free crochet pattern](/free-crochet-patterns). Choosing a smooth yarn helps too, as explained in [the best yarn for amigurumi](/guides/best-yarn-for-amigurumi).`,
     },
   ],
   faq: [
@@ -106,6 +115,14 @@ export const safetyEyesGuide: Guide = {
     {
       q: `When do I put in the safety eyes?`,
       a: `Before you close the head, so you can reach the inside to fit the washers. Pin the eyes in place first and check the position.`,
+    },
+    {
+      q: `How far apart should safety eyes be?`,
+      a: `About one eye width apart is a common starting point. Wider spacing looks younger and closer spacing looks more serious, so pin them and check from a distance.`,
+    },
+    {
+      q: `Can I wash a toy with safety eyes?`,
+      a: `Often yes, if the yarn is washable, but a damp cloth is gentler on plastic parts. Check the yarn label and wash gently.`,
     },
     {
       q: `Can I remove a safety eye after fitting it?`,

@@ -6,7 +6,7 @@ export const washCrochetGuide: Guide = {
   description:
     'Learn how to wash crochet and amigurumi safely: read care symbols, hand wash, use a mesh bag, test for color bleed, dry flat and refluff toys.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
   related: ['how-to-read-yarn-labels', 'best-yarn-for-amigurumi', 'how-to-block-crochet'],
   body: [
@@ -103,6 +103,20 @@ export const washCrochetGuide: Guide = {
       type: 'p',
       text: `While the toy is still slightly damp, squeeze the stuffing gently with your hands to break up any clumps and push it back into place. Pull the body, ears and limbs into their original shapes, then let it finish drying. Once dry, brush the surface lightly. If the toy stays lumpy, you can restuff it, as described in our guide to [stuffing and assembling amigurumi](/guides/how-to-stuff-and-assemble-amigurumi).`,
     },
+    { type: 'h2', text: `Removing stains and smells` },
+    {
+      type: 'p',
+      text: `Act on a stain while it is fresh. Blot, never rub, with a damp cloth and a drop of mild soap, working from the outside of the mark toward the middle. Rinse the spot with cool water and let it dry flat before you decide whether it needs a full wash.`,
+    },
+    {
+      type: 'p',
+      text: `For a stale smell, air the piece in a shaded, breezy spot for a few hours. Pilling, the small fuzz balls that form on rubbed areas, is a surface effect of friction. Snip them off with small scissors rather than pulling.`,
+    },
+    { type: 'h2', text: `Washing gifts and baby items` },
+    {
+      type: 'p',
+      text: `If you give a handmade piece away, tell the recipient the fiber and the care method, or tuck in a note with the yarn label details. Soft cotton and washable acrylic are common choices for items that will be washed often. Our guide to [amigurumi yarn](/guides/best-yarn-for-amigurumi) compares them. Check small parts after each wash, and remember that toy safety rules differ by country.`,
+    },
     { type: 'h2', text: `How often to wash and how to store` },
     {
       type: 'p',
@@ -151,6 +165,18 @@ export const washCrochetGuide: Guide = {
     {
       q: `How do I stop crochet from shrinking?`,
       a: `Use cool water, avoid agitation and never wring or tumble dry wool.`,
+    },
+    {
+      q: `Can I wash an amigurumi with safety eyes?`,
+      a: `Usually yes by hand in cool water, but check that the eyes are still firmly attached afterward. Embroidered eyes are gentler on a toy that will be washed often.`,
+    },
+    {
+      q: `How do I get a smell out of a crochet toy?`,
+      a: `Air it in a shaded, breezy spot first. If that is not enough, hand wash it with mild soap and make sure it dries completely, since damp stuffing is what usually causes musty smells.`,
+    },
+    {
+      q: `How do I remove pilling from crochet?`,
+      a: `Snip the fuzz balls off with small scissors. Pulling them can loosen stitches.`,
     },
     {
       q: `How do I fluff a stuffed toy after washing?`,

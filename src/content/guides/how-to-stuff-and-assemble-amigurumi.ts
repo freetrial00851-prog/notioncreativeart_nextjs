@@ -6,9 +6,9 @@ export const stuffAndAssembleGuide: Guide = {
   description:
     'Learn how to stuff amigurumi evenly, close the last round, place safety eyes, sew on limbs and finish a toy neatly, with fixes for lumpy shapes.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-make-a-magic-ring-crochet', 'how-to-single-crochet', 'how-to-read-a-crochet-pattern'],
+  related: ['how-to-make-a-magic-ring-crochet', 'how-to-single-crochet', 'how-to-read-a-crochet-pattern', 'how-to-join-limbs-and-sew-on-parts-amigurumi'],
   body: [
     {
       type: 'p',
@@ -83,6 +83,15 @@ export const stuffAndAssembleGuide: Guide = {
       type: 'p',
       text: `Some patterns use a no-sew method, where the limbs are crocheted straight onto the body. Our [no-sew amigurumi patterns](/shop/no-sew-amigurumi) use that approach, and they need very little assembly.`,
     },
+    { type: 'h2', text: `Weight, shape and sitting upright` },
+    {
+      type: 'p',
+      text: `If a toy tips over, the base is usually too light or too rounded. Some makers sew a small fabric pouch of plastic pellets and place it in the bottom of the body, then stuff fiberfill around it. Pellets are for display toys and older children. Rules on toy filling differ by country, so check the ones that apply to you.`,
+    },
+    {
+      type: 'p',
+      text: `Wire or pipe cleaners inside limbs can help a toy hold a pose, but they are not suitable for young children. Our guides on [making amigurumi sit, stand or pose](/guides/make-amigurumi-sit-stand-or-pose) and on [stuffing and fiberfill alternatives](/guides/amigurumi-stuffing-fiberfill-and-alternatives) go into more detail.`,
+    },
     { type: 'h2', text: `Step 5: weave in the ends` },
     {
       type: 'p',
@@ -128,6 +137,18 @@ export const stuffAndAssembleGuide: Guide = {
     {
       q: `Are safety eyes really safe for children?`,
       a: `They lock firmly in place when fitted correctly, but they are not suitable for babies or very young children, because a hard plastic part can come loose if it is pulled. Use embroidered eyes for children under three, and check the toy safety rules for your country.`,
+    },
+    {
+      q: `How do I make my amigurumi sit up?`,
+      a: `Make the base flat and slightly heavier than the top, attach the head at the center, and sew the legs so they point forward. A flat bottom and firm stuffing in the body also help the toy stay upright.`,
+    },
+    {
+      q: `What can I use instead of polyester fiberfill?`,
+      a: `Makers also use cotton batting, wool roving or clean yarn scraps cut very short. They behave differently when washed, so check how you plan to care for the toy before you choose.`,
+    },
+    {
+      q: `What stitch should I use to sew on parts?`,
+      a: `A whip stitch or a mattress stitch with the yarn tail works well. Sew through the last round of the part and the stitches on the body, and keep the stitches small and even.`,
     },
     {
       q: `Can I wash an amigurumi toy?`,

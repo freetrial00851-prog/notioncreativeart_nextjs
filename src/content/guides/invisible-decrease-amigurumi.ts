@@ -6,9 +6,9 @@ export const invisibleDecreaseGuide: Guide = {
   description:
     'Learn the invisible decrease and the standard sc2tog for amigurumi: step-by-step instructions, how to count decreases and how to fix gaps and bumps.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-single-crochet', 'how-to-make-a-magic-ring-crochet', 'how-to-stuff-and-assemble-amigurumi'],
+  related: ['how-to-single-crochet', 'how-to-make-a-magic-ring-crochet', 'how-to-stuff-and-assemble-amigurumi', 'front-loop-only-and-back-loop-only-crochet'],
   body: [
     {
       type: 'p',
@@ -76,6 +76,15 @@ export const invisibleDecreaseGuide: Guide = {
       type: 'p',
       text: `A line such as "Rnd 10: (sc 4, dec) x 6 (30)" means: work 4 single crochets, then 1 decrease, and repeat that group 6 times. Each group uses 4 + 2 = 6 stitches from the round before, and it makes 4 + 1 = 5 new stitches. After 6 groups you used 36 stitches and made 30. The number in brackets at the end is the stitch count you should have. Count after every round. Our guide on [how to read a crochet pattern](/guides/how-to-read-a-crochet-pattern) explains this notation in more detail.`,
     },
+    { type: 'h2', text: `Increases and decreases together: shaping a ball` },
+    {
+      type: 'p',
+      text: `A simple ball shows how the two work as a pair. Start with a [magic ring](/guides/how-to-make-a-magic-ring-crochet) and increase to 24 stitches (6, 12, 18, 24). Work a few rounds with no shaping, so the sides go straight. Then mirror the start with decreases: 18, 12, 6. Each decrease round takes away 6 stitches, the same number the increase rounds added.`,
+    },
+    {
+      type: 'p',
+      text: `Stuff the ball before the last rounds, then close it as described below. A ball is also good practice for [working in the round](/guides/how-to-crochet-in-the-round), because you see at once if a round has too many or too few stitches.`,
+    },
     { type: 'h2', text: `Closing the top of a toy` },
     {
       type: 'p',
@@ -107,6 +116,14 @@ export const invisibleDecreaseGuide: Guide = {
     {
       q: `Can I use an invisible decrease when the pattern just says dec?`,
       a: `Yes. It uses the same two stitches and gives the same stitch count, so it does not change the pattern. It usually gives a neater look in amigurumi.`,
+    },
+    {
+      q: `What does sc2tog mean?`,
+      a: `It means single crochet two together, which is a decrease. Some patterns write it as "dec", and a few write "sc2tog" for the standard method and "inv dec" for the invisible one.`,
+    },
+    {
+      q: `What is the opposite of a decrease?`,
+      a: `An increase, which means working two stitches into the same stitch. Patterns write it as "inc". Increases make a piece wider, and decreases make it narrower.`,
     },
     {
       q: `How do I decrease in the round without a visible line?`,

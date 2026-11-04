@@ -6,9 +6,9 @@ export const crochetInTheRoundGuide: Guide = {
   description:
     'Learn how to crochet in the round: start a circle, how many stitches each round needs, spiral versus joined rounds, tubes, and how to fix cupping and ruffling.',
   datePublished: '2026-11-02',
-  dateModified: '2026-11-02',
+  dateModified: '2026-11-05',
   author: 'Notion Creative Art',
-  related: ['how-to-make-a-magic-ring-crochet', 'how-to-single-crochet', 'invisible-decrease-amigurumi'],
+  related: ['how-to-make-a-magic-ring-crochet', 'how-to-single-crochet', 'invisible-decrease-amigurumi', 'crochet-hook-sizes-chart', 'best-yarn-for-amigurumi'],
   body: [
     {
       type: 'p',
@@ -73,6 +73,16 @@ export const crochetInTheRoundGuide: Guide = {
         `Ball or sphere: increase for a few rounds, work several rounds with no increases, then decrease evenly. A [guide to the invisible decrease](/guides/invisible-decrease-amigurumi) shows how to close it neatly.`,
       ],
     },
+    { type: 'h2', text: `Making rounds firm enough for toys` },
+    {
+      type: 'p',
+      text: `A toy needs a dense fabric so the stuffing does not show. Most amigurumi uses single crochet worked with a hook one or two sizes smaller than the yarn label suggests, which pulls the stitches close together. Keep your tension even from the first round to the last, because rounds that are tight in one place and loose in another make a lumpy shape. Our [crochet hook sizes chart](/guides/crochet-hook-sizes-chart) lists common sizes in millimeters and US letters, and [best yarn for amigurumi](/guides/best-yarn-for-amigurumi) explains which yarns hold their shape.`,
+    },
+    { type: 'h2', text: `Turning, rows and rounds: the terms` },
+    {
+      type: 'p',
+      text: `A row is worked back and forth, and you turn the work at the end. A round is worked in a circle, and you do not turn, so the right side always faces you. In a joined round you may turn at the end if the pattern says so, but spirals never do. If a pattern for a flat piece uses "Row 1, Row 2", it is not worked in the round, even if it later shapes into a tube.`,
+    },
     { type: 'h2', text: `Common problems and how to fix them` },
     {
       type: 'table',
@@ -107,6 +117,14 @@ export const crochetInTheRoundGuide: Guide = {
     {
       q: `Why does my circle curl?`,
       a: `It probably has too few increases. Count the stitches in each round and compare with the numbers for the stitch you are using.`,
+    },
+    {
+      q: `What is the difference between a round and a row in crochet?`,
+      a: `A row goes back and forth and you turn the work. A round goes in a circle and you keep the same side facing you. Rounds make toys, hats and baskets.`,
+    },
+    {
+      q: `Why do amigurumi patterns use a smaller hook?`,
+      a: `A smaller hook makes tighter stitches, so the fabric is dense and the stuffing does not show through. The pattern lists the hook size to use.`,
     },
     {
       q: `How do I make the sides straight?`,
