@@ -13,6 +13,21 @@ import { FaqAccordion } from '@/components/FaqAccordion'
 type Props = { params: Promise<{ slug: string }> }
 
 /** Every guide is known at build time; anything else is a real 404. */
+const NEXT_LINKS: Record<string, { href: string; label: string }[]> = {
+  'start-here': [
+    { href: '/crochet-patterns-for-beginners', label: 'Beginner patterns' },
+    { href: '/shop/amigurumi', label: 'Amigurumi patterns' },
+  ],
+  amigurumi: [
+    { href: '/amigurumi-animals', label: 'Amigurumi animals' },
+    { href: '/mini-amigurumi-and-keychains', label: 'Keychains and minis' },
+  ],
+  default: [
+    { href: '/amigurumi-animals', label: 'Amigurumi animals' },
+    { href: '/crochet-patterns-for-beginners', label: 'Beginner patterns' },
+  ],
+}
+
 export const dynamicParams = false
 
 export function generateStaticParams() {
@@ -143,6 +158,14 @@ export default async function GuidePage({ params }: Props) {
                 Browse all patterns
               </Link>
             </div>
+            <p className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1 text-[14px] text-white/80">
+              <span>Also see:</span>
+              {(NEXT_LINKS[group.id] ?? NEXT_LINKS.default).map((l) => (
+                <Link key={l.href} href={l.href} className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-4 hover:text-white/80">
+                  {l.label}
+                </Link>
+              ))}
+            </p>
           </div>
         </article>
 
