@@ -13,6 +13,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import { getStatusBadge, skillLevelTagLabel } from '../lib/productCardMeta'
 import { prefetchProduct } from '../lib/prefetchCache'
+import { preloadCartDrawer } from '../lib/overlayChunks'
 import { downloadFreePattern } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 
@@ -167,6 +168,7 @@ export function ProductCard({
           <button
             type="button"
             onClick={free ? downloadFree : toggleCart}
+            onPointerEnter={free ? undefined : preloadCartDrawer}
             disabled={free && downloadingFree}
             aria-label={free ? `Download ${product.title} free` : addLabel}
             className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-md bg-navy text-[12px] font-bold uppercase tracking-[0.06em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"

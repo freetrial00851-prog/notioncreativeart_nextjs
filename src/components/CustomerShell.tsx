@@ -6,11 +6,14 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { GlobalAccountBanners } from '@/components/GlobalAccountBanners'
 import { AdminAreaGuard } from '@/components/AdminAreaGuard'
-import { CartDrawer } from '@/components/CartDrawer'
 import { CheckoutOverlay } from '@/components/CheckoutOverlay'
 import dynamic from 'next/dynamic'
-import { AuthSheet } from '@/components/AuthSheet'
-// Loaded only when needed, so every page does not download the chat and newsletter code.
+import { Deferred } from '@/components/Deferred'
+import { useCart } from '@/context/CartContext'
+// Loaded after the page is usable (or when opened), so the first visit does not download or run them up front.
+import { importCartDrawer, importAuthSheet } from '@/lib/overlayChunks'
+const CartDrawer = dynamic(() => importCartDrawer().then((m) => m.CartDrawer), { ssr: false })
+const AuthSheet = dynamic(() => importAuthSheet().then((m) => m.AuthSheet), { ssr: false })
 const SupportChat = dynamic(() => import('@/components/SupportChat').then((m) => m.SupportChat), { ssr: false })
 const NewsletterPromptModal = dynamic(() => import('@/components/NewsletterPromptModal').then((m) => m.NewsletterPromptModal), { ssr: false })
 import { useUI } from '@/context/UIContext'
@@ -27,6 +30,25 @@ function NewsletterPromptHost() {
   return <NewsletterPromptModal open={newsletterPromptOpen} onClose={closeNewsletterPrompt} />
 }
 
+/** Cart drawer and sign-in sheet are only downloaded when opened (or when the visitor reaches for the button); the chat after the page is idle. */
+function DeferredOverlays() {
+  const { drawerOpen } = useCart()
+  const { authSheetOpen } = useUI()
+  return (
+    <>
+      <Deferred now={drawerOpen} whenIdle={false}>
+        <CartDrawer />
+      </Deferred>
+      <Deferred now={authSheetOpen} whenIdle={false}>
+        <AuthSheet />
+      </Deferred>
+      <Deferred>
+        <SupportChat />
+      </Deferred>
+    </>
+  )
+}
+
 export function CustomerShell({ children }: { children: React.ReactNode }) {
   // Lemon Squeezy checkout overlay — same as the Vite app's useEffect in App.tsx
   useEffect(() => {
@@ -39,10 +61,8 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
       <ScrollToTop />
       <StorefrontPageViewTracker />
       <AdminAreaGuard />
-      <CartDrawer />
+      <DeferredOverlays />
       <CheckoutOverlay />
-      <SupportChat />
-      <AuthSheet />
       <NewsletterPromptHost />
       <div className="min-h-screen flex flex-col">
         <AnnouncementBar />

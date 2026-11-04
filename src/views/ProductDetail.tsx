@@ -19,6 +19,7 @@ import { useToast } from '../context/ToastContext'
 import { downloadFreePattern, triggerPdfDownload } from '../lib/downloads'
 import { isFreeProduct } from '../lib/product'
 import { ga4ViewItem } from '../lib/ga4'
+import { preloadCartDrawer } from '../lib/overlayChunks'
 import { fetchProductReviewStats } from '../lib/reviews'
 import { useReviewStatsMapForLists } from '../lib/useReviewStatsMap'
 import { PatternCard } from '../components/PatternCard'
@@ -975,7 +976,7 @@ export function ProductDetail({
                         In cart, view cart
                       </Link>
                     ) : (
-                      <button type="button" onClick={toggleCart} className={secondaryButtonClass}>
+                      <button type="button" onClick={toggleCart} onPointerEnter={preloadCartDrawer} onFocus={preloadCartDrawer} className={secondaryButtonClass}>
                         Add to cart
                       </button>
                     )}

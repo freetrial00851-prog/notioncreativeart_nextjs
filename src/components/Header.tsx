@@ -18,6 +18,7 @@ import {
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { useFocusTrap } from '../lib/useFocusTrap'
+import { preloadAuthSheet, preloadCartDrawer } from '../lib/overlayChunks'
 import type { Product } from '../lib/types'
 import { profileDisplayName, profileInitial } from '../lib/profileName'
 import { MaterialIcon } from './MaterialIcon'
@@ -232,6 +233,8 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => requireAuth()}
+                onPointerEnter={preloadAuthSheet}
+                onFocus={preloadAuthSheet}
                 className={`${NAV_LABEL} hidden min-h-11 items-center px-2 lg:inline-flex`}
               >
                 Sign in
@@ -265,6 +268,8 @@ export function Header() {
               type="button"
               aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ''}`}
               onClick={openDrawer}
+              onPointerEnter={preloadCartDrawer}
+              onFocus={preloadCartDrawer}
               className="relative inline-flex min-h-11 min-w-11 items-center justify-center gap-1 px-2 text-[12px] font-semibold transition-colors hover:text-coral"
             >
               <MaterialIcon name="shopping_bag" size={22} color="currentColor" className="sm:hidden" />
