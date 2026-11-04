@@ -76,6 +76,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ['@supabase/supabase-js'],
+    // Put the (Tailwind) CSS inside the HTML instead of a blocking stylesheet request: faster first paint on phones.
+    inlineCss: true,
   },
   /**
    * WordPress / WooCommerce cutover — 308 permanent redirects only where a

@@ -6,14 +6,23 @@ export const COOKIE_CONSENT_KEY = 'nca_cookie_consent'
 export const COOKIE_CONSENT_EVENT = 'nca-cookie-consent-changed'
 export const COOKIE_CONSENT_REOPEN_EVENT = 'nca-cookie-consent-reopen'
 
+/** Set on <html> by a tiny inline script (see layout.tsx) when a choice was already made, so the bar never flashes. */
+export const COOKIE_DECIDED_CLASS = 'cookie-decided'
+
 export function CookieConsent() {
-  const [visible, setVisible] = useState(false)
+  // The bar is part of the server HTML (visible from the first paint). Painting it late, after the page had
+  // hydrated, made this small text block the page's Largest Contentful Paint (6+ seconds on a phone).
+  const [visible, setVisible] = useState(true)
   const barRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const stored = localStorage.getItem(COOKIE_CONSENT_KEY)
-    if (!stored) setVisible(true)
-    const reopen = () => setVisible(true)
+    // Reading localStorage is only possible in the browser, so the saved choice is applied after the first render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (localStorage.getItem(COOKIE_CONSENT_KEY)) setVisible(false)
+    const reopen = () => {
+      document.documentElement.classList.remove(COOKIE_DECIDED_CLASS)
+      setVisible(true)
+    }
     window.addEventListener(COOKIE_CONSENT_REOPEN_EVENT, reopen)
     return () => window.removeEventListener(COOKIE_CONSENT_REOPEN_EVENT, reopen)
   }, [])
@@ -40,6 +49,7 @@ export function CookieConsent() {
 
   const choose = (value: 'accepted' | 'rejected') => {
     localStorage.setItem(COOKIE_CONSENT_KEY, value)
+    document.documentElement.classList.add(COOKIE_DECIDED_CLASS)
     window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: value }))
     setVisible(false)
   }
@@ -51,7 +61,7 @@ export function CookieConsent() {
       ref={barRef}
       role="region"
       aria-label="Cookie preferences"
-      className="fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-4 py-2 md:bottom-4 md:left-4 md:right-auto md:max-w-[440px] md:rounded-xl md:border md:px-5 md:py-4 md:shadow-card"
+      className="cookie-bar fixed bottom-0 left-0 right-0 z-[60] bg-canvas border-t border-line px-4 py-2 md:bottom-4 md:left-4 md:right-auto md:max-w-[440px] md:rounded-xl md:border md:px-5 md:py-4 md:shadow-card"
     >
       <div className="max-w-site w-full mx-auto flex flex-col items-stretch gap-2 md:gap-3">
         <p className="text-[12px] text-ink-soft flex-1 leading-snug md:text-[13px] md:leading-relaxed">

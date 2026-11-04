@@ -20,7 +20,8 @@ import { DEFAULT_HOMEPAGE_META_DESCRIPTION, getSiteSeoContext } from '@/lib/seoS
  */
 const fraunces = Fraunces({
   subsets: ['latin'],
-  axes: ['SOFT', 'WONK', 'opsz'],
+  // SOFT only: WONK and opsz stay at their defaults (opsz 14 is the sturdy text cut), which keeps the font file much smaller.
+  axes: ['SOFT'],
   // No italic file: nothing on the storefront uses it, so visitors do not download it.
   style: ['normal'],
   variable: '--font-fraunces',
@@ -29,13 +30,14 @@ const fraunces = Fraunces({
 // Body and UI text: a rounded, high x-height sans so the shop looks the same on every device.
 const nunito = Nunito({
   subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
   variable: '--font-nunito',
   display: 'swap',
 })
 const caveat = Caveat({
   subsets: ['latin'],
   weight: ['500', '700'],
+  // Only used for tiny notes: not worth competing with the first paint for bandwidth.
+  preload: false,
   variable: '--font-caveat',
   display: 'swap',
 })
@@ -85,6 +87,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {/* SVG favicon (public/) — raster + apple-touch icons auto-wired from src/app/ */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {/* Runs before first paint: a visitor who already chose never sees the cookie bar flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('nca_cookie_consent'))document.documentElement.classList.add('cookie-decided')}catch(e){}",
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString(orgJsonLd) }}

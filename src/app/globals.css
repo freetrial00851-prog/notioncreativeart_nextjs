@@ -250,6 +250,9 @@ html {
 }
 
 
+/* The cookie bar is in the server HTML; once a choice exists, hide it before first paint. */
+html.cookie-decided .cookie-bar { display: none; }
+
 html {
   /* Anchors and keyboard focus must never end up under the sticky header or the mobile buy bar. */
   scroll-padding-top: 96px;

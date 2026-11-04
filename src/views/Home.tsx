@@ -662,7 +662,7 @@ export function Home({
                 suppressHydrationWarning
                 className={`reveal rounded-2xl p-[25px] text-navy border border-border bg-surface-warm ${i === 2 ? 'hidden md:block' : ''}`}
               >
-                <div className="mb-3 flex gap-0.5 text-navy" aria-label={`${t.rating} out of 5 stars`}>
+                <div className="mb-3 flex gap-0.5 text-navy" role="img" aria-label={`${t.rating} out of 5 stars`}>
                   {Array.from({ length: 5 }).map((_, si) => (
                     <Star key={si} filled={si < Math.round(t.rating)} />
                   ))}
