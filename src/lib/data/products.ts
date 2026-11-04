@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { createStaticClient } from '@/lib/supabase/static'
 import type { Product, Category } from '@/lib/types'
 import { filterProductsByListingParams } from '@/lib/listingFilters'
@@ -97,7 +98,7 @@ export async function getCategoryById(
  * crawlers (and slow connections) see real product links and images instead of "Loading…".
  * Mirrors the client query in views/Shop.tsx for the unfiltered, newest-first state.
  */
-export async function getShopSeed(
+async function getShopSeedUncached(
   categorySlug?: string,
   limit = 12,
   /** Seed enough products (page x limit, newest first) that the requested page can be sliced out of the list on the server. */
@@ -129,7 +130,7 @@ export async function getShopSeed(
 }
 
 /** Server seed for the dedicated free-patterns page: free products (price 0), newest first, plus the true total. */
-export async function getFreeSeed(limit = 48): Promise<{ products: Product[]; categories: Category[]; total: number } | null> {
+async function getFreeSeedUncached(limit = 48): Promise<{ products: Product[]; categories: Category[]; total: number } | null> {
   try {
     const supabase = createStaticClient()
     const [{ data: cats }, { data, count }] = await Promise.all([
@@ -150,7 +151,7 @@ export async function getFreeSeed(limit = 48): Promise<{ products: Product[]; ca
 }
 
 /** Server seed for the beginners hub: beginner-level patterns, free ones and paid ones separately, newest first, with true totals. */
-export async function getBeginnerSeed(
+async function getBeginnerSeedUncached(
   limit = 24,
 ): Promise<{ free: Product[]; paid: Product[]; freeTotal: number; paidTotal: number } | null> {
   try {
@@ -219,3 +220,13 @@ export async function getCategoryIntro(slug: string): Promise<string | null> {
     return null
   }
 }
+
+
+/**
+ * The listing seeds are cached for 60 seconds (shared by every visitor). /shop is rendered per request because it
+ * reads the query string, and each request used to wait on two database round trips before sending any HTML.
+ * A new or edited pattern shows up on the listing within a minute, the same freshness as its product page.
+ */
+export const getShopSeed = unstable_cache(getShopSeedUncached, ['shop-seed-v1'], { revalidate: 60, tags: ['products'] })
+export const getFreeSeed = unstable_cache(getFreeSeedUncached, ['free-seed-v1'], { revalidate: 60, tags: ['products'] })
+export const getBeginnerSeed = unstable_cache(getBeginnerSeedUncached, ['beginner-seed-v1'], { revalidate: 60, tags: ['products'] })

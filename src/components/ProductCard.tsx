@@ -107,7 +107,12 @@ export function ProductCard({
     if (result.ok) maybeOpenNewsletterPrompt()
   }
 
-  const prefetch = () => prefetchProduct(product.slug)
+  // Cards do not prefetch their page while scrolling past (a grid of 12+ cards downloaded several product pages and
+  // their large photos before the visitor chose one, competing with the images actually on screen). Warm it on intent.
+  const prefetch = () => {
+    prefetchProduct(product.slug)
+    router.prefetch(href)
+  }
 
   const tile = tileColor(product.id)
   const addLabel = inCart ? `Remove ${product.title} from cart` : `Add ${product.title} to cart`
@@ -122,7 +127,7 @@ export function ProductCard({
         onMouseEnter={prefetch}
         onTouchStart={prefetch}
       >
-        <Link href={href} className="press-card absolute inset-0 z-0 block" aria-label={product.title} tabIndex={-1}>
+        <Link href={href} prefetch={false} className="press-card absolute inset-0 z-0 block" aria-label={product.title} tabIndex={-1}>
           {product.images?.[0] ? (
             <span className="absolute inset-0 block overflow-hidden">
               <Image
@@ -131,7 +136,8 @@ export function ProductCard({
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 priority={priority}
-                className={`img-fade object-cover transition-transform duration-[var(--dur-slow)] ease-[var(--ease-out)] [@media(hover:hover)]:group-hover/card:scale-[1.05] ${product.sold_out ? 'opacity-50' : ''}`}
+                fetchPriority={priority ? 'high' : undefined}
+                className={`${priority ? '' : 'img-fade'} object-cover transition-transform duration-[var(--dur-slow)] ease-[var(--ease-out)] [@media(hover:hover)]:group-hover/card:scale-[1.05] ${product.sold_out ? 'opacity-50' : ''}`}
               />
             </span>
           ) : (
@@ -178,6 +184,7 @@ export function ProductCard({
         <h3 className="mb-[9px] font-heading text-[15px] font-semibold leading-[1.3] text-ink md:text-[17px]">
           <Link
             href={href}
+            prefetch={false}
             onMouseEnter={prefetch}
             onTouchStart={prefetch}
             title={product.title}
