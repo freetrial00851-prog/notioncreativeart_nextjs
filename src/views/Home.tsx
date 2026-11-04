@@ -435,6 +435,29 @@ export function Home({
             <Link className="underline" href="/crochet-patterns-for-beginners">crochet patterns for beginners</Link> first. Every pattern lists its skill level,
             materials and photos, and you can print the PDF or follow it on your phone.
           </p>
+          <p className="mt-4">
+            Looking for a particular toy? Browse amigurumi by animal:{' '}
+            {[
+              ['bunny', 'bunny'],
+              ['teddy bear', 'teddy'],
+              ['cat and kitten', 'kitten'],
+              ['fox', 'fox'],
+              ['frog', 'frog'],
+              ['puppy and dog', 'puppy'],
+              ['capybara', 'capybara'],
+              ['penguin', 'penguin'],
+              ['dinosaur', 'dinosaur'],
+              ['keychain charms', 'keychain'],
+            ].map(([label, q], i, all) => (
+              <span key={q}>
+                <Link className="underline" href={`/search?q=${q}`}>{label}</Link>
+                {i < all.length - 1 ? ', ' : '.'}
+              </span>
+            ))}{' '}
+            New to amigurumi? Read <Link className="underline" href="/guides/what-is-amigurumi">what amigurumi is</Link>, learn the{' '}
+            <Link className="underline" href="/guides/how-to-make-a-magic-ring-crochet">magic ring</Link> and the{' '}
+            <Link className="underline" href="/guides">full set of crochet guides</Link>.
+          </p>
         </div>
       </section>
 

@@ -160,6 +160,52 @@ export const amigurumiContent: CategoryContent = {
       type: 'p',
       text: `Spot clean with a damp cloth and mild soap when you can. To wash a whole toy, check the yarn label, use a mesh bag, a gentle cycle and cool water, and air dry completely, since damp stuffing can smell.`,
     },
+    { type: 'h2', text: `Amigurumi by animal: find the toy you want to make` },
+    {
+      type: 'p',
+      text: `Most people look for a pattern by the animal first, so here is how the shop's amigurumi is grouped. Each link opens the matching patterns.`,
+    },
+    {
+      type: 'ul',
+      items: [
+        `Pets: [kitten and cat](/search?q=kitten) patterns, [puppy](/search?q=puppy) and [corgi](/search?q=corgi) patterns, and a [hamster](/search?q=hamster).`,
+        `Bunnies and bears: the largest groups, from a tiny [bunny](/search?q=bunny) charm to a classic [teddy bear](/search?q=teddy) and a [panda](/search?q=panda).`,
+        `Woodland and farm: [fox](/search?q=fox), [hedgehog](/search?q=hedgehog), [squirrel](/search?q=squirrel), [beaver](/search?q=beaver), [lamb](/search?q=lamb), [goat](/search?q=goat), [horse](/search?q=horse) and [rooster](/search?q=rooster) patterns.`,
+        `Safari and wild animals: [giraffe](/search?q=giraffe), [zebra](/search?q=zebra), [lion](/search?q=lion), [elephant](/search?q=elephant) and [capybara](/search?q=capybara) patterns.`,
+        `Sea and water: [jellyfish](/search?q=jellyfish), [sea turtle](/search?q=turtle), [dolphin](/search?q=dolphin), [penguin](/search?q=penguin), [crab](/search?q=crab) and [seagull](/search?q=seagull) patterns.`,
+        `Fantasy and seasonal: [ghost](/search?q=ghost), [alien](/search?q=alien), [monster](/search?q=monster), [dinosaur](/search?q=dinosaur), [Nessie](/search?q=nessie), [pumpkin](/search?q=pumpkin) and [Christmas](/search?q=christmas) patterns.`,
+      ],
+    },
+    { type: 'h2', text: `Amigurumi sizes: keychain, mini and plush` },
+    {
+      type: 'p',
+      text: `Finished size depends on the pattern, the yarn and the hook. The listings range from tiny charms of about 1.5 inches to plush toys of more than 10 inches, and a listing gives the finished size when its pattern states one. Keychain and bag charm patterns are the smallest and use a fine yarn with a small hook. Many mini toys are about 3 to 5 inches tall, and plush toys often use thicker plush or velvet yarn. If you want a different size, change the yarn and hook: see how to [make amigurumi bigger or smaller](/guides/how-to-make-amigurumi-bigger-or-smaller).`,
+    },
+    { type: 'h2', text: `Outfits, accessories and finishing touches` },
+    {
+      type: 'p',
+      text: `Many patterns add a small outfit that changes how the toy looks without changing how you make the body: a dress and bow, a sweater, a scarf and hat, overalls, a swimsuit, a backpack, an umbrella or headphones. Look for these in the listing title or subtitle. They are worked as extra small pieces, so they are a good way to practice shaping once the basic toy feels comfortable. A few designs, such as the posable ones, use craft wire inside the limbs so the toy holds its pose.`,
+    },
+    { type: 'h2', text: `Amigurumi keychains and bag charms` },
+    {
+      type: 'p',
+      text: `A keychain is the quickest amigurumi project, so it is a good first make. You crochet a small toy, then attach a keychain ring or a clasp. Many keychain patterns can also be finished as a bag charm, an ornament or a car charm. Use a firm stitch and a small hook so the stuffing stays inside. Browse the [keychain patterns](/search?q=keychain), or start with a [free crochet pattern](/free-crochet-patterns).`,
+    },
+    { type: 'h2', text: `Amigurumi gift ideas` },
+    {
+      type: 'p',
+      text: `Crochet toys are often made as a baby shower gift, a birthday present, nursery decoration, an Easter basket filler or a Valentine's gift, and a keychain makes a small present for a friend. If the toy is for a baby or toddler, embroider the face instead of using safety eyes and check the toy safety rules that apply where you live. Our guides to [safety eyes](/guides/safety-eyes-for-amigurumi) and [embroidering faces](/guides/how-to-embroider-faces-on-amigurumi) explain both options.`,
+    },
+    { type: 'h2', text: `Which loops do I crochet into, and what is yarn under?` },
+    {
+      type: 'p',
+      text: `Unless a pattern says otherwise, crochet under both loops of each stitch. A pattern that wants only one loop will say front loop only (FLO) or back loop only (BLO). Some crocheters also work "yarn under" instead of the usual "yarn over" when they pull up the loop. It twists the stitch differently and gives a slightly tighter fabric, but it is optional, so use the standard yarn over unless the pattern asks for something else. The [abbreviations guide](/guides/crochet-abbreviations-us-vs-uk) explains FLO, BLO and every other term.`,
+    },
+    { type: 'h2', text: `More ways to browse` },
+    {
+      type: 'p',
+      text: `New to crochet? See the [crochet patterns for beginners](/crochet-patterns-for-beginners). Want to avoid sewing? Browse the [no-sew amigurumi patterns](/shop/no-sew-amigurumi). Prefer to try before you buy? The [free crochet patterns](/free-crochet-patterns) download without an account, and the [crochet guides](/guides) cover every basic stitch.`,
+    },
     { type: 'h2', text: `What is in the shop right now` },
     {
       type: 'p',
@@ -191,6 +237,26 @@ export const amigurumiContent: CategoryContent = {
     {
       q: `Are safety eyes safe for children?`,
       a: `They are built to lock, but a hard part on a toy is still a risk for very young children. For babies and toddlers, general good practice is to embroider the face and to check the toy safety rules in your country. For a gift, ask the parent what they prefer.`,
+    },
+    {
+      q: `How much stuffing does an amigurumi toy need?`,
+      a: `Stuff firmly, in small pieces, and add more until the toy keeps its shape when you squeeze it and no stuffing shows between the stitches. A loosely stuffed toy sags and looks lumpy. See our guide on how to stuff and assemble amigurumi.`,
+    },
+    {
+      q: `How do I make my amigurumi sit up straight?`,
+      a: `Stuff the body firmly, pin the head and limbs in place before sewing, and check the toy from the front and the side. Sewing the head on a little forward and the legs slightly apart helps most toys sit without leaning.`,
+    },
+    {
+      q: `Should I use safety eyes, embroidered eyes or felt eyes?`,
+      a: `Safety eyes give a clean look, embroidered eyes are the safer choice for babies and toddlers, and felt eyes sewn on suit older children. Toy safety rules differ between countries, so check the ones that apply to you.`,
+    },
+    {
+      q: `Do amigurumi patterns include the finished size?`,
+      a: `Many do, and a listing gives the size when the pattern states it. The size also depends on your yarn and hook, so a thicker yarn makes a bigger toy from the same pattern.`,
+    },
+    {
+      q: `Why are my stitches uneven?`,
+      a: `Uneven stitches usually come from changing tension. Hold the yarn the same way, keep the loop on the hook a steady size, and practice a flat circle until the rounds look even. Our crochet tension and gauge guides can help.`,
     },
     {
       q: `Why do US and UK crochet terms confuse amigurumi patterns?`,

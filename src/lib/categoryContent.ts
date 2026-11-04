@@ -10,6 +10,7 @@ import { homeDecorContent } from '@/content/categories/home-decor'
 import { kitchenStorageContent } from '@/content/categories/kitchen-storage'
 import { seasonalContent } from '@/content/categories/seasonal'
 import { toolsGuidesContent } from '@/content/categories/tools-guides'
+import { allPatternsContent } from '@/content/categories/all-patterns'
 
 /** Long-form text shown under the pattern grid on a category page. Same block format as the guides. */
 export type CategoryContent = {
@@ -31,6 +32,7 @@ const CONTENT: CategoryContent[] = [
   kitchenStorageContent,
   seasonalContent,
   toolsGuidesContent,
+  allPatternsContent,
 ]
 
 export function getCategoryContent(slug: string): CategoryContent | undefined {

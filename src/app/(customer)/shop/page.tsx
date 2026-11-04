@@ -8,6 +8,7 @@ import {
   listingPageFromParams,
 } from '@/lib/seo'
 import { Shop } from '@/views/Shop'
+import { CategoryContent } from '@/components/CategoryContent'
 import { getShopSeed } from '@/lib/data/products'
 import {
   resolveShopPageTitle,
@@ -64,6 +65,7 @@ export default async function ShopPage({ searchParams }: Props) {
       <Suspense fallback={<ShopLoading title={title} />}>
         <Shop initialTitle={title} initialProducts={seed?.products} initialCategories={seed?.categories} initialTotal={seed?.total} />
       </Suspense>
+      {onlyPage && listingPageFromParams(sp) === 1 ? <CategoryContent slug="all-patterns" /> : null}
     </>
   )
 }
