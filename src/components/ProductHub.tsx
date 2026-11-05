@@ -8,7 +8,7 @@ import { GuideBody } from '@/components/guides/GuideBody'
 import type { Hub } from '@/content/pages/hubs'
 import type { Product } from '@/lib/types'
 
-const PER_GROUP = 8
+const PER_GROUP = 40
 
 /** A topic hub: short intro, then the real patterns grouped by theme, then explanatory text and FAQ. Server component. */
 export async function ProductHub({ hub }: { hub: Hub }) {
