@@ -10,6 +10,7 @@ const EXPLORE = [
   { label: 'Beginner patterns', to: '/crochet-patterns-for-beginners' },
   { label: 'Amigurumi animals', to: '/amigurumi-animals' },
   { label: 'Keychains and minis', to: '/mini-amigurumi-and-keychains' },
+  { label: 'Dressed amigurumi', to: '/amigurumi-in-clothes-and-hats' },
   { label: 'Crochet guides', to: '/guides' },
 ]
 

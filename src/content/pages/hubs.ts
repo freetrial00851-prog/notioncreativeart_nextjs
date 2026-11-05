@@ -100,3 +100,45 @@ export const MINI_HUB: Hub = {
     { q: 'Are mini patterns good for beginners?', a: 'Many are, because they are small and use basic stitches. Check the skill level on each listing.' },
   ],
 }
+
+export const DRESSED_HUB: Hub = {
+  path: '/amigurumi-in-clothes-and-hats',
+  title: 'Amigurumi in Clothes: Dress, Sweater and Hat Crochet Patterns (PDF)',
+  h1: 'Dressed amigurumi: crochet patterns with dresses, sweaters and hats',
+  description:
+    'Crochet patterns for amigurumi animals and dolls wearing dresses, sweaters, overalls, hats and scarves. PDF patterns with instant download.',
+  lead: 'These toys come with a wardrobe: a bunny in a dress, a puppy in a sweater, a turtle in a sun hat. Each pattern is a PDF you can download right after payment, with a materials list and a skill level, and the free ones download without an account.',
+  groups: [
+    { id: 'dresses', title: 'Dresses and skirts', intro: 'Bunnies, bears, cats and ducks in dresses, with bows and ruffles.', terms: ['dress', 'sundress', 'skirt'], searchQ: 'dress' },
+    { id: 'sweaters-and-outfits', title: 'Sweaters, overalls and outfits', intro: 'Toys dressed in knitted-look sweaters, overalls and small costumes.', terms: ['sweater', 'overalls', 'outfit', 'costume'], searchQ: 'sweater' },
+    { id: 'hats-and-scarves', title: 'Hats, scarves and bonnets', intro: 'Sun hats, sailor hats, bonnets and winter scarves for small toys.', terms: ['scarf', 'bonnet', 'sun hat', 'sailor hat', 'orange hat', 'beanie', 'sporty cap'], searchQ: 'scarf' },
+    { id: 'wearables-for-people', title: 'Crochet clothes for people', intro: 'Cardigans and other wearable patterns for you rather than a toy.', terms: ['cardigan', 'shawl'], searchQ: 'cardigan' },
+  ],
+  body: [
+    { type: 'h2', text: `How do you crochet clothes for amigurumi?` },
+    {
+      type: 'p',
+      text: `Most toy clothes are small flat or tubular pieces worked with the same hook as the toy. A dress is usually a tube of single crochet that grows with increases, a sweater is a tube with two small sleeves, and a hat is a half sphere. Making the clothes as separate pieces lets you take them off, which many people like for gifts.`,
+    },
+    { type: 'h2', text: `Yarn and hook for toy clothes` },
+    {
+      type: 'p',
+      text: `Use a yarn that is thinner or the same weight as the toy so the clothes do not look bulky. Cotton and acrylic both work. Check your [gauge](/guides/crochet-gauge-swatch) on a small swatch, because clothes that are even a little too tight are hard to pull over the head. Our [yarn weight chart](/guides/yarn-weight-chart) and [hook size chart](/guides/crochet-hook-sizes-chart) show the matching hook for each yarn.`,
+    },
+    { type: 'h2', text: `Safety for toys with small parts` },
+    {
+      type: 'p',
+      text: `Buttons, bows and loose accessories can come off. If the toy is for a baby or a young child, sew every piece on firmly or crochet it into the garment, and use [embroidered faces](/guides/how-to-embroider-faces-on-amigurumi) instead of hard eyes. Rules differ by country, so check the ones that apply where you live.`,
+    },
+    { type: 'h2', text: `More ways to browse` },
+    {
+      type: 'p',
+      text: `Choose by animal in [amigurumi animals](/amigurumi-animals), see small makes in [mini amigurumi and keychains](/mini-amigurumi-and-keychains), or browse the [wearables category](/shop/wearables) and [crochet patterns for beginners](/crochet-patterns-for-beginners).`,
+    },
+  ],
+  faq: [
+    { q: 'Can I take the clothes off the toy?', a: 'It depends on the pattern. Many patterns make the clothes as separate pieces, and the listing and the pattern notes say how each one is built.' },
+    { q: 'Are patterns with clothes harder than plain toys?', a: 'They add a few small pieces, so they are usually a step up from a basic toy. Each listing shows its skill level, and the beginner patterns page is a good place to start.' },
+    { q: 'What yarn is best for crochet doll clothes?', a: 'A smooth cotton or acrylic yarn in the same weight as the toy or one size thinner. Follow the materials list in the pattern for the exact yarn and hook.' },
+  ],
+}

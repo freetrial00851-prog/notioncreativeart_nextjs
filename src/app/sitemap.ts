@@ -16,6 +16,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${SITE_URL}/guides`, changeFrequency: 'weekly', priority: 0.6 },
   { url: `${SITE_URL}/amigurumi-animals`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${SITE_URL}/mini-amigurumi-and-keychains`, changeFrequency: 'weekly', priority: 0.7 },
+  { url: `${SITE_URL}/amigurumi-in-clothes-and-hats`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${SITE_URL}/faq`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/contact`, changeFrequency: 'monthly', priority: 0.3 },
