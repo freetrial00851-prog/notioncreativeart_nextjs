@@ -174,7 +174,9 @@ export function ProductCard({
             aria-label={free ? `Download ${product.title} free` : addLabel}
             className="absolute bottom-2 right-2 z-10 inline-flex size-11 items-center justify-center rounded-md bg-navy text-[12px] font-bold uppercase tracking-[0.06em] text-white transition-[opacity,transform,background-color] hover:bg-violet focus-visible:translate-y-0 focus-visible:opacity-100 disabled:opacity-60 md:inset-x-3 md:bottom-3 md:right-3 md:size-auto md:min-h-11 md:translate-y-1 md:px-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100"
           >
-            <span key={`${free}-${downloadingFree}-${inCart}`} aria-hidden className="atc-glyph text-[18px] leading-none md:hidden">{free ? (downloadingFree ? '…' : '↓') : inCart ? '✓' : '+'}</span>
+            <span aria-hidden className="inline-flex md:hidden">
+              <span key={`${free}-${downloadingFree}-${inCart}`} className="atc-glyph text-[18px] leading-none">{free ? (downloadingFree ? '…' : '↓') : inCart ? '✓' : '+'}</span>
+            </span>
             <span className="hidden md:inline">{quickLabel}</span>
           </button>
         )}

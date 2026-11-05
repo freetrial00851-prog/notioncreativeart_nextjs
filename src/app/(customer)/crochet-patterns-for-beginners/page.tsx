@@ -58,25 +58,73 @@ export default async function BeginnersHubPage() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(itemListJsonLd) }} />
       )}
 
-      <div className="max-w-site w-full mx-auto page-gutter pt-8 pb-6 md:pt-12">
-        <nav aria-label="Breadcrumb" className="mb-4 text-[13px] text-muted">
+      <div className="max-w-site w-full mx-auto page-gutter pt-8 pb-8 md:pt-12 md:pb-10">
+        <nav aria-label="Breadcrumb" className="mb-6 text-[13px] text-muted">
           <Link href="/" className="hover:text-ink">Home</Link> <span aria-hidden>›</span>{' '}
           <Link href="/shop" className="hover:text-ink">Shop</Link> <span aria-hidden>›</span>{' '}
           <span className="font-semibold text-ink">Crochet Patterns for Beginners</span>
         </nav>
-        <h1 className="font-heading text-[clamp(34px,5vw,56px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">
-          Crochet Patterns for Beginners
-        </h1>
-        <p className="mt-4 max-w-[68ch] text-[15px] leading-[1.75] text-muted md:text-[16px]">
-          New to crochet? Start here. These are the patterns marked beginner level, with the free ones first so you can try a style before you buy.
-          {freeTotal + paidTotal > 0 ? ` There are ${freeTotal} free and ${paidTotal} paid beginner patterns, ` : ' '}
-          each with a materials list and a PDF you can download straight away, with no account needed. Unsure how to read a pattern? Our{' '}
-          <Link href="/guides/how-to-read-a-crochet-pattern" className="text-primary underline underline-offset-4">beginner guide</Link> explains it step by step.
-        </p>
-        <p className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[14px] font-semibold">
-          {free.length > 0 && <a href="#free-beginner-patterns" className="text-primary hover:underline">Free beginner patterns ↓</a>}
-          {paid.length > 0 && <a href="#more-beginner-patterns" className="text-primary hover:underline">More beginner patterns ↓</a>}
-        </p>
+        <div className="grid items-start gap-8 lg:grid-cols-[1.25fr_1fr] lg:gap-14">
+          <div>
+            <p className="text-[12px] font-extrabold uppercase tracking-[0.12em] text-primary">Start here</p>
+            <h1 className="mt-3 font-heading text-[clamp(34px,5vw,56px)] font-semibold leading-[1.1] tracking-[-0.01em] text-ink">
+              Crochet Patterns for Beginners
+            </h1>
+            <p className="mt-5 max-w-[56ch] text-[16px] leading-[1.7] text-ink/80 md:text-[17px]">
+              New to crochet? These patterns are marked beginner level. Each one has a materials list, clear stitch counts and a PDF you can download straight away, with no account needed.
+            </p>
+            <p className="mt-3 max-w-[56ch] text-[15px] leading-[1.7] text-muted">
+              The free ones come first, so you can try a style before you buy. Unsure how to read a pattern? Our{' '}
+              <Link href="/guides/how-to-read-a-crochet-pattern" className="text-primary underline underline-offset-4">beginner guide</Link> explains it step by step.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              {free.length > 0 && (
+                <a href="#free-beginner-patterns" className="inline-flex min-h-12 items-center justify-center rounded-lg bg-navy px-6 text-[15px] font-bold text-white transition-colors hover:bg-violet">
+                  See free patterns
+                </a>
+              )}
+              {paid.length > 0 && (
+                <a href="#more-beginner-patterns" className="inline-flex min-h-12 items-center justify-center rounded-lg border-2 border-ink px-6 text-[15px] font-bold text-ink transition-colors hover:bg-ink hover:text-white">
+                  More beginner patterns
+                </a>
+              )}
+            </div>
+          </div>
+
+          <aside aria-label="What you get" className="rounded-xl border border-border bg-surface-warm p-6 md:p-7">
+            {freeTotal + paidTotal > 0 && (
+              <dl className="grid grid-cols-2 divide-x divide-border border-b border-border pb-5">
+                <div className="pr-5">
+                  <dt className="text-[12px] font-extrabold uppercase tracking-[0.08em] text-muted">Free patterns</dt>
+                  <dd className="mt-1 font-heading text-[40px] font-semibold leading-none text-ink">{freeTotal}</dd>
+                </div>
+                <div className="pl-5">
+                  <dt className="text-[12px] font-extrabold uppercase tracking-[0.08em] text-muted">Paid patterns</dt>
+                  <dd className="mt-1 font-heading text-[40px] font-semibold leading-none text-ink">{paidTotal}</dd>
+                </div>
+              </dl>
+            )}
+            <ul className="mt-5 space-y-3 text-[15px] leading-snug text-ink">
+              {[
+                'Skill level shown on every pattern',
+                'Materials list before you buy',
+                'Instant PDF download',
+                'Free patterns need no account',
+              ].map((line) => (
+                <li key={line} className="flex items-start gap-3">
+                  <svg aria-hidden viewBox="0 0 20 20" className="mt-[3px] size-4 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 10.5l4 4 8-9" />
+                  </svg>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 border-t border-border pt-4 text-[14px] text-muted">
+              New to the hook?{' '}
+              <Link href="/guides/how-to-crochet-for-beginners" className="font-semibold text-primary hover:underline">How to crochet for beginners</Link>
+            </p>
+          </aside>
+        </div>
       </div>
 
       {free.length > 0 && (
