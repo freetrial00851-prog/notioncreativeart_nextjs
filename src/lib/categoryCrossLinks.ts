@@ -2,7 +2,7 @@
  * Categories with no patterns of their own. The matching patterns are filed under Amigurumi, so these pages point
  * visitors there instead of leaving an empty grid. Only existing pages are linked; nothing says "coming soon".
  */
-export type CrossLinks = { lead: string; links: { href: string; label: string }[]; /** Words matched against pattern titles, to show a few real patterns on an otherwise empty category page. */ terms?: string[] }
+export type CrossLinks = { lead: string; links: { href: string; label: string }[]; /** Words matched against pattern titles, to show a few real patterns on an otherwise empty category page. */ terms?: string[]; /** Guides to show as cards, for a category that is about know-how rather than patterns. */ guideSlugs?: string[] }
 
 const AMIGURUMI = { href: '/shop/amigurumi', label: 'All amigurumi patterns' }
 const FREE = { href: '/free-crochet-patterns', label: 'Free crochet patterns' }
@@ -62,5 +62,6 @@ export const CATEGORY_CROSS_LINKS: Record<string, CrossLinks> = {
       { href: '/guides/yarn-weight-chart', label: 'Yarn weight chart' },
       { href: '/guides/best-yarn-for-amigurumi', label: 'Best yarn for amigurumi' },
     ],
+    guideSlugs: ['crochet-hook-sizes-chart', 'yarn-weight-chart', 'crochet-gauge-swatch', 'how-to-read-yarn-labels', 'best-yarn-for-amigurumi', 'safety-eyes-for-amigurumi'],
   },
 }

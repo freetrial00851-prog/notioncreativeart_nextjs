@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { CategoryContent } from '@/components/CategoryContent'
 import { CATEGORY_CROSS_LINKS } from '@/lib/categoryCrossLinks'
 import { getShopSeed, getCategoryIntro, getProductsByTerms } from '@/lib/data/products'
+import { getGuide, type Guide } from '@/lib/guides'
 import { PatternCard } from '@/components/PatternCard'
 import { PatternGrid } from '@/components/PatternGrid'
 
@@ -151,6 +152,9 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
   const copy = categoryListingCopy(categorySlug, label)
   const crossTerms = seed && seed.total === 0 ? CATEGORY_CROSS_LINKS[categorySlug]?.terms : undefined
   const related = crossTerms ? await getProductsByTerms(crossTerms, 12) : []
+  const guideCards = (seed && seed.total === 0 ? CATEGORY_CROSS_LINKS[categorySlug]?.guideSlugs ?? [] : [])
+    .map((s) => getGuide(s))
+    .filter((g): g is Guide => !!g)
   const collectionJsonLd = buildCollectionPageJsonLd({
     name: copy.title,
     description: copy.description,
@@ -187,6 +191,21 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
               ))}
             </ul>
           </div>
+          {guideCards.length > 0 ? (
+            <div className="mt-8">
+              <h2 className="font-heading text-[22px] font-semibold leading-snug text-ink md:text-[26px]">Guides, charts and tools</h2>
+              <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {guideCards.map((g) => (
+                  <li key={g.slug}>
+                    <Link href={`/guides/${g.slug}`} className="group flex h-full flex-col rounded-xl border border-border bg-white p-5 transition-[border-color,box-shadow] hover:border-ink/40 hover:shadow-card-hover">
+                      <span className="font-heading text-[19px] font-semibold leading-snug text-ink group-hover:underline group-hover:underline-offset-4">{g.title}</span>
+                      <span className="mt-2 text-[14px] leading-relaxed text-muted">{g.description}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {related.length > 0 ? (
             <div className="mt-8">
               <h2 className="font-heading text-[22px] font-semibold leading-snug text-ink md:text-[26px]">Patterns you may be looking for</h2>
