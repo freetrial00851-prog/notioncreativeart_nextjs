@@ -454,6 +454,10 @@ export function Home({
                 {i < all.length - 1 ? ', ' : '.'}
               </span>
             ))}{' '}
+            Prefer to see the whole range at once? Open{' '}
+            <Link className="underline" href="/amigurumi-animals">amigurumi animals</Link>,{' '}
+            <Link className="underline" href="/mini-amigurumi-and-keychains">mini amigurumi and keychains</Link> or{' '}
+            <Link className="underline" href="/amigurumi-in-clothes-and-hats">dressed amigurumi in dresses and hats</Link>.{' '}
             New to amigurumi? Read <Link className="underline" href="/guides/what-is-amigurumi">what amigurumi is</Link>, learn the{' '}
             <Link className="underline" href="/guides/how-to-make-a-magic-ring-crochet">magic ring</Link> and the{' '}
             <Link className="underline" href="/guides">full set of crochet guides</Link>.

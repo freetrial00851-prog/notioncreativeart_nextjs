@@ -10,7 +10,7 @@ const FREE = { href: '/free-crochet-patterns', label: 'Free crochet patterns' }
 export const CATEGORY_CROSS_LINKS: Record<string, CrossLinks> = {
   accessories: {
     lead: 'Our keychains, bag charms, pencil cases and glasses cases are amigurumi patterns, so you will find them under Amigurumi.',
-    links: [AMIGURUMI, { href: '/search?q=keychain', label: 'Crochet keychain patterns' }, { href: '/search?q=case', label: 'Case and pouch patterns' }, FREE],
+    links: [AMIGURUMI, { href: '/mini-amigurumi-and-keychains', label: 'Mini amigurumi and keychains' }, { href: '/search?q=keychain', label: 'Crochet keychain patterns' }, { href: '/search?q=case', label: 'Case and pouch patterns' }, FREE],
   },
   'baby-kids': {
     lead: 'Rattles, lovey toys and baby animal sets are amigurumi patterns, so they are listed under Amigurumi.',
@@ -18,6 +18,7 @@ export const CATEGORY_CROSS_LINKS: Record<string, CrossLinks> = {
       AMIGURUMI,
       { href: '/search?q=rattle', label: 'Rattle patterns' },
       { href: '/search?q=baby', label: 'Baby animal patterns' },
+      { href: '/amigurumi-animals', label: 'Amigurumi animals' },
       { href: '/guides/safety-eyes-for-amigurumi', label: 'Safety eyes guide' },
     ],
   },
@@ -36,7 +37,7 @@ export const CATEGORY_CROSS_LINKS: Record<string, CrossLinks> = {
   },
   seasonal: {
     lead: 'Seasonal amigurumi, from pumpkins and woodland animals to spring bunnies and sea creatures, is listed under Amigurumi.',
-    links: [AMIGURUMI, { href: '/search?q=pumpkin', label: 'Pumpkin patterns' }, { href: '/search?q=bunny', label: 'Bunny patterns' }, FREE],
+    links: [AMIGURUMI, { href: '/amigurumi-animals', label: 'Amigurumi animals' }, { href: '/search?q=pumpkin', label: 'Pumpkin patterns' }, { href: '/search?q=bunny', label: 'Bunny patterns' }, FREE],
   },
   'home-decor': {
     lead: 'Decor toys, baskets and shelf sitters are amigurumi patterns, so they are listed under Amigurumi.',
