@@ -35,6 +35,7 @@ export const doubleCrochetGuide: Guide = {
         `Yarn over again and pull the yarn through the last 2 loops. One loop is left, and the stitch is done.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-double-crochet/dc-02.webp', alt: `Three loops on the hook after pulling the yarn back through the stitch`, caption: `Step 3: three loops on the hook.` },
     {
       type: 'note',
       text: `Pattern line: dc in each st across. That means a double crochet in every stitch.`,
@@ -61,6 +62,7 @@ export const doubleCrochetGuide: Guide = {
         `Chain 3, turn, and repeat.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-double-crochet/dc-04.webp', alt: `A swatch of double crochet rows with the turning chain at the edge`, caption: `A swatch of double crochet in rows.` },
     {
       type: 'p',
       text: `Patterns differ on this point: some count the turning chain as a stitch, and some do not. The pattern will say, usually with a note such as "ch 3 counts as first dc". Follow the note and count the stitches after every row. A row of double crochet shows a line of posts with a V on top, and each post and V together is one stitch.`,

@@ -30,6 +30,7 @@ export const fastenOffGuide: Guide = {
         `Pull gently on the tail to tighten the loop. The last stitch is now locked.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-fasten-off-and-weave-in-ends/fo-01.webp', alt: `The cut tail pulled through the last loop to lock the final stitch`, caption: `Pull the cut end through the loop to lock the last stitch.` },
     { type: 'h2', text: `What you need to weave in ends` },
     {
       type: 'ul',
@@ -51,11 +52,13 @@ export const fastenOffGuide: Guide = {
         `Trim the tail close to the fabric. Do not pull the yarn hard while you trim, or the tail may pull back into the work and the stitch may distort.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-fasten-off-and-weave-in-ends/fo-02.webp', alt: `A yarn needle weaving the tail through the stitches of a crochet swatch`, caption: `Weave the tail through the back of the stitches.` },
     { type: 'h2', text: `How to hide ends in amigurumi` },
     {
       type: 'p',
       text: `In a stuffed toy, tails can be hidden inside the body, which is faster and neater. Thread the tail onto the needle, and push the needle in at the end of the piece, then bring it out several stitches away through the body. Pull the yarn gently, trim it close to the surface and let the fabric spring back so the end vanishes into the stuffing. For small pieces such as ears and limbs, use the long tail to sew the piece on, and then hide the end in the body. The finishing steps for toys are in our guide on [how to stuff and assemble amigurumi](/guides/how-to-stuff-and-assemble-amigurumi).`,
     },
+    { type: 'image', src: '/guides/how-to-fasten-off-and-weave-in-ends/fo-03.webp', alt: `A yarn needle hiding a tail inside a stuffed crochet ball`, caption: `In amigurumi, run the needle through the body to hide the end.` },
     { type: 'h2', text: `Making ends secure on stuffed pieces` },
     {
       type: 'p',

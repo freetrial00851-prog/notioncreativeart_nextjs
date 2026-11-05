@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { GuideBlock } from '@/lib/guides'
 import { slugifyHeading } from '@/lib/guideMeta'
 
@@ -85,6 +86,38 @@ export function GuideBody({ blocks }: { blocks: GuideBlock[] }) {
               <aside key={i} className="rounded-lg border border-border border-l-4 border-l-coral bg-surface-warm px-5 py-4 text-[15px] leading-relaxed text-ink md:text-[16px]">
                 <Inline text={b.text} />
               </aside>
+            )
+          case 'image':
+            return (
+              <figure key={i} className="my-2">
+                <Image
+                  src={b.src}
+                  alt={b.alt}
+                  width={1200}
+                  height={900}
+                  sizes="(min-width: 1024px) 720px, 100vw"
+                  className="h-auto w-full rounded-lg border border-border bg-surface-warm"
+                />
+                {b.caption && <figcaption className="mt-2 text-[13px] leading-snug text-muted">{b.caption}</figcaption>}
+              </figure>
+            )
+          case 'gallery':
+            return (
+              <div key={i} className="my-2 grid gap-4 sm:grid-cols-2">
+                {b.images.map((im) => (
+                  <figure key={im.src}>
+                    <Image
+                      src={im.src}
+                      alt={im.alt}
+                      width={1200}
+                      height={900}
+                      sizes="(min-width: 1024px) 350px, (min-width: 640px) 45vw, 100vw"
+                      className="h-auto w-full rounded-lg border border-border bg-surface-warm"
+                    />
+                    {im.caption && <figcaption className="mt-2 text-[13px] leading-snug text-muted">{im.caption}</figcaption>}
+                  </figure>
+                ))}
+              </div>
             )
           case 'table':
             return (

@@ -26,6 +26,13 @@ export const slipStitchGuide: Guide = {
       ],
     },
     {
+      type: 'gallery',
+      images: [
+        { src: '/guides/how-to-slip-stitch-and-slip-knot/sk-01.webp', alt: `Yarn crossed over itself to make a loop for a slip knot, with the hook reaching into the loop`, caption: `Step 1: make a loop and reach through it with the hook.` },
+        { src: '/guides/how-to-slip-stitch-and-slip-knot/sk-02.webp', alt: `A finished slip knot snug on the crochet hook`, caption: `The finished slip knot, snug on the hook.` },
+      ],
+    },
+    {
       type: 'p',
       text: `If the knot is too tight, the first stitch is hard to work. If it is too loose, it will slip off the hook. Aim for a loop that moves freely with a small tug. The slip knot does not count as a stitch when you count chains.`,
     },
@@ -39,6 +46,7 @@ export const slipStitchGuide: Guide = {
         `One loop remains on the hook, and you have made one slip stitch.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-slip-stitch-and-slip-knot/ss-01.webp', alt: `The hook pulling yarn through a stitch to make a slip stitch`, caption: `Pull the yarn through the stitch and the loop on the hook.` },
     {
       type: 'note',
       text: `Pattern line: sl st in next 3 sts. That means three slip stitches, one in each of the next three stitches.`,

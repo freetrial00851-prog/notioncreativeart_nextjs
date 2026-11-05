@@ -33,6 +33,7 @@ export const holdYarnGuide: Guide = {
       type: 'p',
       text: `The pencil grip gives fine control, so it suits small hooks, thin yarn and amigurumi.`,
     },
+    { type: 'image', src: '/guides/how-to-hold-yarn-and-hook-crochet/hold-01.webp', alt: `A crochet hook held in a pencil grip`, caption: `The pencil grip.` },
     { type: 'h2', text: `The knife grip` },
     {
       type: 'ol',
@@ -47,6 +48,7 @@ export const holdYarnGuide: Guide = {
       type: 'p',
       text: `The knife grip often feels steadier with larger hooks and thick yarn. Both grips make the same stitches, so choose the one that feels comfortable.`,
     },
+    { type: 'image', src: '/guides/how-to-hold-yarn-and-hook-crochet/hold-02.webp', alt: `A crochet hook held in a knife grip`, caption: `The knife grip.` },
     { type: 'h2', text: `The hand that holds the work` },
     {
       type: 'p',
@@ -65,6 +67,7 @@ export const holdYarnGuide: Guide = {
       type: 'p',
       text: `This is the simplest method and gives light tension.`,
     },
+    { type: 'image', src: '/guides/how-to-hold-yarn-and-hook-crochet/hold-03.webp', alt: `Yarn running over the index finger of the left hand to control tension`, caption: `Tension method 1: yarn over the index finger.` },
     { type: 'h2', text: `Yarn tension method 2: wrap around the little finger` },
     {
       type: 'ol',

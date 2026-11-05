@@ -51,6 +51,10 @@ export type GuideBlock =
   | { type: 'ol'; items: string[] }
   | { type: 'table'; caption?: string; head: string[]; rows: string[][] }
   | { type: 'note'; text: string }
+  /** A photo in /public/guides/<slug>/. Always 4:3 (1200 x 900). Write alt text that says what the picture shows. */
+  | { type: 'image'; src: string; alt: string; caption?: string }
+  /** Two or more photos side by side (one column on a phone). Same rules as `image`. */
+  | { type: 'gallery'; images: { src: string; alt: string; caption?: string }[] }
 
 export type Guide = {
   slug: string

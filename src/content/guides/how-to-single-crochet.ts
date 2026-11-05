@@ -38,6 +38,13 @@ export const singleCrochetGuide: Guide = {
         `Repeat until you have 21 chains. Do not count the loop that is on the hook. Keep the chains loose enough that you can fit the hook into them later.`,
       ],
     },
+    {
+      type: 'gallery',
+      images: [
+        { src: '/guides/how-to-single-crochet/sc-01.webp', alt: `A slip knot on a crochet hook`, caption: `Step 1: a slip knot on the hook.` },
+        { src: '/guides/how-to-single-crochet/sc-02.webp', alt: `A foundation chain of crochet stitches with the hook in the last loop`, caption: `Step 1: the foundation chain, with one loop on the hook.` },
+      ],
+    },
     { type: 'h2', text: `Step 2: make your first single crochet` },
     {
       type: 'ol',
@@ -46,6 +53,13 @@ export const singleCrochetGuide: Guide = {
         `Yarn over and pull the yarn through the chain. You now have 2 loops on the hook.`,
         `Yarn over again and pull the yarn through both loops. You have 1 loop left on the hook.`,
         `That is one single crochet. Repeat in each chain across. A chain of 21 gives you 20 single crochets.`,
+      ],
+    },
+    {
+      type: 'gallery',
+      images: [
+        { src: '/guides/how-to-single-crochet/sc-03.webp', alt: `The hook going under the top V of a stitch to start a single crochet`, caption: `Step 2: put the hook under the top V of the stitch.` },
+        { src: '/guides/how-to-single-crochet/sc-04.webp', alt: `Two loops on the hook before the last yarn over of a single crochet`, caption: `Step 2: two loops on the hook, before the final pull-through.` },
       ],
     },
     {
@@ -63,6 +77,7 @@ export const singleCrochetGuide: Guide = {
         `Chain 1, turn, and repeat until the swatch is about 10 rows tall.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-single-crochet/sc-05.webp', alt: `A small swatch of single crochet rows with even edges`, caption: `A swatch of single crochet in rows, with straight edges.` },
     { type: 'h2', text: `How to count your stitches` },
     {
       type: 'p',

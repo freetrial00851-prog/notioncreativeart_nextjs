@@ -34,6 +34,7 @@ export const halfDoubleCrochetGuide: Guide = {
         `Yarn over once more and pull the yarn through all 3 loops at once. One loop is left on the hook.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-half-double-crochet/hdc-01.webp', alt: `Three loops on the hook in a half double crochet`, caption: `Step 3: three loops on the hook, before the pull-through.` },
     {
       type: 'note',
       text: `Pattern line: hdc in each st across (20). That means a half double crochet in every stitch, with 20 stitches at the end of the row.`,
@@ -57,6 +58,7 @@ export const halfDoubleCrochetGuide: Guide = {
         `Chain 2, turn, and repeat for 10 or more rows.`,
       ],
     },
+    { type: 'image', src: '/guides/how-to-half-double-crochet/hdc-03.webp', alt: `A swatch of half double crochet rows with a soft ridged texture`, caption: `A swatch of half double crochet in rows.` },
     {
       type: 'p',
       text: `Some patterns count the turning chain of 2 as the first stitch of the row, and some do not. The pattern will say so, usually with a note like "ch 2 (does not count as a stitch)". If it does count, you work your last stitch into the top of the turning chain from the row before. Always follow the note in the pattern, and count your stitches after every row.`,

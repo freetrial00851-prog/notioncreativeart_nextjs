@@ -48,6 +48,14 @@ export const magicRingGuide: Guide = {
       ],
     },
     {
+      type: 'gallery',
+      images: [
+        { src: '/guides/how-to-make-a-magic-ring-crochet/mr-01.webp', alt: `Yarn wrapped around two fingers, crossing in an X, to start a magic ring`, caption: `Steps 1 and 2: wrap the yarn around two fingers so it crosses in an X.` },
+        { src: '/guides/how-to-make-a-magic-ring-crochet/mr-04.webp', alt: `Small stitches worked in a circle around an open magic ring before it is tightened`, caption: `Step 6: work the first round of stitches into the ring.` },
+        { src: '/guides/how-to-make-a-magic-ring-crochet/mr-05.webp', alt: `The magic ring pulled tight into a closed circle with a small center`, caption: `Step 7: pull the tail to close the ring.` },
+      ],
+    },
+    {
       type: 'note',
       text: `Pattern line: Rnd 1: 6 sc in magic ring (6). That means a first round of six single crochets in the ring, with six stitches at the end.`,
     },
