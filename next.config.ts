@@ -115,6 +115,12 @@ const nextConfig: NextConfig = {
         destination: '/pattern/:slug',
         permanent: true,
       },
+      // An old category that now has a close match: the animal hub. Other retired categories stay 404.
+      {
+        source: '/shop/pet-animals',
+        destination: '/amigurumi-animals',
+        permanent: true,
+      },
       // WooCommerce product categories → shop category routes
       {
         source: '/product-category/:slug',
