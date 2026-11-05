@@ -18,7 +18,9 @@ import { Shop } from '@/views/Shop'
 import Link from 'next/link'
 import { CategoryContent } from '@/components/CategoryContent'
 import { CATEGORY_CROSS_LINKS } from '@/lib/categoryCrossLinks'
-import { getShopSeed, getCategoryIntro } from '@/lib/data/products'
+import { getShopSeed, getCategoryIntro, getProductsByTerms } from '@/lib/data/products'
+import { PatternCard } from '@/components/PatternCard'
+import { PatternGrid } from '@/components/PatternGrid'
 
 type Props = {
   params: Promise<{ categorySlug: string }>
@@ -147,6 +149,8 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
     category?.name ??
     categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   const copy = categoryListingCopy(categorySlug, label)
+  const crossTerms = seed && seed.total === 0 ? CATEGORY_CROSS_LINKS[categorySlug]?.terms : undefined
+  const related = crossTerms ? await getProductsByTerms(crossTerms, 12) : []
   const collectionJsonLd = buildCollectionPageJsonLd({
     name: copy.title,
     description: copy.description,
@@ -183,6 +187,18 @@ export default async function CategoryShopPage({ params, searchParams }: Props) 
               ))}
             </ul>
           </div>
+          {related.length > 0 ? (
+            <div className="mt-8">
+              <h2 className="font-heading text-[22px] font-semibold leading-snug text-ink md:text-[26px]">Patterns you may be looking for</h2>
+              <div className="mt-5">
+                <PatternGrid variant="shop">
+                  {related.map((p) => (
+                    <PatternCard key={p.id} product={p} />
+                  ))}
+                </PatternGrid>
+              </div>
+            </div>
+          ) : null}
         </section>
       ) : null}
       {onlyPage && pageNum === 1 && category ? <CategoryContent slug={categorySlug} /> : null}
