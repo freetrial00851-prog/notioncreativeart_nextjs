@@ -466,9 +466,6 @@ export function Home({
         </div>
       </section>
 
-      {/* 3b · Guides: learn to crochet */}
-      <HomeGuides />
-
       {/* 4 · Collections (navy band) */}
       <section id="collections" className="scroll-mt-20 bg-navy py-[58px] text-white md:py-20">
         <div className="mx-auto max-w-site page-gutter">
@@ -604,6 +601,9 @@ export function Home({
           ))}
         </ol>
       </section>
+
+      {/* 6b · Guides: learn to crochet */}
+      <HomeGuides />
 
       {/* 7 · Free feature */}
       <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">

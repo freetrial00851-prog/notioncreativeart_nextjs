@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { GUIDE_GROUPS } from '@/lib/guideMeta'
 
 /** A short, fixed list on purpose: importing the guide registry here would put every article into the home page bundle. */
 const FEATURED = [
@@ -31,6 +32,7 @@ const FEATURED = [
 
 /** Learn-to-crochet strip for the home page: real step photos from the guides, linking to the articles. */
 export function HomeGuides() {
+  const total = GUIDE_GROUPS.reduce((n, g) => n + g.slugs.length, 0)
   return (
     <section id="guides" aria-labelledby="home-guides-heading" className="scroll-mt-20 py-[58px] md:py-20">
       <div className="mx-auto max-w-site page-gutter">
@@ -45,7 +47,7 @@ export function HomeGuides() {
             </p>
           </div>
           <Link href="/guides" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-coral hover:underline">
-            All crochet guides <span aria-hidden>→</span>
+            All {total} guides <span aria-hidden>→</span>
           </Link>
         </div>
         <ul className="grid gap-5 md:grid-cols-3">
@@ -53,7 +55,7 @@ export function HomeGuides() {
             <li key={g.href}>
               <Link
                 href={g.href}
-                className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-[border-color,box-shadow] hover:border-ink/40 hover:shadow-card-hover"
+                className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow] hover:border-ink/40 hover:shadow-card-hover"
               >
                 <Image
                   src={g.src}
