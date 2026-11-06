@@ -420,49 +420,85 @@ export function Home({
         )}
       </section>
 
-      {/* 2b · Plain-text introduction with real category links (server-rendered, for search engines and readers) */}
-      <section className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
-        <div className="max-w-3xl text-[14px] leading-[1.9] text-muted">
-          <p className="eyebrow">Who we are</p>
-          <h2 className="mt-[13px] font-heading text-[clamp(26px,3vw,36px)] font-semibold leading-[1.1] tracking-[-0.01em] text-ink">
-            Crochet patterns you can download in minutes
-          </h2>
-          <p className="mt-4">
-            Notion Creative Art is a small studio writing <Link className="underline" href="/shop">crochet patterns</Link> as instant PDF
-            downloads. Browse cuddly <Link className="underline" href="/shop/amigurumi">amigurumi patterns</Link>, easy{' '}
-            <Link className="underline" href="/shop/no-sew-amigurumi">no-sew amigurumi</Link> and{' '}
-            <Link className="underline" href="/shop/wearables">wearable crochet patterns</Link>, or start with a{' '}
-            <Link className="underline" href="/free-crochet-patterns">free crochet pattern</Link>. New to crochet? Try our{' '}
-            <Link className="underline" href="/crochet-patterns-for-beginners">crochet patterns for beginners</Link> first. Every pattern lists its skill level,
-            materials and photos, and you can print the PDF or follow it on your phone.
-          </p>
-          <p className="mt-4">
-            Looking for a particular toy? Browse amigurumi by animal:{' '}
+      {/* 2b · Introduction with real category links (server-rendered, for search engines and readers) */}
+      <section aria-labelledby="home-intro-heading" className="mx-auto max-w-site page-gutter pb-[58px] md:pb-[88px]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:gap-16">
+          <div>
+            <p className="eyebrow">Who we are</p>
+            <h2 id="home-intro-heading" className="mt-[13px] font-heading text-[clamp(28px,3.4vw,42px)] font-semibold leading-[1.1] tracking-[-0.01em] text-ink">
+              Crochet patterns you can download in minutes
+            </h2>
+            <p className="mt-5 max-w-[46ch] text-[16px] leading-[1.75] text-ink/80">
+              Notion Creative Art is a small studio writing <Link className="underline underline-offset-4" href="/shop">crochet patterns</Link> as instant PDF
+              downloads.
+            </p>
+            <p className="mt-3 max-w-[46ch] text-[15px] leading-[1.75] text-muted">
+              Every pattern lists its skill level, materials and photos, and you can print the PDF or follow it on your phone. New to crochet? Try our{' '}
+              <Link className="underline underline-offset-4" href="/crochet-patterns-for-beginners">crochet patterns for beginners</Link> first.
+            </p>
+          </div>
+
+          <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2">
             {[
-              ['bunny', 'bunny'],
-              ['teddy bear', 'teddy'],
-              ['cat and kitten', 'kitten'],
-              ['fox', 'fox'],
-              ['frog', 'frog'],
-              ['puppy and dog', 'puppy'],
-              ['capybara', 'capybara'],
-              ['penguin', 'penguin'],
-              ['dinosaur', 'dinosaur'],
-              ['keychain charms', 'keychain'],
-            ].map(([label, q], i, all) => (
-              <span key={q}>
-                <Link className="underline" href={`/search?q=${q}`}>{label}</Link>
-                {i < all.length - 1 ? ', ' : '.'}
-              </span>
-            ))}{' '}
-            Prefer to see the whole range at once? Open{' '}
-            <Link className="underline" href="/amigurumi-animals">amigurumi animals</Link>,{' '}
-            <Link className="underline" href="/mini-amigurumi-and-keychains">mini amigurumi and keychains</Link> or{' '}
-            <Link className="underline" href="/amigurumi-in-clothes-and-hats">dressed amigurumi in dresses and hats</Link>.{' '}
-            New to amigurumi? Read <Link className="underline" href="/guides/what-is-amigurumi">what amigurumi is</Link>, learn the{' '}
-            <Link className="underline" href="/guides/how-to-make-a-magic-ring-crochet">magic ring</Link> and the{' '}
-            <Link className="underline" href="/guides">full set of crochet guides</Link>.
-          </p>
+              {
+                title: 'Browse patterns',
+                links: [
+                  ['/shop/amigurumi', 'Amigurumi patterns'],
+                  ['/shop/no-sew-amigurumi', 'No-sew amigurumi'],
+                  ['/shop/wearables', 'Wearable crochet patterns'],
+                  ['/free-crochet-patterns', 'Free crochet patterns'],
+                  ['/crochet-patterns-for-beginners', 'Crochet patterns for beginners'],
+                ],
+              },
+              {
+                title: 'See the whole range',
+                links: [
+                  ['/amigurumi-animals', 'Amigurumi animals'],
+                  ['/mini-amigurumi-and-keychains', 'Mini amigurumi and keychains'],
+                  ['/amigurumi-in-clothes-and-hats', 'Dressed amigurumi in dresses and hats'],
+                ],
+              },
+              {
+                title: 'By animal',
+                links: [
+                  ['bunny', 'Bunny'],
+                  ['teddy', 'Teddy bear'],
+                  ['kitten', 'Cat and kitten'],
+                  ['fox', 'Fox'],
+                  ['frog', 'Frog'],
+                  ['puppy', 'Puppy and dog'],
+                  ['capybara', 'Capybara'],
+                  ['penguin', 'Penguin'],
+                  ['dinosaur', 'Dinosaur'],
+                  ['keychain', 'Keychain charms'],
+                ].map(([q, label]) => [`/search?q=${q}`, label]),
+              },
+              {
+                title: 'New to amigurumi?',
+                links: [
+                  ['/guides/what-is-amigurumi', 'What amigurumi is'],
+                  ['/guides/how-to-make-a-magic-ring-crochet', 'The magic ring'],
+                  ['/guides', 'Full set of crochet guides'],
+                ],
+              },
+            ].map((g) => (
+              <div key={g.title}>
+                <h3 className="border-b border-border pb-2 text-[12px] font-extrabold uppercase tracking-[0.1em] text-ink">{g.title}</h3>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {g.links.map(([href, label]) => (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className="inline-flex min-h-11 items-center rounded-md border border-border bg-white px-3 text-[14px] font-semibold text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
