@@ -26,6 +26,7 @@ import { fetchMakerReviewsForHome, type MakerReviewCard } from '../lib/reviews'
 import { HOME_FAQ } from '../lib/homeFaq'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { productImageAlt } from '../lib/productImages'
+import { HomeGuides } from '../components/home/HomeGuides'
 
 function readCachedCatalog(): HomeCatalogSnapshot | null {
   if (typeof window === 'undefined') return null
@@ -464,6 +465,9 @@ export function Home({
           </p>
         </div>
       </section>
+
+      {/* 3b · Guides: learn to crochet */}
+      <HomeGuides />
 
       {/* 4 · Collections (navy band) */}
       <section id="collections" className="scroll-mt-20 bg-navy py-[58px] text-white md:py-20">
