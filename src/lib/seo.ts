@@ -219,6 +219,8 @@ type ProductJsonLdReview = {
 /** JSON-LD Product schema for rich search results on pattern pages. */
 export function buildProductJsonLd(
   product: {
+    /** Stable id, used as the SKU. Slugs change and many are longer than the 50 characters Google accepts for a SKU. */
+    id?: string
     title: string
     description: string | null
     slug: string
@@ -239,7 +241,7 @@ export function buildProductJsonLd(
     description: product.description ?? undefined,
     // Google wants several high-res images, not just the small card variant.
     image: (product.images ?? []).slice(0, 8).map((u) => deriveVariantUrl(u, 'large')),
-    sku: product.slug,
+    sku: (product.id ?? product.slug).slice(0, 50),
     brand: { '@type': 'Brand', name: SITE_NAME },
     offers: {
       '@type': 'Offer',
