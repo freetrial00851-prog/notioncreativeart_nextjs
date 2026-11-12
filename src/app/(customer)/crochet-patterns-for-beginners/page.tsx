@@ -6,7 +6,7 @@ import {
   buildBreadcrumbListJsonLd,
   buildCollectionPageJsonLd,
   buildItemListJsonLd,
-  buildListingMetadata,
+  buildMetadata,
 } from '@/lib/seo'
 import { getBeginnerSeed } from '@/lib/data/products'
 import { PatternCard } from '@/components/PatternCard'
@@ -20,11 +20,8 @@ const TITLE = 'Crochet Patterns for Beginners (Free and Paid PDFs)'
 const DESCRIPTION =
   'Easy crochet patterns for beginners: free and paid amigurumi PDFs with materials lists and clear skill levels. Instant download, no account needed.'
 
-type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
-
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, path: PATH, searchParams: await searchParams })
-}
+/** Static on purpose: this page has no filters or pages, so it can be prerendered and its title and description sit in the HTML head. */
+export const metadata: Metadata = buildMetadata({ title: TITLE, description: DESCRIPTION, path: PATH })
 
 /** Rebuild every five minutes so new beginner patterns appear without a deploy. */
 export const revalidate = 300

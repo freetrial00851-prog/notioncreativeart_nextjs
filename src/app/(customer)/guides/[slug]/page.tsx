@@ -6,6 +6,7 @@ import { buildArticleJsonLd, buildBreadcrumbListJsonLd, buildMetadata } from '@/
 import { getAllGuides, getGuide, getRelatedGuides } from '@/lib/guides'
 import { GUIDE_GROUPS, getGuideGroup, guideReadMinutes, guideTocItems } from '@/lib/guideMeta'
 import { GuideBody } from '@/components/guides/GuideBody'
+import { GuidePatterns } from '@/components/guides/GuidePatterns'
 import { GuideIcon } from '@/components/guides/GuideIcon'
 import { GuideTocMobile, GuideTocSidebar } from '@/components/guides/GuideToc'
 import { FaqAccordion } from '@/components/FaqAccordion'
@@ -29,6 +30,9 @@ const NEXT_LINKS: Record<string, { href: string; label: string }[]> = {
 }
 
 export const dynamicParams = false
+
+/** The patterns under each guide are picked from the live catalogue, so refresh them every hour. */
+export const revalidate = 3600
 
 export function generateStaticParams() {
   return getAllGuides().map((g) => ({ slug: g.slug }))
@@ -129,6 +133,8 @@ export default async function GuidePage({ params }: Props) {
               <FaqAccordion items={guide.faq.map((f) => ({ question: f.q, answer: f.a }))} />
             </section>
           )}
+
+          <GuidePatterns slug={guide.slug} groupId={group.id} />
 
           {next && (
             <Link
