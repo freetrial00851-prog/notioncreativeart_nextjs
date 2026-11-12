@@ -34,7 +34,7 @@ const FEATURED = [
 export function HomeGuides() {
   const total = GUIDE_GROUPS.reduce((n, g) => n + g.slugs.length, 0)
   return (
-    <section id="guides" aria-labelledby="home-guides-heading" className="scroll-mt-20 py-[58px] md:py-20">
+    <section id="guides" aria-labelledby="home-guides-heading" className="scroll-mt-20 py-11 md:py-20">
       <div className="mx-auto max-w-site page-gutter">
         <div className="mb-8 flex flex-col items-start justify-between gap-4 md:mb-10 md:flex-row md:items-end">
           <div>
@@ -50,12 +50,12 @@ export function HomeGuides() {
             All {total} guides <span aria-hidden>→</span>
           </Link>
         </div>
-        <ul className="grid gap-5 md:grid-cols-3">
+        <ul className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden">
           {FEATURED.map((g) => (
-            <li key={g.href}>
+            <li key={g.href} className="w-[78%] shrink-0 snap-start md:w-auto">
               <Link
                 href={g.href}
-                className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow] hover:border-ink/40 hover:shadow-card-hover"
+                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-white transition-[border-color,box-shadow] hover:border-ink/40 hover:shadow-card-hover"
               >
                 <Image
                   src={g.src}

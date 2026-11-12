@@ -7,7 +7,7 @@ import {
   buildWebPageJsonLd,
   SITE_URL,
 } from '@/lib/seo'
-import { Home } from '@/views/Home'
+import { HomeNew } from '@/views/HomeNew'
 import { getHomeCatalogServer } from '@/lib/data/home'
 import { mergeLayout } from '@/lib/defaultLayout'
 import { getSiteSeoContext } from '@/lib/seoSettings'
@@ -63,7 +63,7 @@ export default async function HomePage() {
       {listJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(listJsonLd) }} />
       )}
-      <Home
+      <HomeNew
         initialCatalog={snapshot}
         initialFeaturedError={featuredError}
         initialHero={snapshot.hero}
