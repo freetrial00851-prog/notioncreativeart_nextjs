@@ -14,6 +14,7 @@ import {
 import type { CategoryWithCount } from '../lib/categories'
 import { DEFAULT_HOME_COPY, type Product, type HeroContent, type ChapterContent, type LayoutSection, type HomeCopy } from '../lib/types'
 import { PatternCard } from '../components/PatternCard'
+import { Button } from '../components/ui/Button'
 import { MaterialIcon } from '../components/MaterialIcon'
 import { MAKER } from '../content/maker'
 import { EmailSignup } from '../components/EmailSignup'
@@ -234,109 +235,91 @@ export function HomeNew({
 
   return (
     <div className="flex flex-col bg-bg">
-      {/* 1 · Hero: search first, photo collage */}
-      <section className="order-1 relative isolate overflow-hidden bg-gradient-to-b from-butter via-peach to-bg">
-        <span aria-hidden className="absolute -right-32 -top-32 -z-10 size-[460px] rounded-full bg-pink/80" />
-        <span aria-hidden className="absolute -bottom-24 -left-24 -z-10 size-[300px] rounded-full bg-sun/70" />
-        <div className="mx-auto grid max-w-site items-center gap-12 page-gutter pb-5 pt-4 md:pb-20 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
-          <div className="min-w-0">
-            <p className="hero-rise hidden max-w-full items-center gap-2 sm:inline-flex rounded-full bg-white/85 px-3.5 py-1.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.08em] text-coral ring-1 ring-border">
-              <span aria-hidden>✳</span>
-              {copy.hero_eyebrow}
-            </p>
-            <h1 className="hero-rise-y mb-3 mt-0 sm:my-4 font-heading text-[clamp(30px,5vw,72px)] font-semibold leading-[1.08] tracking-[-0.015em] text-ink md:my-6">
-              {copy.hero_title.split('\n').map((line, i) => (
-                <Fragment key={i}>
-                  {i > 0 && <br />}
-                  {line.split(/(\*[^*]+\*)/).map((part, j) =>
-                    part.startsWith('*') && part.endsWith('*') && part.length > 2 ? (
-                      <em key={j} className="relative inline-block not-italic text-coral">
-                        {part.slice(1, -1)}
-                        <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.14em] w-full text-[#E2B764]">
-                          <path d="M2 7 C 20 1, 36 11, 56 6 S 92 2, 112 7 S 150 11, 170 5 S 192 4, 198 6" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
-                        </svg>
-                      </em>
-                    ) : (
-                      part
-                    ),
-                  )}
-                </Fragment>
-              ))}
-            </h1>
-            <p className="hero-rise hidden max-w-[46ch] text-[16px] leading-[1.75] text-ink/75 sm:block" style={{ ['--d' as string]: '120ms' }}>
-              {copy.hero_subtitle}
-            </p>
-
-            <form
-              action="/search"
-              method="get"
-              role="search"
-              className="hero-rise mt-3 flex max-w-[580px] md:mt-7 items-center rounded-full bg-white p-1.5 shadow-[0_12px_34px_rgba(42,27,20,0.14)] ring-1 ring-border focus-within:ring-2 focus-within:ring-ink"
-              style={{ ['--d' as string]: '200ms' }}
-            >
-              <label htmlFor="home-search" className="sr-only">Search crochet patterns</label>
-              <MaterialIcon name="search" size={22} className="ml-4 shrink-0 text-muted" />
-              <input
-                id="home-search"
-                name="q"
-                type="search"
-                autoComplete="off"
-                placeholder="Search bunny, fox, cardigan…"
-                className="min-w-0 flex-1 bg-transparent px-3 text-[16px] text-ink outline-none placeholder:text-muted-light"
-              />
-              <button type="submit" className="inline-flex min-h-12 shrink-0 items-center rounded-full bg-ink px-6 text-[14px] font-bold text-white transition-colors hover:bg-primary-hover">
-                Search
-              </button>
-            </form>
-
-            <p className="hero-rise mt-3 flex items-center gap-2 overflow-x-auto pb-1 text-[13px] [scrollbar-width:none] sm:flex-wrap sm:overflow-visible md:mt-5 [&::-webkit-scrollbar]:hidden" style={{ ['--d' as string]: '260ms' }}>
-              <span className="shrink-0 font-semibold text-muted">Popular:</span>
-              {[
-                ['/amigurumi-animals/bunny', 'Bunny'],
-                ['/amigurumi-animals/bear', 'Teddy bear'],
-                ['/amigurumi-animals/cat', 'Cat'],
-                ['/amigurumi-animals/fox', 'Fox'],
-                ['/shop/wearables', 'Wearables'],
-                ['/free-crochet-patterns', 'Free'],
-              ].map(([href, label]) => (
-                <Link key={href} href={href} className="inline-flex min-h-9 shrink-0 items-center rounded-full bg-white/80 px-3.5 font-semibold text-ink ring-1 ring-border transition-colors hover:bg-ink hover:text-white">
-                  {label}
-                </Link>
-              ))}
-            </p>
-
-            <div className="hero-rise mt-5 hidden flex-wrap items-center gap-x-8 gap-y-3 sm:flex md:mt-8" style={{ ['--d' as string]: '320ms' }}>
-              <Link href={heroPrimaryHref(hero?.cta_link)} className="inline-flex min-h-12 items-center rounded-full bg-coral px-7 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(185,71,47,0.35)] transition-transform hover:-translate-y-0.5">
-                {copy.hero_cta} <span aria-hidden className="ml-2">↗</span>
-              </Link>
-              <Link href={heroSecondaryHref(hero?.secondary_cta_link)} className="inline-flex min-h-12 items-center border-b-2 border-ink text-[14px] font-bold text-ink hover:text-coral">
+      {/* 1 · Hero */}
+      <section className="order-1 mx-auto grid max-w-site items-center gap-8 page-gutter py-10 md:py-14 lg:grid-cols-[1fr_1.02fr] lg:gap-[5%] lg:py-[55px]">
+        <div>
+          <p className="eyebrow hero-rise">{copy.hero_eyebrow}</p>
+          <h1 className="hero-rise-y my-5 font-heading text-[clamp(40px,5.2vw,68px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink md:my-6">
+            {copy.hero_title.split('\n').map((line, i) => (
+              <Fragment key={i}>
+                {i > 0 && <br />}
+                {line.split(/(\*[^*]+\*)/).map((part, j) =>
+                  part.startsWith('*') && part.endsWith('*') && part.length > 2 ? (
+                    <em key={j} className="relative inline-block not-italic text-coral">
+                      {part.slice(1, -1)}
+                      <svg aria-hidden viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.14em] w-full text-[#E2B764]">
+                        <path d="M2 7 C 20 1, 36 11, 56 6 S 92 2, 112 7 S 150 11, 170 5 S 192 4, 198 6" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+                      </svg>
+                    </em>
+                  ) : (
+                    part
+                  ),
+                )}
+              </Fragment>
+            ))}
+          </h1>
+          <p className="hero-rise mb-7 max-w-[420px] text-[14px] leading-[1.9] text-muted" style={{ ["--d" as string]: "120ms" }}>
+            {copy.hero_subtitle}
+          </p>
+          <div className="hero-rise flex flex-col gap-3 sm:flex-row" style={{ ["--d" as string]: "220ms" }}>
+            <Link href={heroPrimaryHref(hero?.cta_link)}>
+              <Button variant="primary" size="lg" className="w-full sm:w-auto" iconRight={<span aria-hidden>↗</span>}>
+                {copy.hero_cta}
+              </Button>
+            </Link>
+            <Link href={heroSecondaryHref(hero?.secondary_cta_link)}>
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto">
                 {copy.hero_cta2}
-              </Link>
-            </div>
+              </Button>
+            </Link>
           </div>
+          <ul className="hero-rise mt-9 flex flex-wrap gap-x-[22px] gap-y-2 text-[12px] text-muted">
+            {['Instant PDF downloads', 'Made for every skill level', 'Free crochet patterns included'].map((t) => (
+              <li key={t} className="inline-flex items-center gap-2">
+                <span className="text-coral" aria-hidden>✳</span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-          {/* Collage */}
-          <div className="hero-settle relative mx-auto hidden aspect-[5/6] w-full max-w-[560px] lg:block lg:max-w-none">
-            {heroTiles[0] ? (
-              <div className="absolute left-0 top-[6%] h-[80%] w-[58%] overflow-hidden rounded-t-[999px] rounded-b-[28px] border-[6px] border-white bg-surface-warm shadow-[0_22px_44px_rgba(42,27,20,0.22)]">
-                <Image src={deriveVariantUrl(heroTiles[0].src, 'large')} alt={heroTiles[0].alt} fill priority sizes="(max-width:1023px) 58vw, 360px" className="object-cover object-center" />
+        {/* Yellow art panel — real photo framed over a pink sun */}
+        <div className="hero-settle relative isolate grid min-h-[360px] place-items-center overflow-hidden rounded-2xl bg-sun sm:min-h-[430px] lg:min-h-[470px]">
+          <span aria-hidden className="absolute -z-0 size-[220px] rounded-full bg-pink sm:size-[280px]" style={{ top: 35, right: '10%' }} />
+          <span aria-hidden className="absolute right-[10%] top-[8%] text-[46px] leading-none text-violet">✳</span>
+          <span aria-hidden className="pointer-events-none absolute inset-4 z-[1] border-2 border-navy/20" />
+          {heroTiles[0] ? (
+            <div className="relative z-[2] -mt-10 w-[58%] max-w-[290px] -rotate-2 rounded-lg bg-white p-2 shadow-[0_18px_30px_rgba(32,32,68,0.22)] sm:-mt-14 sm:w-[44%]">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-md">
+                <Image
+                  src={deriveVariantUrl(heroTiles[0].src, 'large')}
+                  alt={heroTiles[0].alt}
+                  fill
+                  priority
+                  sizes="(max-width:1023px) 58vw, 290px"
+                  className="object-cover object-center"
+                />
               </div>
-            ) : null}
-            {heroTiles[1] ? (
-              <div className="absolute right-[2%] top-0 aspect-square w-[36%] overflow-hidden rounded-full border-[6px] border-white bg-surface-warm shadow-[0_16px_34px_rgba(42,27,20,0.2)]">
-                <Image src={deriveVariantUrl(heroTiles[1].src, 'large')} alt={heroTiles[1].alt} fill sizes="(max-width:1023px) 36vw, 220px" className="object-cover object-center" />
-              </div>
-            ) : null}
-            {heroTiles[2] ? (
-              <div className="absolute bottom-[4%] right-0 aspect-[4/5] w-[44%] rotate-3 overflow-hidden rounded-3xl border-[6px] border-white bg-surface-warm shadow-[0_18px_38px_rgba(42,27,20,0.22)]">
-                <Image src={deriveVariantUrl(heroTiles[2].src, 'large')} alt={heroTiles[2].alt} fill sizes="(max-width:1023px) 44vw, 270px" className="object-cover object-center" />
-              </div>
-            ) : null}
-            <div aria-hidden className="absolute bottom-[10%] left-[-2%] grid size-[112px] -rotate-[10deg] place-items-center rounded-full bg-sun text-center font-heading text-[15px] font-semibold leading-tight text-ink shadow-[0_10px_24px_rgba(42,27,20,0.18)] md:size-[128px] md:text-[17px]">
-              Instant<br />PDF<br />download
             </div>
-            <span aria-hidden className="absolute right-[40%] top-[2%] text-[40px] leading-none text-violet">✳</span>
-          </div>
+          ) : null}
+          <p className="absolute bottom-[26px] left-[29px] z-[3] hidden font-heading text-[19px] leading-tight text-ink sm:block">
+            Make something amazing
+            <small className="mt-[7px] block font-sans text-[12px] font-semibold uppercase tracking-[0.06em]">
+              Patterns for your next project
+            </small>
+          </p>
+          {heroTiles[0]?.href ? (
+            <Link
+              href={heroTiles[0].href}
+              className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-lg bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink shadow-[0_5px_18px_rgba(0,0,0,0.08)] hover:text-violet sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]"
+            >
+              Your next favourite make
+            </Link>
+          ) : (
+            <span className="absolute bottom-[22px] right-[18px] z-[3] rotate-3 rounded-lg bg-white px-[15px] py-3 text-[13px] font-extrabold text-ink sm:bottom-auto sm:right-[25px] sm:top-[24px] sm:text-[15px]">
+              Your next favourite make
+            </span>
+          )}
         </div>
       </section>
 
