@@ -233,18 +233,18 @@ export function HomeNew({
 
 
   return (
-    <div className="bg-bg">
+    <div className="flex flex-col bg-bg">
       {/* 1 · Hero: search first, photo collage */}
-      <section className="relative isolate overflow-hidden bg-gradient-to-b from-butter via-peach to-bg">
+      <section className="order-1 relative isolate overflow-hidden bg-gradient-to-b from-butter via-peach to-bg">
         <span aria-hidden className="absolute -right-32 -top-32 -z-10 size-[460px] rounded-full bg-pink/80" />
         <span aria-hidden className="absolute -bottom-24 -left-24 -z-10 size-[300px] rounded-full bg-sun/70" />
-        <div className="mx-auto grid max-w-site items-center gap-12 page-gutter pb-8 pt-6 md:pb-20 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+        <div className="mx-auto grid max-w-site items-center gap-12 page-gutter pb-5 pt-4 md:pb-20 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
           <div className="min-w-0">
-            <p className="hero-rise inline-flex max-w-full items-center gap-2 rounded-full bg-white/85 px-3.5 py-1.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.08em] text-coral ring-1 ring-border">
+            <p className="hero-rise hidden max-w-full items-center gap-2 sm:inline-flex rounded-full bg-white/85 px-3.5 py-1.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.08em] text-coral ring-1 ring-border">
               <span aria-hidden>✳</span>
               {copy.hero_eyebrow}
             </p>
-            <h1 className="hero-rise-y my-4 font-heading text-[clamp(36px,5vw,72px)] font-semibold leading-[1.06] tracking-[-0.015em] text-ink md:my-6">
+            <h1 className="hero-rise-y mb-3 mt-0 sm:my-4 font-heading text-[clamp(30px,5vw,72px)] font-semibold leading-[1.08] tracking-[-0.015em] text-ink md:my-6">
               {copy.hero_title.split('\n').map((line, i) => (
                 <Fragment key={i}>
                   {i > 0 && <br />}
@@ -271,7 +271,7 @@ export function HomeNew({
               action="/search"
               method="get"
               role="search"
-              className="hero-rise mt-5 flex max-w-[580px] md:mt-7 items-center rounded-full bg-white p-1.5 shadow-[0_12px_34px_rgba(42,27,20,0.14)] ring-1 ring-border focus-within:ring-2 focus-within:ring-ink"
+              className="hero-rise mt-3 flex max-w-[580px] md:mt-7 items-center rounded-full bg-white p-1.5 shadow-[0_12px_34px_rgba(42,27,20,0.14)] ring-1 ring-border focus-within:ring-2 focus-within:ring-ink"
               style={{ ['--d' as string]: '200ms' }}
             >
               <label htmlFor="home-search" className="sr-only">Search crochet patterns</label>
@@ -289,7 +289,7 @@ export function HomeNew({
               </button>
             </form>
 
-            <p className="hero-rise mt-4 flex items-center gap-2 overflow-x-auto pb-1 text-[13px] [scrollbar-width:none] sm:flex-wrap sm:overflow-visible md:mt-5 [&::-webkit-scrollbar]:hidden" style={{ ['--d' as string]: '260ms' }}>
+            <p className="hero-rise mt-3 flex items-center gap-2 overflow-x-auto pb-1 text-[13px] [scrollbar-width:none] sm:flex-wrap sm:overflow-visible md:mt-5 [&::-webkit-scrollbar]:hidden" style={{ ['--d' as string]: '260ms' }}>
               <span className="shrink-0 font-semibold text-muted">Popular:</span>
               {[
                 ['/amigurumi-animals/bunny', 'Bunny'],
@@ -305,7 +305,7 @@ export function HomeNew({
               ))}
             </p>
 
-            <div className="hero-rise mt-5 flex flex-wrap items-center gap-x-8 gap-y-3 md:mt-8" style={{ ['--d' as string]: '320ms' }}>
+            <div className="hero-rise mt-5 hidden flex-wrap items-center gap-x-8 gap-y-3 sm:flex md:mt-8" style={{ ['--d' as string]: '320ms' }}>
               <Link href={heroPrimaryHref(hero?.cta_link)} className="inline-flex min-h-12 items-center rounded-full bg-coral px-7 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(185,71,47,0.35)] transition-transform hover:-translate-y-0.5">
                 {copy.hero_cta} <span aria-hidden className="ml-2">↗</span>
               </Link>
@@ -341,7 +341,7 @@ export function HomeNew({
       </section>
 
       {/* 2 · Trust band (the one dark band) */}
-      <section aria-label="Why buy here" className="bg-navy text-white">
+      <section aria-label="Why buy here" className="order-2 hidden bg-navy text-white md:block">
         <ul className="mx-auto grid max-w-site grid-cols-2 gap-x-3 gap-y-3 page-gutter py-4 md:grid-cols-4 md:gap-x-8 md:gap-y-5 md:py-7">
           {[
             { icon: 'download', t: 'Instant PDF download', d: 'Yours the moment you pay' },
@@ -363,7 +363,7 @@ export function HomeNew({
       </section>
 
       {/* 3 · Shop by animal: round photo bubbles */}
-      <section aria-labelledby="home-animals" className="mx-auto max-w-site page-gutter py-11 md:py-[84px]">
+      <section aria-labelledby="home-animals" className="order-4 md:order-3 mx-auto max-w-site page-gutter py-11 md:py-[84px]">
         <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">Shop by animal</p>
@@ -396,7 +396,7 @@ export function HomeNew({
       </section>
 
       {/* 4 · Fresh from the studio: swipe row */}
-      <section aria-labelledby="home-featured" className="bg-peach py-11 md:py-[84px]">
+      <section aria-labelledby="home-featured" className="order-3 md:order-4 bg-peach py-8 md:py-[84px]">
         <div className="mx-auto max-w-site page-gutter">
           <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
             <div>
@@ -442,7 +442,7 @@ export function HomeNew({
       </section>
 
       {/* 5 · Start here: bento of ways in */}
-      <section aria-labelledby="home-start" className="mx-auto max-w-site page-gutter py-11 md:py-[84px]">
+      <section aria-labelledby="home-start" className="order-5 mx-auto max-w-site page-gutter py-11 md:py-[84px]">
         <div className="mb-8">
           <p className="eyebrow">Find your way in</p>
           <h2 id="home-start" className="mt-3 font-heading text-[clamp(34px,4vw,54px)] font-semibold leading-[1.08] tracking-[-0.01em] text-ink">
@@ -476,7 +476,7 @@ export function HomeNew({
       </section>
 
       {/* 6 · Free spotlight */}
-      <section className="mx-auto max-w-site page-gutter pb-11 md:pb-[84px]">
+      <section className="order-6 mx-auto max-w-site page-gutter pb-11 md:pb-[84px]">
         <div className="relative isolate grid overflow-hidden rounded-[28px] bg-coral text-white md:grid-cols-2">
           <span aria-hidden className="absolute -left-16 -top-16 -z-10 size-[260px] rounded-full bg-white/10" />
           <div className="self-center p-7 md:p-14">
@@ -507,11 +507,11 @@ export function HomeNew({
       </section>
 
       {/* 7 · Guides */}
-      <HomeGuides />
+      <div className="order-7"><HomeGuides /></div>
 
       {/* 8 · Meet the maker: shown only once the owner has supplied real text (src/content/maker.ts) */}
       {MAKER.headline && MAKER.story && (
-        <section className="bg-surface-warm">
+        <section className="order-8 bg-surface-warm">
           <div className="max-w-site mx-auto grid grid-cols-1 items-center gap-8 page-gutter py-[58px] md:py-[88px] lg:grid-cols-2 lg:gap-[8%]">
             {MAKER.photo && (
               <div className="relative mx-auto aspect-[3/4] w-full max-w-[360px] overflow-hidden rounded-t-[999px] rounded-b-3xl lg:mx-0 lg:max-w-[440px]">
@@ -542,7 +542,7 @@ export function HomeNew({
 
       {/* 9 · Reviews (only when real reviews exist) */}
       {makerReviews.length > 0 && (
-        <section id="reviews" className="mx-auto max-w-site scroll-mt-20 page-gutter py-11 md:py-[84px]">
+        <section id="reviews" className="order-9 mx-auto max-w-site scroll-mt-20 page-gutter py-11 md:py-[84px]">
           <p className="eyebrow">What makers say</p>
           <h2 className="mb-8 mt-3 font-heading text-[clamp(34px,4vw,54px)] font-semibold leading-[1.08] tracking-[-0.01em] text-ink">Kind words from makers.</h2>
           <div className={`grid gap-3 md:gap-4 ${makerReviews.length === 1 ? 'md:grid-cols-1' : makerReviews.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
@@ -565,7 +565,7 @@ export function HomeNew({
       )}
 
       {/* 10 · FAQ */}
-      <section className="bg-surface-warm">
+      <section className="order-10 bg-surface-warm">
         <div className="max-w-site mx-auto grid grid-cols-1 gap-8 page-gutter py-11 md:py-[84px] lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <p className="eyebrow">Questions, answered</p>
@@ -582,7 +582,7 @@ export function HomeNew({
       </section>
 
       {/* 11 · Introduction with real category links (server-rendered, for search engines and readers) */}
-      <section aria-labelledby="home-intro-heading" className="mx-auto max-w-site page-gutter py-11 md:py-[84px]">
+      <section aria-labelledby="home-intro-heading" className="order-11 mx-auto max-w-site page-gutter py-11 md:py-[84px]">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:gap-16">
           <div>
             <p className="eyebrow">Who we are</p>
@@ -665,7 +665,7 @@ export function HomeNew({
         </div>
       </section>
 
-      <EmailSignup />
+      <div className="order-12"><EmailSignup /></div>
     </div>
   )
 }
