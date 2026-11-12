@@ -1,16 +1,18 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { isVercelProduction } from '@/lib/env'
 import { ProductDetail } from '@/views/ProductDetail'
 import { DesignPreviewGuard } from '@/components/DesignPreviewGuard'
 import { DESIGN_PREVIEW_PRODUCTS } from '@/lib/designPreviewData'
 
-/** Hidden design preview: the full product page with a mock listing. Not indexed. */
+/** Hidden design preview: the full product page with a mock listing. 404 in Vercel production. */
 export const metadata: Metadata = {
   title: 'Design preview',
   robots: { index: false, follow: false, nocache: true },
 }
 
 export default async function DesignPreviewPdp({ params }: { params: Promise<{ slug: string }> }) {
+  if (isVercelProduction()) notFound()
   const { slug } = await params
   const product = DESIGN_PREVIEW_PRODUCTS.find((p) => p.slug === slug)
   if (!product) notFound()

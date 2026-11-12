@@ -1103,12 +1103,21 @@ export function ProductDetail({
               </div>
             )}
 
-            {mode === 'free' && !hideOwnerCopyPlaceholders && (
-              <p className="mt-4 text-[13px] leading-relaxed text-muted">
-                {/* TODO(owner): license note */}
-                [LICENSE NOTE: for example, personal use only, no resale.]
-              </p>
-            )}
+            <div className="mt-5 flex items-start gap-3 rounded-2xl border border-border bg-surface-warm px-4 py-4 md:px-5">
+              <MaterialIcon name="description" size={20} color="var(--color-primary)" className="mt-0.5 shrink-0" />
+              <div className="min-w-0 text-[14px]">
+                <p className="font-bold text-ink">Licence</p>
+                <p className="mt-1 leading-relaxed text-muted">
+                  You may make and sell finished items from this pattern. Please do not resell, redistribute or share the pattern file or any copy of it.
+                </p>
+                <Link
+                  href="/terms"
+                  className="mt-2 inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-2 hover:text-primary-hover md:min-h-0"
+                >
+                  Read the full terms
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

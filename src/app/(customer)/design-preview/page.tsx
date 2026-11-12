@@ -1,17 +1,21 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { isVercelProduction } from '@/lib/env'
 import { PatternCard } from '@/components/PatternCard'
 import { PatternGrid } from '@/components/PatternGrid'
 import { DesignPreviewGuard } from '@/components/DesignPreviewGuard'
 import { DESIGN_PREVIEW_PRODUCTS } from '@/lib/designPreviewData'
 
-/** Hidden design preview: not linked anywhere, not indexed, mock data only. */
+/** Hidden design preview: mock data only. 404 in Vercel production, like the other dev routes. */
 export const metadata: Metadata = {
   title: 'Design preview',
   robots: { index: false, follow: false, nocache: true },
 }
 
 export default function DesignPreviewGrid() {
+  if (isVercelProduction()) notFound()
+
   return (
     <div className="bg-bg min-h-[50vh]">
       <DesignPreviewGuard />
