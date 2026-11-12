@@ -46,6 +46,7 @@ export function Cart() {
   const { showToast } = useToast()
   const [busyId, setBusyId] = useState<string | null>(null)
   const [pool, setPool] = useState<Product[]>([])
+  const [poolLoaded, setPoolLoaded] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -56,7 +57,10 @@ export function Cart() {
         .eq('active', true)
         .order('created_at', { ascending: false })
         .limit(RECOMMENDATION_POOL)
-      if (!cancelled) setPool((data as Product[]) ?? [])
+      if (!cancelled) {
+        setPool((data as Product[]) ?? [])
+        setPoolLoaded(true)
+      }
     })()
     return () => {
       cancelled = true
@@ -116,6 +120,12 @@ export function Cart() {
       setBusyId(null)
     }
   }
+
+  // Until the recommendations arrive, hold the space they will take (about 2 rows of 2 cards on phones,
+  // 1 row of 4 on large screens). Otherwise the footer jumps down when the row loads (layout shift).
+  const recommendationsPlaceholder = !poolLoaded && (
+    <div aria-hidden className="mt-10 md:mt-12 min-h-[788px] lg:min-h-[474px]" />
+  )
 
   const recommendationsSection = recommendations.length > 0 && (
     <section className="mt-10 md:mt-12" aria-labelledby="cart-recommendations">
@@ -184,7 +194,7 @@ export function Cart() {
             </Link>
           </div>
         </div>
-        {recommendationsSection}
+        {recommendationsSection || recommendationsPlaceholder}
       </div>
     )
   }
@@ -358,7 +368,7 @@ export function Cart() {
         </aside>
       </div>
 
-      {recommendationsSection}
+      {recommendationsSection || recommendationsPlaceholder}
 
       <div data-sticky-bar className="md:hidden fixed inset-x-0 bottom-[var(--cookie-h,0px)] z-30 border-t border-border bg-surface px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-4">
