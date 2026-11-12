@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase'
 import { startApiCheckout } from '../lib/lemonsqueezy'
 import { getPrefetchedProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
+import { getProductGuideLinks } from '../lib/productGuides'
 import { GalleryLightbox } from '../components/GalleryLightbox'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
@@ -1230,9 +1231,7 @@ export function ProductDetail({
           <h2 id="helpful-guides" className="type-h2 text-ink">Helpful guides</h2>
           <ul className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { href: '/crochet-patterns-for-beginners', title: 'Crochet patterns for beginners', text: 'Free and paid patterns marked beginner level.' },
-              { href: '/guides/how-to-read-a-crochet-pattern', title: 'How to read a crochet pattern', text: 'What the abbreviations, brackets and stitch counts mean.' },
-              { href: '/guides/crochet-abbreviations-us-vs-uk', title: 'US and UK crochet terms', text: 'The same stitch name can mean two different stitches.' },
+              ...getProductGuideLinks({ title: product.title, categorySlug: category?.slug, skillLevel: product.skill_level }).slice(0, 3),
               free
                 ? { href: category ? shopLink : '/shop', title: category ? `More ${category.name} patterns` : 'Browse all patterns', text: 'See other crochet patterns from the shop.' }
                 : { href: '/free-crochet-patterns', title: 'Try a free pattern first', text: 'Free crochet PDF patterns you can download straight away.' },
