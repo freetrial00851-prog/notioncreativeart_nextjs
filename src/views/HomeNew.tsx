@@ -85,6 +85,19 @@ const FAQ_ITEM_FILE_ISSUE_PLACEHOLDER = {
   ),
 }
 
+const IMG = 'https://anlsellghialszuuvipw.supabase.co/storage/v1/object/public/product-images/'
+
+/** Entry points shown as photo tiles. Photos are real listing photos, cropped to the tile with object-position. */
+const BENTO: { href: string; t: string; d: string; img: string; pos: string; cls: string; big?: boolean }[] = [
+  { href: '/crochet-patterns-for-beginners', t: 'Crochet patterns for beginners', d: 'Easy, round-by-round patterns marked beginner level. Start here if this is your first toy.', img: `${IMG}8f2a3d96-546b-4144-9ea3-7f175e1ad521-panda_plushies_sitting_on_rug_202608311736-card.webp`, pos: 'center 45%', cls: 'col-span-2 md:row-span-2 md:min-h-[400px]', big: true },
+  { href: '/free-crochet-patterns', t: 'Free patterns', d: 'Download, no account.', img: `${IMG}d05e0630-c304-48d7-90de-0ab80d01085e-amigurumi_fox_toy_sitting_202609011508-card.webp`, pos: 'center 35%', cls: '' },
+  { href: '/mini-amigurumi-and-keychains', t: 'Mini and keychains', d: 'Done in an evening.', img: `${IMG}e0d4b414-cead-455e-b1c4-e1e21e0d8dd2-fox_charms_on_fabric_background_202609091755-card.webp`, pos: 'center 50%', cls: '' },
+  { href: '/amigurumi-in-clothes-and-hats', t: 'Dressed amigurumi', d: 'Dresses, hats, scarves.', img: `${IMG}5daae6be-5205-4ce7-bd4f-7d19aa5e10bf-bunny_seated_on_rag_rug_202608231850-card.webp`, pos: 'center 40%', cls: '' },
+  { href: '/shop/wearables', t: 'Wearables', d: 'Tops, cardigans, skirts.', img: `${IMG}7fe012af-9779-4a49-9a68-5e9726220115-nnnew-copy-of-safety-guides-for-etsy-cover-1-card.webp`, pos: 'center 30%', cls: '' },
+  { href: '/shop/home-decor', t: 'Home decor', d: 'Flowers, coasters, cushions.', img: `${IMG}b0134faa-f9b7-4ece-b6a5-d750aa361314-crochet_tulip_bouquet_in_jar_202607031928-card.webp`, pos: 'center 55%', cls: 'col-span-2' },
+  { href: '/guides', t: 'Learn to crochet', d: 'Free step-by-step guides with photos.', img: '/guides/how-to-single-crochet/sc-02.webp', pos: 'center 50%', cls: 'col-span-2' },
+]
+
 type HeroPhoto = { src: string; alt: string; href?: string }
 
 export function HomeNew({
@@ -225,13 +238,13 @@ export function HomeNew({
       <section className="relative isolate overflow-hidden bg-gradient-to-b from-butter via-peach to-bg">
         <span aria-hidden className="absolute -right-32 -top-32 -z-10 size-[460px] rounded-full bg-pink/80" />
         <span aria-hidden className="absolute -bottom-24 -left-24 -z-10 size-[300px] rounded-full bg-sun/70" />
-        <div className="mx-auto grid max-w-site items-center gap-12 page-gutter pb-14 pt-10 md:pb-20 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+        <div className="mx-auto grid max-w-site items-center gap-12 page-gutter pb-8 pt-6 md:pb-20 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
           <div className="min-w-0">
             <p className="hero-rise inline-flex max-w-full items-center gap-2 rounded-full bg-white/85 px-3.5 py-1.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.08em] text-coral ring-1 ring-border">
               <span aria-hidden>✳</span>
               {copy.hero_eyebrow}
             </p>
-            <h1 className="hero-rise-y my-5 font-heading text-[clamp(40px,5vw,72px)] font-semibold leading-[1.06] tracking-[-0.015em] text-ink md:my-6">
+            <h1 className="hero-rise-y my-4 font-heading text-[clamp(36px,5vw,72px)] font-semibold leading-[1.06] tracking-[-0.015em] text-ink md:my-6">
               {copy.hero_title.split('\n').map((line, i) => (
                 <Fragment key={i}>
                   {i > 0 && <br />}
@@ -250,7 +263,7 @@ export function HomeNew({
                 </Fragment>
               ))}
             </h1>
-            <p className="hero-rise max-w-[46ch] text-[16px] leading-[1.75] text-ink/75" style={{ ['--d' as string]: '120ms' }}>
+            <p className="hero-rise hidden max-w-[46ch] text-[16px] leading-[1.75] text-ink/75 sm:block" style={{ ['--d' as string]: '120ms' }}>
               {copy.hero_subtitle}
             </p>
 
@@ -258,7 +271,7 @@ export function HomeNew({
               action="/search"
               method="get"
               role="search"
-              className="hero-rise mt-7 flex max-w-[580px] items-center rounded-full bg-white p-1.5 shadow-[0_12px_34px_rgba(42,27,20,0.14)] ring-1 ring-border focus-within:ring-2 focus-within:ring-ink"
+              className="hero-rise mt-5 flex max-w-[580px] md:mt-7 items-center rounded-full bg-white p-1.5 shadow-[0_12px_34px_rgba(42,27,20,0.14)] ring-1 ring-border focus-within:ring-2 focus-within:ring-ink"
               style={{ ['--d' as string]: '200ms' }}
             >
               <label htmlFor="home-search" className="sr-only">Search crochet patterns</label>
@@ -276,8 +289,8 @@ export function HomeNew({
               </button>
             </form>
 
-            <p className="hero-rise mt-5 flex flex-wrap items-center gap-2 text-[13px]" style={{ ['--d' as string]: '260ms' }}>
-              <span className="font-semibold text-muted">Popular:</span>
+            <p className="hero-rise mt-4 flex items-center gap-2 overflow-x-auto pb-1 text-[13px] [scrollbar-width:none] sm:flex-wrap sm:overflow-visible md:mt-5 [&::-webkit-scrollbar]:hidden" style={{ ['--d' as string]: '260ms' }}>
+              <span className="shrink-0 font-semibold text-muted">Popular:</span>
               {[
                 ['/amigurumi-animals/bunny', 'Bunny'],
                 ['/amigurumi-animals/bear', 'Teddy bear'],
@@ -286,13 +299,13 @@ export function HomeNew({
                 ['/shop/wearables', 'Wearables'],
                 ['/free-crochet-patterns', 'Free'],
               ].map(([href, label]) => (
-                <Link key={href} href={href} className="inline-flex min-h-9 items-center rounded-full bg-white/80 px-3.5 font-semibold text-ink ring-1 ring-border transition-colors hover:bg-ink hover:text-white">
+                <Link key={href} href={href} className="inline-flex min-h-9 shrink-0 items-center rounded-full bg-white/80 px-3.5 font-semibold text-ink ring-1 ring-border transition-colors hover:bg-ink hover:text-white">
                   {label}
                 </Link>
               ))}
             </p>
 
-            <div className="hero-rise mt-8 flex flex-wrap items-center gap-x-8 gap-y-3" style={{ ['--d' as string]: '320ms' }}>
+            <div className="hero-rise mt-5 flex flex-wrap items-center gap-x-8 gap-y-3 md:mt-8" style={{ ['--d' as string]: '320ms' }}>
               <Link href={heroPrimaryHref(hero?.cta_link)} className="inline-flex min-h-12 items-center rounded-full bg-coral px-7 text-[14px] font-bold text-white shadow-[0_8px_20px_rgba(185,71,47,0.35)] transition-transform hover:-translate-y-0.5">
                 {copy.hero_cta} <span aria-hidden className="ml-2">↗</span>
               </Link>
@@ -303,7 +316,7 @@ export function HomeNew({
           </div>
 
           {/* Collage */}
-          <div className="hero-settle relative mx-auto aspect-[5/6] w-full max-w-[560px] lg:max-w-none">
+          <div className="hero-settle relative mx-auto hidden aspect-[5/6] w-full max-w-[560px] lg:block lg:max-w-none">
             {heroTiles[0] ? (
               <div className="absolute left-0 top-[6%] h-[80%] w-[58%] overflow-hidden rounded-t-[999px] rounded-b-[28px] border-[6px] border-white bg-surface-warm shadow-[0_22px_44px_rgba(42,27,20,0.22)]">
                 <Image src={deriveVariantUrl(heroTiles[0].src, 'large')} alt={heroTiles[0].alt} fill priority sizes="(max-width:1023px) 58vw, 360px" className="object-cover object-center" />
@@ -329,7 +342,7 @@ export function HomeNew({
 
       {/* 2 · Trust band (the one dark band) */}
       <section aria-label="Why buy here" className="bg-navy text-white">
-        <ul className="mx-auto grid max-w-site grid-cols-2 gap-x-4 gap-y-5 page-gutter py-6 md:grid-cols-4 md:gap-x-8 md:py-7">
+        <ul className="mx-auto grid max-w-site grid-cols-2 gap-x-3 gap-y-3 page-gutter py-4 md:grid-cols-4 md:gap-x-8 md:gap-y-5 md:py-7">
           {[
             { icon: 'download', t: 'Instant PDF download', d: 'Yours the moment you pay' },
             { icon: 'verified_user', t: '14-day refund', d: 'If something is not right' },
@@ -337,12 +350,12 @@ export function HomeNew({
             { icon: 'mail', t: 'Real support', d: 'We reply in 1 to 2 days' },
           ].map((x) => (
             <li key={x.t} className="flex items-start gap-3.5">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/10">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 md:size-11">
                 <MaterialIcon name={x.icon} size={22} color="#EFE0BC" />
               </span>
               <span className="min-w-0">
-                <span className="block text-[15px] font-bold leading-tight">{x.t}</span>
-                <span className="mt-1 block text-[13px] leading-snug text-white/70">{x.d}</span>
+                <span className="block text-[13px] font-bold leading-tight md:text-[15px]">{x.t}</span>
+                <span className="mt-1 hidden text-[13px] leading-snug text-white/70 md:block">{x.d}</span>
               </span>
             </li>
           ))}
@@ -436,24 +449,26 @@ export function HomeNew({
             Whatever you want to make next.
           </h2>
         </div>
-        <ul className="grid auto-rows-[minmax(132px,auto)] grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          {[
-            { href: '/crochet-patterns-for-beginners', t: 'Crochet patterns for beginners', d: 'Easy, round-by-round patterns marked beginner level. Start here if this is your first toy.', bg: 'bg-sage-soft', cls: 'col-span-2 md:row-span-2 md:min-h-[340px]', big: true },
-            { href: '/free-crochet-patterns', t: 'Free patterns', d: 'Download, no account.', bg: 'bg-butter', cls: '' },
-            { href: '/mini-amigurumi-and-keychains', t: 'Mini and keychains', d: 'Done in an evening.', bg: 'bg-lilac', cls: '' },
-            { href: '/amigurumi-in-clothes-and-hats', t: 'Dressed amigurumi', d: 'Dresses, hats, scarves.', bg: 'bg-aqua', cls: '' },
-            { href: '/shop/wearables', t: 'Wearables', d: 'Tops, cardigans, skirts.', bg: 'bg-pink', cls: '' },
-            { href: '/shop/home-decor', t: 'Home decor', d: 'Flowers, coasters, cushions.', bg: 'bg-tint-cream', cls: 'col-span-2' },
-            { href: '/guides', t: 'Learn to crochet', d: 'Free step-by-step guides with photos.', bg: 'bg-sun', cls: 'col-span-2' },
-          ].map((x) => (
+        <ul className="grid auto-rows-[minmax(190px,auto)] grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          {BENTO.map((x) => (
             <li key={x.href} className={x.cls}>
-              <Link href={x.href} className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl p-5 transition-transform duration-300 hover:-translate-y-1 md:p-6 ${x.bg}`}>
-                <span aria-hidden className="absolute -right-3 -top-4 text-[84px] leading-none text-ink/[0.07]">✳</span>
-                <span className="relative">
-                  <span className={`block font-heading font-semibold leading-[1.1] tracking-[-0.01em] text-ink ${x.big ? 'text-[clamp(28px,3.4vw,44px)]' : 'text-[22px] md:text-[26px]'}`}>{x.t}</span>
-                  <span className={`mt-2 block leading-snug text-ink/70 ${x.big ? 'max-w-[34ch] text-[15px]' : 'text-[13px]'}`}>{x.d}</span>
+              <Link href={x.href} className="group relative isolate flex h-full min-h-[190px] flex-col justify-end overflow-hidden rounded-3xl bg-navy text-white">
+                <Image
+                  src={x.img.startsWith('http') ? deriveVariantUrl(x.img, 'large') : x.img}
+                  alt=""
+                  fill
+                  sizes={x.big ? '(max-width:767px) 100vw, 50vw' : '(max-width:767px) 50vw, 25vw'}
+                  style={{ objectPosition: x.pos }}
+                  className="-z-20 object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] motion-reduce:transition-none"
+                />
+                <span aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/25 to-black/5" />
+                <span className="flex items-end justify-between gap-3 p-4 md:p-6">
+                  <span className="min-w-0">
+                    <span className={`block font-heading font-semibold leading-[1.1] tracking-[-0.01em] ${x.big ? 'text-[clamp(28px,3.4vw,44px)]' : 'text-[20px] md:text-[26px]'}`}>{x.t}</span>
+                    <span className={`mt-1.5 block leading-snug text-white/85 ${x.big ? 'max-w-[38ch] text-[15px]' : 'text-[12.5px] md:text-[13px]'}`}>{x.d}</span>
+                  </span>
+                  <span aria-hidden className="hidden size-10 shrink-0 place-items-center rounded-full bg-white text-ink transition-transform duration-300 group-hover:translate-x-1 sm:grid">→</span>
                 </span>
-                <span className="relative mt-5 inline-flex size-10 items-center justify-center rounded-full bg-ink text-white transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
               </Link>
             </li>
           ))}
