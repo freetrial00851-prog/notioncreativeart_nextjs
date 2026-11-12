@@ -9,10 +9,19 @@ import type { Hub } from '@/content/pages/hubs'
 import type { Product } from '@/lib/types'
 
 const PER_GROUP = 40
+/** The database match is a plain substring, so "hen" also finds "chenille". Keep whole words (and plurals) only. */
+const FETCH_LIMIT = 200
+
+function matchesTerms(title: string, terms: string[]) {
+  return terms.some((t) => {
+    const escaped = t.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`\\b${escaped}(?:s|es)?\\b`, 'i').test(title)
+  })
+}
 
 /** A topic hub: short intro, then the real patterns grouped by theme, then explanatory text and FAQ. Server component. */
 export async function ProductHub({ hub }: { hub: Hub }) {
-  const results = await Promise.all(hub.groups.map((g) => getProductsByTerms(g.terms, 40)))
+  const results = await Promise.all(hub.groups.map((g) => getProductsByTerms(g.terms, FETCH_LIMIT)))
 
   // A pattern shows once on the page, in the first group it fits.
   const seen = new Set<string>()
@@ -20,7 +29,7 @@ export async function ProductHub({ hub }: { hub: Hub }) {
     .map((g, i) => {
       const items: Product[] = []
       let total = 0
-      for (const p of results[i]) {
+      for (const p of results[i].filter((r) => matchesTerms(r.title, g.terms))) {
         if (seen.has(p.id)) continue
         total += 1
         if (items.length < PER_GROUP) items.push(p)
@@ -32,9 +41,10 @@ export async function ProductHub({ hub }: { hub: Hub }) {
 
   const all = groups.flatMap((g) => g.items)
   const collectionJsonLd = buildCollectionPageJsonLd({ name: hub.h1, description: hub.description, path: hub.path })
+  const trail = hub.parent ? hub.parent : { name: 'Shop', path: '/shop' }
   const breadcrumbJsonLd = buildBreadcrumbListJsonLd([
     { name: 'Home', path: '/' },
-    { name: 'Shop', path: '/shop' },
+    { name: trail.name, path: trail.path },
     { name: hub.h1, path: hub.path },
   ])
   const itemListJsonLd = buildItemListJsonLd(all.slice(0, 24).map((p) => ({ name: p.title, url: `${SITE_URL}/pattern/${p.slug}` })))
@@ -50,11 +60,12 @@ export async function ProductHub({ hub }: { hub: Hub }) {
       <div className="max-w-site w-full mx-auto page-gutter pt-8 pb-6 md:pt-12">
         <nav aria-label="Breadcrumb" className="mb-4 text-[13px] text-muted">
           <Link href="/" className="hover:text-ink">Home</Link> <span aria-hidden>›</span>{' '}
-          <Link href="/shop" className="hover:text-ink">Shop</Link> <span aria-hidden>›</span>{' '}
+          <Link href={trail.path} className="hover:text-ink">{trail.name}</Link> <span aria-hidden>›</span>{' '}
           <span className="font-semibold text-ink">{hub.h1}</span>
         </nav>
         <h1 className="font-heading text-[clamp(32px,5vw,52px)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink">{hub.h1}</h1>
         <p className="mt-4 max-w-[68ch] text-[15px] leading-[1.75] text-muted md:text-[16px]">{hub.lead}</p>
+        {groups.length > 1 && (
         <p className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-[14px] font-semibold">
           {groups.map((g) => (
             <a key={g.id} href={`#${g.id}`} className="inline-flex min-h-11 items-center text-primary hover:underline">
@@ -62,6 +73,7 @@ export async function ProductHub({ hub }: { hub: Hub }) {
             </a>
           ))}
         </p>
+        )}
       </div>
 
       {groups.map((g) => (
@@ -71,9 +83,15 @@ export async function ProductHub({ hub }: { hub: Hub }) {
               <h2 id={`${g.id}-title`} className="type-h2 text-ink">{g.title}</h2>
               <p className="mt-2 max-w-[60ch] text-[14px] leading-relaxed text-muted md:text-[15px]">{g.intro}</p>
             </div>
-            <Link href={`/search?q=${encodeURIComponent(g.searchQ)}`} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
-              See all <span aria-hidden>→</span>
-            </Link>
+            {g.pageHref ? (
+              <Link href={g.pageHref} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
+                {g.pageLabel ?? 'See all'} <span aria-hidden>→</span>
+              </Link>
+            ) : (
+              <Link href={`/search?q=${encodeURIComponent(g.searchQ)}`} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-[15px] font-bold text-primary hover:underline">
+                See all <span aria-hidden>→</span>
+              </Link>
+            )}
           </div>
           <PatternGrid variant="shop">
             {g.items.map((p) => (

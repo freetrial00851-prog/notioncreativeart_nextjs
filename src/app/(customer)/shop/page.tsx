@@ -24,7 +24,7 @@ const SHOP_DESCRIPTION =
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   return buildListingMetadata({
-    title: 'Shop All Patterns',
+    title: 'All Crochet Patterns (PDF Instant Download)',
     description: SHOP_DESCRIPTION,
     path: '/shop',
     searchParams: await searchParams,

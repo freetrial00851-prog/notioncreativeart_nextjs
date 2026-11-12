@@ -3,6 +3,7 @@ import { SITE_URL } from '@/lib/seo'
 import { getSitemapData } from '@/lib/data/products'
 import { getAllGuides } from '@/lib/guides'
 import { deriveVariantUrl } from '@/lib/imageVariants'
+import { ANIMAL_HUBS } from '@/content/pages/animals'
 
 /** Rebuild hourly so new patterns reach the sitemap without a deploy. */
 export const revalidate = 3600
@@ -17,6 +18,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${SITE_URL}/amigurumi-animals`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${SITE_URL}/mini-amigurumi-and-keychains`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${SITE_URL}/amigurumi-in-clothes-and-hats`, changeFrequency: 'weekly', priority: 0.7 },
+  ...ANIMAL_HUBS.map((h) => ({ url: `${SITE_URL}${h.path}`, changeFrequency: 'weekly' as const, priority: 0.6 })),
   { url: `${SITE_URL}/faq`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.3 },
   { url: `${SITE_URL}/contact`, changeFrequency: 'monthly', priority: 0.3 },

@@ -42,7 +42,7 @@ export function resolveShopPageTitle(input: ShopTitleInput): string {
   if (levels.length > 0) {
     return `${levels.map((l) => l.charAt(0).toUpperCase() + l.slice(1)).join(' & ')} Patterns`
   }
-  return 'All Patterns'
+  return 'All Crochet Patterns'
 }
 
 /** Read Next.js `searchParams` record into ShopTitleInput filter fields. */

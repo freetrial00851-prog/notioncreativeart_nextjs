@@ -9,10 +9,15 @@ export type HubGroup = {
   terms: string[]
   /** Link to a full search for the same idea. */
   searchQ: string
+  /** An indexable landing page for this group, used instead of the search link when set. */
+  pageHref?: string
+  pageLabel?: string
 }
 
 export type Hub = {
   path: string
+  /** Set on child pages (such as one animal) so the breadcrumb shows the parent hub. */
+  parent?: { name: string; path: string }
   title: string
   h1: string
   description: string
@@ -30,14 +35,14 @@ export const ANIMALS_HUB: Hub = {
     'Browse amigurumi animal crochet patterns by animal: bunnies, bears, cats, dogs, foxes, frogs, sea creatures and more. PDF patterns with instant download.',
   lead: 'Looking for a particular toy? Pick an animal family below. Every pattern is a PDF you can download right after payment, with a materials list and a skill level, and the free ones download without an account.',
   groups: [
-    { id: 'bunnies', title: 'Bunnies and rabbits', intro: 'The largest group, from tiny bunny charms to plush rabbits in dresses.', terms: ['bunny', 'rabbit'], searchQ: 'bunny' },
-    { id: 'bears', title: 'Teddy bears, pandas and koalas', intro: 'Classic teddy bears, bears in outfits and other round, cuddly bears.', terms: ['teddy', 'bear', 'panda', 'koala'], searchQ: 'teddy' },
-    { id: 'cats', title: 'Cats and kittens', intro: 'Kittens, cats in costumes and keychain cats.', terms: ['cat', 'kitten', 'kitty'], searchQ: 'cat' },
-    { id: 'dogs-and-farm', title: 'Dogs, horses and farm animals', intro: 'Puppies, corgis, horses, goats, lambs and more.', terms: ['puppy', 'dachshund', 'corgi', 'pug', 'horse', 'pony', 'goat', 'lamb', 'sheep', 'rooster'], searchQ: 'puppy' },
-    { id: 'woodland', title: 'Woodland animals', intro: 'Foxes, hedgehogs, squirrels, beavers and mice.', terms: ['fox', 'hedgehog', 'squirrel', 'beaver', 'mouse', 'hamster'], searchQ: 'fox' },
+    { id: 'bunnies', title: 'Bunnies and rabbits', intro: 'The largest group, from tiny bunny charms to plush rabbits in dresses.', terms: ['bunny', 'rabbit'], searchQ: 'bunny', pageHref: '/amigurumi-animals/bunny', pageLabel: 'Bunny patterns' },
+    { id: 'bears', title: 'Teddy bears, pandas and koalas', intro: 'Classic teddy bears, bears in outfits and other round, cuddly bears.', terms: ['teddy', 'bear', 'panda', 'koala'], searchQ: 'teddy', pageHref: '/amigurumi-animals/bear', pageLabel: 'Bear patterns' },
+    { id: 'cats', title: 'Cats and kittens', intro: 'Kittens, cats in costumes and keychain cats.', terms: ['cat', 'kitten', 'kitty'], searchQ: 'cat', pageHref: '/amigurumi-animals/cat', pageLabel: 'Cat patterns' },
+    { id: 'dogs-and-farm', title: 'Dogs, horses and farm animals', intro: 'Puppies, corgis, horses, goats, lambs and more.', terms: ['puppy', 'dachshund', 'corgi', 'pug', 'horse', 'pony', 'goat', 'lamb', 'sheep', 'rooster'], searchQ: 'puppy', pageHref: '/amigurumi-animals/dog', pageLabel: 'Dog patterns' },
+    { id: 'woodland', title: 'Woodland animals', intro: 'Foxes, hedgehogs, squirrels, beavers and mice.', terms: ['fox', 'hedgehog', 'squirrel', 'beaver', 'mouse', 'hamster'], searchQ: 'fox', pageHref: '/amigurumi-animals/fox', pageLabel: 'Fox patterns' },
     { id: 'wild', title: 'Safari and wild animals', intro: 'Giraffes, zebras, lions, elephants, capybaras and more.', terms: ['giraffe', 'zebra', 'lion', 'elephant', 'hippo', 'capybara', 'lemur'], searchQ: 'giraffe' },
     { id: 'sea', title: 'Sea and water animals', intro: 'Jellyfish, turtles, dolphins, penguins, crabs and seagulls.', terms: ['jellyfish', 'turtle', 'dolphin', 'penguin', 'crab', 'seagull', 'fish', 'sea star'], searchQ: 'turtle' },
-    { id: 'frogs-and-snakes', title: 'Frogs, snakes and small creatures', intro: 'Frogs, snakes, a gecko, a spider and a bee.', terms: ['frog', 'snake', 'gecko', 'spider', 'bee'], searchQ: 'frog' },
+    { id: 'frogs-and-snakes', title: 'Frogs, snakes and small creatures', intro: 'Frogs, snakes, a gecko, a spider and a bee.', terms: ['frog', 'snake', 'gecko', 'spider', 'bee'], searchQ: 'frog', pageHref: '/amigurumi-animals/frog', pageLabel: 'Frog patterns' },
     { id: 'fantasy', title: 'Dinosaurs, ghosts and fantasy characters', intro: 'Dinosaurs, ghosts, monsters, an alien and Nessie.', terms: ['dinosaur', 'ghost', 'monster', 'alien', 'nessie'], searchQ: 'monster' },
   ],
   body: [
@@ -54,7 +59,7 @@ export const ANIMALS_HUB: Hub = {
     { type: 'h2', text: `More ways to browse` },
     {
       type: 'p',
-      text: `See all [amigurumi crochet patterns](/shop/amigurumi), the [no-sew amigurumi patterns](/shop/no-sew-amigurumi), and the small [keychains and mini toys](/mini-amigurumi-and-keychains). New to the craft? [What is amigurumi?](/guides/what-is-amigurumi) explains it.`,
+      text: `Go straight to [horse and pony patterns](/amigurumi-animals/horse) or [duck, goose and bird patterns](/amigurumi-animals/ducks-and-birds). See all [amigurumi crochet patterns](/shop/amigurumi), the [no-sew amigurumi patterns](/shop/no-sew-amigurumi), and the small [keychains and mini toys](/mini-amigurumi-and-keychains). New to the craft? [What is amigurumi?](/guides/what-is-amigurumi) explains it.`,
     },
   ],
   faq: [
