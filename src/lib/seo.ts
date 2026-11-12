@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { env } from '@/lib/env'
 import { deriveVariantUrl } from '@/lib/imageVariants'
+import { splitPatternFacts } from '@/lib/patternFacts'
 
 /** Brand constants — single source of truth for SEO across the site. */
 export const SITE_NAME = 'Notion Creative Art'
@@ -234,11 +235,20 @@ export function buildProductJsonLd(
     reviews?: ProductJsonLdReview[]
   },
 ) {
+  // The "AT A GLANCE" facts (skill level, size, yarn, hook, terms) are structured data, not prose.
+  const { facts, body } = splitPatternFacts(product.description)
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
-    description: product.description ?? undefined,
+    description: (facts.length > 0 ? body : product.description) ?? undefined,
+    ...(facts.length > 0
+      ? {
+          additionalProperty: facts
+            .filter((f) => f.label !== 'Good to know')
+            .map((f) => ({ '@type': 'PropertyValue', name: f.label, value: f.value })),
+        }
+      : {}),
     // Google wants several high-res images, not just the small card variant.
     image: (product.images ?? []).slice(0, 8).map((u) => deriveVariantUrl(u, 'large')),
     sku: (product.id ?? product.slug).slice(0, 50),

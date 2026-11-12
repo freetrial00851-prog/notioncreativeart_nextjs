@@ -11,6 +11,7 @@ import { startApiCheckout } from '../lib/lemonsqueezy'
 import { getPrefetchedProduct } from '../lib/prefetchCache'
 import { deriveVariantUrl } from '../lib/imageVariants'
 import { getProductGuideLinks } from '../lib/productGuides'
+import { splitPatternFacts } from '../lib/patternFacts'
 import { GalleryLightbox } from '../components/GalleryLightbox'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
@@ -603,6 +604,9 @@ export function ProductDetail({
     ...(product.materials?.trim() ? ['Materials list'] : []),
   ]
 
+  // "AT A GLANCE" bullets in the description become a facts table; the prose is shown without them.
+  const { facts: patternFacts, body: descriptionBody } = splitPatternFacts(product.description)
+
   const renderTabContent = (tab: Tab, opts?: { includeSectionHeading?: boolean }) => {
     const includeHeading = opts?.includeSectionHeading !== false
     if (tab === 'description') {
@@ -611,7 +615,17 @@ export function ProductDetail({
           {includeHeading ? (
             <h2 className="text-[18px] font-bold text-ink mb-3">About this pattern</h2>
           ) : null}
-          <DescriptionBlocks text={product.description} />
+          {patternFacts.length > 0 ? (
+            <dl className="mb-5 max-w-[68ch] rounded-2xl border border-border bg-surface-warm divide-y divide-border text-[14px]" aria-label="Pattern facts">
+              {patternFacts.map((f, i) => (
+                <div key={`${f.label}-${i}`} className="flex flex-col gap-0.5 px-4 py-2.5 sm:flex-row sm:justify-between sm:gap-6">
+                  <dt className="text-muted shrink-0">{f.label}</dt>
+                  <dd className="text-ink sm:text-right min-w-0">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+          <DescriptionBlocks text={descriptionBody} />
         </div>
       ) : (
         <p className="text-[15px] text-muted leading-relaxed">No description yet.</p>
