@@ -31,6 +31,14 @@ const NAV_LINKS = [
   { href: '/about', label: 'Our story' },
 ] as const
 
+/** The topic hubs: grouped pattern pages that are also the best entry points for search engines. */
+const TOPIC_LINKS = [
+  { href: '/amigurumi-animals', label: 'Amigurumi animals' },
+  { href: '/mini-amigurumi-and-keychains', label: 'Mini and keychains' },
+  { href: '/amigurumi-in-clothes-and-hats', label: 'Dressed amigurumi' },
+  { href: '/shop/no-sew-amigurumi', label: 'No-sew amigurumi' },
+] as const
+
 const POPULAR_SEARCHES = [
   { label: 'Free patterns', href: '/free-crochet-patterns' },
   { label: 'Beginner', href: '/shop?level=beginner' },
@@ -473,6 +481,17 @@ export function Header() {
                   ))}
                 </ul>
 
+                <p className="pb-1 pt-5 text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">By topic</p>
+                <ul>
+                  {TOPIC_LINKS.map((l) => (
+                    <li key={l.href} className="border-b border-border">
+                      <Link href={l.href} onClick={closeMenu} className="flex min-h-12 items-center text-[15px] font-semibold text-ink">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
                 <p className="pb-1 pt-5 text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">Categories</p>
                 <ul>
                   {categories.map((c) => {
@@ -606,6 +625,16 @@ function ShopMegaMenu({ categories, onClose }: { categories: CategoryWithCount[]
                 { href: '/shop?level=intermediate', label: 'Intermediate' },
                 { href: '/shop?level=advanced', label: 'Advanced' },
               ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} onClick={onClose} className={row}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className={`${colHead} mt-7`}>By topic</p>
+            <ul>
+              {TOPIC_LINKS.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} onClick={onClose} className={row}>
                     {l.label}
