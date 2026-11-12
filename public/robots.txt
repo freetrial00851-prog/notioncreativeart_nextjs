@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /account
-Disallow: /admin
-Disallow: /cart
-Disallow: /wishlist
-
-Sitemap: https://notioncreativeart.com/sitemap.xml

@@ -253,6 +253,7 @@ export function buildProductJsonLd(
         ? 'https://schema.org/SoldOut'
         : 'https://schema.org/InStock',
       url: `${SITE_URL}/pattern/${product.slug}`,
+      hasMerchantReturnPolicy: buildReturnPolicyJsonLd(),
     },
   }
 
@@ -306,6 +307,22 @@ export function buildBreadcrumbListJsonLd(
   }
 }
 
+/**
+ * Return policy as structured data. It mirrors /refund-policy: a full refund within 14 days of
+ * purchase. These are digital files, so there is no return method or return shipping to describe.
+ */
+function buildReturnPolicyJsonLd() {
+  return {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: ['US', 'CA', 'GB', 'AU', 'NZ', 'IE', 'DE', 'FR', 'ES', 'IT', 'NL', 'SE', 'PL', 'PT', 'BE', 'AT', 'DK', 'NO', 'FI', 'CH'],
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: 14,
+    refundType: 'https://schema.org/FullRefund',
+    returnFees: 'https://schema.org/FreeReturn',
+    merchantReturnLink: `${SITE_URL}/refund-policy`,
+  }
+}
+
 /** JSON-LD Organization + OnlineStore — brand entity and catalog Google can crawl later. */
 export function buildOrganizationJsonLd() {
   return {
@@ -314,7 +331,19 @@ export function buildOrganizationJsonLd() {
     name: SITE_NAME,
     alternateName: ['NotionCreativeArt', 'NCA'],
     url: SITE_URL,
-    logo: `${SITE_URL}/favicon.svg`,
+    // A raster logo: Google's logo guidelines do not accept SVG.
+    logo: `${SITE_URL}/logo-nca.png`,
+    image: `${SITE_URL}/logo-nca.png`,
+    email: 'patterns@notioncreativeart.com',
+    address: { '@type': 'PostalAddress', addressCountry: 'PK' },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      email: 'patterns@notioncreativeart.com',
+      url: `${SITE_URL}/contact`,
+      availableLanguage: 'English',
+    },
+    hasMerchantReturnPolicy: buildReturnPolicyJsonLd(),
     description:
       'Considered crochet patterns, delivered as instant PDF downloads. A small studio writing and testing crochet patterns, one at a time.',
     hasOfferCatalog: {
