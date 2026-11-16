@@ -46,6 +46,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
+    // Photos are served straight from the pre-sized WebP files in Supabase Storage (see src/lib/imageLoader.ts),
+    // not through Vercel's image optimiser, whose quota ran out and answered 402 (broken images).
+    loader: 'custom',
+    loaderFile: './src/lib/imageLoader.ts',
     // Prefer AVIF when the browser accepts it; fall back to WebP.
     formats: ['image/avif', 'image/webp'],
     // Gallery sources top out at large≈1000 / full≈1600; stage CSS width is rarely
