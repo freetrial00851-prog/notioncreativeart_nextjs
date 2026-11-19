@@ -51,6 +51,13 @@ function emptyDraft(): ShopFilterDraft {
   return { categorySlug: null, levels: [], price: null, sale: false, bundle: false }
 }
 
+/**
+ * Columns the listing needs to draw cards, filter and sort. The long text columns (description, materials, meta_*)
+ * are left out: fetching them for the whole catalogue added 300 KB of JSON to every shop view.
+ */
+const LISTING_COLUMNS =
+  'id,slug,title,subtitle,skill_level,price,compare_at_price,category_id,images,image_alts,featured,card_badge,sold_out,is_bundle,wishlist_count,checkout_provider,checkout_mode,created_at,active,lemon_variant_id,lemon_numeric_variant_id,paddle_price_id,paddle_product_id,pdf_pages'
+
 export function Shop({
   initialTitle,
   initialCategoryName = null,
@@ -164,7 +171,7 @@ export function Shop({
     } else if (hasPrior) setFilterFetching(true)
     else setInitialLoading(true)
 
-    let query = supabase.from('products').select('*').eq('active', true)
+    let query = supabase.from('products').select(LISTING_COLUMNS).eq('active', true)
     if (levels.length > 0) query = query.in('skill_level', levels)
     if (priceFilter === 'free') query = query.eq('price', 0)
     if (priceFilter === 'paid') query = query.gt('price', 0)
