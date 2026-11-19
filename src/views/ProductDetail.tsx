@@ -808,7 +808,8 @@ export function ProductDetail({
                         aria-hidden={off !== 0 || undefined}
                         fill
                         priority={idx === 0 && off === 0}
-                        fetchPriority={idx === 0 && off === 0 ? 'high' : 'auto'}
+                        // Only the shown photo is high priority; the neighbours load too, but behind it, so they do not slow the main photo.
+                        fetchPriority={off === 0 ? (idx === 0 ? 'high' : 'auto') : 'low'}
                         loading={idx === 0 && off === 0 ? undefined : 'eager'}
                         decoding="async"
                         sizes={GALLERY_LCP_SIZES}
