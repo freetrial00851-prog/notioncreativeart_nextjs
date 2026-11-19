@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { COOKIE_CONSENT_KEY, COOKIE_CONSENT_EVENT } from './CookieConsent'
+import { isInternalVisitor } from '@/lib/internalTraffic'
 import {
   PINTEREST_TAG_ID,
   loadPinterestTag,
@@ -10,7 +11,7 @@ import {
 } from '@/lib/pinterest'
 
 function hasAnalyticsConsent(): boolean {
-  return typeof window !== 'undefined' && localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted'
+  return typeof window !== 'undefined' && localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted' && !isInternalVisitor()
 }
 
 /**
@@ -40,7 +41,7 @@ export function PinterestTag() {
 
     const onConsentChange = (e: Event) => {
       const detail = (e as CustomEvent<'accepted' | 'rejected'>).detail
-      if (detail === 'accepted') enable()
+      if (detail === 'accepted' && !isInternalVisitor()) enable()
     }
     window.addEventListener(COOKIE_CONSENT_EVENT, onConsentChange)
     return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onConsentChange)

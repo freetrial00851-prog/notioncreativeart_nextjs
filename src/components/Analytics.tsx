@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { COOKIE_CONSENT_KEY, COOKIE_CONSENT_EVENT } from './CookieConsent'
+import { isInternalVisitor } from '@/lib/internalTraffic'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID as string | undefined
 
 function hasAnalyticsConsent(): boolean {
-  return typeof window !== 'undefined' && localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted'
+  return typeof window !== 'undefined' && localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted' && !isInternalVisitor()
 }
 
 /**
@@ -26,7 +27,7 @@ export function Analytics() {
 
     const onConsentChange = (e: Event) => {
       const detail = (e as CustomEvent<'accepted' | 'rejected'>).detail
-      if (detail === 'accepted') enable()
+      if (detail === 'accepted' && !isInternalVisitor()) enable()
     }
     window.addEventListener(COOKIE_CONSENT_EVENT, onConsentChange)
     return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onConsentChange)

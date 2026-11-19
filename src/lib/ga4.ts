@@ -1,5 +1,6 @@
 import { sendGAEvent } from '@next/third-parties/google'
 import { COOKIE_CONSENT_KEY } from '@/components/CookieConsent'
+import { isInternalVisitor } from '@/lib/internalTraffic'
 
 /**
  * GA4 events (ecommerce + a few engagement ones), sent only after the visitor accepted
@@ -17,6 +18,7 @@ function ready(): boolean {
   try {
     if (localStorage.getItem(COOKIE_CONSENT_KEY) !== 'accepted') return false
     if (window.location.pathname.startsWith('/admin')) return false
+    if (isInternalVisitor()) return false
     return Array.isArray((window as unknown as { dataLayer?: unknown[] }).dataLayer)
   } catch {
     return false

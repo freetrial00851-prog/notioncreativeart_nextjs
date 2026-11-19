@@ -4,6 +4,7 @@
  */
 
 import { COOKIE_CONSENT_KEY } from '@/components/CookieConsent'
+import { isInternalVisitor } from '@/lib/internalTraffic'
 
 export const PINTEREST_TAG_ID = process.env.NEXT_PUBLIC_PINTEREST_TAG_ID as string | undefined
 
@@ -29,7 +30,7 @@ export type PinterestEventPayload = {
 }
 
 function hasAnalyticsConsent(): boolean {
-  return typeof window !== 'undefined' && localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted'
+  return typeof window !== 'undefined' && localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted' && !isInternalVisitor()
 }
 
 let tagLoaded = false

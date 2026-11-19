@@ -11,6 +11,7 @@
  *  - If the function is missing (404) tracking switches itself off for the session.
  */
 import { supabase } from './supabase'
+import { isInternalVisitor } from './internalTraffic'
 
 export type TrackEvent =
   | 'page_view'
@@ -100,6 +101,7 @@ export function track(
 ): void {
   if (!TRACKING_ENABLED || typeof window === 'undefined') return
   try {
+    if (isInternalVisitor()) return
     if (sessionStorage.getItem(OFF_KEY) === '1') return
     const path = (data.path ?? window.location.pathname).split('?')[0]
     if (path.startsWith('/admin')) return

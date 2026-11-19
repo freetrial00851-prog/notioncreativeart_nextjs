@@ -11,6 +11,7 @@ import { PendingActionRunner } from '@/components/PendingActionRunner'
 import { GuestMergeRunner } from '@/components/GuestMergeRunner'
 import { AdminRedirect } from '@/components/AdminRedirect'
 import { Analytics } from '@/components/Analytics'
+import { InternalTrafficMarker } from '@/components/InternalTrafficMarker'
 import { PinterestTag } from '@/components/PinterestTag'
 import { CookieConsent } from '@/components/CookieConsent'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -41,6 +42,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 <GuestMergeRunner />
                 <PendingActionRunner />
                 <AdminRedirect />
+                <InternalTrafficMarker />
                 <Suspense fallback={null}>
                   <Analytics />
                   <PinterestTag />
